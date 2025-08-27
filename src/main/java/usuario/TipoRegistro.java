@@ -1,20 +1,16 @@
 package usuario;
 
-import java.time.LocalDate;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.HashMap;
-
-public class Institucion {
+public class TipoRegistro {
     private String nombre;
     private String descripcion;
-    private String link;
+    private int costo;
+    private int cupo;
 
-    public Institucion(String nombre, String descripcion, String link) {
+    public TipoRegistro(String nombre, String descripcion, int costo, int cupo) {
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.link = link;
+        this.costo = costo;
+        this.cupo = cupo;
     }
 
     public String getNombre() {
@@ -33,11 +29,19 @@ public class Institucion {
         this.descripcion = descripcion;
     }
 
-    public String getLink() {
-        return link;
+    public int getCosto() {
+        return costo;
     }
 
-    public void setLink(String link) {
-        this.link = link;
+    public void setCosto(int costo) {
+        this.costo = costo;
+    }
+
+    public int getCupo() {
+        return cupo;
+    }
+
+    public void setCupo(int cupo) {
+        this.cupo = cupo;
     }
 }
