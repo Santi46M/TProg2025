@@ -1,4 +1,12 @@
-public class Usuario {
+package usuario;
+
+import java.time.LocalDate;
+import java.util.Set;
+import java.util.Map;
+import java.util.HashSet;
+import java.util.HashMap;
+
+public abstract class Usuario {
     private String nickname;
     private String nombre;
     private String email;
