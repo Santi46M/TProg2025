@@ -8,7 +8,7 @@ import logica.manejadorUsuario;
 import logica.manejadorAuxiliar;
 import java.util.ArrayList;
 import java.util.Map;
-
+import java.util.stream.Collectors;
 import excepciones.NombreEdicionEnUsoException;
 
 
@@ -170,7 +170,7 @@ public class ControladorEvento {
     }
 
     // ConsultaEdicionEvento: Devuelve los detalles de una edición de un evento
-    public DTEvento consultaEdicionEvento(String siglaEvento, String siglaEdicion) {
+    public DTEdicionEvento consultaEdicionEvento(String siglaEvento, String siglaEdicion) {
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
         Eventos evento = manejador.obtenerEvento(siglaEvento);
         if (evento == null) return null;
@@ -186,14 +186,43 @@ public class ControladorEvento {
         );
     }
 
-    public Eventos consultaEvento(String nombreEvento) {
-        ManejadorEvento manejador = ManejadorEvento.getInstancia();
-        Eventos evento = manejador.obtenerEvento(nombreEvento);
-        if (evento == null) return null;
-        // Aquí se pueden agregar más detalles si se requiere (categorías, ediciones, etc.)
-        // Si el administrador selecciona una edición, se debe consultar la edición de evento:
-        // TODO: Implementar consulta de edición de evento según el caso de uso
-        return evento;
+    public DTEvento ConsultaEvento(Eventos ev, Ediciones ed) {    
+        List<String> categorias = ev.getCategorias();
+
+        // Lista para almacenar las ediciones convertidas a DTO
+        List<DTEdicionEvento> dtEdiciones = new ArrayList<>();
+
+        // Recorremos el map de ediciones del evento
+        for (Ediciones e : ev.getEdiciones().values()) {
+            DTEdicionEvento dt = new DTEdicionEvento(
+                e.getNombre(),                         
+                e.getSigla(),                           
+                e.getDesc(),                            
+                e.getFechaInicio(),      
+                e.getFechaFin(),
+                e.getFechaAlta(),        
+                e.getOrganizador().getNombre(),         
+                e.getCiudad(),                          
+                e.getPais()                             
+            );
+            dtEdiciones.add(dt);
+        } 
+
+
+        DTEvento dtEv = new DTEvento(
+            ev.getNombre(),
+            ev.getSigla(),
+            ev.getDescripcion(),
+            ev.getFecha()
+        );
+
+        // Si se pasa una edición seleccionada, se puede llamar al detalle
+        if (ed != null) {
+            DTEdicionEvento detalleEdicion = consultaEdicionEvento(ev.getSigla(), ed.getSigla());
+            // Aquí podrías reemplazar la edición correspondiente en dtEv o exponerla aparte
+        }
+
+        return dtEv;
     }
 
     public void altaRegistroEdicionEvento(String idRegistro, Usuario usuario, Eventos evento, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
