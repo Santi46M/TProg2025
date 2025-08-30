@@ -22,13 +22,9 @@ public class Eventos{
 		this.descripcion = descripcion;
 		this.fecha = fecha;
 		this.categorias = categorias;
-<<<<<<< Updated upstream
         this.ediciones = new HashMap<>();
 	}	
-=======
-        this.ediciones = new HashMap<>(); 
-	} 	
->>>>>>> Stashed changes
+
 	
 	//Definimos los getters
 	public String getNombre() {
