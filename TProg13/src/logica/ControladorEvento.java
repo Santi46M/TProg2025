@@ -302,6 +302,25 @@ public class ControladorEvento {
 
 		}
     
-}	
+    public DTRegistro ConsultaRegistro(Usuario usuario, Registro registro) {
+      
+        
+        if (registro == null) {
+            throw new IllegalArgumentException("Registro no seleccionado o inexistente");
+        }
+
+        return new DTRegistro(
+                registro.getId(),
+                registro.getFechaRegistro(),
+                registro.getCosto(),
+                registro.getUsuario().getNickname(),   // o getNombre(), según lo que quieras mostrar
+                registro.getEdicion().getNombre(),
+                registro.getTipoRegistro().getNombre(), // o similar
+                registro.getFechaRegistro(),
+                registro.getFechaInicio()
+            );
+    
+}
+}
 	
 	
