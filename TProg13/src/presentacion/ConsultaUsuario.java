@@ -106,6 +106,8 @@ public class ConsultaUsuario extends JInternalFrame {
                 panelDatosUsuario.setLayout(new BoxLayout(panelDatosUsuario, BoxLayout.Y_AXIS)); // <-- CAMBIO
                 panelContenedor.add(panelDatosUsuario, BorderLayout.CENTER);
 
+
+
                 JPanel panelInfoBasica = new JPanel(new GridLayout(0, 2, 10, 10)); // <-- CAMBIO, antes usabas setBounds
                 panelDatosUsuario.add(panelInfoBasica);
                 
@@ -141,7 +143,7 @@ public class ConsultaUsuario extends JInternalFrame {
                 JButton btnCerrar = new JButton("Cerrar");
                 btnCerrar.addActionListener(new ActionListener() {
                     public void actionPerformed(ActionEvent e) {
-                        usuarios.clear();
+//                        usuarios.clear();
 //                        setVisible(false);
                         // Volvemos al panel de seleccion
                         cardLayout.show(getContentPane(), "SELECCION");
@@ -281,6 +283,7 @@ public class ConsultaUsuario extends JInternalFrame {
                     Object[][] datosEdicion = new Object[datos.getEdiciones().size()][columnNames.length];
                     int i = 0;
                     for (DTEdicion ed : datos.getEdiciones()) {
+                    	System.out.println("Entra" + ed.getNombre());
                     	datosEdicion[i][0] = ed.getNombre();
                     	datosEdicion[i][1] = ed.getSigla();
                     	datosEdicion[i][2] = ed.getFechaInicio();
@@ -293,7 +296,7 @@ public class ConsultaUsuario extends JInternalFrame {
 
                     JTable table = new JTable(datosEdicion, columnNames);
                     JScrollPane scrollPane = new JScrollPane(table);
-                    panelDatosUsuario.add(scrollPane); 
+                    panelDatosUsuario.add(scrollPane);
                     panelDatosUsuario.revalidate();
                     panelDatosUsuario.repaint();
 

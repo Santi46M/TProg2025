@@ -127,16 +127,18 @@ public class ControladorUsuario implements IControladorUsuario {
 
         // Datos básicos
         DTDatosUsuario dto = new DTDatosUsuario(u.getNickname(), u.getNombre(), u.getEmail());
-
+        System.out.println(" llega a obtener datos" );
         // Datos específicos
         if (u instanceof Asistente) {
             Asistente a = (Asistente) u;
             dto.setApellido(a.getApellido());
             dto.setFechaNac(a.getFechaDeNacimiento());
             Map<String, Registro> registros = a.getRegistros();
+            System.out.println(" llega a es asistente" );
             
             // Ejemplo de llamada a detalle de un registro seleccionado:
             for (Registro reg : registros.values()) {
+            	System.out.println("Entra para registro " + reg.getId());
             	DTRegistro detalle = obtenerDatosRegistros(reg.getId());
             	dto.addRegistro(detalle);
             }
@@ -145,6 +147,7 @@ public class ControladorUsuario implements IControladorUsuario {
             Organizador o = (Organizador) u;
             dto.setDesc(o.getDesc());
             dto.setLink(o.getLink());
+            System.out.println(" llega a es org" );
             dto.setEdicion(listarEdicionesAPartirDeOrganizador(o));
 //            Set<DTEdicion> ediciones = listarEdicionesAPartirDeOrganizador(o);
 //            	// Ejemplo de llamada a detalle de una edición seleccionada:
@@ -158,10 +161,14 @@ public class ControladorUsuario implements IControladorUsuario {
     }
     public static Set<DTEdicion> listarEdicionesAPartirDeOrganizador(Organizador o) {
         Set<DTEdicion> lista = new HashSet<>();
-
+        System.out.println(" llega a listarEdiciones" );
         // Recorremos el Map de ediciones del organizador
+        if (o.getEdiciones().isEmpty()) {
+        	System.out.println(" no tiene ediciones" );
+        }
         for (Ediciones e : o.getEdiciones().values()) {
-            lista.add(new DTEdicion(
+        	System.out.println("Entra para edicion" + e.getNombre());
+        	lista.add(new DTEdicion(
                 e.getNombre(),
                 e.getSigla(),
                 e.getFechaInicio(),
@@ -217,10 +224,6 @@ private DTRegistro obtenerDatosRegistros(String id) {
 	return dto;
 }
 
-private DTEdicion obtenerDatosEdicionEvento(String nombre) {
-	// TODO Auto-generated method stub
-	return null;
-}
     
 private DTRegistro consultaRegistro(String id) {
 	return null;
