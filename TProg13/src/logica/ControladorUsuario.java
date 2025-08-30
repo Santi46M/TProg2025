@@ -1,18 +1,17 @@
 package logica;
 
-import excepciones.UsuarioYaExisteException;
-import excepciones.InstitucionYaExisteException;
-import excepciones.UsuarioNoExisteException;
-import excepciones.UsuarioTipoIncorrectoException;
-import excepciones.CategoriaSinSeleccionarException;
-import excepciones.CategoriaYaExisteException;
+import exceptions.UsuarioYaExisteException;
+import exceptions.InstitucionYaExisteException;
+import exceptions.UsuarioNoExisteException;
+import exceptions.UsuarioTipoIncorrectoException;
+import exceptions.CategoriaSinSeleccionarException;
+import exceptions.CategoriaYaExisteException;
 import logica.Asistente;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import logica.manejadorUsuario;
 import java.time.LocalDate;
 
 
@@ -33,7 +32,7 @@ public class ControladorUsuario {
     public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link,
                             String apellido, LocalDate fechaNacimiento, Institucion institucion, boolean esOrganizador) {
 
-        manejadorUsuario manejador = manejadorUsuario.getInstancia();
+
 
         // verificar unicidad de nickname y correo
         if (manejador.findUsuario(nickname) != null) {
@@ -112,7 +111,8 @@ public class ControladorUsuario {
         o.setDesc(desc);
         o.setLink(link);
     }
-
+    
+    
     public DTDatosUsuario obtenerDatosUsuario(String nickname) {
 
         Usuario u = manejador.findUsuario(nickname);
@@ -133,43 +133,58 @@ public class ControladorUsuario {
         Categoria c = new Categoria(nombre);
         manejadorAux.addCategoria(c.getNombre());
     }
+    public static List<DTEdicionEvento> listarEdicionesAPartirDeOrganizador(Organizador o) {
+        List<DTEdicionEvento> lista = new ArrayList<>();
 
+        // Recorremos el Map de ediciones del organizador
+        for (Ediciones e : o.getEdiciones().values()) {
+            lista.add(new DTEdicionEvento(
+                e.getNombre(),
+                e.getSigla(),
+                e.getDesc(),
+                e.getFechaInicio(),
+                e.getFechaFin(),
+                e.getFechaAlta(),
+                o.getNombre(), // nombre del organizador
+                e.getCiudad(),
+                e.getPais()
+            ));
+        }
 
-
-public void ConsultaUsuario(String nickname) {
-
-    Usuario u = manejador.findUsuario(nickname);
-
-    if (u == null) {
-        throw new UsuarioNoExisteException(nickname);
+        return lista;
     }
 
-    // Datos básicos toto se la re come
-    String nick = u.getNickname();
-    String nombre = u.getNombre();
-    String correo = u.getEmail();
 
-    if (u instanceof Organizador) {
-        Organizador o = (Organizador) u;
-        String descripcion = o.getDesc();
-        String link = o.getLink();
+    public void ConsultaUsuario(String nickname) {
+        Usuario u = manejador.findUsuario(nickname);
 
-        List<DTEdicionEvento> ediciones = listarEdicionesAPartirDeOrganizador(o);
+        if (u == null) {
+            throw new UsuarioNoExisteException(nickname);
+        }
 
-        // Retornás o almacenás estos datos en un DTO si querés exponerlos
-    } else if (u instanceof Asistente) {
-        Asistente a = (Asistente) u;
-        String apellido = a.getApellido();
-        LocalDate fechaNacimiento = a.getFechaDeNacimiento();
+        // Datos básicos
+        String nick = u.getNickname();
+        String nombre = u.getNombre();
+        String correo = u.getEmail();
 
-        Map<String, Registro> registros = a.getRegistros();
-}
-    
-    //falta la parte de seleccionar administrador en ConsultaUsuario
+        if (u instanceof Organizador o) {
+            List<DTEdicionEvento> ediciones = listarEdicionesAPartirDeOrganizador(o);
 
-    
-    	
+            // Ejemplo de llamada a detalle de una edición seleccionada:
+            for (DTEdicionEvento dtEd : ediciones) {
+                DTEdicionEvento detalle = consultaEdicionEvento(dtEd.getNombre());
+                // ahora podés exponer o almacenar el detalle
+            }
+
+        } else if (u instanceof Asistente a) {
+            Map<String, Registro> registros = a.getRegistros();
+
+            // Ejemplo de llamada a detalle de un registro seleccionado:
+            for (Registro reg : registros.values()) {
+                DTRegistro detalle = consultaRegistro(reg.getId());
+                // ahora podés exponer o almacenar el detalle
+            }
+        }
     }
-
 	
 }

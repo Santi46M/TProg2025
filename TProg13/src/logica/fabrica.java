@@ -4,13 +4,13 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-import excepciones.CategoriaSinSeleccionarException;
-import excepciones.EdicionYaExisteException;
-import excepciones.EventoYaExisteException;
-import excepciones.InstitucionYaExisteException;
-import excepciones.UsuarioYaExisteException;
-import excepciones.FechasCruzadasException;
-import excepciones.ValorPatrocinioExcedidoException;
+import exceptions.CategoriaSinSeleccionarException;
+import exceptions.EdicionYaExisteException;
+import exceptions.EventoYaExisteException;
+import exceptions.InstitucionYaExisteException;
+import exceptions.UsuarioYaExisteException;
+import exceptions.FechasCruzadasException;
+import exceptions.ValorPatrocinioExcedidoException;
 
 public class fabrica {
 	private static fabrica instancia;

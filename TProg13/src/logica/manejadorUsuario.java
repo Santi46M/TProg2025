@@ -52,6 +52,14 @@ public class manejadorUsuario {
 		return usuarios.get(nickname);
 	}
 	
+	public Organizador findOrganizador(String nickname) {
+	    Usuario u = usuarios.get(nickname);
+	    if (u instanceof Organizador) {
+	        return (Organizador) u;
+	    }
+	    return null; // o podés tirar una excepción si preferís
+	}
+	
 	public Usuario findCorreo(String nickname, String correo) {
 		Usuario u = usuarios.get(nickname);
 		if (u != null && u.getEmail() == correo)
