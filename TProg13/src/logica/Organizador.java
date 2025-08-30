@@ -28,13 +28,12 @@ public class Organizador extends Usuario {
         return ediciones;
     }
 
-    public List<DTEdicionEvento> listarEdicionesAPartirDeOrganizador() {
-        List<DTEdicionEvento> lista = new ArrayList<>();
+    public List<DTEdicion> listarEdicionesAPartirDeOrganizador() {
+        List<DTEdicion> lista = new ArrayList<>();
         for (Ediciones e : ediciones.values()) {
-            lista.add(new DTEdicionEvento(
+            lista.add(new DTEdicion(
                 e.getNombre(),
                 e.getSigla(),
-                e.getDesc(),
                 e.getFechaInicio(),
                 e.getFechaFin(),
                 e.getFechaAlta(),
