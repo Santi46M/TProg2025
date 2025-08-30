@@ -12,6 +12,7 @@ import java.util.HashMap;
 import presentacion.*;
 
 import logica.fabrica;
+import logica.CargaDatosPrueba;
 
 import java.time.LocalDate;
 public class main {
@@ -72,7 +73,6 @@ public class main {
             ex.printStackTrace();
         }
     }
-
 
     private void initialize() {
     	
