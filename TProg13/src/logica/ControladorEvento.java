@@ -14,6 +14,7 @@ import excepciones.EventoYaExisteException;
 import excepciones.NombreEdicionEnUsoException;
 import excepciones.EventoYaExisteException;
 import excepciones.EdicionYaExisteException;
+import excepciones.TipoRegistroYaExisteException;
 
 
 public class ControladorEvento implements IControladorEvento{
@@ -41,35 +42,25 @@ public class ControladorEvento implements IControladorEvento{
     }
 
     // Recibe la edición, nombre, descripción, costo y cupo
-    public void AltaTipoRegistro(Ediciones edicion, String nombre, String descripcion, int costo, int cupo) {
-        // Falta chequeo de nombre repetido para la edición (agregar aquí si se requiere)
+    public void AltaTipoRegistro(Ediciones edicion, String nombre, String descripcion, int costo, int cupo) throws TipoRegistroYaExisteException {
+        if (edicion.obtenerTipoRegistro(nombre) != null) {
+            throw new TipoRegistroYaExisteException(nombre);
+        }
         TipoRegistro tipo = new TipoRegistro(edicion, nombre, descripcion, costo, cupo);
         edicion.agregarTipoRegistro(tipo);
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         manejadorEvento.agregarTipoRegistro(tipo);
     }
     
-    // Nuevo método ajustado para AltaPatrocinio
+    // Nuevo método ajustado para AltaPatrocinio con los parámetros requeridos
     public void AltaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) {
         manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
-        // Validar código único
-        if (manejadorAux.existePatrocinio(codigoPatrocinio)) {
-            throw new RuntimeException("Ya existe un patrocinio con el código: " + codigoPatrocinio);
-        }
-        // Validar que no exista un patrocinio de la misma institución para la misma edición
+        // Validar que no exista un patrocinio igual (puedes ajustar la lógica según tus reglas)
         for (Patrocinio p : manejadorAux.listarPatrocinios()) {
-            if (p.getInstitucion().equals(institucion) && p.getEdicion().equals(edicion)) {
-                // TODO: Informar al administrador que ya existe un patrocinio de la institución para la edición
-                // El administrador puede optar por editar el patrocinio o cancelar el alta
+            if (p.getCodigoPatrocinio().equals(codigoPatrocinio)) {
+                // Ya existe un patrocinio igual
                 return;
             }
-        }
-        // Validar porcentaje
-        int costoRegistros = cantidadRegistros * tipoRegistro.getCosto();
-        if (costoRegistros > aporte * 0.2) {
-            // TODO: Informar al administrador que el costo de los registros gratuitos supera el 20% del aporte
-            // El administrador puede optar por editar el patrocinio o cancelar el alta
-            return;
         }
         // Crear y guardar el patrocinio
         Patrocinio pat = new Patrocinio(edicion, institucion, nivel, tipoRegistro, aporte, fechaPatrocinio, cantidadRegistros, codigoPatrocinio);
