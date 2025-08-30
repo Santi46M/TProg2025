@@ -32,6 +32,7 @@ public class manejadorAuxiliar {
 	public void agregarCategoria(String nombre) {
 	    categorias.put(nombre, nombre);
 	}
+	
 
 	public Set<String> listarCategorias() {
 	    return categorias.keySet();

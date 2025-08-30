@@ -16,7 +16,7 @@ public class Asistente extends Usuario {
     
     public Asistente(String nickname, String nombre, String email, String apellido, LocalDate fechaDeNacimiento, Institucion institucion) {
     	
-    	super();
+    	super(nickname,nombre,email);
     	this.apellido = apellido;
     	this.fechaDeNacimiento = fechaDeNacimiento;
     	this.institucion = null;

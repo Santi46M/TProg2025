@@ -7,14 +7,19 @@ import logica.ManejadorEvento;
 import logica.manejadorUsuario;
 import logica.manejadorAuxiliar;
 import java.util.ArrayList;
+import java.util.Map;
+
+import excepciones.NombreEdicionEnUsoException;
+
 
 public class ControladorEvento {
-
+	ManejadorEvento manejador = ManejadorEvento.getInstancia();
+	manejadorUsuario mUsuario = manejadorUsuario.getInstancia();
     public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias) {
         if (categorias == null || categorias.getCategorias() == null || categorias.getCategorias().isEmpty()) {
             throw new RuntimeException("Debe asociar al menos una categoría al evento");
         }
-        ManejadorEvento manejador = ManejadorEvento.getInstancia();
+        
         if (manejador.existeEvento(nombre)) {
         	//throw new EventoExisteException(nombre);
         }
@@ -231,7 +236,7 @@ public class ControladorEvento {
     
     public List<DTEvento> listarEventos() {
 
-	    Map<String, Eventos> eventos = manejador.getEventos();
+	    Map<String, Eventos> eventos = manejador.obtenerEventos();
 
 	    List<DTEvento> lista = new ArrayList<>();
 	    for (Eventos e : eventos.values()) {
@@ -243,34 +248,31 @@ public class ControladorEvento {
 	        ));
 	    }
 	    return lista;
-	}	
-	
-	
-
-
-	public void altaEdicionEvento(String nombreEvento, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String organizador,
-	        String ciudad,
-	        String pais
-	) {
+	}
+    public void altaEdicionEvento(String nombreEvento, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String organizador,String ciudad,String pais) throws NombreEdicionEnUsoException {
 
 	    if (manejador.existeEdicion(nombre)) {
 	        throw new NombreEdicionEnUsoException(nombre);
 	    }
 
-	    Eventos evento = manejador.getEventos().get(nombreEvento);
+	    Eventos evento = manejador.obtenerEventos().get(nombreEvento);
 	    if (evento == null) {
 	        throw new IllegalArgumentException("No existe el evento con sigla: " + nombreEvento);
 	    }
 
-	    Organizador org = (Organizador) mUsuarios.findOrganizador(organizador);
+	    Organizador org = (Organizador) mUsuario.findOrganizador(organizador);
 	    if (org == null) {
 	        throw new IllegalArgumentException("No existe el organizador: " + organizador);
 	    }
-
-
-	    Ediciones nuevaEdicion = new Ediciones(nombre,sigla,desc,fechaInicio, fechaFin,fechaAlta, org.getNombre(), ciudad,pais);
+	    
+	    Ediciones nuevaEdicion = new Ediciones(evento,nombre,sigla,desc,fechaInicio, fechaFin,fechaAlta, org, ciudad,pais);
 
 	    evento.agregarEdicion(nuevaEdicion);
 
-	    manejador.altaEdicion(nuevaEdicion.getNombre(), nuevaEdicion);
-}
+	    manejador.agregarEdicion(nuevaEdicion);
+
+		}
+    
+}	
+	
+	

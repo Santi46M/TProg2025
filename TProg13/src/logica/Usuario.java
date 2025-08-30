@@ -11,6 +11,11 @@ public abstract class Usuario {
     private String nombre;
     private String email;
 
+    public Usuario(String nickname, String nombre, String email) {
+        this.nickname = nickname;
+        this.nombre = nombre;
+        this.email = email;
+    }
     
     public String getNickname() {
         return nickname;

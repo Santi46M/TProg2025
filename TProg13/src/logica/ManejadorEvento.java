@@ -48,6 +48,12 @@ public class ManejadorEvento {
         }
         return null;
     }
+    public boolean existeEdicion(String nombre){
+    	if (obtenerEvento(nombre) != null) {
+    		return true;
+    		}
+    	else return false;
+    	}
 
     public Ediciones obtenerEdicionEvento(String nombreEvento, String nombreEdicion) {
         Eventos evento = eventos.get(nombreEvento);
@@ -74,6 +80,7 @@ public class ManejadorEvento {
         return tiposRegistro;
     }
 
+    
     public void agregarEdicion(Ediciones edicion) {
         ediciones.put(edicion.getSigla(), edicion);
     }

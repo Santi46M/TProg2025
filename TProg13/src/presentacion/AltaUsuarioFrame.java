@@ -285,6 +285,16 @@ public class AltaUsuarioFrame extends JInternalFrame {
             	}else {
             		JOptionPane.showMessageDialog(this, "TIENE",title, JOptionPane.INFORMATION_MESSAGE);
             	}
+            	Map<String, Usuario> prueba = controlUsr.listarUsuarios();
+
+            	for (Map.Entry<String, Usuario> entry : prueba.entrySet()) {
+            	    String clave = entry.getKey();      // el nickname o id
+
+            	    System.out.println("Clave: " + clave);
+
+            	    System.out.println("--------------");
+            	}
+
 //            	
 //            	for (Map.Entry<String, Usuario> entrada : prueba.entrySet()) {
 //            	    String clave = entrada.getKey();

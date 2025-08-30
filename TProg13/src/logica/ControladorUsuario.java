@@ -163,9 +163,13 @@ public class ControladorUsuario implements IControladorUsuario {
                 e.getFechaAlta(),
                 o.getNombre(), // nombre del organizador
                 e.getCiudad(),
-                e.getPais()))
+                e.getPais()));
         }
-    public void ConsultaUsuario(String nickname) {
+        return lista;
+    }
+    
+    
+    public void ConsultaUsuario(String nickname) throws UsuarioNoExisteException {
         Usuario u = manejador.findUsuario(nickname);
 
         if (u == null) {
@@ -199,14 +203,24 @@ public class ControladorUsuario implements IControladorUsuario {
 
 
 
+private DTRegistro consultaRegistro(String id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+private DTEdicionEvento consultaEdicionEvento(String nombre) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 public void AltaCategoriaSinGUI(String nombre) throws CategoriaYaExisteException {
 
-    if (manejadorAux.findCategoria(nombre) != null) {
+    if (manejadorAux.existeCategoria(nombre)) {
         throw new CategoriaYaExisteException(nombre);
     }
 
     Categoria c = new Categoria(nombre);
-    manejadorAux.addCategoria(c.getNombre());
+    manejadorAux.agregarCategoria(c.getNombre());
 }
 
 	
