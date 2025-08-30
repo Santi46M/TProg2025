@@ -8,6 +8,7 @@ import excepciones.CategoriaYaExisteException;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Set;
 
 public interface IControladorUsuario {
 
@@ -23,6 +24,7 @@ public interface IControladorUsuario {
     public Map<String, Usuario> listarUsuarios();
     public Map<String, Usuario> listarAsistentes();
     public Map<String, Usuario> listarOrganizadores();
+    public Set<String> getInstituciones();
 
     // Actualizaciones
     public void actualizarAsistente(String nickname, String apellido, LocalDate fechaNacimiento) throws UsuarioYaExisteException, UsuarioTipoIncorrectoException;

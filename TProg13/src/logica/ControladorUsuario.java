@@ -75,6 +75,10 @@ public class ControladorUsuario implements IControladorUsuario {
     public Map<String, Usuario> listarOrganizadores() {
         return manejador.getOrganizadores();
     }
+    
+    public Set<String> getInstituciones(){
+    	return manejador.getInstituciones();
+    }
 
     public void actualizarAsistente(String nickname, String apellido, LocalDate fechaNacimiento) throws UsuarioYaExisteException, UsuarioTipoIncorrectoException {
 

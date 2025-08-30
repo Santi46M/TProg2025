@@ -1,23 +1,18 @@
 package presentacion;
 
 import javax.swing.*;
-import javax.swing.JInternalFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.SwingConstants;
 
 import com.toedter.calendar.JDateChooser;
 
+import excepciones.UsuarioNoExisteException;
+
+import java.util.*;
 import logica.IControladorUsuario;
 import logica.*;
 import java.util.Map;
-
+import java.util.Vector;
 import java.time.LocalDate;
 import java.time.*;
-import javax.swing.JTextField;
-import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import java.awt.*;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
@@ -29,6 +24,8 @@ public class AltaUsuarioFrame extends JInternalFrame {
 	private IControladorUsuario controlUsr;
 	private JPanel panelAsistente;
 	private JPanel panelOrganizador;
+	private Vector<String> instituciones;
+	private JComboBox<String> comboInstitucion;
 
 	
 	private JTextField textField;
@@ -133,11 +130,12 @@ public class AltaUsuarioFrame extends JInternalFrame {
 
         
         //Forzadas
-        JComboBox<String> comboInstitucion = new JComboBox<>();
-        comboInstitucion.addItem("Ninguna");
-        comboInstitucion.addItem("Universidad A");
-        comboInstitucion.addItem("Instituto B");
-        comboInstitucion.addItem("Escuela C");
+        
+        instituciones = new Vector<>();
+        //Agrego una opcion para que no sea necessario que tenga que elegir una institucion
+        instituciones.add("Ninguna");
+        instituciones.addAll(controlUsr.getInstituciones());
+        comboInstitucion = new JComboBox<>(instituciones);
         comboInstitucion.setBounds(120, 70, 200, 20);
         panelAsistente.add(comboInstitucion);
 
@@ -349,4 +347,14 @@ public class AltaUsuarioFrame extends JInternalFrame {
         panelAsistente.setVisible(false);
         panelOrganizador.setVisible(false);
     }
+    
+    public void cargarInstituciones() {
+    	//Agregar bien la exception
+    	DefaultComboBoxModel<String> model;
+    	instituciones.clear();
+    	instituciones.add("Ninguna");
+    	instituciones.addAll(controlUsr.getInstituciones());
+		model = new DefaultComboBoxModel<String>(instituciones);
+		comboInstitucion.setModel(model);
+    	}
 }
