@@ -96,6 +96,13 @@ public class ManejadorEvento {
     public Registro obtenerRegistro(String id) {
         return registros.get(id);
     }
+    public boolean existeRegistro(String id) {
+    		if(obtenerRegistro(id) != null) {
+    			return true;
+    		}
+    		
+    	return false;
+    }
 
     public Map<String, Registro> obtenerRegistros() {
         return registros;

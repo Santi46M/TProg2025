@@ -45,7 +45,7 @@ public class DTDatosUsuario {
         this.registros.add(registro);
     }
 
-    public void addEdicion(DTEdicion edicion) {
-        this.ediciones.add(edicion);
+    public void setEdicion(Set<DTEdicion> edicion) {
+        this.ediciones = edicion;
     }
 }
