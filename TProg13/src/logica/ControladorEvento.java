@@ -171,19 +171,11 @@ public class ControladorEvento {
 
     // ConsultaEdicionEvento: Devuelve los detalles de una edición de un evento
     public DTEdicionEvento consultaEdicionEvento(String siglaEvento, String siglaEdicion) {
-        ManejadorEvento manejador = ManejadorEvento.getInstancia();
         Eventos evento = manejador.obtenerEvento(siglaEvento);
         if (evento == null) return null;
         Ediciones edicion = evento.obtenerEdicion(siglaEdicion);
         if (edicion == null) return null;
-        // Por ahora, solo se devuelven los datos básicos de la edición usando DTEvento
-        // TODO: Agregar detalles de tipos de registro, registros y patrocinios
-        return new DTEvento(
-            edicion.getNombre(),
-            edicion.getSigla(),
-            edicion.getDesc(),
-            edicion.getFechaAlta()
-        );
+       
     }
 
     public DTEvento ConsultaEvento(Eventos ev, Ediciones ed) {    
