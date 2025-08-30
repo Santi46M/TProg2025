@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.time.LocalDate;
+import java.util.HashSet;
 
 public class ControladorUsuario implements IControladorUsuario {
 	
@@ -18,7 +19,8 @@ public class ControladorUsuario implements IControladorUsuario {
     manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
 	
 	public Organizador ingresarOrganizador(String nickname, String nombre, String email, String desc, String link) {
-        return new Organizador(nickname, nombre, email, desc, link);
+        
+		return new Organizador(nickname, nombre, email, desc, link);
     }
 
     public Asistente ingresarAsistente(String nickname, String nombre, String email, String apellido,
@@ -44,6 +46,7 @@ public class ControladorUsuario implements IControladorUsuario {
         if (esOrganizador) {
             // crear organizador
             nuevoUsuario = ingresarOrganizador(nickname, nombre, correo, descripcion, link);
+            
         } else {
             // crear asistente
         	Institucion inst = manejador.findInstitucion(institucion);
@@ -68,11 +71,11 @@ public class ControladorUsuario implements IControladorUsuario {
         return manejador.getUsuarios();
     }
 
-    public Map<String, Usuario> listarAsistentes() {
+    public Map<String, Asistente> listarAsistentes() {
         return manejador.getAsistentes();
     }
 
-    public Map<String, Usuario> listarOrganizadores() {
+    public Map<String, Organizador> listarOrganizadores() {
         return manejador.getOrganizadores();
     }
     
@@ -131,10 +134,10 @@ public class ControladorUsuario implements IControladorUsuario {
             dto.setApellido(a.getApellido());
             dto.setFechaNac(a.getFechaDeNacimiento());
             Map<String, Registro> registros = a.getRegistros();
-
+            
             // Ejemplo de llamada a detalle de un registro seleccionado:
             for (Registro reg : registros.values()) {
-            	DTRegistro detalle = consultaRegistro(reg.getId());
+            	DTRegistro detalle = obtenerDatosRegistros(reg.getId());
             	dto.addRegistro(detalle);
             }
 
@@ -142,18 +145,19 @@ public class ControladorUsuario implements IControladorUsuario {
             Organizador o = (Organizador) u;
             dto.setDesc(o.getDesc());
             dto.setLink(o.getLink());
-            List<DTEdicion> ediciones = listarEdicionesAPartirDeOrganizador(o);
-            	// Ejemplo de llamada a detalle de una edición seleccionada:
-                for (DTEdicion dtEd : ediciones) {
-                      DTEdicion detalle = consultaEdicionEvento(dtEd.getNombre());
-                      dto.addEdicion(detalle);
-                }
+            dto.setEdicion(listarEdicionesAPartirDeOrganizador(o));
+//            Set<DTEdicion> ediciones = listarEdicionesAPartirDeOrganizador(o);
+//            	// Ejemplo de llamada a detalle de una edición seleccionada:
+//                for (DTEdicion dtEd : ediciones) {
+//                      DTEdicion detalle =  obtenerDatosEdicionEvento(dtEd.getNombre());
+//                      dto.addEdicion(detalle);
+//                }
         }
 
         return dto;
     }
-    public static List<DTEdicion> listarEdicionesAPartirDeOrganizador(Organizador o) {
-        List<DTEdicion> lista = new ArrayList<>();
+    public static Set<DTEdicion> listarEdicionesAPartirDeOrganizador(Organizador o) {
+        Set<DTEdicion> lista = new HashSet<>();
 
         // Recorremos el Map de ediciones del organizador
         for (Ediciones e : o.getEdiciones().values()) {
@@ -184,7 +188,7 @@ public class ControladorUsuario implements IControladorUsuario {
         String correo = u.getEmail();
 
         if (u instanceof Organizador o) {
-            List<DTEdicion> ediciones = listarEdicionesAPartirDeOrganizador(o);
+            Set<DTEdicion> ediciones = listarEdicionesAPartirDeOrganizador(o);
 
             // Ejemplo de llamada a detalle de una edición seleccionada:
             for (DTEdicion dtEd : ediciones) {
@@ -194,7 +198,6 @@ public class ControladorUsuario implements IControladorUsuario {
 
         } else if (u instanceof Asistente a) {
             Map<String, Registro> registros = a.getRegistros();
-
             // Ejemplo de llamada a detalle de un registro seleccionado:
             for (Registro reg : registros.values()) {
                 DTRegistro detalle = consultaRegistro(reg.getId());
@@ -204,10 +207,23 @@ public class ControladorUsuario implements IControladorUsuario {
     }
 
 
+private DTRegistro obtenerDatosRegistros(String id) {
+	// TODO Auto-generated method stub
+	DTRegistro dto = null;
+	if (manejadorEv.existeRegistro(id)) {
+		Registro reg = manejadorEv.obtenerRegistro(id);
+		dto = new DTRegistro(reg.getId(),reg.getUsuario().getNickname(),reg.getEdicion().getNombre(),reg.getTipoRegistro().getNombre(),reg.getFechaRegistro(),reg.getCosto(),reg.getFechaInicio());
+	}
+	return dto;
+}
 
+private DTEdicion obtenerDatosEdicionEvento(String nombre) {
+	// TODO Auto-generated method stub
+	return null;
+}
+    
 private DTRegistro consultaRegistro(String id) {
-		// TODO Auto-generated method stub
-		return null;
+	return null;
 	}
 
 private DTEdicion consultaEdicionEvento(String nombre) {

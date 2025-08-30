@@ -101,35 +101,40 @@ public class ConsultaUsuario extends JInternalFrame {
                 panelDatos.add(panelContenedor, BorderLayout.CENTER);
 
                 // Panel donde van los datos (con absolute)
-                JPanel panelDatosUsuario = new JPanel(null);
+
+                JPanel panelDatosUsuario = new JPanel();
+                panelDatosUsuario.setLayout(new BoxLayout(panelDatosUsuario, BoxLayout.Y_AXIS)); // <-- CAMBIO
                 panelContenedor.add(panelDatosUsuario, BorderLayout.CENTER);
 
+                JPanel panelInfoBasica = new JPanel(new GridLayout(0, 2, 10, 10)); // <-- CAMBIO, antes usabas setBounds
+                panelDatosUsuario.add(panelInfoBasica);
+                
                 JLabel lblNick = new JLabel("Nickname:");
                 lblNick.setBounds(101, 11, 94, 14);
-                panelDatosUsuario.add(lblNick);
+                panelInfoBasica.add(lblNick);
 
                 JTextArea txtNick = new JTextArea();
                 txtNick.setBounds(248, 6, 161, 22);
                 txtNick.setEditable(false);
-                panelDatosUsuario.add(txtNick);
+                panelInfoBasica.add(txtNick);
 
                 JLabel lblNombre = new JLabel("Nombre:");
                 lblNombre.setBounds(101, 36, 94, 14);
-                panelDatosUsuario.add(lblNombre);
+                panelInfoBasica.add(lblNombre);
 
                 JTextArea txtNombre = new JTextArea();
                 txtNombre.setBounds(248, 31, 161, 22);
                 txtNombre.setEditable(false);
-                panelDatosUsuario.add(txtNombre);
+                panelInfoBasica.add(txtNombre);
 
                 JLabel lblCorreo = new JLabel("Correo electrónico:");
                 lblCorreo.setBounds(101, 61, 137, 14);
-                panelDatosUsuario.add(lblCorreo);
+                panelInfoBasica.add(lblCorreo);
 
                 JTextArea txtCorreo = new JTextArea();
                 txtCorreo.setBounds(248, 56, 161, 22);
                 txtCorreo.setEditable(false);
-                panelDatosUsuario.add(txtCorreo);
+                panelInfoBasica.add(txtCorreo);
                 
                 // Agregamos un boton para cancelar la sekeccion
                 JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.CENTER));
@@ -145,49 +150,90 @@ public class ConsultaUsuario extends JInternalFrame {
                 });
                 panelSur.add(btnCerrar);
                 panelContenedor.add(panelSur, BorderLayout.SOUTH);
+                System.out.println("llega 0");
                 
-               
+                
+                Map<String, Usuario> prueba = controlUsr.listarUsuarios();
+                
+                            	for (Map.Entry<String, Usuario> entry : prueba.entrySet()) {
+                            	    String clave = entry.getKey();      // el nickname o id
+                
+                            	    System.out.println("Clave: " + clave);
+                
+                            	    System.out.println("--------------");
+                            	}
                 // Separamos en casos, si es asistente o es organizador
                 if ((controlUsr.listarAsistentes() != null) && controlUsr.listarAsistentes().containsKey(usuarioSeleccionado)) {
+                	System.out.println("llega 1");
                 	DTDatosUsuario datos = null;
 					try {
 						datos = controlUsr.obtenerDatosUsuario(usuarioSeleccionado);
+						System.out.println("llega 2");
 					} catch (UsuarioNoExisteException e1) {
 						// TODO Auto-generated catch block
 						// Este caso no pasa, ya que chequee antes que existiera en la lista
 						e1.printStackTrace();
 					}
+					System.out.println("llega 3");
 
-                    txtNick.setText(datos.getNickname());
+					System.out.println("Nick: "+datos.getNickname());
+					txtNick.setText(datos.getNickname());
+					System.out.println("nombre: "+datos.getNombre());
                     txtNombre.setText(datos.getNombre());
+                    System.out.println("email: "+datos.getEmail());
                     txtCorreo.setText(datos.getEmail());
 
-                    JPanel panelDatosAsistente = new JPanel();
-                    panelDatosAsistente.setBounds(10, 100, 414, 172);
-                    panelDatosUsuario.add(panelDatosAsistente);
-                    panelDatosAsistente.setLayout(null);
+                    
+                    JPanel panelAsistente = new JPanel(new GridLayout(0, 2, 10, 10));
+
+                    panelDatosUsuario.add(panelAsistente);
 
                     JLabel lblApellido = new JLabel("Apellido:");
                     lblApellido.setBounds(94, 11, 89, 14);
-                    panelDatosAsistente.add(lblApellido);
+                    panelAsistente.add(lblApellido);
 
                     JTextArea txtApellido = new JTextArea(datos.getApellido());
                     txtApellido.setBounds(237, 6, 161, 22);
                     txtApellido.setEditable(false);
-                    panelDatosAsistente.add(txtApellido);
+                    panelAsistente.add(txtApellido);
 
                     JLabel lblFechaNac = new JLabel("Fecha de nacimiento:");
                     lblFechaNac.setBounds(94, 36, 121, 14);
-                    panelDatosAsistente.add(lblFechaNac);
+                    panelAsistente.add(lblFechaNac);
 
                     JTextArea txtFecha = new JTextArea(datos.getFechaNac().toString());
                     txtFecha.setBounds(237, 31, 161, 22);
                     txtFecha.setEditable(false);
-                    panelDatosAsistente.add(txtFecha);
+                    panelAsistente.add(txtFecha);
+                    
+                 // Supongamos que ya obtuviste el Set<DTRegistro> registros
 
- 
+                    
+                    // Defino las columnas que quiero mostrar
+                    String[] columnNames = {"ID", "Edición", "Tipo", "Fecha Registro", "Costo", "Fecha Inicio"};
+
+                    // Cargo los datos en una matriz de Object
+                    Object[][] dataRegistro = new Object[datos.getRegistros().size()][columnNames.length];
+                    int i = 0;
+                    for (DTRegistro r : datos.getRegistros()) {
+                    	dataRegistro[i][0] = r.getId();
+                    	dataRegistro[i][1] = r.getEdicion();
+                    	dataRegistro[i][2] = r.getTipoRegistro();
+                    	dataRegistro[i][3] = r.getFechaRegistro();
+                        dataRegistro[i][4] = r.getCosto();
+                        dataRegistro[i][5] = r.getFechaInicio();
+                        i++;
+                    }
+
+                    // Creo la JTable
+                    JTable table = new JTable(dataRegistro, columnNames);
+                    JScrollPane scrollPane = new JScrollPane(table);
+                    panelDatosUsuario.add(scrollPane);
+                    panelDatosUsuario.revalidate();
+                    panelDatosUsuario.repaint();
 
 
+                
                 } else if ((controlUsr.listarOrganizadores() != null) && controlUsr.listarOrganizadores().containsKey(usuarioSeleccionado)) {
                 	// En caso de que sea organizador es similar la lógica, pero obtenemos otros campos
                 	DTDatosUsuario datos = null;
@@ -199,29 +245,58 @@ public class ConsultaUsuario extends JInternalFrame {
 						e1.printStackTrace();
 					}
 
-
-                    txtNick.setText(datos.getNickname());
+//					JOptionPane.showMessageDialog(this,datos.getNickname() ,title, JOptionPane.INFORMATION_MESSAGE);
+					System.out.println(datos.getNickname());
+					txtNick.setText(datos.getNickname());
+					System.out.println(datos.getNombre());
                     txtNombre.setText(datos.getNombre());
+                    System.out.println(datos.getEmail());
                     txtCorreo.setText(datos.getEmail());
 
-                    
-                    JPanel panelDatosOrganizador = new JPanel();
-                    panelDatosOrganizador.setBounds(10, 100, 414, 172);
-                    panelDatosUsuario.add(panelDatosOrganizador);
-                    panelDatosOrganizador.setLayout(null);
+
+                    JPanel panelOrganizador = new JPanel(new GridLayout(0, 2, 10, 10)); 
+                    panelDatosUsuario.add(panelOrganizador);
 
                     JLabel lblDesc = new JLabel("Descripción:");
                     lblDesc.setBounds(93, 11, 89, 14);
-                    panelDatosOrganizador.add(lblDesc);
+                    panelOrganizador.add(lblDesc);
 
                     JTextArea txtDesc = new JTextArea(datos.getDesc());
                     txtDesc.setBounds(238, 6, 161, 22);
                     txtDesc.setEditable(false);
-                    panelDatosOrganizador.add(txtDesc);
+                    panelOrganizador.add(txtDesc);
 
                     JLabel lblLink = new JLabel("Link:");
                     lblLink.setBounds(93, 36, 121, 14);
-                    panelDatosOrganizador.add(lblLink);
+                    panelOrganizador.add(lblLink);
+                    
+                    JTextArea txtLink = new JTextArea(datos.getLink());
+                    txtLink.setBounds(237, 31, 161, 22);
+                    txtLink.setEditable(false);
+                    panelOrganizador.add(txtLink);
+                    
+
+                    String[] columnNames = {"Nombre", "Sigla", "Fecha Inicio", "Fecha Fin", "Fecha Alta", "Ciudad", "País"};
+
+                    Object[][] datosEdicion = new Object[datos.getEdiciones().size()][columnNames.length];
+                    int i = 0;
+                    for (DTEdicion ed : datos.getEdiciones()) {
+                    	datosEdicion[i][0] = ed.getNombre();
+                    	datosEdicion[i][1] = ed.getSigla();
+                    	datosEdicion[i][2] = ed.getFechaInicio();
+                    	datosEdicion[i][3] = ed.getFechaFin();
+                    	datosEdicion[i][4] = ed.getFechaAlta();
+                    	datosEdicion[i][5] = ed.getCiudad();
+                    	datosEdicion[i][6] = ed.getPais();
+                        i++;
+                    }
+
+                    JTable table = new JTable(datosEdicion, columnNames);
+                    JScrollPane scrollPane = new JScrollPane(table);
+                    panelDatosUsuario.add(scrollPane); 
+                    panelDatosUsuario.revalidate();
+                    panelDatosUsuario.repaint();
+
 
                     
                 }

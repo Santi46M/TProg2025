@@ -22,8 +22,8 @@ public interface IControladorUsuario {
 
     // Listados
     public Map<String, Usuario> listarUsuarios();
-    public Map<String, Usuario> listarAsistentes();
-    public Map<String, Usuario> listarOrganizadores();
+    public Map<String, Asistente> listarAsistentes();
+    public Map<String, Organizador> listarOrganizadores();
     public Set<String> getInstituciones();
 
     // Actualizaciones
