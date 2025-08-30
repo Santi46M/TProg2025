@@ -3,7 +3,7 @@ package logica;
 import java.time.LocalDate;
 
 public class DTEvento {
-	private String nombre;
+    private String nombre;
     private String sigla;
     private String descripcion;
     private LocalDate fecha;
@@ -15,9 +15,21 @@ public class DTEvento {
         this.fecha = fecha;
     }
 
-    // Getters (y toString si querés)
-    public String getNombre() { return nombre; }
-    public String getSigla() { return sigla; }
-    public String getDescripcion() { return descripcion; }
-    public LocalDate getFecha() { return fecha; }
+    // Getters
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getSigla() {
+        return sigla;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public LocalDate getFecha() {
+        return fecha;
+    }
 }
+

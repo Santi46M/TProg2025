@@ -30,7 +30,7 @@ public class ControladorUsuario implements IControladorUsuario {
     public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link,
                             String apellido, LocalDate fechaNacimiento, Institucion institucion, boolean esOrganizador) throws UsuarioYaExisteException {
 
-        manejadorUsuario manejador = manejadorUsuario.getInstancia();
+
 
         // verificar unicidad de nickname y correo
         if (manejador.findUsuario(nickname) != null) {
@@ -149,47 +149,53 @@ public class ControladorUsuario implements IControladorUsuario {
 
         return dto;
     }
+    public static List<DTEdicionEvento> listarEdicionesAPartirDeOrganizador(Organizador o) {
+        List<DTEdicionEvento> lista = new ArrayList<>();
 
+        // Recorremos el Map de ediciones del organizador
+        for (Ediciones e : o.getEdiciones().values()) {
+            lista.add(new DTEdicionEvento(
+                e.getNombre(),
+                e.getSigla(),
+                e.getDesc(),
+                e.getFechaInicio(),
+                e.getFechaFin(),
+                e.getFechaAlta(),
+                o.getNombre(), // nombre del organizador
+                e.getCiudad(),
+                e.getPais()))
+        }
+    public void ConsultaUsuario(String nickname) {
+        Usuario u = manejador.findUsuario(nickname);
 
+        if (u == null) {
+            throw new UsuarioNoExisteException(nickname);
+        }
 
-public void ConsultaUsuario(String nickname) throws UsuarioNoExisteException {
+        // Datos básicos
+        String nick = u.getNickname();
+        String nombre = u.getNombre();
+        String correo = u.getEmail();
 
-    Usuario u = manejador.findUsuario(nickname);
+        if (u instanceof Organizador o) {
+            List<DTEdicionEvento> ediciones = listarEdicionesAPartirDeOrganizador(o);
 
-    if (u == null) {
-        throw new UsuarioNoExisteException(nickname);
+            // Ejemplo de llamada a detalle de una edición seleccionada:
+            for (DTEdicionEvento dtEd : ediciones) {
+                DTEdicionEvento detalle = consultaEdicionEvento(dtEd.getNombre());
+                // ahora podés exponer o almacenar el detalle
+            }
+
+        } else if (u instanceof Asistente a) {
+            Map<String, Registro> registros = a.getRegistros();
+
+            // Ejemplo de llamada a detalle de un registro seleccionado:
+            for (Registro reg : registros.values()) {
+                DTRegistro detalle = consultaRegistro(reg.getId());
+                // ahora podés exponer o almacenar el detalle
+            }
+        }
     }
-
-    // Datos básicos toto se la re come
-    String nick = u.getNickname();
-    String nombre = u.getNombre();
-    String correo = u.getEmail();
-
-    if (u instanceof Organizador) {
-        Organizador o = (Organizador) u;
-        String descripcion = o.getDesc();
-        String link = o.getLink();
-
-        List<DTEdicionEvento> ediciones = listarEdicionesAPartirDeOrganizador(o);
-
-        // Retornás o almacenás estos datos en un DTO si querés exponerlos
-    } else if (u instanceof Asistente) {
-        Asistente a = (Asistente) u;
-        String apellido = a.getApellido();
-        LocalDate fechaNacimiento = a.getFechaDeNacimiento();
-
-        Map<String, Registro> registros = a.getRegistros();
-}
-    
-    //falta la parte de seleccionar administrador en ConsultaUsuario
-
-    
-    	
-    }
-private List<DTEdicionEvento> listarEdicionesAPartirDeOrganizador(Organizador o) {
-	// TODO Auto-generated method stub
-	return null;
-}
 
 
 

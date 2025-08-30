@@ -4,7 +4,7 @@ import java.util.List;
 import java.time.LocalDate;
 import logica.Eventos;
 import logica.ManejadorEvento;
-import logica.ManejadorUsuario;
+import logica.manejadorUsuario;
 import logica.manejadorAuxiliar;
 import java.util.ArrayList;
 
@@ -228,4 +228,49 @@ public class ControladorEvento {
         Registro nuevoRegistro = new Registro(idRegistro, usuario, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio);
         manejadorEvento.agregarRegistro(nuevoRegistro);
     }
+    
+    public List<DTEvento> listarEventos() {
+
+	    Map<String, Eventos> eventos = manejador.getEventos();
+
+	    List<DTEvento> lista = new ArrayList<>();
+	    for (Eventos e : eventos.values()) {
+	        lista.add(new DTEvento(
+	            e.getNombre(),
+	            e.getSigla(),
+	            e.getDescripcion(),
+	            e.getFecha()
+	        ));
+	    }
+	    return lista;
+	}	
+	
+	
+
+
+	public void altaEdicionEvento(String nombreEvento, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String organizador,
+	        String ciudad,
+	        String pais
+	) {
+
+	    if (manejador.existeEdicion(nombre)) {
+	        throw new NombreEdicionEnUsoException(nombre);
+	    }
+
+	    Eventos evento = manejador.getEventos().get(nombreEvento);
+	    if (evento == null) {
+	        throw new IllegalArgumentException("No existe el evento con sigla: " + nombreEvento);
+	    }
+
+	    Organizador org = (Organizador) mUsuarios.findOrganizador(organizador);
+	    if (org == null) {
+	        throw new IllegalArgumentException("No existe el organizador: " + organizador);
+	    }
+
+
+	    Ediciones nuevaEdicion = new Ediciones(nombre,sigla,desc,fechaInicio, fechaFin,fechaAlta, org.getNombre(), ciudad,pais);
+
+	    evento.agregarEdicion(nuevaEdicion);
+
+	    manejador.altaEdicion(nuevaEdicion.getNombre(), nuevaEdicion);
 }

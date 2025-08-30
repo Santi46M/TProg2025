@@ -14,7 +14,7 @@ public class Eventos{
 	private String descripcion;
 	private LocalDate fecha;
 	private List<String> categorias;
-    private Map<String, Ediciones> ediciones = new HashMap<>();
+	private Map<String, Ediciones> ediciones;
 
 	public Eventos(String nombre, String sigla, String descripcion, LocalDate fecha, List<String> categorias) {
 		this.nombre = nombre;
@@ -22,12 +22,17 @@ public class Eventos{
 		this.descripcion = descripcion;
 		this.fecha = fecha;
 		this.categorias = categorias;
+        this.ediciones = new HashMap<>(); 
 	}	
 	
 	//Definimos los getters
 	public String getNombre() {
 		return this.nombre;
 	}
+	
+	 public void agregarEdicion(Ediciones edicion) {
+	        ediciones.put(edicion.getNombre(), edicion); // clave = nombre de la edición
+	    }
 	
 	public String getSigla() {
 		return this.sigla;
@@ -64,10 +69,6 @@ public class Eventos{
 	
 	public void setCategorias(List<String> categorias) {
         this.categorias = categorias;
-    }
-
-    public void agregarEdicion(Ediciones edicion) {
-        ediciones.put(edicion.getNombre(), edicion);
     }
 
     public Map<String, Ediciones> getEdiciones() {
