@@ -11,6 +11,7 @@ public abstract class Usuario {
     private String nombre;
     private String email;
 
+    
     public String getNickname() {
         return nickname;
     }

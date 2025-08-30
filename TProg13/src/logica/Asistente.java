@@ -15,6 +15,7 @@ public class Asistente extends Usuario {
     private Map<String, Registro> registros;
     
     public Asistente(String nickname, String nombre, String email, String apellido, LocalDate fechaDeNacimiento, Institucion institucion) {
+    	
     	super();
     	this.apellido = apellido;
     	this.fechaDeNacimiento = fechaDeNacimiento;

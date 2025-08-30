@@ -1,0 +1,101 @@
+package logica;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Map;
+import java.util.HashMap;
+import presentacion.AltaUsuarioFrame;
+
+import logica.fabrica;
+
+import java.time.LocalDate;
+public class main {
+
+    private JFrame frame;
+    private JDesktopPane desktopPane;
+    private IControladorUsuario ICU;
+    private AltaUsuarioFrame creUsrInternalFrame;
+//    private ConsultarUsuario conUsrInternalFrame;
+//    private ListaUsuarios lisUsrInternalFrame;
+
+
+    public static void main(String[] args) {
+        // EventQueue asegura que Swing se ejecute en el hilo correcto
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                try {
+                    main window = new main();
+                    window.frame.setVisible(true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public main() {
+        initialize();
+        
+        // Inicialización
+        
+        ICU = fabrica.getInstance().getIControladorUsuario();
+        
+        // Se crean los tres InternalFrame y se incluyen al Frame principal ocultos.
+        // De esta forma, no es necesario crear y destruir objetos lo que enlentece la ejecución.
+        // Cada InternalFrame usa un layout diferente, simplemente para mostrar distintas opciones.
+        creUsrInternalFrame = new AltaUsuarioFrame(ICU);
+        creUsrInternalFrame.setVisible(false);
+
+        frame.getContentPane().setLayout(null);
+
+        desktopPane.add(creUsrInternalFrame);
+        creUsrInternalFrame.setVisible(false);
+        
+        cargarDatosPrueba();
+    }
+    private void cargarDatosPrueba() {
+
+    }
+
+    private void initialize() {
+    	
+    	
+        // Creo el JFrame principal
+        frame = new JFrame();
+        frame.setTitle("Eventos.uy");
+        frame.setBounds(100, 100, 800, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(null);
+
+        // Creo el DesktopPane (contenedor de InternalFrames)
+        desktopPane = new JDesktopPane();
+        desktopPane.setBounds(0, 50, 800, 550);
+        frame.getContentPane().add(desktopPane);
+
+
+        JMenuBar menuBar = new JMenuBar();
+        frame.setJMenuBar(menuBar);
+
+        JMenu menuSistema = new JMenu("Sistema");
+        menuBar.add(menuSistema);
+
+        JMenu menuUsuario = new JMenu("Usuario");
+        menuBar.add(menuUsuario);
+
+
+        JMenuItem itemAltaUsuario = new JMenuItem("Alta de Usuario");
+        menuUsuario.add(itemAltaUsuario);
+        itemAltaUsuario.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	creUsrInternalFrame.setVisible(true);
+            }
+        });
+        
+
+    }
+
+
+}
+

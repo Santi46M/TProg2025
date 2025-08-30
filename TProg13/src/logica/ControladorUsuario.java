@@ -11,12 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import logica.manejadorUsuario;
 import java.time.LocalDate;
 
-
-public class ControladorUsuario {
+public class ControladorUsuario implements IControladorUsuario {
 	
 	manejadorUsuario manejador = manejadorUsuario.getInstancia();
     manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
@@ -31,7 +28,7 @@ public class ControladorUsuario {
     }
 
     public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link,
-                            String apellido, LocalDate fechaNacimiento, Institucion institucion, boolean esOrganizador) {
+                            String apellido, LocalDate fechaNacimiento, Institucion institucion, boolean esOrganizador) throws UsuarioYaExisteException {
 
         manejadorUsuario manejador = manejadorUsuario.getInstancia();
 
@@ -57,7 +54,7 @@ public class ControladorUsuario {
         manejador.addUsuario(nuevoUsuario);
     }
 
-    public void AltaInstitucion(String nombre, String descripcion, String link) {
+    public void AltaInstitucion(String nombre, String descripcion, String link) throws InstitucionYaExisteException {
 
         if (manejador.findInstitucion(nombre) != null) {
             throw new InstitucionYaExisteException(nombre);
@@ -79,7 +76,7 @@ public class ControladorUsuario {
         return manejador.getOrganizadores();
     }
 
-    public void actualizarAsistente(String nickname, String apellido, LocalDate fechaNacimiento) {
+    public void actualizarAsistente(String nickname, String apellido, LocalDate fechaNacimiento) throws UsuarioYaExisteException, UsuarioTipoIncorrectoException {
 
         Usuario u = manejador.findUsuario(nickname);
 
@@ -96,7 +93,7 @@ public class ControladorUsuario {
         a.setFechaDeNacimiento(fechaNacimiento);
     }
 
-    public void actualizarOrganizador(String nickname, String desc, String link) {
+    public void actualizarOrganizador(String nickname, String desc, String link) throws UsuarioNoExisteException, UsuarioTipoIncorrectoException {
 
         Usuario u = manejador.findUsuario(nickname);
 
@@ -113,30 +110,49 @@ public class ControladorUsuario {
         o.setLink(link);
     }
 
-    public DTDatosUsuario obtenerDatosUsuario(String nickname) {
+    public DTDatosUsuario obtenerDatosUsuario(String nickname) throws UsuarioNoExisteException {
 
-        Usuario u = manejador.findUsuario(nickname);
+    	Usuario u = manejador.findUsuario(nickname);
 
         if (u == null) {
             throw new UsuarioNoExisteException(nickname);
         }
 
-        return new DTDatosUsuario();
-    }
+        // Datos básicos
+        DTDatosUsuario dto = new DTDatosUsuario(u.getNickname(), u.getNombre(), u.getEmail());
 
-    public void AltaCategoriaSinGUI(String nombre) {
+        // Datos específicos
+        if (u instanceof Asistente) {
+            Asistente a = (Asistente) u;
+            dto.setApellido(a.getApellido());
+            dto.setFechaNac(a.getFechaDeNacimiento());
+//          Map<String, Registro> registros = a.getRegistros();
+//
+//          // Ejemplo de llamada a detalle de un registro seleccionado:
+//          for (Registro reg : registros.values()) {
+//              DTRegistro detalle = consultaRegistro(reg.getId());
+//              // ahora podés exponer o almacenar el detalle
+//          }
 
-        if (manejadorAux.findCategoria(nombre) != null) {
-            throw new CategoriaYaExisteException(nombre);
+        } else if (u instanceof Organizador) {
+            Organizador o = (Organizador) u;
+            dto.setDesc(o.getDesc());
+            dto.setLink(o.getLink());
+//          List<DTEdicionEvento> ediciones = listarEdicionesAPartirDeOrganizador(o);
+          //
+//                      // Ejemplo de llamada a detalle de una edición seleccionada:
+//                      for (DTEdicionEvento dtEd : ediciones) {
+//                          DTEdicionEvento detalle = consultaEdicionEvento(dtEd.getNombre());
+//                          // ahora podés exponer o almacenar el detalle
+//                      }
         }
 
-        Categoria c = new Categoria(nombre);
-        manejadorAux.addCategoria(c.getNombre());
+        return dto;
     }
 
 
 
-public void ConsultaUsuario(String nickname) {
+public void ConsultaUsuario(String nickname) throws UsuarioNoExisteException {
 
     Usuario u = manejador.findUsuario(nickname);
 
@@ -170,6 +186,22 @@ public void ConsultaUsuario(String nickname) {
     
     	
     }
+private List<DTEdicionEvento> listarEdicionesAPartirDeOrganizador(Organizador o) {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+
+
+public void AltaCategoriaSinGUI(String nombre) throws CategoriaYaExisteException {
+
+    if (manejadorAux.findCategoria(nombre) != null) {
+        throw new CategoriaYaExisteException(nombre);
+    }
+
+    Categoria c = new Categoria(nombre);
+    manejadorAux.addCategoria(c.getNombre());
+}
 
 	
 }
