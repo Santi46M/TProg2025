@@ -149,15 +149,14 @@ public class ControladorUsuario implements IControladorUsuario {
 
         return dto;
     }
-    public static List<DTEdicionEvento> listarEdicionesAPartirDeOrganizador(Organizador o) {
-        List<DTEdicionEvento> lista = new ArrayList<>();
+    public static List<DTEdicion> listarEdicionesAPartirDeOrganizador(Organizador o) {
+        List<DTEdicion> lista = new ArrayList<>();
 
         // Recorremos el Map de ediciones del organizador
         for (Ediciones e : o.getEdiciones().values()) {
-            lista.add(new DTEdicionEvento(
+            lista.add(new DTEdicion(
                 e.getNombre(),
                 e.getSigla(),
-                e.getDesc(),
                 e.getFechaInicio(),
                 e.getFechaFin(),
                 e.getFechaAlta(),
@@ -182,11 +181,11 @@ public class ControladorUsuario implements IControladorUsuario {
         String correo = u.getEmail();
 
         if (u instanceof Organizador o) {
-            List<DTEdicionEvento> ediciones = listarEdicionesAPartirDeOrganizador(o);
+            List<DTEdicion> ediciones = listarEdicionesAPartirDeOrganizador(o);
 
             // Ejemplo de llamada a detalle de una edición seleccionada:
-            for (DTEdicionEvento dtEd : ediciones) {
-                DTEdicionEvento detalle = consultaEdicionEvento(dtEd.getNombre());
+            for (DTEdicion dtEd : ediciones) {
+            	DTEdicion detalle = consultaEdicionEvento(dtEd.getNombre());
                 // ahora podés exponer o almacenar el detalle
             }
 
@@ -208,7 +207,7 @@ private DTRegistro consultaRegistro(String id) {
 		return null;
 	}
 
-private DTEdicionEvento consultaEdicionEvento(String nombre) {
+private DTEdicion consultaEdicionEvento(String nombre) {
 		// TODO Auto-generated method stub
 		return null;
 	}

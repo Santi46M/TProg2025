@@ -11,22 +11,21 @@ public class Ediciones {
     private Eventos evento;
     private String nombre;
     private String sigla;
-    private String desc;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
     private LocalDate fechaAlta;
     private Usuario organizador;
     private String ciudad;
     private String pais;
+    private Map<String, TipoRegistro> tiposRegistro = new HashMap<>();
+    private Set<Patrocinio> patrocinios = new HashSet<>();
 
-
-    public Ediciones(Eventos evento, String nombre, String sigla, String desc,
+    public Ediciones(Eventos evento, String nombre, String sigla,
                      LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
                      Usuario organizador, String ciudad, String pais) {
         this.evento = evento;
         this.nombre = nombre;
         this.sigla = sigla;
-        this.desc = desc;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.fechaAlta = fechaAlta;
@@ -57,14 +56,6 @@ public class Ediciones {
 
     public void setSigla(String sigla) {
         this.sigla = sigla;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
     }
 
     public LocalDate getFechaInicio() {
@@ -119,4 +110,23 @@ public class Ediciones {
 		// TODO Auto-generated method stub
 		
 	}
+
+    public java.util.Collection<TipoRegistro> getTiposRegistro() {
+        return tiposRegistro.values();
+    }
+
+    public TipoRegistro getTipoRegistro(String nombre) {
+        return tiposRegistro.get(nombre);
+    }
+
+    public java.util.Collection<Patrocinio> getPatrocinios() {
+        return patrocinios;
+    }
+
+    public Patrocinio getPatrocinio(String codigo) {
+        for (Patrocinio p : patrocinios) {
+            if (p.getCodigoPatrocinio().equals(codigo)) return p;
+        }
+        return null;
+    }
 }

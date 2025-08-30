@@ -13,17 +13,22 @@ public class Eventos{
 	private String sigla;
 	private String descripcion;
 	private LocalDate fecha;
-	private List<String> categorias;
+	private Map<String, Categoria> categorias;
 	private Map<String, Ediciones> ediciones;
 
-	public Eventos(String nombre, String sigla, String descripcion, LocalDate fecha, List<String> categorias) {
+	public Eventos(String nombre, String sigla, String descripcion, LocalDate fecha, Map<String, Categoria> categorias) {
 		this.nombre = nombre;
 		this.sigla = sigla;
 		this.descripcion = descripcion;
 		this.fecha = fecha;
 		this.categorias = categorias;
+<<<<<<< Updated upstream
         this.ediciones = new HashMap<>();
 	}	
+=======
+        this.ediciones = new HashMap<>(); 
+	} 	
+>>>>>>> Stashed changes
 	
 	//Definimos los getters
 	public String getNombre() {
@@ -46,7 +51,7 @@ public class Eventos{
 		return this.fecha;
 	}
 	
-	public List<String> getCategorias() {
+	public Map<String, Categoria> getCategorias() {
         return this.categorias;
     }
 	
@@ -67,7 +72,7 @@ public class Eventos{
 		this.fecha = fecha;
 	}
 	
-	public void setCategorias(List<String> categorias) {
+	public void setCategorias(Map<String, Categoria> categorias) {
         this.categorias = categorias;
     }
 
@@ -79,5 +84,9 @@ public class Eventos{
         return ediciones.get(nombreEdicion);
     }
     
+
+    public Categoria obtenerCategoria(String nombreCategoria) {
+        return categorias.get(nombreCategoria);
+    }
 
 }
