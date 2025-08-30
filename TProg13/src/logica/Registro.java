@@ -10,7 +10,6 @@ import java.util.HashMap;
 
 public class Registro {
     private String id;
-    private LocalDate fechaRealizacion;
     private float costo;
     // Nuevos campos para el caso de uso AltaRegistroEdicionEvento
     private Usuario usuario;

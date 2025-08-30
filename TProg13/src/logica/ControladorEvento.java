@@ -367,4 +367,19 @@ public class ControladorEvento implements IControladorEvento{
         if (evento == null) return null;
         return evento.obtenerEdicion(nombreEdicion);
     }
+    
+    public DTRegistro consultaRegistro(Usuario u, String idRegistro) {
+        if (!(u instanceof Asistente)) {
+            throw new UsuarioNoEsAsistenteException(u.getNickname());
+        }
+
+        Asistente a = (Asistente) u;
+        Registro r = a.getRegistros().get(idRegistro);
+
+        if (r == null) {
+            throw new RegistroNoExisteException(idRegistro);
+        }
+
+        return new DTRegistro(r.getId(), u.getNombre(), r.getEdicion().getNombre(), r.getTipoRegistro().getNombre(), r.getFechaRegistro(), r.getCosto(), r.getFechaInicio());
+    }
 }
