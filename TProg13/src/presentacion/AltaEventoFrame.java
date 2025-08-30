@@ -13,11 +13,11 @@ public class AltaEventoFrame extends JInternalFrame {
     private Runnable abrirConsultaRunnable;
     public void setAbrirConsultaRunnable(Runnable r) { this.abrirConsultaRunnable = r; }
     private JDesktopPane desktopPane;
-    private ConsultaEventoFrame[] consultaEventoFrameRef;
-    public AltaEventoFrame(JDesktopPane desktopPane, ConsultaEventoFrame[] consultaEventoFrameRef) {
+    //private ConsultaEventoFrame[] consultaEventoFrameRef;
+    public AltaEventoFrame(JDesktopPane desktopPane) {//, ConsultaEventoFrame[] consultaEventoFrameRef) {
         super("Alta de Evento", true, true, true, true);
         this.desktopPane = desktopPane;
-        this.consultaEventoFrameRef = consultaEventoFrameRef;
+       // this.consultaEventoFrameRef = consultaEventoFrameRef;
         setBounds(new Rectangle(50, 50, 450, 300));
         setVisible(true);
 
