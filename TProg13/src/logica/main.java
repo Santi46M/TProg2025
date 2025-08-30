@@ -63,6 +63,14 @@ public class main {
         desktopPane.add(conUsrInternalFrame);
         conUsrInternalFrame.setVisible(false);
         
+        // Cargar datos de prueba automáticamente al iniciar
+        try {
+            CargaDatosPrueba.cargar();
+            System.out.println("Datos de prueba cargados correctamente.");
+        } catch (Exception ex) {
+            System.err.println("Error al cargar datos de prueba: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
 
@@ -124,4 +132,3 @@ public class main {
 
     }
 }
-

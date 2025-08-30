@@ -129,4 +129,11 @@ public class Ediciones {
         }
         return null;
     }
+
+    // Devuelve el tipo de registro por nombre, buscando en el manejador de eventos si no está en el mapa local
+    public TipoRegistro obtenerTipoRegistro(String nombre) {
+        TipoRegistro tipo = tiposRegistro.get(nombre);
+        if (tipo != null) return tipo;
+        return null;
+    }
 }
