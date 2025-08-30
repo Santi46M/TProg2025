@@ -1,5 +1,7 @@
 package logica;
+
 import java.time.LocalDate;
+
 public class DTEdicion {
     private String nombre;
     private String sigla;
