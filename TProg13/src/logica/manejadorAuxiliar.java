@@ -5,11 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
+import logica.Categoria;
 
 public class manejadorAuxiliar {
 	private static manejadorAuxiliar instancia; //singleton
 	// Usar Map para categorías y Set para patrocinios (objetos)
-	private Map<String, String> categorias = new HashMap<>();
+	private Map<String, Categoria> categorias = new HashMap<>();
 	private Set<Patrocinio> patrocinios = new HashSet<>();
 	
 	//// instancia de manejador singleton (no se si esta del todo bien)
@@ -29,11 +30,14 @@ public class manejadorAuxiliar {
 	    return categorias.containsKey(nombre);
 	}
 
-	public void agregarCategoria(String nombre) {
-	    categorias.put(nombre, nombre);
+	public void agregarCategoria(String nombre, Categoria categoria) {
+	    categorias.put(nombre, categoria);
+	}
+
+	public Categoria obtenerCategoria(String nombre) {
+		return categorias.get(nombre);
 	}
 	
-
 	public Set<String> listarCategorias() {
 	    return categorias.keySet();
 	}

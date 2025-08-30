@@ -97,7 +97,8 @@ public class ControladorEvento {
         if (manejadorAux.existeCategoria(nombre)) {
             throw new RuntimeException("Ya existe la categoría: " + nombre);
         }
-        manejadorAux.agregarCategoria(nombre);
+        Categoria categoria = new Categoria(nombre);
+        manejadorAux.agregarCategoria(nombre, categoria);
     }
     /*
     facu public List<DTEvento> ListarEventos() {
@@ -177,7 +178,7 @@ public class ControladorEvento {
     	ManejadorEvento manejador = ManejadorEvento.getInstancia();
     	if(manejador.existeEvento(evento.getNombre())){
     		if(!manejador.existeEdicion(nombre)) {
-	        Ediciones nuevaEdicion = new Ediciones(evento, nombre, sigla, desc, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais);
+	        Ediciones nuevaEdicion = new Ediciones(evento, nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais);
 	        evento.agregarEdicion(nuevaEdicion);
 	        manejador.agregarEdicion(nuevaEdicion);
     		}

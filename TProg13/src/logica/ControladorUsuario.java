@@ -221,7 +221,7 @@ public void AltaCategoriaSinGUI(String nombre) throws CategoriaYaExisteException
     }
 
     Categoria c = new Categoria(nombre);
-    manejadorAux.agregarCategoria(c.getNombre());
+    manejadorAux.agregarCategoria(c.getNombre(), c);
 }
 
 	
