@@ -12,7 +12,7 @@ import java.util.Map;
 public interface IControladorUsuario {
 
     // Crear usuarios
-    public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link, String apellido, LocalDate fechaNacimiento, Institucion institucion, boolean esOrganizador) throws UsuarioYaExisteException;
+    public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador) throws UsuarioYaExisteException;
     public Organizador ingresarOrganizador(String nickname, String nombre, String email, String desc, String link);
     public Asistente ingresarAsistente(String nickname, String nombre, String email, String apellido,LocalDate fechaDeNacimiento, Institucion institucion);
     

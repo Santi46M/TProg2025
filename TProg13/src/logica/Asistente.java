@@ -19,7 +19,7 @@ public class Asistente extends Usuario {
     	super(nickname,nombre,email);
     	this.apellido = apellido;
     	this.fechaDeNacimiento = fechaDeNacimiento;
-    	this.institucion = null;
+    	this.institucion = institucion;
     	this.registros = new HashMap<String, Registro>();
     }
     

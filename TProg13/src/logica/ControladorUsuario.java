@@ -16,6 +16,7 @@ import java.time.LocalDate;
 public class ControladorUsuario implements IControladorUsuario {
 	
 	manejadorUsuario manejador = manejadorUsuario.getInstancia();
+	ManejadorEvento manejadorEv = ManejadorEvento.getInstancia();
     manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
 	
 	public Organizador ingresarOrganizador(String nickname, String nombre, String email, String desc, String link) {
@@ -28,7 +29,7 @@ public class ControladorUsuario implements IControladorUsuario {
     }
 
     public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link,
-                            String apellido, LocalDate fechaNacimiento, Institucion institucion, boolean esOrganizador) throws UsuarioYaExisteException {
+                            String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador) throws UsuarioYaExisteException {
 
 
 
@@ -47,7 +48,8 @@ public class ControladorUsuario implements IControladorUsuario {
             nuevoUsuario = ingresarOrganizador(nickname, nombre, correo, descripcion, link);
         } else {
             // crear asistente
-            nuevoUsuario = ingresarAsistente(nickname, nombre, correo, apellido, fechaNacimiento, institucion);
+        	Institucion inst = manejador.findInstitucion(institucion);
+            nuevoUsuario = ingresarAsistente(nickname, nombre, correo, apellido, fechaNacimiento, inst);
         }
 
         // lo agrego a la base de datos
