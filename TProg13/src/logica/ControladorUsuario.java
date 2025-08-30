@@ -8,6 +8,7 @@ import excepciones.CategoriaYaExisteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.time.LocalDate;
 
 public class ControladorUsuario implements IControladorUsuario {
@@ -141,10 +142,10 @@ public class ControladorUsuario implements IControladorUsuario {
             Organizador o = (Organizador) u;
             dto.setDesc(o.getDesc());
             dto.setLink(o.getLink());
-            List<DTEdicionEvento> ediciones = listarEdicionesAPartirDeOrganizador(o);
+            List<DTEdicion> ediciones = listarEdicionesAPartirDeOrganizador(o);
             	// Ejemplo de llamada a detalle de una edición seleccionada:
-                for (DTEdicionEvento dtEd : ediciones) {
-                      DTEdicionEvento detalle = consultaEdicionEvento(dtEd.getNombre());
+                for (DTEdicion dtEd : ediciones) {
+                      DTEdicion detalle = consultaEdicionEvento(dtEd.getNombre());
                       dto.addEdicion(detalle);
                 }
         }

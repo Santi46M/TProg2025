@@ -50,19 +50,18 @@ public class main {
         // Cada InternalFrame usa un layout diferente, simplemente para mostrar distintas opciones.
         // Alta de usuario
         creUsrInternalFrame = new AltaUsuarioFrame(ICU);
-        creUsrInternalFrame.setLocation(54, 11);
         creUsrInternalFrame.setVisible(false);
+        // Consulta de usuario
+        conUsrInternalFrame = new ConsultaUsuario(ICU);
+        conUsrInternalFrame.setVisible(false);
         
         frame.getContentPane().setLayout(null);
         // Agregamos Alta de usuario
         desktopPane.add(creUsrInternalFrame);
-        // Consulta de usuario
-        conUsrInternalFrame = new ConsultaUsuario(ICU);
-        conUsrInternalFrame.setBounds(126, 159, 500, 200);
-        creUsrInternalFrame.getContentPane().add(conUsrInternalFrame);
-        conUsrInternalFrame.setVisible(false);
-        conUsrInternalFrame.setVisible(false);
         creUsrInternalFrame.setVisible(false);
+        //Agregamos Consulta de usuario
+        desktopPane.add(conUsrInternalFrame);
+        conUsrInternalFrame.setVisible(false);
         
     }
 
@@ -97,7 +96,13 @@ public class main {
         menuUsuario.add(itemAltaUsuario);
         itemAltaUsuario.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+            	try {
             		creUsrInternalFrame.cargarInstituciones();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+            		
             		creUsrInternalFrame.setVisible(true);
             }
         });

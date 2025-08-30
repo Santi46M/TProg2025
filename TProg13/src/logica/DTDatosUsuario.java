@@ -14,7 +14,7 @@ public class DTDatosUsuario {
     private String link;           // si es Organizador
     // Agrego para el método obtenerDatosUsuario
     private Set<DTRegistro> registros;
-    private Set<DTEdicionEvento> ediciones;
+    private Set<DTEdicion> ediciones;
 
     // Constructor básico para todos
     public DTDatosUsuario(String nickname, String nombre, String email) {
@@ -34,7 +34,7 @@ public class DTDatosUsuario {
     public String getDesc() { return desc; }
     public String getLink() { return link; }
     public Set<DTRegistro> getRegistros() { return registros; }
-    public Set<DTEdicionEvento> getEdiciones() { return ediciones; }
+    public Set<DTEdicion> getEdiciones() { return ediciones; }
     
     // --- Setters opcionales ---
     public void setApellido(String apellido) { this.apellido = apellido; }
@@ -45,7 +45,7 @@ public class DTDatosUsuario {
         this.registros.add(registro);
     }
 
-    public void addEdicion(DTEdicionEvento edicion) {
+    public void addEdicion(DTEdicion edicion) {
         this.ediciones.add(edicion);
     }
 }
