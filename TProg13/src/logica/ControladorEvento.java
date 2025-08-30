@@ -16,7 +16,7 @@ import excepciones.EventoYaExisteException;
 import excepciones.EdicionYaExisteException;
 
 
-public class ControladorEvento {
+public class ControladorEvento implements IControladorEvento{
 	ManejadorEvento manejador = ManejadorEvento.getInstancia();
 	manejadorUsuario mUsuario = manejadorUsuario.getInstancia();
 
