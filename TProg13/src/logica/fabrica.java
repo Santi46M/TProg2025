@@ -62,8 +62,6 @@ public class fabrica {
                             	cUsuario.AltaUsuario(nickname, nombre, correo, null, null, apellido, fechaNac, Institucion, false);
                             }
                         }
-                        //(String nickname, String nombre, String correo, String descripcion, String link,
-                        //String apellido, LocalDate fechaNacimiento, Institucion institucion, boolean esOrganizador)
                 	}
                 }else if (tipo == "O") {
                 	String rutaAsistente = "resources/2025Usuarios-Organizadores.csv";

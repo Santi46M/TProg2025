@@ -12,20 +12,31 @@ import java.util.Map;
 import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.NombreEdicionEnUsoException;
+import excepciones.EventoYaExisteException;
+import excepciones.EdicionYaExisteException;
 
 
 public class ControladorEvento {
 	ManejadorEvento manejador = ManejadorEvento.getInstancia();
 	manejadorUsuario mUsuario = manejadorUsuario.getInstancia();
-    public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias, String evento) {
+
+    public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias) throws EventoYaExisteException {
         if (categorias == null || categorias.getCategorias() == null || categorias.getCategorias().isEmpty()) {
             throw new RuntimeException("Debe asociar al menos una categoría al evento");
         }
-        
         if (manejador.existeEvento(nombre)) {
-        	//throw new EventoExisteException(nombre);
+            throw new EventoYaExisteException(nombre);
         }
-        Eventos nuevoEvento = new Eventos(nombre, sigla, desc, fechaDeAlta, categorias.getCategorias());
+        manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
+        Map<String, Categoria> categoriasMap = new java.util.HashMap<>();
+        for (String nombreCat : categorias.getCategorias()) {
+            Categoria cat = manejadorAux.obtenerCategoria(nombreCat);
+            if (cat == null) {
+                throw new RuntimeException("La categoría '" + nombreCat + "' no existe");
+            }
+            categoriasMap.put(nombreCat, cat);
+        }
+        Eventos nuevoEvento = new Eventos(nombre, sigla, desc, fechaDeAlta, categoriasMap);
         manejador.agregarEvento(nuevoEvento);
     }
 
@@ -176,19 +187,22 @@ public class ControladorEvento {
     }
 
     // ConsultaEdicionEvento: Devuelve los detalles de una edición de un evento
-    public DTEvento consultaEdicionEvento(String siglaEvento, String siglaEdicion) {
+    public DTEdicion consultaEdicionEvento(String siglaEvento, String siglaEdicion) {
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
         Eventos evento = manejador.obtenerEvento(siglaEvento);
         if (evento == null) return null;
         Ediciones edicion = evento.obtenerEdicion(siglaEdicion);
         if (edicion == null) return null;
-        // Por ahora, solo se devuelven los datos básicos de la edición usando DTEvento
-        // TODO: Agregar detalles de tipos de registro, registros y patrocinios
-        return new DTEvento(
+        // Devuelve los datos de la edición usando DTEdicion
+        return new DTEdicion(
             edicion.getNombre(),
             edicion.getSigla(),
-            edicion.getDesc(),
-            edicion.getFechaAlta()
+            edicion.getFechaInicio(),
+            edicion.getFechaFin(),
+            edicion.getFechaAlta(),
+            edicion.getOrganizador().getNickname(),
+            edicion.getCiudad(),
+            edicion.getPais()
         );
     }
 
@@ -271,7 +285,7 @@ public class ControladorEvento {
 	        throw new IllegalArgumentException("No existe el organizador: " + organizador);
 	    }
 	    
-	    Ediciones nuevaEdicion = new Ediciones(evento,nombre,sigla,desc,fechaInicio, fechaFin,fechaAlta, org, ciudad,pais);
+	    Ediciones nuevaEdicion = new Ediciones(evento,nombre,sigla,fechaInicio, fechaFin,fechaAlta, org, ciudad,pais);
 
 	    evento.agregarEdicion(nuevaEdicion);
 
@@ -279,6 +293,15 @@ public class ControladorEvento {
 
 		}
     
-}	
-	
-	
+    public List<String> listarEdicionesEvento(String nombreEvento) {
+        Eventos evento = manejador.obtenerEvento(nombreEvento);
+        if (evento == null) return new ArrayList<>();
+        return new ArrayList<>(evento.getEdiciones().keySet());
+    }
+
+    public Ediciones obtenerEdicion(String nombreEvento, String nombreEdicion) {
+        Eventos evento = manejador.obtenerEvento(nombreEvento);
+        if (evento == null) return null;
+        return evento.obtenerEdicion(nombreEdicion);
+    }
+}
