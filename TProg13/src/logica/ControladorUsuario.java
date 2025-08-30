@@ -126,25 +126,24 @@ public class ControladorUsuario implements IControladorUsuario {
             Asistente a = (Asistente) u;
             dto.setApellido(a.getApellido());
             dto.setFechaNac(a.getFechaDeNacimiento());
-//          Map<String, Registro> registros = a.getRegistros();
-//
-//          // Ejemplo de llamada a detalle de un registro seleccionado:
-//          for (Registro reg : registros.values()) {
-//              DTRegistro detalle = consultaRegistro(reg.getId());
-//              // ahora podés exponer o almacenar el detalle
-//          }
+            Map<String, Registro> registros = a.getRegistros();
+
+            // Ejemplo de llamada a detalle de un registro seleccionado:
+            for (Registro reg : registros.values()) {
+            	DTRegistro detalle = consultaRegistro(reg.getId());
+            	dto.addRegistro(detalle);
+            }
 
         } else if (u instanceof Organizador) {
             Organizador o = (Organizador) u;
             dto.setDesc(o.getDesc());
             dto.setLink(o.getLink());
-//          List<DTEdicionEvento> ediciones = listarEdicionesAPartirDeOrganizador(o);
-          //
-//                      // Ejemplo de llamada a detalle de una edición seleccionada:
-//                      for (DTEdicionEvento dtEd : ediciones) {
-//                          DTEdicionEvento detalle = consultaEdicionEvento(dtEd.getNombre());
-//                          // ahora podés exponer o almacenar el detalle
-//                      }
+            List<DTEdicionEvento> ediciones = listarEdicionesAPartirDeOrganizador(o);
+            	// Ejemplo de llamada a detalle de una edición seleccionada:
+                for (DTEdicionEvento dtEd : ediciones) {
+                      DTEdicionEvento detalle = consultaEdicionEvento(dtEd.getNombre());
+                      dto.addEdicion(detalle);
+                }
         }
 
         return dto;
