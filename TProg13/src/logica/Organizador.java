@@ -12,7 +12,7 @@ public class Organizador extends Usuario {
     private String link;
 
     public Organizador(String nickname, String nombre, String email, String desc, String link) {
-    	super();
+    	super(nickname, nombre, email);
     	this.desc = desc;
     	this.link = link;
     }

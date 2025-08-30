@@ -8,12 +8,13 @@ import java.util.Set;
 
 public class manejadorAuxiliar {
 	private static manejadorAuxiliar instancia; //singleton
-	private Set<String> categorias = new HashSet<String>();
-	private Set<String> patrocinios = new HashSet<String>();
+	// Usar Map para categorías y Set para patrocinios (objetos)
+	private Map<String, String> categorias = new HashMap<>();
+	private Set<Patrocinio> patrocinios = new HashSet<>();
 	
 	//// instancia de manejador singleton (no se si esta del todo bien)
 	private manejadorAuxiliar() {
-		 this.categorias = new HashSet<>();
+		 this.categorias = new HashMap<>();
 		 this.patrocinios = new HashSet<>();
 	}
 	
@@ -24,30 +25,30 @@ public class manejadorAuxiliar {
 		return instancia;
 	}
 	
-	public Set<String> getCategorias() {
-		return this.categorias;
+	public boolean existeCategoria(String nombre) {
+	    return categorias.containsKey(nombre);
 	}
 
-	public Set<String> getPatrocinios() {
-		return this.patrocinios;
+	public void agregarCategoria(String nombre) {
+	    categorias.put(nombre, nombre);
 	}
 
-	public void addCategoria(String c) {
-		this.categorias.add(c);
-	}
-	
-	public void addPatrocinio(String p) {
-		this.patrocinios.add(p);
+	public Set<String> listarCategorias() {
+	    return categorias.keySet();
 	}
 
-	public String findCategoria(String nombre) {
-		return null ;//categorias.get(nombre);
+	public boolean existePatrocinio(String codigo) {
+	    for (Patrocinio p : patrocinios) {
+	        if (p.getCodigoPatrocinio().equals(codigo)) return true;
+	    }
+	    return false;
 	}
-	
-	public String findPatrocinio(int patrocinio) {
-		return null ; //this.patrocinios.get(patrocinio);
+
+	public void agregarPatrocinio(Patrocinio patrocinio) {
+	    patrocinios.add(patrocinio);
 	}
-	
+
+	public Set<Patrocinio> listarPatrocinios() {
+	    return patrocinios;
+	}
 }
-	
-	

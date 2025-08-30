@@ -5,8 +5,10 @@ public class TipoRegistro {
     private String descripcion;
     private int costo;
     private int cupo;
+    private Ediciones edicion;
 
-    public TipoRegistro(String nombre, String descripcion, int costo, int cupo) {
+    public TipoRegistro(Ediciones edicion, String nombre, String descripcion, int costo, int cupo) {
+        this.edicion = edicion;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.costo = costo;
@@ -43,5 +45,13 @@ public class TipoRegistro {
 
     public void setCupo(int cupo) {
         this.cupo = cupo;
+    }
+
+    public Ediciones getEdicion() {
+        return edicion;
+    }
+
+    public void setEdicion(Ediciones edicion) {
+        this.edicion = edicion;
     }
 }

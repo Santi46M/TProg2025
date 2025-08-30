@@ -8,20 +8,22 @@ import java.util.HashMap;
 
 
 public class Ediciones {
+    private Eventos evento;
     private String nombre;
     private String sigla;
     private String desc;
     private LocalDate fechaInicio;
     private LocalDate fechaFin;
     private LocalDate fechaAlta;
-    private String organizador;
+    private Usuario organizador;
     private String ciudad;
     private String pais;
 
 
-    public Ediciones(String nombre, String sigla, String desc,
+    public Ediciones(Eventos evento, String nombre, String sigla, String desc,
                      LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
-                     String organizador, String ciudad, String pais) {
+                     Usuario organizador, String ciudad, String pais) {
+        this.evento = evento;
         this.nombre = nombre;
         this.sigla = sigla;
         this.desc = desc;
@@ -31,6 +33,14 @@ public class Ediciones {
         this.organizador = organizador;
         this.ciudad = ciudad;
         this.pais = pais;
+    }
+
+    public Eventos getEvento() {
+        return evento;
+    }
+
+    public void setEvento(Eventos evento) {
+        this.evento = evento;
     }
 
     public String getNombre() {
@@ -81,11 +91,11 @@ public class Ediciones {
         this.fechaAlta = fechaAlta;
     }
 
-    public String getOrganizador() {
+    public Usuario getOrganizador() {
         return organizador;
     }
 
-    public void setOrganizador(String organizador) {
+    public void setOrganizador(Usuario organizador) {
         this.organizador = organizador;
     }
 
@@ -104,4 +114,9 @@ public class Ediciones {
     public void setPais(String pais) {
         this.pais = pais;
     }
+
+	public void agregarTipoRegistro(TipoRegistro tipo) {
+		// TODO Auto-generated method stub
+		
+	}
 }

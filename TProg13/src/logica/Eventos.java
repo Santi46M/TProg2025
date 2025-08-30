@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.HashMap;
+import java.util.List;
 
 
 public class Eventos{
@@ -12,12 +13,15 @@ public class Eventos{
 	private String sigla;
 	private String descripcion;
 	private LocalDate fecha;
+	private List<String> categorias;
+    private Map<String, Ediciones> ediciones = new HashMap<>();
 
-	public Eventos(String nombre, String sigla, String descripcion, LocalDate fecha) {
+	public Eventos(String nombre, String sigla, String descripcion, LocalDate fecha, List<String> categorias) {
 		this.nombre = nombre;
 		this.sigla = sigla;
 		this.descripcion = descripcion;
 		this.fecha = fecha;
+		this.categorias = categorias;
 	}	
 	
 	//Definimos los getters
@@ -37,6 +41,10 @@ public class Eventos{
 		return this.fecha;
 	}
 	
+	public List<String> getCategorias() {
+        return this.categorias;
+    }
+	
 	//Definimos los setters
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
@@ -53,5 +61,21 @@ public class Eventos{
 	public void setFecha(LocalDate fecha){
 		this.fecha = fecha;
 	}
+	
+	public void setCategorias(List<String> categorias) {
+        this.categorias = categorias;
+    }
+
+    public void agregarEdicion(Ediciones edicion) {
+        ediciones.put(edicion.getNombre(), edicion);
+    }
+
+    public Map<String, Ediciones> getEdiciones() {
+        return ediciones;
+    }
+
+    public Ediciones obtenerEdicion(String nombreEdicion) {
+        return ediciones.get(nombreEdicion);
+    }
 
 }

@@ -3,57 +3,42 @@ package logica;
 import java.time.LocalDate;
 
 public class Patrocinio {
-    private LocalDate fecha;
-    private int monto;
-    private int codigo;
+    // Cambios: ahora se usan referencias a Ediciones, Institucion y TipoRegistro
+    private Ediciones edicion;
+    private Institucion institucion;
     private DTNivel nivel;
-    private int cantRegistrosGratuitos;
+    private TipoRegistro tipoRegistro;
+    private int aporte;
+    private LocalDate fechaPatrocinio;
+    private int cantidadRegistros;
+    private String codigoPatrocinio;
 
-    public Patrocinio(LocalDate fecha, int monto, int codigo, DTNivel nivel, int cantRegistrosGratuitos) {
-        this.fecha = fecha;
-        this.monto = monto;
-        this.codigo = codigo;
+    public Patrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) {
+        this.edicion = edicion;
+        this.institucion = institucion;
         this.nivel = nivel;
-        this.cantRegistrosGratuitos = cantRegistrosGratuitos;
+        this.tipoRegistro = tipoRegistro;
+        this.aporte = aporte;
+        this.fechaPatrocinio = fechaPatrocinio;
+        this.cantidadRegistros = cantidadRegistros;
+        this.codigoPatrocinio = codigoPatrocinio;
     }
 
-    public LocalDate getFecha() {
-        return fecha;
-    }
+    public Ediciones getEdicion() { return edicion; }
+    public Institucion getInstitucion() { return institucion; }
+    public DTNivel getNivel() { return nivel; }
+    public TipoRegistro getTipoRegistro() { return tipoRegistro; }
+    public int getAporte() { return aporte; }
+    public LocalDate getFechaPatrocinio() { return fechaPatrocinio; }
+    public int getCantidadRegistros() { return cantidadRegistros; }
+    public String getCodigoPatrocinio() { return codigoPatrocinio; }
 
-    public void setFecha(LocalDate fecha) {
-        this.fecha = fecha;
-    }
-
-    public int getMonto() {
-        return monto;
-    }
-
-    public void setMonto(int monto) {
-        this.monto = monto;
-    }
-
-    public int getCodigo() {
-        return codigo;
-    }
-
-    public void setCodigo(int codigo) {
-        this.codigo = codigo;
-    }
-
-    public DTNivel getNivel() {
-        return nivel;
-    }
-
-    public void setNivel(DTNivel nivel) {
-        this.nivel = nivel;
-    }
-
-    public int getCantRegistrosGratuitos() {
-        return cantRegistrosGratuitos;
-    }
-
-    public void setCantRegistrosGratuitos(int cantRegistrosGratuitos) {
-        this.cantRegistrosGratuitos = cantRegistrosGratuitos;
-    }
+    public void setEdicion(Ediciones edicion) { this.edicion = edicion; }
+    public void setInstitucion(Institucion institucion) { this.institucion = institucion; }
+    public void setNivel(DTNivel nivel) { this.nivel = nivel; }
+    public void setTipoRegistro(TipoRegistro tipoRegistro) { this.tipoRegistro = tipoRegistro; }
+    public void setAporte(int aporte) { this.aporte = aporte; }
+    public void setFechaPatrocinio(LocalDate fechaPatrocinio) { this.fechaPatrocinio = fechaPatrocinio; }
+    public void setCantidadRegistros(int cantidadRegistros) { this.cantidadRegistros = cantidadRegistros; }
+    public void setCodigoPatrocinio(String codigoPatrocinio) { this.codigoPatrocinio = codigoPatrocinio; }
 }
