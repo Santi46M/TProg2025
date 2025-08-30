@@ -9,13 +9,15 @@ import logica.manejadorAuxiliar;
 import java.util.ArrayList;
 import java.util.Map;
 
+import excepciones.EdicionYaExisteException;
+import excepciones.EventoYaExisteException;
 import excepciones.NombreEdicionEnUsoException;
 
 
 public class ControladorEvento {
 	ManejadorEvento manejador = ManejadorEvento.getInstancia();
 	manejadorUsuario mUsuario = manejadorUsuario.getInstancia();
-    public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias) {
+    public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias, String evento) {
         if (categorias == null || categorias.getCategorias() == null || categorias.getCategorias().isEmpty()) {
             throw new RuntimeException("Debe asociar al menos una categoría al evento");
         }
@@ -160,13 +162,17 @@ public class ControladorEvento {
         return null;
     } */
 
-    public void AltaEdicionEvento(Eventos evento, Usuario organizador, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais) {
-        // TODO: Verificar que el nombre de la edición sea único en toda la plataforma y lanzar excepción si no lo es
-        // TODO: lanzar excepción si la sigla ya existe en el evento
-        Ediciones nuevaEdicion = new Ediciones(evento, nombre, sigla, desc, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais);
-        evento.agregarEdicion(nuevaEdicion);
-        ManejadorEvento manejador = ManejadorEvento.getInstancia();
-        manejador.agregarEdicion(nuevaEdicion);
+    public void AltaEdicionEvento(Eventos evento, Usuario organizador, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais)throws EdicionYaExisteException, EventoYaExisteException {
+    	ManejadorEvento manejador = ManejadorEvento.getInstancia();
+    	if(manejador.existeEvento(evento.getNombre())){
+    		if(!manejador.existeEdicion(nombre)) {
+	        Ediciones nuevaEdicion = new Ediciones(evento, nombre, sigla, desc, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais);
+	        evento.agregarEdicion(nuevaEdicion);
+	        manejador.agregarEdicion(nuevaEdicion);
+    		}
+    		else throw new EdicionYaExisteException(nombre);
+    	}
+    	else throw new EventoYaExisteException(evento.getNombre());
     }
 
     // ConsultaEdicionEvento: Devuelve los detalles de una edición de un evento

@@ -22,7 +22,7 @@ public class Eventos{
 		this.descripcion = descripcion;
 		this.fecha = fecha;
 		this.categorias = categorias;
-        this.ediciones = new HashMap<>(); 
+        this.ediciones = new HashMap<>();
 	}	
 	
 	//Definimos los getters
@@ -78,5 +78,6 @@ public class Eventos{
     public Ediciones obtenerEdicion(String nombreEdicion) {
         return ediciones.get(nombreEdicion);
     }
+    
 
 }
