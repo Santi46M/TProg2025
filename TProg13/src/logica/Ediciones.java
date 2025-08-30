@@ -106,8 +106,9 @@ public class Ediciones {
         this.pais = pais;
     }
 
-	public void agregarTipoRegistro(TipoRegistro tipo) {
+	public void agregarTipoRegistro(String id, TipoRegistro tipo) {
 		// TODO Auto-generated method stub
+		this.tiposRegistro.put(id, tipo);
 		
 	}
 

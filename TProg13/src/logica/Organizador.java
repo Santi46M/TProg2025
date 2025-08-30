@@ -44,6 +44,11 @@ public class Organizador extends Usuario {
         }
         return lista;
     }
+    //Agregar una edicion
+    public void agregarEdicion(Ediciones ed) {
+    	ediciones.put(ed.getNombre(), ed);
+    }
+    
     public void setDesc(String desc) {
         this.desc = desc;
     }
