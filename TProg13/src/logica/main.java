@@ -157,6 +157,23 @@ public class main {
                 }
             }
         });
+        // Mover Alta de Institución al menú Usuario
+        JMenuItem itemAltaInstitucion = new JMenuItem("Alta de Institución");
+        menuUsuario.add(itemAltaInstitucion);
+        itemAltaInstitucion.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (altaInstitucionFrame == null || altaInstitucionFrame.isClosed()) {
+                        altaInstitucionFrame = new AltaInstitucionFrame(new java.util.HashSet<>());
+                        desktopPane.add(altaInstitucionFrame);
+                    }
+                    altaInstitucionFrame.setVisible(true);
+                    altaInstitucionFrame.toFront();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
         JMenuItem itemConsultaEvento = new JMenuItem("Consulta de Evento");
         menuEvento.add(itemConsultaEvento);
         itemConsultaEvento.addActionListener(new ActionListener() {
@@ -195,9 +212,17 @@ public class main {
         menuEvento.add(itemConsultaTipoRegistro);
         itemConsultaTipoRegistro.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                consultaTipoRegistroFrame.cargarEventos();
-                consultaTipoRegistroFrame.setVisible(true);
-                consultaTipoRegistroFrame.toFront();
+                try {
+                    if (consultaTipoRegistroFrame == null || consultaTipoRegistroFrame.isClosed()) {
+                        consultaTipoRegistroFrame = new ConsultaTipoRegistroFrame();
+                        desktopPane.add(consultaTipoRegistroFrame);
+                    }
+                    consultaTipoRegistroFrame.cargarEventos();
+                    consultaTipoRegistroFrame.setVisible(true);
+                    consultaTipoRegistroFrame.toFront();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         JMenuItem itemConsultaRegistro = new JMenuItem("Consulta de Registro");
@@ -280,22 +305,6 @@ public class main {
                     altaPatrocinioFrame.cargarDatos();
                     altaPatrocinioFrame.setVisible(true);
                     altaPatrocinioFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
-        JMenuItem itemAltaInstitucion = new JMenuItem("Alta de Institución");
-        menuEvento.add(itemAltaInstitucion);
-        itemAltaInstitucion.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    if (altaInstitucionFrame == null || altaInstitucionFrame.isClosed()) {
-                        altaInstitucionFrame = new AltaInstitucionFrame(new java.util.HashSet<>());
-                        desktopPane.add(altaInstitucionFrame);
-                    }
-                    altaInstitucionFrame.setVisible(true);
-                    altaInstitucionFrame.toFront();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

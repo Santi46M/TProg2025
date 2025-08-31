@@ -80,9 +80,7 @@ public class AltaInstitucionFrame extends JInternalFrame {
             JOptionPane.showMessageDialog(this, "Institución creada con éxito:\nNombre: " + nombre +
                     "\nDescripción: " + descripcion +
                     (sitioWeb.isEmpty() ? "" : "\nSitio web: " + sitioWeb));
-            txtNombre.setText("");
-            txtDescripcion.setText("");
-            txtSitioWeb.setText("");
+            this.dispose();
         });
 
         btnCancelar.addActionListener(e -> this.dispose());

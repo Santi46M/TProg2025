@@ -218,8 +218,11 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
             LocalDate fechaRegistro = LocalDate.now();
             float costo = tipo.getCosto();
             LocalDate fechaInicio = edicion.getFechaInicio();
-            controladorEvento.altaRegistroEdicionEvento(usuario, edicion, tipo, fechaRegistro, costo, fechaInicio);
+            StringBuilder sb = new StringBuilder();
+            sb.append(usuario.getNickname() + " "+ edicion.getNombre());
+            controladorEvento.altaRegistroEdicionEvento(sb.toString() ,usuario, controladorEvento.consultaEvento(nombreEvento) ,edicion, tipo, fechaRegistro, costo, fechaInicio);
             JOptionPane.showMessageDialog(this, "Registro realizado correctamente.");
+            this.dispose();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error al registrar: " + ex.getMessage());
         }

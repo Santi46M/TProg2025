@@ -206,6 +206,7 @@ public class AltaPatrocinioFrame extends JInternalFrame {
             txtAporte.setText("");
             txtCantidadGratuitos.setText("");
             txtCodigo.setText("");
+            this.dispose();
         });
         btnCancelar.addActionListener(e -> this.dispose());
     }

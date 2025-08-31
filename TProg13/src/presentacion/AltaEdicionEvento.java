@@ -5,11 +5,15 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import com.toedter.calendar.JDateChooser;
 
 public class AltaEdicionEvento extends JInternalFrame {
 	private JComboBox<String> comboEvento;
 	private JComboBox<String> comboOrganizador;
 	private logica.IControladorUsuario controladorUsuario;
+	private JDateChooser dateChooserInicio;
+	private JDateChooser dateChooserFin;
+	private JDateChooser dateChooserAlta;
 	
     public AltaEdicionEvento(logica.IControladorUsuario controladorUsuario) {
 		super("Alta de Edición de Evento", true, true, true, true);
@@ -124,7 +128,7 @@ public class AltaEdicionEvento extends JInternalFrame {
 		getContentPane().add(txtPais, gbc_txtPais);
 		txtPais.setColumns(10);
 
-		JLabel lblFechaInicio = new JLabel("Fecha de inicio (YYYY-MM-DD):");
+		JLabel lblFechaInicio = new JLabel("Fecha de inicio:");
 		GridBagConstraints gbc_lblFechaInicio = new GridBagConstraints();
 		gbc_lblFechaInicio.insets = new Insets(0, 0, 5, 5);
 		gbc_lblFechaInicio.anchor = GridBagConstraints.WEST;
@@ -132,16 +136,15 @@ public class AltaEdicionEvento extends JInternalFrame {
 		gbc_lblFechaInicio.gridy = 6;
 		getContentPane().add(lblFechaInicio, gbc_lblFechaInicio);
 
-		JTextField txtFechaInicio = new JTextField();
-		GridBagConstraints gbc_txtFechaInicio = new GridBagConstraints();
-		gbc_txtFechaInicio.insets = new Insets(0, 0, 5, 0);
-		gbc_txtFechaInicio.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtFechaInicio.gridx = 1;
-		gbc_txtFechaInicio.gridy = 6;
-		getContentPane().add(txtFechaInicio, gbc_txtFechaInicio);
-		txtFechaInicio.setColumns(10);
+		dateChooserInicio = new JDateChooser();
+		GridBagConstraints gbc_dateChooserInicio = new GridBagConstraints();
+		gbc_dateChooserInicio.insets = new Insets(0, 0, 5, 0);
+		gbc_dateChooserInicio.fill = GridBagConstraints.HORIZONTAL;
+		gbc_dateChooserInicio.gridx = 1;
+		gbc_dateChooserInicio.gridy = 6;
+		getContentPane().add(dateChooserInicio, gbc_dateChooserInicio);
 
-		JLabel lblFechaFin = new JLabel("Fecha de fin (YYYY-MM-DD):");
+		JLabel lblFechaFin = new JLabel("Fecha de fin:");
 		GridBagConstraints gbc_lblFechaFin = new GridBagConstraints();
 		gbc_lblFechaFin.insets = new Insets(0, 0, 5, 5);
 		gbc_lblFechaFin.anchor = GridBagConstraints.WEST;
@@ -149,16 +152,15 @@ public class AltaEdicionEvento extends JInternalFrame {
 		gbc_lblFechaFin.gridy = 7;
 		getContentPane().add(lblFechaFin, gbc_lblFechaFin);
 
-		JTextField txtFechaFin = new JTextField();
-		GridBagConstraints gbc_txtFechaFin = new GridBagConstraints();
-		gbc_txtFechaFin.insets = new Insets(0, 0, 5, 0);
-		gbc_txtFechaFin.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtFechaFin.gridx = 1;
-		gbc_txtFechaFin.gridy = 7;
-		getContentPane().add(txtFechaFin, gbc_txtFechaFin);
-		txtFechaFin.setColumns(10);
+		dateChooserFin = new JDateChooser();
+		GridBagConstraints gbc_dateChooserFin = new GridBagConstraints();
+		gbc_dateChooserFin.insets = new Insets(0, 0, 5, 0);
+		gbc_dateChooserFin.fill = GridBagConstraints.HORIZONTAL;
+		gbc_dateChooserFin.gridx = 1;
+		gbc_dateChooserFin.gridy = 7;
+		getContentPane().add(dateChooserFin, gbc_dateChooserFin);
 
-		JLabel lblFechaAlta = new JLabel("Fecha de alta (YYYY-MM-DD):");
+		JLabel lblFechaAlta = new JLabel("Fecha de alta:");
 		GridBagConstraints gbc_lblFechaAlta = new GridBagConstraints();
 		gbc_lblFechaAlta.insets = new Insets(0, 0, 0, 5);
 		gbc_lblFechaAlta.anchor = GridBagConstraints.WEST;
@@ -166,14 +168,13 @@ public class AltaEdicionEvento extends JInternalFrame {
 		gbc_lblFechaAlta.gridy = 8;
 		getContentPane().add(lblFechaAlta, gbc_lblFechaAlta);
 
-		JTextField txtFechaAlta = new JTextField();
-		GridBagConstraints gbc_txtFechaAlta = new GridBagConstraints();
-		gbc_txtFechaAlta.insets = new Insets(0, 0, 0, 0);
-		gbc_txtFechaAlta.fill = GridBagConstraints.HORIZONTAL;
-		gbc_txtFechaAlta.gridx = 1;
-		gbc_txtFechaAlta.gridy = 8;
-		getContentPane().add(txtFechaAlta, gbc_txtFechaAlta);
-		txtFechaAlta.setColumns(10);
+		dateChooserAlta = new JDateChooser();
+		GridBagConstraints gbc_dateChooserAlta = new GridBagConstraints();
+		gbc_dateChooserAlta.insets = new Insets(0, 0, 0, 0);
+		gbc_dateChooserAlta.fill = GridBagConstraints.HORIZONTAL;
+		gbc_dateChooserAlta.gridx = 1;
+		gbc_dateChooserAlta.gridy = 8;
+		getContentPane().add(dateChooserAlta, gbc_dateChooserAlta);
 
 		JButton btnAceptar = new JButton("Aceptar");
 		GridBagConstraints gbc_btnAceptar = new GridBagConstraints();
@@ -192,49 +193,45 @@ public class AltaEdicionEvento extends JInternalFrame {
 		getContentPane().add(btnCancelar, gbc_btnCancelar);
 
 		btnAceptar.addActionListener(ev -> {
-            String eventoNombre = (String) comboEvento.getSelectedItem();
-            String organizadorNick = (String) comboOrganizador.getSelectedItem();
-            String nombre = txtNombre.getText().trim();
-            String sigla = txtSigla.getText().trim();
-            String ciudad = txtCiudad.getText().trim();
-            String pais = txtPais.getText().trim();
-            String fechaInicio = txtFechaInicio.getText().trim();
-            String fechaFin = txtFechaFin.getText().trim();
-            String fechaAlta = txtFechaAlta.getText().trim();
-            if (eventoNombre == null || organizadorNick == null || nombre.isEmpty() || sigla.isEmpty() || ciudad.isEmpty() || pais.isEmpty() || fechaInicio.isEmpty() || fechaFin.isEmpty() || fechaAlta.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Todos los campos deben estar completos.");
-                return;
-            }
-            try {
-                DateTimeFormatter flexibleFormatter = DateTimeFormatter.ofPattern("yyyy-M-d");
-                LocalDate fInicio = LocalDate.parse(fechaInicio, flexibleFormatter);
-                LocalDate fFin = LocalDate.parse(fechaFin, flexibleFormatter);
-                LocalDate fAlta = LocalDate.parse(fechaAlta, flexibleFormatter);
-                logica.ControladorEvento controladorEvento = new logica.ControladorEvento();
-                logica.ManejadorEvento manejadorEvento = logica.ManejadorEvento.getInstancia();
-                logica.Eventos evento = manejadorEvento.obtenerEvento(eventoNombre);
-                logica.Organizador organizador = null;
-                if (controladorUsuario != null) {
-                    java.util.Map<String, logica.Organizador> orgs = controladorUsuario.listarOrganizadores();
-                    organizador = orgs.get(organizadorNick);
-                }
-                if (evento == null || organizador == null) {
-                    JOptionPane.showMessageDialog(this, "No se pudo encontrar el evento u organizador seleccionado.");
-                    return;
-                }
-                controladorEvento.AltaEdicionEvento(evento, organizador, nombre, sigla, "", fInicio, fFin, fAlta, ciudad, pais);
-                JOptionPane.showMessageDialog(this, "Edición registrada con éxito.");
-                this.dispose();
-            } catch (DateTimeParseException ex) {
-                JOptionPane.showMessageDialog(this, "Formato de fecha inválido. Use AAAA-MM-DD, por ejemplo: 2000-02-02 o 2000-2-2");
-            } catch (excepciones.EdicionYaExisteException ex) {
-                JOptionPane.showMessageDialog(this, "Ya existe una edición con ese nombre.");
-            } catch (excepciones.EventoYaExisteException ex) {
-                JOptionPane.showMessageDialog(this, "El evento no existe.");
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error al registrar la edición: " + ex.getMessage());
-            }
-        });
+			String eventoNombre = (String) comboEvento.getSelectedItem();
+			String organizadorNick = (String) comboOrganizador.getSelectedItem();
+			String nombre = txtNombre.getText().trim();
+			String sigla = txtSigla.getText().trim();
+			String ciudad = txtCiudad.getText().trim();
+			String pais = txtPais.getText().trim();
+			// Fechas con JDateChooser
+			java.util.Date fechaInicioDate = dateChooserInicio.getDate();
+			java.util.Date fechaFinDate = dateChooserFin.getDate();
+			java.util.Date fechaAltaDate = dateChooserAlta.getDate();
+			if (eventoNombre == null || organizadorNick == null || nombre.isEmpty() || sigla.isEmpty() || ciudad.isEmpty() || pais.isEmpty() || fechaInicioDate == null || fechaFinDate == null || fechaAltaDate == null) {
+				JOptionPane.showMessageDialog(this, "Todos los campos deben estar completos.");
+				return;
+			}
+			try {
+				LocalDate fInicio = fechaInicioDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+				LocalDate fFin = fechaFinDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+				LocalDate fAlta = fechaAltaDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+				logica.ControladorEvento controladorEvento = new logica.ControladorEvento();
+				logica.ManejadorEvento manejadorEvento = logica.ManejadorEvento.getInstancia();
+				logica.Eventos evento = manejadorEvento.obtenerEvento(eventoNombre);
+				logica.Organizador organizador = null;
+				if (controladorUsuario != null) {
+					java.util.Map<String, logica.Organizador> orgs = controladorUsuario.listarOrganizadores();
+					organizador = orgs.get(organizadorNick);
+				}
+				if (evento == null || organizador == null) {
+					JOptionPane.showMessageDialog(this, "No se pudo encontrar el evento u organizador seleccionado.");
+					return;
+				}
+				controladorEvento.AltaEdicionEvento(evento, organizador, nombre, sigla, "", fInicio, fFin, fAlta, ciudad, pais);
+				JOptionPane.showMessageDialog(this, "Edición registrada con éxito.");
+				this.dispose();
+			} catch (excepciones.FechasCruzadasException ex) {
+				JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de fechas", JOptionPane.ERROR_MESSAGE);
+			} catch (Exception ex) {
+				JOptionPane.showMessageDialog(this, "Error al registrar la edición: " + ex.getMessage());
+			}
+		});
 
         btnCancelar.addActionListener(ev -> this.dispose());
     }
