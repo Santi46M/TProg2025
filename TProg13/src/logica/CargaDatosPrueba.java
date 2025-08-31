@@ -4,6 +4,7 @@ import excepciones.EventoYaExisteException;
 import excepciones.InstitucionYaExisteException;
 import excepciones.TipoRegistroYaExisteException;
 import excepciones.UsuarioYaExisteException;
+import excepciones.ValorPatrocinioExcedidoException;
 
 public class CargaDatosPrueba {
     public static void cargar() throws Exception {
@@ -13,7 +14,7 @@ public class CargaDatosPrueba {
         cargarUsuariosEjemplo();
         cargarEdicionesEjemplo();
         cargarTipoRegistroEjemplo();
-        cargarRegistrosEjemplo(); // ACTIVADO para que los registros de ejemplo estén disponibles
+        cargarRegistrosEjemplo();
         cargarPatrociniosEjemplo();
         logResumenDatos();
     }
@@ -26,7 +27,7 @@ public class CargaDatosPrueba {
         for (String cat : categorias) {
             System.out.println("  - " + cat);
         }
-        // Instituciones (solo nombres)
+        // Instituciones
         var instituciones = logica.manejadorUsuario.getInstancia().getInstituciones();
         System.out.println("Instituciones: " + instituciones.size());
         for (String nombre : instituciones) {
@@ -44,7 +45,7 @@ public class CargaDatosPrueba {
         for (var us : usuarios.values()) {
             System.out.println("  - " + us.getNickname() + " (" + us.getNombre() + ")");
         }
-        // Ediciones (desde cada evento)
+        // Ediciones
         int totalEdiciones = 0;
         for (var ev : eventos.values()) {
             totalEdiciones += ev.getEdiciones().size();
@@ -55,7 +56,7 @@ public class CargaDatosPrueba {
                 System.out.println("  - " + ed.getNombre());
             }
         }
-        // Tipos de registro (desde cada edición)
+        // Tipos de registro
         int totalTipos = 0;
         for (var ev : eventos.values()) {
             for (var ed : ev.getEdiciones().values()) {
@@ -356,29 +357,50 @@ public class CargaDatosPrueba {
         System.out.println("Registros de ejemplo dados de alta.");
     }
     
-    private static void cargarPatrociniosEjemplo() {
+    private static void cargarPatrociniosEjemplo() throws ValorPatrocinioExcedidoException {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
-        logica.ControladorUsuario controladorUsuario = new logica.ControladorUsuario();
-        // Obtener instituciones usando el método por nombre
-        Institucion ins01 = controladorUsuario.getInstitucionPorNombre("Facultad de Ingeniería");
-        Institucion ins03 = controladorUsuario.getInstitucionPorNombre("Universidad Católica del Uruguay");
-        Institucion ins04 = controladorUsuario.getInstitucionPorNombre("Antel");
-        Institucion ins05 = controladorUsuario.getInstitucionPorNombre("Agencia Nacional de Investigación e Innovación (ANII)");
-        // Obtener ediciones y tipos de registro
-        Ediciones edev08 = manejadorEvento.obtenerEdicion("CONFTECH26");
-        Ediciones edev02 = manejadorEvento.obtenerEdicion("MARATON25");
-        Ediciones edev07 = manejadorEvento.obtenerEdicion("EXPOAGRO25");
-        // Tipos de registro
-        TipoRegistro tr19 = edev08 != null ? edev08.obtenerTipoRegistro("Estudiante") : null;
-        TipoRegistro tr18 = edev08 != null ? edev08.obtenerTipoRegistro("General") : null;
-        TipoRegistro tr05 = edev02 != null ? edev02.obtenerTipoRegistro("Corredor 10K") : null;
-        TipoRegistro tr15 = edev07 != null ? edev07.obtenerTipoRegistro("General") : null;
-        // Alta de patrocinios con los parámetros correctos
-        controlador.AltaPatrocinio(edev08, ins01, DTNivel.ORO, tr19, 20000, java.time.LocalDate.of(2025, 8, 21), 4, "TECHFING");
-        controlador.AltaPatrocinio(edev08, ins05, DTNivel.PLATA, tr18, 10000, java.time.LocalDate.of(2025, 8, 20), 1, "TECHANII");
-        controlador.AltaPatrocinio(edev02, ins04, DTNivel.PLATINO, tr05, 25000, java.time.LocalDate.of(2025, 3, 4), 10, "CORREANTEL");
-        controlador.AltaPatrocinio(edev07, ins03, DTNivel.BRONCE, tr15, 15000, java.time.LocalDate.of(2025, 5, 5), 10, "EXPOCAT");
+        // Alta de patrocinios con los parámetros correctos, pasando directamente los objetos
+        controlador.AltaPatrocinio(
+            manejadorEvento.obtenerEdicion("CONFTECH26"),
+            new Institucion("Facultad de Ingeniería", "Facultad de Ingeniería de la Universidad de la República", "https://www.fing.edu.uy"),
+            DTNivel.ORO,
+            manejadorEvento.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("Estudiante"),
+            20000,
+            java.time.LocalDate.of(2025, 8, 21),
+            4,
+            "TECHFING"
+        );
+        controlador.AltaPatrocinio(
+            manejadorEvento.obtenerEdicion("CONFTECH26"),
+            new Institucion("Agencia Nacional de Investigación e Innovación (ANII)", "Fomenta la investigación y la innovación en Uruguay", "https://anii.org.uy"),
+            DTNivel.PLATA,
+            manejadorEvento.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("General"),
+            10000,
+            java.time.LocalDate.of(2025, 8, 20),
+            1,
+            "TECHANII"
+        );
+        controlador.AltaPatrocinio(
+            manejadorEvento.obtenerEdicion("MARATON25"),
+            new Institucion("Antel", "Empresa estatal de telecomunicaciones", "https://antel.com.uy"),
+            DTNivel.PLATINO,
+            manejadorEvento.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 10K"),
+            25000,
+            java.time.LocalDate.of(2025, 3, 4),
+            10,
+            "CORREANTEL"
+        );
+        controlador.AltaPatrocinio(
+            manejadorEvento.obtenerEdicion("EXPOAGRO25"),
+            new Institucion("Universidad Católica del Uruguay", "Institución de educación superior privada", "https://ucu.edu.uy"),
+            DTNivel.BRONCE,
+            manejadorEvento.obtenerEdicion("EXPOAGRO25").obtenerTipoRegistro("General"),
+            15000,
+            java.time.LocalDate.of(2025, 5, 5),
+            10,
+            "EXPOCAT"
+        );
         System.out.println("Patrocinios de ejemplo dados de alta.");
     }
     

@@ -11,6 +11,7 @@ public class manejadorUsuario {
 	private Map<String, Usuario> usuarios = new HashMap<String, Usuario>();
 	private Map<String, Asistente> asistentes = new HashMap<String, Asistente>();
 	private Map<String, Organizador> organizadores = new HashMap<String, Organizador>();
+	private Map<String, Institucion> institucionesMap = new HashMap<>();
 	private Set<String> instituciones = new HashSet<String>();
 	
 	//// instancia de manejador singleton (no se si esta del todo bien)
@@ -43,7 +44,6 @@ public class manejadorUsuario {
 	public Set<String> getInstituciones() {
 		return this.instituciones;
 	}
-
 	public void addUsuario(Usuario u) {
 		this.usuarios.put(u.getNickname(), u);
 		if (u instanceof Asistente) {
@@ -54,11 +54,10 @@ public class manejadorUsuario {
 			this.organizadores.put(org.getNickname(), org);
 		}
 	}
-	
 	public void addInstitucion(Institucion i) {
 		this.instituciones.add(i.getNombre());
+		this.institucionesMap.put(i.getNombre(), i);
 	}
-
 	public Usuario findUsuario(String nickname) {
 		return usuarios.get(nickname);
 	}
@@ -86,7 +85,7 @@ public class manejadorUsuario {
 	}
 	
 	public Institucion findInstitucion(String nombre) {
-		return null; //this.instituciones.get(nombre);
+		return institucionesMap.get(nombre);
 	}
 	
 }

@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class AltaInstitucionFrame extends JInternalFrame {
-    private Set<String> nombresInstituciones = new HashSet<>(); // Simulación de nombres existentes
+    private Set<String> nombresInstituciones = new HashSet<>(); 
 
     public AltaInstitucionFrame(Set<String> nombresExistentes) {
         super("Alta de Institución", true, true, true, true);
@@ -68,7 +68,14 @@ public class AltaInstitucionFrame extends JInternalFrame {
                 JOptionPane.showMessageDialog(this, "Ya existe una institución con ese nombre. Ingrese otro nombre o cancele.");
                 return;
             }
-            // Simular alta
+            // Alta real de la institución
+            try {
+                logica.Institucion institucion = new logica.Institucion(nombre, descripcion, sitioWeb);
+                logica.manejadorUsuario.getInstancia().addInstitucion(institucion);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error al crear la institución: " + ex.getMessage());
+                return;
+            }
             nombresInstituciones.add(nombre.toLowerCase());
             JOptionPane.showMessageDialog(this, "Institución creada con éxito:\nNombre: " + nombre +
                     "\nDescripción: " + descripcion +

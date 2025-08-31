@@ -3,7 +3,6 @@ package logica;
 import java.time.LocalDate;
 
 public class Patrocinio {
-    // Cambios: ahora se usan referencias a Ediciones, Institucion y TipoRegistro
     private Ediciones edicion;
     private Institucion institucion;
     private DTNivel nivel;

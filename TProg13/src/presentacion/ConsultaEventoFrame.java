@@ -2,8 +2,10 @@ package presentacion;
 
 import javax.swing.*;
 import java.awt.*;
+import logica.IControladorEvento;
 
 public class ConsultaEventoFrame extends JInternalFrame {
+    private IControladorEvento controladorEvento;
     private JComboBox<String> comboEventos;
     private DefaultListModel<String> listModel;
     private JTextArea txtDatos;
@@ -13,8 +15,9 @@ public class ConsultaEventoFrame extends JInternalFrame {
     private String[][] categoriasEventos;
     private String[][] edicionesEventos;
 
-    public ConsultaEventoFrame(String[] eventos, String[][] datosEventos, String[][] categoriasEventos, String[][] edicionesEventos) {
+    public ConsultaEventoFrame(IControladorEvento controladorEvento) {
         super("Consulta de Evento", true, true, true, true);
+        this.controladorEvento = controladorEvento;
         setBounds(100, 100, 600, 400);
         setLayout(new BorderLayout());
 
@@ -51,12 +54,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
 
     public void cargarEventos() {
         try {
-            logica.ControladorEvento controlador = new logica.ControladorEvento();
-            java.util.List<logica.DTEvento> eventos = controlador.listarEventos();
-            System.out.println("[ConsultaEventoFrame] Eventos encontrados: " + eventos.size());
-            for (logica.DTEvento ev : eventos) {
-                System.out.println("  - " + ev.getNombre());
-            }
+            java.util.List<logica.DTEvento> eventos = controladorEvento.listarEventos();
             String[] eventosArr = new String[eventos.size()];
             datosEventos = new String[eventos.size()][1];
             categoriasEventos = new String[eventos.size()][];
@@ -119,7 +117,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
         }
         String nombreEvento = comboEventos.getItemAt(idxEvento);
         String nombreEdicion = edicionesEventos[idxEvento][idxEd];
-        logica.Ediciones edi = new logica.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
+        logica.Ediciones edi = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
         if (edi == null) {
             txtEdicion.setText("No se encontró la edición.");
             return;

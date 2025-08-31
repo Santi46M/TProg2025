@@ -1,11 +1,5 @@
 package logica;
 
-import java.time.LocalDate;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.HashMap;
-
 public class Institucion {
     private String nombre;
     private String descripcion;

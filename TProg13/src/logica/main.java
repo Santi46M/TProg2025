@@ -48,7 +48,7 @@ public class main {
         creUsrInternalFrame.setVisible(false);
         conUsrInternalFrame = new ConsultaUsuario(ICU);
         conUsrInternalFrame.setVisible(false);
-        consultaEventoFrame = new ConsultaEventoFrame(new String[0], new String[0][0], new String[0][0], new String[0][0]);
+        consultaEventoFrame = new ConsultaEventoFrame(new logica.ControladorEvento());
         consultaEventoFrame.setVisible(false);
         consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame();
         consultaEdicionEventoFrame.setVisible(false);
@@ -56,13 +56,13 @@ public class main {
         consultaTipoRegistroFrame.setVisible(false);
         consultaRegistroFrame = new ConsultaRegistroFrame(ICU);
         consultaRegistroFrame.setVisible(false);
-        consultaPatrocinioFrame = new ConsultaPatrocinioFrame(new String[0], new String[0][0], new String[0][0], new String[0][0]);
+        consultaPatrocinioFrame = new ConsultaPatrocinioFrame();
         consultaPatrocinioFrame.setVisible(false);
         altaEventoFrame = new AltaEventoFrame(desktopPane);
         altaEventoFrame.setVisible(false);
         altaTipoRegistroFrame = new AltaTipoRegistroFrame(new logica.ControladorEvento());
         altaTipoRegistroFrame.setVisible(false);
-        altaPatrocinioFrame = new AltaPatrocinioFrame(new String[0], new String[0][0], new String[0][0], new String[0], new java.util.HashSet<>(), new java.util.HashSet<>(), new double[0]);
+        altaPatrocinioFrame = new AltaPatrocinioFrame();
         altaPatrocinioFrame.setVisible(false);
         altaInstitucionFrame = new AltaInstitucionFrame(new java.util.HashSet<>());
         altaInstitucionFrame.setVisible(false);
@@ -163,7 +163,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (consultaEventoFrame == null || consultaEventoFrame.isClosed()) {
-                        consultaEventoFrame = new ConsultaEventoFrame(new String[0], new String[0][0], new String[0][0], new String[0][0]);
+                        consultaEventoFrame = new ConsultaEventoFrame(new logica.ControladorEvento());
                         desktopPane.add(consultaEventoFrame);
                     }
                     consultaEventoFrame.cargarEventos();
@@ -221,7 +221,17 @@ public class main {
         menuEvento.add(itemConsultaPatrocinio);
         itemConsultaPatrocinio.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                consultaPatrocinioFrame.setVisible(true);
+                try {
+                    if (consultaPatrocinioFrame == null || consultaPatrocinioFrame.isClosed()) {
+                        consultaPatrocinioFrame = new ConsultaPatrocinioFrame();
+                        desktopPane.add(consultaPatrocinioFrame);
+                    }
+                    consultaPatrocinioFrame.cargarDatos();
+                    consultaPatrocinioFrame.setVisible(true);
+                    consultaPatrocinioFrame.toFront();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         JMenuItem itemAltaEvento = new JMenuItem("Alta de Evento");
@@ -264,9 +274,10 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (altaPatrocinioFrame == null || altaPatrocinioFrame.isClosed()) {
-                        altaPatrocinioFrame = new AltaPatrocinioFrame(new String[0], new String[0][0], new String[0][0], new String[0], new java.util.HashSet<>(), new java.util.HashSet<>(), new double[0]);
+                        altaPatrocinioFrame = new AltaPatrocinioFrame();
                         desktopPane.add(altaPatrocinioFrame);
                     }
+                    altaPatrocinioFrame.cargarDatos();
                     altaPatrocinioFrame.setVisible(true);
                     altaPatrocinioFrame.toFront();
                 } catch (Exception ex) {
@@ -325,5 +336,107 @@ public class main {
                 }
             }
         });
+    }
+
+    private String[] getEventos() {
+        // Carga dinámica como en AltaEdicionEvento
+        logica.ControladorEvento controlador = new logica.ControladorEvento();
+        java.util.List<logica.DTEvento> eventos = controlador.listarEventos();
+        String[] nombres = new String[eventos.size()];
+        for (int i = 0; i < eventos.size(); i++) {
+            nombres[i] = eventos.get(i).getNombre();
+        }
+        return nombres;
+    }
+    private String[][] getEdicionesPorEvento() {
+        logica.ControladorEvento controlador = new logica.ControladorEvento();
+        java.util.List<logica.DTEvento> eventos = controlador.listarEventos();
+        String[][] ediciones = new String[eventos.size()][];
+        for (int i = 0; i < eventos.size(); i++) {
+            java.util.List<String> eds = controlador.listarEdicionesEvento(eventos.get(i).getNombre());
+            ediciones[i] = eds.toArray(new String[0]);
+        }
+        return ediciones;
+    }
+    private String[][] getTiposPorEdicion() {
+        var eventos = logica.ManejadorEvento.getInstancia().obtenerEventos();
+        java.util.List<String[]> tiposList = new java.util.ArrayList<>();
+        for (var e : eventos.values()) {
+            for (var ed : e.getEdiciones().values()) {
+                java.util.List<String> nombres = new java.util.ArrayList<>();
+                for (logica.TipoRegistro tipo : ed.getTiposRegistro()) {
+                    nombres.add(tipo.getNombre());
+                }
+                tiposList.add(nombres.toArray(new String[0]));
+            }
+        }
+        return tiposList.toArray(new String[0][0]);
+    }
+    private double[] getCostosTipoRegistro() {
+        java.util.List<Double> costos = new java.util.ArrayList<>();
+        var eventos = logica.ManejadorEvento.getInstancia().obtenerEventos();
+        for (var e : eventos.values()) {
+            for (var ed : e.getEdiciones().values()) {
+                for (logica.TipoRegistro tipo : ed.getTiposRegistro()) {
+                    costos.add((double) tipo.getCosto());
+                }
+            }
+        }
+        return costos.stream().mapToDouble(Double::doubleValue).toArray();
+    }
+
+    private String[] getInstituciones() {
+        return logica.manejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
+    }
+    private java.util.Set<String> getCodigosPatrocinio() {
+        java.util.Set<String> codigos = new java.util.HashSet<>();
+        for (var p : logica.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+            if (p != null && p.getCodigoPatrocinio() != null)
+                codigos.add(p.getCodigoPatrocinio().toLowerCase());
+        }
+        return codigos;
+    }
+    private java.util.Set<String> getPatrociniosInstitucionEdicion() {
+        java.util.Set<String> claves = new java.util.HashSet<>();
+        for (var p : logica.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+            if (p != null && p.getInstitucion() != null && p.getEdicion() != null && p.getInstitucion().getNombre() != null && p.getEdicion().getNombre() != null)
+                claves.add(p.getInstitucion().getNombre().toLowerCase() + "-" + p.getEdicion().getNombre().toLowerCase());
+        }
+        return claves;
+    }
+    private String[][] getPatrociniosPorEdicion() {
+        var eventos = logica.ManejadorEvento.getInstancia().obtenerEventos();
+        java.util.List<String[]> patrociniosList = new java.util.ArrayList<>();
+        for (var e : eventos.values()) {
+            for (var ed : e.getEdiciones().values()) {
+                java.util.List<String> pats = new java.util.ArrayList<>();
+                for (var p : ed.getPatrocinios()) {
+                    pats.add(p.getCodigoPatrocinio());
+                }
+                patrociniosList.add(pats.toArray(new String[0]));
+            }
+        }
+        return patrociniosList.toArray(new String[0][0]);
+    }
+    private String[][] getDatosPatrocinio() {
+        var eventos = logica.ManejadorEvento.getInstancia().obtenerEventos();
+        java.util.List<String[]> datosList = new java.util.ArrayList<>();
+        for (var e : eventos.values()) {
+            for (var ed : e.getEdiciones().values()) {
+                java.util.List<String> datosPat = new java.util.ArrayList<>();
+                for (var p : ed.getPatrocinios()) {
+                    String datos = "Institución: " + p.getInstitucion().getNombre() +
+                        "\nNivel: " + p.getNivel().toString() +
+                        "\nTipo Registro: " + p.getTipoRegistro().getNombre() +
+                        "\nAporte: " + p.getAporte() +
+                        "\nFecha: " + p.getFechaPatrocinio() +
+                        "\nCantidad Registros Gratuitos: " + p.getCantidadRegistros() +
+                        "\nCódigo: " + p.getCodigoPatrocinio();
+                    datosPat.add(datos);
+                }
+                datosList.add(datosPat.toArray(new String[0]));
+            }
+        }
+        return datosList.toArray(new String[0][0]);
     }
 }

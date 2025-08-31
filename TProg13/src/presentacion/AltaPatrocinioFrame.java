@@ -5,12 +5,30 @@ import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
+import java.util.HashSet;
 
 public class AltaPatrocinioFrame extends JInternalFrame {
-    public AltaPatrocinioFrame(String[] eventos, String[][] edicionesPorEvento, String[][] tiposPorEdicion, String[] instituciones, Set<String> codigosPatrocinio, Set<String> patrociniosInstitucionEdicion, double[] costosTipoRegistro) {
+    private JComboBox<String> comboEventos;
+    private JComboBox<String> comboEdiciones;
+    private JComboBox<String> comboTipos;
+    private JComboBox<String> comboInstituciones;
+    private JComboBox<String> comboTipoGratuito;
+    private JComboBox<String> comboNivel;
+    private JTextField txtAporte;
+    private JTextField txtCantidadGratuitos;
+    private JTextField txtCodigo;
+    private String[] eventos;
+    private String[][] edicionesPorEvento;
+    private String[][] tiposPorEdicion;
+    private String[] instituciones;
+    private double[] costosTipoRegistro;
+    private Set<String> codigosPatrocinio = new HashSet<>();
+    private Set<String> patrociniosInstitucionEdicion = new HashSet<>();
+
+    public AltaPatrocinioFrame() {
         super("Alta de Patrocinio", true, true, true, true);
         setBounds(250, 250, 600, 400);
-        setVisible(true);
+        setVisible(false);
         setLayout(new BorderLayout());
 
         JPanel panelSeleccion = new JPanel(new GridBagLayout());
@@ -20,82 +38,73 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         gbc.gridx = 0;
         gbc.gridy = 0;
 
-        // Evento
         JLabel lblEvento = new JLabel("Evento:");
-        JComboBox<String> comboEventos = new JComboBox<>(eventos);
+        comboEventos = new JComboBox<>();
         panelSeleccion.add(lblEvento, gbc);
         gbc.gridx = 1;
         panelSeleccion.add(comboEventos, gbc);
         gbc.gridx = 0;
         gbc.gridy++;
 
-        // Edición
         JLabel lblEdicion = new JLabel("Edición:");
-        JComboBox<String> comboEdiciones = new JComboBox<>();
+        comboEdiciones = new JComboBox<>();
         panelSeleccion.add(lblEdicion, gbc);
         gbc.gridx = 1;
         panelSeleccion.add(comboEdiciones, gbc);
         gbc.gridx = 0;
         gbc.gridy++;
 
-        // Tipo de registro
         JLabel lblTipo = new JLabel("Tipo de Registro:");
-        JComboBox<String> comboTipos = new JComboBox<>();
+        comboTipos = new JComboBox<>();
         panelSeleccion.add(lblTipo, gbc);
         gbc.gridx = 1;
         panelSeleccion.add(comboTipos, gbc);
         gbc.gridx = 0;
         gbc.gridy++;
 
-        // Institución
         JLabel lblInstitucion = new JLabel("Institución:");
-        JComboBox<String> comboInstituciones = new JComboBox<>(instituciones);
+        comboInstituciones = new JComboBox<>();
         panelSeleccion.add(lblInstitucion, gbc);
         gbc.gridx = 1;
         panelSeleccion.add(comboInstituciones, gbc);
         gbc.gridx = 0;
         gbc.gridy++;
 
-        // Nivel de patrocinio
         JLabel lblNivel = new JLabel("Nivel de Patrocinio:");
         String[] niveles = {"Platino", "Oro", "Plata", "Bronce"};
-        JComboBox<String> comboNivel = new JComboBox<>(niveles);
+        comboNivel = new JComboBox<>(niveles);
         panelSeleccion.add(lblNivel, gbc);
         gbc.gridx = 1;
         panelSeleccion.add(comboNivel, gbc);
         gbc.gridx = 0;
         gbc.gridy++;
 
-        // Aporte económico
         JLabel lblAporte = new JLabel("Aporte económico:");
-        JTextField txtAporte = new JTextField(10);
+        txtAporte = new JTextField(10);
         panelSeleccion.add(lblAporte, gbc);
         gbc.gridx = 1;
         panelSeleccion.add(txtAporte, gbc);
         gbc.gridx = 0;
         gbc.gridy++;
 
-        // Tipo de registro gratuito
         JLabel lblTipoGratuito = new JLabel("Tipo de Registro Gratuito:");
-        JComboBox<String> comboTipoGratuito = new JComboBox<>();
+        comboTipoGratuito = new JComboBox<>();
         panelSeleccion.add(lblTipoGratuito, gbc);
         gbc.gridx = 1;
         panelSeleccion.add(comboTipoGratuito, gbc);
         gbc.gridx = 0;
         gbc.gridy++;
 
-        // Cantidad de registros gratuitos
         JLabel lblCantidadGratuitos = new JLabel("Cantidad Registros Gratuitos:");
-        JTextField txtCantidadGratuitos = new JTextField(10);
+        txtCantidadGratuitos = new JTextField(10);
         panelSeleccion.add(lblCantidadGratuitos, gbc);
         gbc.gridx = 1;
         panelSeleccion.add(txtCantidadGratuitos, gbc);
         gbc.gridx = 0;
         gbc.gridy++;
 
-        // Código de patrocinio
         JLabel lblCodigo = new JLabel("Código de Patrocinio:");
-        JTextField txtCodigo = new JTextField(12);
+        txtCodigo = new JTextField(12);
         panelSeleccion.add(lblCodigo, gbc);
         gbc.gridx = 1;
         panelSeleccion.add(txtCodigo, gbc);
@@ -109,33 +118,13 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         panelBotones.add(btnCancelar);
         add(panelBotones, BorderLayout.SOUTH);
 
-        // Actualizar ediciones al seleccionar evento
         comboEventos.addActionListener(e -> {
-            int idx = comboEventos.getSelectedIndex();
-            comboEdiciones.removeAllItems();
-            comboTipos.removeAllItems();
-            comboTipoGratuito.removeAllItems();
-            if (idx < 0) return;
-            for (String ed : edicionesPorEvento[idx]) {
-                comboEdiciones.addItem(ed);
-            }
+            cargarEdiciones();
+            cargarTipos();
         });
-        // Actualizar tipos al seleccionar edición
         comboEdiciones.addActionListener(e -> {
-            int idxEvento = comboEventos.getSelectedIndex();
-            int idxEdicion = comboEdiciones.getSelectedIndex();
-            comboTipos.removeAllItems();
-            comboTipoGratuito.removeAllItems();
-            if (idxEvento < 0 || idxEdicion < 0) return;
-            for (String tipo : tiposPorEdicion[idxEdicion]) {
-                comboTipos.addItem(tipo);
-                comboTipoGratuito.addItem(tipo);
-            }
+            cargarTipos();
         });
-        // Inicializar combos
-        if (eventos.length > 0) {
-            comboEventos.setSelectedIndex(0);
-        }
 
         btnAceptar.addActionListener(e -> {
             int idxEvento = comboEventos.getSelectedIndex();
@@ -160,34 +149,57 @@ public class AltaPatrocinioFrame extends JInternalFrame {
                 JOptionPane.showMessageDialog(this, "Aporte y cantidad deben ser numéricos.");
                 return;
             }
-            // Validar código único
             if (codigosPatrocinio.contains(codigo.toLowerCase())) {
                 JOptionPane.showMessageDialog(this, "Ya existe un patrocinio con ese código. Ingrese otro código o cancele.");
                 return;
             }
-            // Validar patrocinio único por institución y edición
             String clavePatrocinio = comboInstituciones.getItemAt(idxInstitucion).toLowerCase() + "-" + comboEdiciones.getItemAt(idxEdicion).toLowerCase();
             if (patrociniosInstitucionEdicion.contains(clavePatrocinio)) {
                 JOptionPane.showMessageDialog(this, "Ya existe un patrocinio de esta institución para la edición seleccionada.");
                 return;
             }
-            // Validar 20% del aporte
-            double costoTipo = costosTipoRegistro[idxTipoGratuito];
+            double costoTipo = costosTipoRegistro.length > idxTipoGratuito ? costosTipoRegistro[idxTipoGratuito] : 0.0;
             double totalGratis = costoTipo * cantidadGratuitos;
             if (totalGratis > aporte * 0.2) {
                 JOptionPane.showMessageDialog(this, "El costo de los registros gratuitos supera el 20% del aporte económico. Modifique los valores o cancele.");
                 return;
             }
-            // Simular alta
+            // --- ALTA REAL DEL PATROCINIO EN LA LÓGICA ---
+            try {
+                logica.ControladorEvento controlador = new logica.ControladorEvento();
+                String nombreEvento = comboEventos.getItemAt(idxEvento);
+                String nombreEdicion = comboEdiciones.getItemAt(idxEdicion);
+                String nombreInstitucion = comboInstituciones.getItemAt(idxInstitucion);
+                String tipoRegistroGratuito = comboTipoGratuito.getItemAt(idxTipoGratuito);
+                // Obtener objetos reales
+                logica.Ediciones edicion = controlador.obtenerEdicion(nombreEvento, nombreEdicion);
+                logica.Institucion institucion = logica.manejadorUsuario.getInstancia().findInstitucion(nombreInstitucion);
+                logica.TipoRegistro tipoRegistro = edicion != null ? edicion.getTipoRegistro(tipoRegistroGratuito) : null;
+                logica.DTNivel nivelEnum = logica.DTNivel.valueOf(nivel.toUpperCase());
+                java.time.LocalDate fechaHoy = java.time.LocalDate.now();
+                controlador.AltaPatrocinio(
+                    edicion,
+                    institucion,
+                    nivelEnum,
+                    tipoRegistro,
+                    (int) aporte,
+                    fechaHoy,
+                    cantidadGratuitos,
+                    codigo
+                );
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error al dar de alta el patrocinio: " + ex.getMessage());
+                return;
+            }
             codigosPatrocinio.add(codigo.toLowerCase());
             patrociniosInstitucionEdicion.add(clavePatrocinio);
             String fechaAlta = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
-            JOptionPane.showMessageDialog(this, "Patrocinio creado con éxito:\nEvento: " + eventos[idxEvento] +
-                    "\nEdición: " + comboEdiciones.getItemAt(idxEdicion) +
-                    "\nInstitución: " + comboInstituciones.getItemAt(idxInstitucion) +
+            JOptionPane.showMessageDialog(this, "Patrocinio creado con éxito:\nEvento: " + comboEventos.getSelectedItem() +
+                    "\nEdición: " + comboEdiciones.getSelectedItem() +
+                    "\nInstitución: " + comboInstituciones.getSelectedItem() +
                     "\nNivel: " + nivel +
                     "\nAporte: " + aporte +
-                    "\nTipo gratuito: " + comboTipoGratuito.getItemAt(idxTipoGratuito) +
+                    "\nTipo gratuito: " + comboTipoGratuito.getSelectedItem() +
                     "\nCantidad gratuitos: " + cantidadGratuitos +
                     "\nCódigo: " + codigo +
                     "\nFecha de alta: " + fechaAlta);
@@ -195,7 +207,86 @@ public class AltaPatrocinioFrame extends JInternalFrame {
             txtCantidadGratuitos.setText("");
             txtCodigo.setText("");
         });
-
         btnCancelar.addActionListener(e -> this.dispose());
+    }
+
+    public void cargarDatos() {
+        // Cargar eventos y datos auxiliares desde la lógica
+        logica.ControladorEvento controlador = new logica.ControladorEvento();
+        java.util.List<logica.DTEvento> listaEventos = controlador.listarEventos();
+        eventos = new String[listaEventos.size()];
+        edicionesPorEvento = new String[listaEventos.size()][];
+        java.util.List<String[]> tiposList = new java.util.ArrayList<>();
+        java.util.List<Double> costosList = new java.util.ArrayList<>();
+        for (int i = 0; i < listaEventos.size(); i++) {
+            logica.DTEvento ev = listaEventos.get(i);
+            eventos[i] = ev.getNombre();
+            java.util.List<String> eds = controlador.listarEdicionesEvento(ev.getNombre());
+            edicionesPorEvento[i] = eds.toArray(new String[0]);
+            for (String ed : eds) {
+                logica.Ediciones edi = controlador.obtenerEdicion(ev.getNombre(), ed);
+                java.util.List<String> tipos = new java.util.ArrayList<>();
+                if (edi != null) {
+                    for (logica.TipoRegistro tr : edi.getTiposRegistro()) {
+                        tipos.add(tr.getNombre());
+                        costosList.add((double) tr.getCosto());
+                    }
+                }
+                tiposList.add(tipos.toArray(new String[0]));
+            }
+        }
+        tiposPorEdicion = tiposList.toArray(new String[0][0]);
+        costosTipoRegistro = costosList.stream().mapToDouble(Double::doubleValue).toArray();
+        instituciones = logica.manejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
+        codigosPatrocinio = new HashSet<>();
+        for (var p : logica.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+            if (p != null && p.getCodigoPatrocinio() != null)
+                codigosPatrocinio.add(p.getCodigoPatrocinio().toLowerCase());
+        }
+        patrociniosInstitucionEdicion = new HashSet<>();
+        for (var p : logica.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+            if (p != null && p.getInstitucion() != null && p.getEdicion() != null && p.getInstitucion().getNombre() != null && p.getEdicion().getNombre() != null)
+                patrociniosInstitucionEdicion.add(p.getInstitucion().getNombre().toLowerCase() + "-" + p.getEdicion().getNombre().toLowerCase());
+        }
+        // Cargar combos
+        comboEventos.removeAllItems();
+        for (String ev : eventos) comboEventos.addItem(ev);
+        comboInstituciones.removeAllItems();
+        for (String inst : instituciones) comboInstituciones.addItem(inst);
+        if (eventos.length > 0) {
+            comboEventos.setSelectedIndex(0);
+            cargarEdiciones();
+            cargarTipos();
+        } else {
+            comboEdiciones.removeAllItems();
+            comboTipos.removeAllItems();
+            comboTipoGratuito.removeAllItems();
+        }
+    }
+
+    private void cargarEdiciones() {
+        comboEdiciones.removeAllItems();
+        int idxEvento = comboEventos.getSelectedIndex();
+        if (idxEvento < 0 || edicionesPorEvento == null || edicionesPorEvento.length <= idxEvento) return;
+        for (String ed : edicionesPorEvento[idxEvento]) comboEdiciones.addItem(ed);
+        if (comboEdiciones.getItemCount() > 0) comboEdiciones.setSelectedIndex(0);
+    }
+    private void cargarTipos() {
+        comboTipos.removeAllItems();
+        comboTipoGratuito.removeAllItems();
+        int idxEvento = comboEventos.getSelectedIndex();
+        int idxEdicion = comboEdiciones.getSelectedIndex();
+        int idxTipo = 0;
+        for (int i = 0; i < idxEvento; i++) {
+            idxTipo += edicionesPorEvento[i].length;
+        }
+        idxTipo += idxEdicion;
+        if (idxEvento < 0 || idxEdicion < 0 || tiposPorEdicion == null || tiposPorEdicion.length <= idxTipo) return;
+        for (String tipo : tiposPorEdicion[idxTipo]) {
+            comboTipos.addItem(tipo);
+            comboTipoGratuito.addItem(tipo);
+        }
+        if (comboTipos.getItemCount() > 0) comboTipos.setSelectedIndex(0);
+        if (comboTipoGratuito.getItemCount() > 0) comboTipoGratuito.setSelectedIndex(0);
     }
 }

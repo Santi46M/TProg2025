@@ -108,7 +108,6 @@ public class Ediciones {
     }
 
 	public void agregarTipoRegistro(String id, TipoRegistro tipo) {
-		// TODO Auto-generated method stub
 		this.tiposRegistro.put(id, tipo);
 		
 	}
@@ -136,7 +135,6 @@ public class Ediciones {
         return registros;
     }
 
-    // Devuelve el tipo de registro por nombre, buscando en el manejador de eventos si no está en el mapa local
     public TipoRegistro obtenerTipoRegistro(String nombre) {
         TipoRegistro tipo = tiposRegistro.get(nombre);
         if (tipo != null) return tipo;

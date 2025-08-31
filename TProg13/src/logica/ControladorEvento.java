@@ -17,6 +17,8 @@ import excepciones.EventoYaExisteException;
 import excepciones.EdicionYaExisteException;
 import excepciones.TipoRegistroYaExisteException;
 import excepciones.UsuarioNoEsAsistente;
+import excepciones.PatrocinioYaExisteException;
+import excepciones.ValorPatrocinioExcedidoException;
 
 
 public class ControladorEvento implements IControladorEvento{
@@ -43,7 +45,6 @@ public class ControladorEvento implements IControladorEvento{
         manejador.agregarEvento(nuevoEvento);
     }
 
-    // Recibe la edición, nombre, descripción, costo y cupo
     public void AltaTipoRegistro(Ediciones edicion, String nombre, String descripcion, int costo, int cupo) throws TipoRegistroYaExisteException {
         if (edicion.obtenerTipoRegistro(nombre) != null) {
             throw new TipoRegistroYaExisteException(nombre);
@@ -52,42 +53,26 @@ public class ControladorEvento implements IControladorEvento{
         edicion.agregarTipoRegistro(nombre, tipo);
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         manejadorEvento.agregarTipoRegistro(tipo);
-        // Agregar el tipo de registro a la colección de la edición (ya se hace en agregarTipoRegistro)
-        // No se requiere acción adicional aquí
     }
     
-    // Nuevo método ajustado para AltaPatrocinio con los parámetros requeridos
-    public void AltaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) {
+    public void AltaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException {
         manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
-        // Validar que no exista un patrocinio igual (puedes ajustar la lógica según tus reglas)
         for (Patrocinio p : manejadorAux.listarPatrocinios()) {
+            if (p.getInstitucion().equals(institucion) && p.getEdicion().equals(edicion)) {
+                throw new PatrocinioYaExisteException(institucion.getNombre(), edicion.getNombre());
+            }
             if (p.getCodigoPatrocinio().equals(codigoPatrocinio)) {
-                // Ya existe un patrocinio igual
                 return;
             }
         }
-        // Crear y guardar el patrocinio
+        int valorRegistros = cantidadRegistros * tipoRegistro.getCosto();
+        if (valorRegistros > (aporte * 0.2)) {
+            throw new ValorPatrocinioExcedidoException();
+        }
         Patrocinio pat = new Patrocinio(edicion, institucion, nivel, tipoRegistro, aporte, fechaPatrocinio, cantidadRegistros, codigoPatrocinio);
         manejadorAux.agregarPatrocinio(pat);
-        // Agregar el patrocinio a la colección de la edición
         edicion.getPatrocinios().add(pat);
     }
-    // Método auxiliar para obtener el costo del tipo de registro
-    /*
-    private int obtenerCostoTipoRegistro(String siglaEdicion, String tipoRegistro) {
-        // Buscar el costo del tipo de registro en la edición
-        for (Eventos evento : ManejadorEvento.getInstancia().obtenerEventos().values()) {
-            Ediciones ed = evento.obtenerEdicion(siglaEdicion);
-            if (ed != null) {
-                TipoRegistro tr = ed.obtenerTipoRegistro(tipoRegistro);
-                if (tr != null) {
-                    return tr.getCosto();
-                }
-            }
-        }
-        throw new RuntimeException("No se encontró el tipo de registro en la edición");
-    }
-    */
     
     public void AltaCategoria(String nombre) {
     	manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
@@ -97,73 +82,6 @@ public class ControladorEvento implements IControladorEvento{
         Categoria categoria = new Categoria(nombre);
         manejadorAux.agregarCategoria(nombre, categoria);
     }
-    /*
-
-    public DTEvento DetallesEvento(String sigla) {
-        return null;
-    }
-
-    public List<String> ListarTipoRegistro() {
-        return null;
-    }
-
-    public int CuposDisponibles(String siglaEdicion, String nombreTipoRegistro) {
-        return 0;
-    }
-
-    public boolean ExistePatrocinio(String codigo) {
-        return false;
-    }
-
-    public List<DTPatrocinio> ListarPatrocinios() {
-        return null;
-    }
-
-    public DTPatrocinio DetallesPatrocinio(String codigo) {
-        return null;
-    }
-
-
-    public DTEdicion DetallesEdicion(String siglaEdicion) {
-        return null;
-    }
-
-    public List<String> ListarEdiciones() {
-        return null;
-    }
-
-    public void RegistroEdicionEvento(String nicknameAsistente, String siglaEdicion, String nombreTipoRegistro) {
-    }
-
-    public List<String> ListarCategorias() {
-        return null;
-    }
-
-    public List<DTRegistro> ListarRegistros(String nicknameAsistente) {
-        return null;
-    }
-
-    public DTRegistro DetallesRegistro(int idRegistro) {
-        return null;
-    }
-
-    public DTEdicionEvento ConsultaEdicionEvento(Evento ev, EdicionEvento ed, TipoRegistro reg, Patrocinio pat) {
-        return null;
-    }
-	*/
-    /*
-    /*
-    public DTRegistro ConsultaRegistro(Usuario usuario, Registro registro) {
-        return null;
-    }
-
-    public DTTipoRegistro ConsultaTipoRegistro(Evento evento, Edicion edicion, TipoRegistro tipoRegistro) {
-        return null;
-    }
-
-    public DTPatrocinio ConsultaPatrocinio(String nombreCategoria) {
-        return null;
-    } */
 
     public void AltaEdicionEvento(Eventos evento, Usuario usuario, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais)throws EdicionYaExisteException, EventoYaExisteException {
     	ManejadorEvento manejador = ManejadorEvento.getInstancia();
@@ -173,7 +91,6 @@ public class ControladorEvento implements IControladorEvento{
 	        evento.agregarEdicion(nuevaEdicion);
 	        manejador.agregarEdicion(nuevaEdicion);
 	        System.out.println(" da de alta la edicion" + nombre );
-	        // agregamos la edicion al usuario
 	        mUsuario.findOrganizador(usuario.getNickname()).agregarEdicion(nuevaEdicion);
     		}
     		else throw new EdicionYaExisteException(nombre);
@@ -181,14 +98,12 @@ public class ControladorEvento implements IControladorEvento{
     	else throw new EventoYaExisteException(evento.getNombre());
     }
 
-    // ConsultaEdicionEvento: Devuelve los detalles de una edición de un evento
     public DTEdicion consultaEdicionEvento(String siglaEvento, String siglaEdicion) {
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
         Eventos evento = manejador.obtenerEvento(siglaEvento);
         if (evento == null) return null;
         Ediciones edicion = evento.obtenerEdicion(siglaEdicion);
         if (edicion == null) return null;
-        // Devuelve los datos de la edición usando DTEdicion
         return new DTEdicion(
             edicion.getNombre(),
             edicion.getSigla(),
@@ -205,9 +120,6 @@ public class ControladorEvento implements IControladorEvento{
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
         Eventos evento = manejador.obtenerEvento(nombreEvento);
         if (evento == null) return null;
-        // Aquí se pueden agregar más detalles si se requiere (categorías, ediciones, etc.)
-        // Si el administrador selecciona una edición, se debe consultar la edición de evento:
-        // TODO: Implementar consulta de edición de evento según el caso de uso
         return evento;
     }
 
@@ -222,7 +134,6 @@ public class ControladorEvento implements IControladorEvento{
         if (tipoRegistro == null) {
             throw new RuntimeException("No se encontró el tipo de registro especificado para la edición.");
         }
-        // Verificar si el usuario ya está registrado en la edición
         boolean yaRegistrado = false;
         for (Registro reg : manejadorEvento.obtenerRegistros().values()) {
             if (reg.getUsuario().equals(usuario) && reg.getEdicion().equals(edicion)) {
@@ -230,7 +141,6 @@ public class ControladorEvento implements IControladorEvento{
                 break;
             }
         }
-        // Verificar cupo del tipo de registro
         int cantidadRegistrados = 0;
         for (Registro reg : manejadorEvento.obtenerRegistros().values()) {
             if (reg.getTipoRegistro().equals(tipoRegistro) && reg.getEdicion().equals(edicion)) {
@@ -238,16 +148,11 @@ public class ControladorEvento implements IControladorEvento{
             }
         }
         if (yaRegistrado) {
-            // TODO: Informar al administrador que el usuario ya está registrado en la edición
-            // El administrador puede optar por editar el registro o cancelar el alta
             return;
         }
         if (cantidadRegistrados >= tipoRegistro.getCupo()) {
-            // TODO: Informar al administrador que se alcanzó el cupo para el tipo de registro
-            // El administrador puede optar por editar el registro o cancelar el alta
             return;
         }
-        // Crear y guardar el registro
         Registro nuevoRegistro = new Registro(idRegistro, usuario, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio);
         manejadorEvento.agregarRegistro(nuevoRegistro);
         Asistente asist = (Asistente) usuario;
@@ -305,9 +210,7 @@ public class ControladorEvento implements IControladorEvento{
 	@Override
 	public void altaEdicionEvento(String nombreEvento, String nombre, String sigla, String desc, LocalDate fechaInicio,
 			LocalDate fechaFin, LocalDate fechaAlta, String organizador, String ciudad, String pais)
-			throws NombreEdicionEnUsoException {
-		// TODO Auto-generated method stub
-		
+			throws NombreEdicionEnUsoException {		
 	}
 	
 	public void altaRegistroEdicionEvento(Usuario usuario, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
@@ -320,14 +223,12 @@ public class ControladorEvento implements IControladorEvento{
         if (tipoRegistro == null) {
             throw new RuntimeException("No se encontró el tipo de registro especificado para la edición.");
         }
-        // Verificar si el asistente ya está registrado en la edición
         Asistente asistente = (Asistente) usuario;
         for (Registro reg : asistente.getRegistros().values()) {
             if (reg.getEdicion().equals(edicion)) {
                 throw new RuntimeException("El asistente ya está registrado a esta edición.");
             }
         }
-        // Verificar cupo del tipo de registro
         int cantidadRegistrados = 0;
         for (Registro reg : edicion.getRegistros().values()) {
             if (reg.getTipoRegistro().equals(tipoRegistro)) {
@@ -337,11 +238,9 @@ public class ControladorEvento implements IControladorEvento{
         if (cantidadRegistrados >= tipoRegistro.getCupo()) {
             throw new RuntimeException("Ya se alcanzó el cupo para este tipo de registro.");
         }
-        // Crear y guardar el registro
         Registro nuevoRegistro = new Registro(UUID.randomUUID().toString(), usuario, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio);
         ManejadorEvento.getInstancia().agregarRegistro(nuevoRegistro);
         asistente.addRegistro(nuevoRegistro.getId(), nuevoRegistro);
         edicion.getRegistros().put(nuevoRegistro.getId(), nuevoRegistro);
     }
 }
-
