@@ -18,7 +18,7 @@ public abstract class Usuario {
     }
     
     public String getNickname() {
-        return nickname;
+        return this.nickname;
     }
 
     public void setNickname(String nickname) {
@@ -26,7 +26,7 @@ public abstract class Usuario {
     }
 
     public String getNombre() {
-        return nombre;
+        return this.nombre;
     }
 
     public void setNombre(String nombre) {
@@ -34,7 +34,7 @@ public abstract class Usuario {
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public void setEmail(String email) {

@@ -77,11 +77,17 @@ public class manejadorUsuario {
 	    return null; // o podés tirar una excepción si preferís
 	}
 	
-	public Usuario findCorreo(String nickname, String correo) {
-		Usuario u = usuarios.get(nickname);
-		if (u != null && u.getEmail() == correo)
-			return null;
-		else return u;
+	public Boolean findCorreo(String correo) {
+		for (Map.Entry<String, Usuario> i : usuarios.entrySet()){
+			Usuario u = i.getValue();
+			System.out.println(u.getEmail());
+			if(u.getEmail().equals(correo)) {
+				System.out.println("se encontro");
+				return true;
+				
+			}
+		}
+		return false;
 	}
 	
 	public Institucion findInstitucion(String nombre) {

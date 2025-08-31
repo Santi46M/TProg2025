@@ -48,12 +48,18 @@ public class ManejadorEvento {
         }
         return null;
     }
+    
     public boolean existeEdicion(String nombre){
-    	if (obtenerEvento(nombre) != null) {
-    		return true;
-    		}
-    	else return false;
-    	}
+		for (Map.Entry<String, Ediciones> i : ediciones.entrySet()){
+			Ediciones e = i.getValue();
+			//System.out.println(u.getEmail());
+			if(e.getNombre().equals(nombre)) {
+				return true;				
+			}
+		}
+		return false;
+	}
+	
 
     public Ediciones obtenerEdicionEvento(String nombreEvento, String nombreEdicion) {
         Eventos evento = eventos.get(nombreEvento);

@@ -36,7 +36,8 @@ public class ControladorUsuario implements IControladorUsuario {
         if (manejador.findUsuario(nickname) != null) {
             throw new UsuarioYaExisteException(nickname);
         }
-        if (manejador.findCorreo(nickname, correo) != null) {
+        if (manejador.findCorreo(correo) == true) {
+        	System.out.println("el correo es:" + correo);
             throw new UsuarioYaExisteException(correo);
         }
 

@@ -185,7 +185,7 @@ public class AltaUsuarioFrame extends JInternalFrame {
 
         // Botón Aceptar
         JButton btnAceptar = new JButton("Aceptar");
-        btnAceptar.setBackground(Color.GREEN);
+       // btnAceptar.setBackground(Color.GREEN);
         btnAceptar.setBounds(92, 320, 100, 25);
         getContentPane().add(btnAceptar);
         btnAceptar.addActionListener(new ActionListener() {
@@ -196,7 +196,7 @@ public class AltaUsuarioFrame extends JInternalFrame {
 
         // Botón Cancelar
         JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(Color.RED);
+     //   btnCancelar.setBackground(Color.RED);
         btnCancelar.setBounds(236, 320, 100, 25);
         getContentPane().add(btnCancelar);
         btnCancelar.addActionListener(new ActionListener() {
