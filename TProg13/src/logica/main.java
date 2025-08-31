@@ -204,8 +204,17 @@ public class main {
         menuEvento.add(itemConsultaRegistro);
         itemConsultaRegistro.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	consultaRegistroFrame.cargarUsuarios();
-            	consultaRegistroFrame.setVisible(true);
+                try {
+                    if (consultaRegistroFrame == null || consultaRegistroFrame.isClosed()) {
+                        consultaRegistroFrame = new ConsultaRegistroFrame(ICU);
+                        desktopPane.add(consultaRegistroFrame);
+                    }
+                    consultaRegistroFrame.cargarUsuarios();
+                    consultaRegistroFrame.setVisible(true);
+                    consultaRegistroFrame.toFront();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         JMenuItem itemConsultaPatrocinio = new JMenuItem("Consulta de Patrocinio");
@@ -294,6 +303,23 @@ public class main {
                     altaEdicionEventoFrame.cargarOrganizadores();
                     altaEdicionEventoFrame.setVisible(true);
                     altaEdicionEventoFrame.toFront();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+        JMenuItem itemRegistroEdicionEvento = new JMenuItem("Registro/Edición de Evento");
+        menuEvento.add(itemRegistroEdicionEvento);
+        itemRegistroEdicionEvento.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (registroEdicionEventoFrame == null || registroEdicionEventoFrame.isClosed()) {
+                        registroEdicionEventoFrame = new RegistroEdicionEventoFrame();
+                        desktopPane.add(registroEdicionEventoFrame);
+                    }
+                    registroEdicionEventoFrame.cargarDatos(); // <-- Llenar combos correctamente
+                    registroEdicionEventoFrame.setVisible(true);
+                    registroEdicionEventoFrame.toFront();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }

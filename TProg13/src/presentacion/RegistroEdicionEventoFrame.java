@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import logica.*;
+import java.time.LocalDate;
 
 public class RegistroEdicionEventoFrame extends JInternalFrame {
     private JComboBox<String> comboEventos;
@@ -19,7 +20,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
     private List<DTEvento> eventos;
     private String[][] edicionesPorEvento;
     private String[][] tiposPorEdicion;
-    private List<Asistente> asistentes;
+    private List<logica.Usuario> usuarios; // Cambiado para almacenar todos los usuarios
     private ControladorEvento controladorEvento;
     private IControladorUsuario controladorUsuario;
 
@@ -44,22 +45,26 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         comboTipos = new JComboBox<>();
         panelSeleccion.add(lblTipo);
         panelSeleccion.add(comboTipos);
-        JLabel lblAsistente = new JLabel("Asistente:");
-        comboAsistentes = new JComboBox<>();
-        panelSeleccion.add(lblAsistente);
-        panelSeleccion.add(comboAsistentes);
         add(panelSeleccion, BorderLayout.NORTH);
+
+        // Panel para el combo de asistentes debajo
+        JPanel panelAsistentes = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel lblAsistente = new JLabel("Usuario:");
+        comboAsistentes = new JComboBox<>();
+        panelAsistentes.add(lblAsistente);
+        panelAsistentes.add(comboAsistentes);
+        add(panelAsistentes, BorderLayout.CENTER);
 
         txtInfo = new JTextArea(5, 40);
         txtInfo.setEditable(false);
-        add(new JScrollPane(txtInfo), BorderLayout.CENTER);
+        add(new JScrollPane(txtInfo), BorderLayout.SOUTH);
 
         btnRegistrar = new JButton("Registrar");
         btnCancelar = new JButton("Cancelar");
         JPanel panelBotones = new JPanel();
         panelBotones.add(btnRegistrar);
         panelBotones.add(btnCancelar);
-        add(panelBotones, BorderLayout.SOUTH);
+        add(panelBotones, BorderLayout.PAGE_END);
 
         comboEventos.addActionListener(e -> cargarEdiciones());
         comboEdiciones.addActionListener(e -> cargarTipos());
@@ -77,12 +82,18 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         for (DTEvento ev : eventos) {
             comboEventos.addItem(ev.getNombre());
         }
-        // Cargar asistentes
-        Map<String, Asistente> mapAsistentes = controladorUsuario.listarAsistentes();
-        asistentes = new ArrayList<>(mapAsistentes.values());
+        if (comboEventos.getItemCount() > 0) {
+            comboEventos.setSelectedIndex(0);
+        }
+        // Cargar todos los usuarios SIEMPRE
+        Map<String, logica.Usuario> mapUsuarios = controladorUsuario.listarUsuarios();
+        usuarios = new ArrayList<>(mapUsuarios.values());
         comboAsistentes.removeAllItems();
-        for (Asistente a : asistentes) {
-            comboAsistentes.addItem(a.getNickname());
+        for (logica.Usuario u : usuarios) {
+            comboAsistentes.addItem(u.getNickname());
+        }
+        if (comboAsistentes.getItemCount() > 0) {
+            comboAsistentes.setSelectedIndex(0);
         }
         // Inicializar combos dependientes
         cargarEdiciones();
@@ -96,7 +107,11 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         for (String ed : evento.getEdiciones()) {
             comboEdiciones.addItem(ed);
         }
+        if (comboEdiciones.getItemCount() > 0) {
+            comboEdiciones.setSelectedIndex(0);
+        }
         cargarTipos();
+        // NO tocar comboAsistentes aquí, siempre debe estar disponible
     }
 
     private void cargarTipos() {
@@ -110,6 +125,9 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         if (edicion == null) return;
         for (TipoRegistro tr : edicion.getTiposRegistro()) {
             comboTipos.addItem(tr.getNombre());
+        }
+        if (comboTipos.getItemCount() > 0) {
+            comboTipos.setSelectedIndex(0);
         }
         mostrarInfo();
     }
@@ -137,16 +155,11 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
             }
         }
         int cupoDisponible = tipo.getCupo() - cantidadRegistrados;
-        // Verificar si el asistente ya está registrado
-        Asistente asistente = null;
-        for (Asistente a : asistentes) {
-            if (a.getNickname().equals(nicknameAsistente)) {
-                asistente = a;
-                break;
-            }
-        }
+        // Verificar si el usuario ya está registrado
+        logica.Usuario usuario = usuarios.get(idxAsistente);
         boolean yaRegistrado = false;
-        if (asistente != null) {
+        if (usuario instanceof Asistente) {
+            Asistente asistente = (Asistente) usuario;
             for (Registro reg : asistente.getRegistros().values()) {
                 if (reg.getEdicion().equals(edicion)) {
                     yaRegistrado = true;
@@ -154,7 +167,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
                 }
             }
         }
-        txtInfo.setText("Cupo disponible: " + cupoDisponible + (yaRegistrado ? "\nEl asistente ya está registrado a esta edición." : ""));
+        txtInfo.setText("Cupo disponible: " + cupoDisponible + (yaRegistrado ? "\nEl usuario ya está registrado a esta edición." : ""));
     }
 
     private void registrar() {
@@ -163,7 +176,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         int idxTipo = comboTipos.getSelectedIndex();
         int idxAsistente = comboAsistentes.getSelectedIndex();
         if (idxEvento < 0 || idxEdicion < 0 || idxTipo < 0 || idxAsistente < 0) {
-            JOptionPane.showMessageDialog(this, "Debe seleccionar evento, edición, tipo y asistente.");
+            JOptionPane.showMessageDialog(this, "Debe seleccionar evento, edición, tipo y usuario.");
             return;
         }
         String nombreEvento = eventos.get(idxEvento).getNombre();
@@ -172,17 +185,17 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         String nicknameAsistente = (String) comboAsistentes.getSelectedItem();
         Ediciones edicion = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
         TipoRegistro tipo = edicion.getTipoRegistro(nombreTipo);
-        Asistente asistente = null;
-        for (Asistente a : asistentes) {
-            if (a.getNickname().equals(nicknameAsistente)) {
-                asistente = a;
-                break;
-            }
-        }
-        if (edicion == null || tipo == null || asistente == null) {
+        logica.Usuario usuario = usuarios.get(idxAsistente);
+        if (edicion == null || tipo == null || usuario == null) {
             JOptionPane.showMessageDialog(this, "Datos inválidos para el registro.");
             return;
         }
+        // Solo permitir registrar si es Asistente
+        if (!(usuario instanceof Asistente)) {
+            JOptionPane.showMessageDialog(this, "Solo los usuarios de tipo Asistente pueden registrarse.");
+            return;
+        }
+        Asistente asistente = (Asistente) usuario;
         // Verificar cupo y registro previo
         int cantidadRegistrados = 0;
         for (Registro reg : edicion.getRegistros().values()) {
@@ -191,20 +204,22 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
             }
         }
         if (cantidadRegistrados >= tipo.getCupo()) {
-            JOptionPane.showMessageDialog(this, "Ya se alcanzó el cupo para este tipo de registro.");
+            JOptionPane.showMessageDialog(this, "No hay cupo disponible para este tipo de registro.");
             return;
         }
         for (Registro reg : asistente.getRegistros().values()) {
             if (reg.getEdicion().equals(edicion)) {
-                JOptionPane.showMessageDialog(this, "El asistente ya está registrado a esta edición. Puede editar el registro o cancelar.");
+                JOptionPane.showMessageDialog(this, "El usuario ya está registrado a esta edición.");
                 return;
             }
         }
-        // Realizar alta
         try {
-            controladorEvento.altaRegistroEdicionEvento(asistente, edicion, tipo, java.time.LocalDate.now(), tipo.getCosto(), edicion.getFechaInicio());
-            JOptionPane.showMessageDialog(this, "Registro exitoso.");
-            mostrarInfo();
+            // Obtener los objetos necesarios
+            LocalDate fechaRegistro = LocalDate.now();
+            float costo = tipo.getCosto();
+            LocalDate fechaInicio = edicion.getFechaInicio();
+            controladorEvento.altaRegistroEdicionEvento(usuario, edicion, tipo, fechaRegistro, costo, fechaInicio);
+            JOptionPane.showMessageDialog(this, "Registro realizado correctamente.");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error al registrar: " + ex.getMessage());
         }
