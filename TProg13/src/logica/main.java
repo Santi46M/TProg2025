@@ -1,20 +1,13 @@
 package logica;
 
 import javax.swing.*;
-
 import excepciones.UsuarioNoExisteException;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Map;
-import java.util.HashMap;
 import presentacion.*;
 
-import logica.fabrica;
-import logica.CargaDatosPrueba;
 
-import java.time.LocalDate;
 public class main {
 
     private JFrame frame;
@@ -33,11 +26,9 @@ public class main {
     private AltaInstitucionFrame altaInstitucionFrame;
     private RegistroEdicionEventoFrame registroEdicionEventoFrame;
     private AltaEdicionEvento altaEdicionEventoFrame;
-//    private ListaUsuarios lisUsrInternalFrame;
 
 
     public static void main(String[] args) {
-        // EventQueue asegura que Swing se ejecute en el hilo correcto
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
@@ -53,13 +44,10 @@ public class main {
     public main() {
         initialize();
         ICU = fabrica.getInstance().getIControladorUsuario();
-        // Alta de usuario
         creUsrInternalFrame = new AltaUsuarioFrame(ICU);
         creUsrInternalFrame.setVisible(false);
-        // Consulta de usuario
         conUsrInternalFrame = new ConsultaUsuario(ICU);
         conUsrInternalFrame.setVisible(false);
-        // Frames de eventos (consultas)
         consultaEventoFrame = new ConsultaEventoFrame(new String[0], new String[0][0], new String[0][0], new String[0][0]);
         consultaEventoFrame.setVisible(false);
         consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame();
@@ -70,7 +58,6 @@ public class main {
         consultaRegistroFrame.setVisible(false);
         consultaPatrocinioFrame = new ConsultaPatrocinioFrame(new String[0], new String[0][0], new String[0][0], new String[0][0]);
         consultaPatrocinioFrame.setVisible(false);
-        // Frames de eventos (altas)
         altaEventoFrame = new AltaEventoFrame(desktopPane);
         altaEventoFrame.setVisible(false);
         altaTipoRegistroFrame = new AltaTipoRegistroFrame(new logica.ControladorEvento());
@@ -85,7 +72,6 @@ public class main {
         altaEdicionEventoFrame.setVisible(false);
         
         frame.getContentPane().setLayout(null);
-        // Agregamos Alta de usuario
         desktopPane.add(creUsrInternalFrame);
         desktopPane.add(conUsrInternalFrame);
         desktopPane.add(consultaEventoFrame);
@@ -100,7 +86,6 @@ public class main {
         desktopPane.add(registroEdicionEventoFrame);
         desktopPane.add(altaEdicionEventoFrame);
         
-        // Cargar datos de prueba automáticamente al iniciar
         try {
             CargaDatosPrueba.cargar();
             System.out.println("Datos de prueba cargados correctamente.");
@@ -113,14 +98,12 @@ public class main {
     private void initialize() {
     	
     	
-        // Creo el JFrame principal
         frame = new JFrame();
         frame.setTitle("Eventos.uy");
         frame.setBounds(100, 100, 800, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
-        // Creo el DesktopPane (contenedor de InternalFrames)
         desktopPane = new JDesktopPane();
         desktopPane.setBounds(0, 50, 800, 550);
         frame.getContentPane().add(desktopPane);
@@ -143,11 +126,16 @@ public class main {
         itemAltaUsuario.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
+                    if (creUsrInternalFrame == null || creUsrInternalFrame.isClosed()) {
+                        creUsrInternalFrame = new AltaUsuarioFrame(ICU);
+                        desktopPane.add(creUsrInternalFrame);
+                    }
                     creUsrInternalFrame.cargarInstituciones();
+                    creUsrInternalFrame.setVisible(true);
+                    creUsrInternalFrame.toFront();
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
-                creUsrInternalFrame.setVisible(true);
             }
         });
         JMenuItem itemConsultaUsuario = new JMenuItem("Consulta de Usuario");
@@ -155,7 +143,6 @@ public class main {
         itemConsultaUsuario.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    // Si la instancia es null o está cerrada, crear una nueva y agregarla al desktopPane
                     if (conUsrInternalFrame == null || conUsrInternalFrame.isClosed()) {
                         conUsrInternalFrame = new ConsultaUsuario(ICU);
                         desktopPane.add(conUsrInternalFrame);
@@ -170,7 +157,6 @@ public class main {
                 }
             }
         });
-        // Menú Evento
         JMenuItem itemConsultaEvento = new JMenuItem("Consulta de Evento");
         menuEvento.add(itemConsultaEvento);
         itemConsultaEvento.addActionListener(new ActionListener() {
@@ -228,54 +214,88 @@ public class main {
                 consultaPatrocinioFrame.setVisible(true);
             }
         });
-        // Menú Evento (agregar altas)
         JMenuItem itemAltaEvento = new JMenuItem("Alta de Evento");
         menuEvento.add(itemAltaEvento);
         itemAltaEvento.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                altaEventoFrame.cargarCategorias();
-                altaEventoFrame.setVisible(true);
+                try {
+                    if (altaEventoFrame == null || altaEventoFrame.isClosed()) {
+                        altaEventoFrame = new AltaEventoFrame(desktopPane);
+                        desktopPane.add(altaEventoFrame);
+                    }
+                    altaEventoFrame.cargarCategorias();
+                    altaEventoFrame.setVisible(true);
+                    altaEventoFrame.toFront();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         JMenuItem itemAltaTipoRegistro = new JMenuItem("Alta de Tipo de Registro");
         menuEvento.add(itemAltaTipoRegistro);
         itemAltaTipoRegistro.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                altaTipoRegistroFrame.cargarEventos();
-                altaTipoRegistroFrame.setVisible(true);
-                altaTipoRegistroFrame.toFront();
+                try {
+                    if (altaTipoRegistroFrame == null || altaTipoRegistroFrame.isClosed()) {
+                        altaTipoRegistroFrame = new AltaTipoRegistroFrame(new logica.ControladorEvento());
+                        desktopPane.add(altaTipoRegistroFrame);
+                    }
+                    altaTipoRegistroFrame.cargarEventos();
+                    altaTipoRegistroFrame.setVisible(true);
+                    altaTipoRegistroFrame.toFront();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         JMenuItem itemAltaPatrocinio = new JMenuItem("Alta de Patrocinio");
         menuEvento.add(itemAltaPatrocinio);
         itemAltaPatrocinio.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                altaPatrocinioFrame.setVisible(true);
+                try {
+                    if (altaPatrocinioFrame == null || altaPatrocinioFrame.isClosed()) {
+                        altaPatrocinioFrame = new AltaPatrocinioFrame(new String[0], new String[0][0], new String[0][0], new String[0], new java.util.HashSet<>(), new java.util.HashSet<>(), new double[0]);
+                        desktopPane.add(altaPatrocinioFrame);
+                    }
+                    altaPatrocinioFrame.setVisible(true);
+                    altaPatrocinioFrame.toFront();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         JMenuItem itemAltaInstitucion = new JMenuItem("Alta de Institución");
         menuEvento.add(itemAltaInstitucion);
         itemAltaInstitucion.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                altaInstitucionFrame.setVisible(true);
-            }
-        });
-        JMenuItem itemRegistroEdicionEvento = new JMenuItem("Registro en Edición de Evento");
-        menuEvento.add(itemRegistroEdicionEvento);
-        itemRegistroEdicionEvento.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                registroEdicionEventoFrame.cargarDatos();
-                registroEdicionEventoFrame.setVisible(true);
+                try {
+                    if (altaInstitucionFrame == null || altaInstitucionFrame.isClosed()) {
+                        altaInstitucionFrame = new AltaInstitucionFrame(new java.util.HashSet<>());
+                        desktopPane.add(altaInstitucionFrame);
+                    }
+                    altaInstitucionFrame.setVisible(true);
+                    altaInstitucionFrame.toFront();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
         JMenuItem itemAltaEdicionEvento = new JMenuItem("Alta de Edición de Evento");
         menuEvento.add(itemAltaEdicionEvento);
         itemAltaEdicionEvento.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                altaEdicionEventoFrame.cargarEventos();
-                altaEdicionEventoFrame.cargarOrganizadores();
-                altaEdicionEventoFrame.setVisible(true);
-                altaEdicionEventoFrame.toFront();
+                try {
+                    if (altaEdicionEventoFrame == null || altaEdicionEventoFrame.isClosed()) {
+                        altaEdicionEventoFrame = new AltaEdicionEvento(ICU);
+                        desktopPane.add(altaEdicionEventoFrame);
+                    }
+                    altaEdicionEventoFrame.cargarEventos();
+                    altaEdicionEventoFrame.cargarOrganizadores();
+                    altaEdicionEventoFrame.setVisible(true);
+                    altaEdicionEventoFrame.toFront();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         });
     }
