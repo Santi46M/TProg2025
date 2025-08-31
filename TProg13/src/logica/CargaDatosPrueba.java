@@ -1,10 +1,5 @@
 package logica;
 
-import logica.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-
 import excepciones.EventoYaExisteException;
 import excepciones.InstitucionYaExisteException;
 import excepciones.TipoRegistroYaExisteException;
@@ -67,30 +62,14 @@ public class CargaDatosPrueba {
                 totalTipos += ed.getTiposRegistro().size();
             }
         }
-        /*
-        System.out.println("Tipos de registro: " + totalTipos);
-        for (var ev : eventos.values()) {
-            for (var ed : ev.getEdiciones().values()) {
-                for (var tr : ed.getTiposRegistro().values()) {
-                    System.out.println("  - " + tr.getNombre() + " (edición: " + ed.getCodigo() + ")");
-                }
-            }
-        }
-        */
+
         // Registros
         var registros = logica.ManejadorEvento.getInstancia().obtenerRegistros();
         System.out.println("Registros: " + registros.size());
         for (var reg : registros.values()) {
             System.out.println("  - " + reg.getId() + " (usuario: " + reg.getUsuario().getNickname() + ", edición: " + ", tipo: " + reg.getTipoRegistro().getNombre() + ")");
         }
-        // Patrocinios (desde manejadorAuxiliar)
-        /*
-        var patrocinios = logica.manejadorAuxiliar.getInstancia().getPatrocinios();
-        System.out.println("Patrocinios: " + patrocinios.size());
-        for (var pat : patrocinios) {
-            System.out.println("  - " + pat.getCodigoPatrocinio() + " (institución: " + pat.getInstitucion().getNombre() + ", edición: " + pat.getEdicion().getCodigo() + ")");
-        }
-        */
+
         System.out.println("\n--- Fin del resumen de datos cargados ---\n");
     }
 
