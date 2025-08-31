@@ -21,25 +21,25 @@ public abstract class Usuario {
         return this.nickname;
     }
 
-    public void setNickname(String nickname) {
+    /*public void setNickname(String nickname) {
         this.nickname = nickname;
-    }
+    }*/
 
     public String getNombre() {
         return this.nombre;
     }
 
-    public void setNombre(String nombre) {
+    /*public void setNombre(String nombre) {
         this.nombre = nombre;
-    }
+    }*/
 
     public String getEmail() {
         return this.email;
     }
 
-    public void setEmail(String email) {
+    /*public void setEmail(String email) {
         this.email = email;
-    }
+    }*/
     
     public boolean esAsistente(Usuario u) {
     	if (u instanceof Asistente) {
@@ -48,12 +48,12 @@ public abstract class Usuario {
     	else return false;
     }
     
-    public boolean esOrganizador(Usuario u) {
+   /* public boolean esOrganizador(Usuario u) {
     	if (u instanceof Organizador) {
     		return true;
     	}
     	else return false;
-    }
+    }*/
 
     public Institucion getInstitucion() {
         return null;

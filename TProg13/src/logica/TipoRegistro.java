@@ -28,24 +28,24 @@ public class TipoRegistro {
     }
 
     public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+      this.descripcion = descripcion;
     }
 
     public int getCosto() {
         return costo;
     }
 
-    public void setCosto(int costo) {
-        this.costo = costo;
-    }
+    //public void setCosto(int costo) {
+    //    this.costo = costo;
+    //}
 
     public int getCupo() {
         return cupo;
     }
 
-    public void setCupo(int cupo) {
-        this.cupo = cupo;
-    }
+    //public void setCupo(int cupo) {
+    //    this.cupo = cupo;
+    //}
 
     public Ediciones getEdicion() {
         return edicion;

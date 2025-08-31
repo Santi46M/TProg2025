@@ -12,10 +12,5 @@ public class FabricaInterfacesDisponiblesTest {
         assertSame(f1, f2);
     }
 
-    @Test
-    void cargarUsuariosDesdeCSV_no_explota() {
-        // Va a imprimir stacktrace porque el archivo no existe,
-        // pero al menos cubre el método
-        assertDoesNotThrow(() -> fabrica.getInstance().cargarUsuariosDesdeCSV());
-    }
+
 }

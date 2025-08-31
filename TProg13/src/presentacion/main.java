@@ -1,11 +1,15 @@
-package logica;
+package presentacion;
 
 import javax.swing.*;
 import excepciones.UsuarioNoExisteException;
+import logica.CargaDatosPrueba;
+import logica.IControladorEvento;
+import logica.IControladorUsuario;
+import logica.fabrica;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import presentacion.*;
 
 
 public class main {

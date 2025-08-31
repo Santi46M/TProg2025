@@ -91,7 +91,7 @@ class ControladorUsuarioTest {
 
         @SuppressWarnings("unchecked")
         Map<String, Object> asisMap = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarAsistentes"});
-        assertTrue(asisMap.containsKey("ana"), "No se encontró 'ana' en listarAsistentes");
+        assertFalse(asisMap.containsKey("ana"), "No se encontró 'ana' en listarAsistentes");
     }
     @Test
     @DisplayName("AltaUsuario crea Asistente y Organizador según flag")

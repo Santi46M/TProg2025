@@ -32,12 +32,12 @@ public class Patrocinio {
     public int getCantidadRegistros() { return cantidadRegistros; }
     public String getCodigoPatrocinio() { return codigoPatrocinio; }
 
-    public void setEdicion(Ediciones edicion) { this.edicion = edicion; }
-    public void setInstitucion(Institucion institucion) { this.institucion = institucion; }
-    public void setNivel(DTNivel nivel) { this.nivel = nivel; }
-    public void setTipoRegistro(TipoRegistro tipoRegistro) { this.tipoRegistro = tipoRegistro; }
-    public void setAporte(int aporte) { this.aporte = aporte; }
-    public void setFechaPatrocinio(LocalDate fechaPatrocinio) { this.fechaPatrocinio = fechaPatrocinio; }
-    public void setCantidadRegistros(int cantidadRegistros) { this.cantidadRegistros = cantidadRegistros; }
-    public void setCodigoPatrocinio(String codigoPatrocinio) { this.codigoPatrocinio = codigoPatrocinio; }
+    //public void setEdicion(Ediciones edicion) { this.edicion = edicion; }
+    //public void setInstitucion(Institucion institucion) { this.institucion = institucion; }
+    //public void setNivel(DTNivel nivel) { this.nivel = nivel; }
+    //public void setTipoRegistro(TipoRegistro tipoRegistro) { this.tipoRegistro = tipoRegistro; }
+    //public void setAporte(int aporte) { this.aporte = aporte; }
+    //public void setFechaPatrocinio(LocalDate fechaPatrocinio) { this.fechaPatrocinio = fechaPatrocinio; }
+    //public void setCantidadRegistros(int cantidadRegistros) { this.cantidadRegistros = cantidadRegistros; }
+    //public void setCodigoPatrocinio(String codigoPatrocinio) { this.codigoPatrocinio = codigoPatrocinio; }
 }

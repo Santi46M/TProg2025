@@ -3,7 +3,7 @@ package test;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import org.junit.jupiter.api.Test;
 
-import logica.main;
+import presentacion.main;
 
 public class MainHeadlessTest {
     @Test

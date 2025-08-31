@@ -48,7 +48,7 @@ public class Eventos{
     }
 	
 	//Definimos los setters
-	public void setNombre(String nombre) {
+	/*public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
 	
@@ -63,7 +63,7 @@ public class Eventos{
 	public void setFecha(LocalDate fecha){
 		this.fecha = fecha;
 	}
-	
+	*/
 	public void setCategorias(Map<String, Categoria> categorias) {
         this.categorias = categorias;
     }
