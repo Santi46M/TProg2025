@@ -7,7 +7,6 @@ import java.util.List;
 import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.FechasCruzadasException;
-import excepciones.NombreEdicionEnUsoException;
 import excepciones.TipoRegistroYaExisteException;
 import excepciones.ValorPatrocinioExcedidoException;
 
@@ -21,7 +20,6 @@ public interface IControladorEvento {
     public Eventos consultaEvento(String nombreEvento);
     public void altaRegistroEdicionEvento(String idRegistro, Usuario usuario, Eventos evento, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio);
     public List<DTEvento> listarEventos();
-    public void altaEdicionEvento(String nombreEvento, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String organizador,String ciudad,String pais) throws NombreEdicionEnUsoException;
     public List<String> listarEdicionesEvento(String nombreEvento);
     public Ediciones obtenerEdicion(String nombreEvento, String nombreEdicion);
 }

@@ -7,7 +7,6 @@ import java.util.*;
 
 import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
-import excepciones.NombreEdicionEnUsoException;
 import excepciones.RegistroNoExiste;
 import excepciones.TipoRegistroYaExisteException;
 import excepciones.UsuarioNoEsAsistente;
@@ -208,11 +207,4 @@ public class ControladorEvento implements IControladorEvento{
 
         return new DTRegistro(r.getId(), u.getNombre(), r.getEdicion().getNombre(), r.getTipoRegistro().getNombre(), r.getFechaRegistro(), r.getCosto(), r.getFechaInicio());
     }
-
-
-	@Override
-	public void altaEdicionEvento(String nombreEvento, String nombre, String sigla, String desc, LocalDate fechaInicio,
-			LocalDate fechaFin, LocalDate fechaAlta, String organizador, String ciudad, String pais)
-			throws NombreEdicionEnUsoException {		
-	}
 }

@@ -54,4 +54,8 @@ public abstract class Usuario {
     	}
     	else return false;
     }
+
+    public Institucion getInstitucion() {
+        return null;
+    }
 }

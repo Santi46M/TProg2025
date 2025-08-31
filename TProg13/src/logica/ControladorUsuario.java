@@ -247,7 +247,6 @@ public void AltaCategoriaSinGUI(String nombre) throws CategoriaYaExisteException
     manejadorAux.agregarCategoria(c.getNombre(), c);
 }
 
-    // Permite obtener una Institucion por su nombre directamente
     public Institucion getInstitucionPorNombre(String nombre) {
         return manejador.findInstitucion(nombre);
     }

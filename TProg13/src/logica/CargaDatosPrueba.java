@@ -360,10 +360,9 @@ public class CargaDatosPrueba {
     private static void cargarPatrociniosEjemplo() throws ValorPatrocinioExcedidoException {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
-        // Alta de patrocinios con los parámetros correctos, pasando directamente los objetos
         controlador.AltaPatrocinio(
             manejadorEvento.obtenerEdicion("CONFTECH26"),
-            new Institucion("Facultad de Ingeniería", "Facultad de Ingeniería de la Universidad de la República", "https://www.fing.edu.uy"),
+            logica.manejadorUsuario.getInstancia().findInstitucion("Facultad de Ingeniería"),
             DTNivel.ORO,
             manejadorEvento.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("Estudiante"),
             20000,
@@ -373,7 +372,7 @@ public class CargaDatosPrueba {
         );
         controlador.AltaPatrocinio(
             manejadorEvento.obtenerEdicion("CONFTECH26"),
-            new Institucion("Agencia Nacional de Investigación e Innovación (ANII)", "Fomenta la investigación y la innovación en Uruguay", "https://anii.org.uy"),
+            logica.manejadorUsuario.getInstancia().findInstitucion("Agencia Nacional de Investigación e Innovación (ANII)"),
             DTNivel.PLATA,
             manejadorEvento.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("General"),
             10000,
@@ -383,7 +382,7 @@ public class CargaDatosPrueba {
         );
         controlador.AltaPatrocinio(
             manejadorEvento.obtenerEdicion("MARATON25"),
-            new Institucion("Antel", "Empresa estatal de telecomunicaciones", "https://antel.com.uy"),
+            logica.manejadorUsuario.getInstancia().findInstitucion("Antel"),
             DTNivel.PLATINO,
             manejadorEvento.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 10K"),
             25000,
@@ -393,7 +392,7 @@ public class CargaDatosPrueba {
         );
         controlador.AltaPatrocinio(
             manejadorEvento.obtenerEdicion("EXPOAGRO25"),
-            new Institucion("Universidad Católica del Uruguay", "Institución de educación superior privada", "https://ucu.edu.uy"),
+            logica.manejadorUsuario.getInstancia().findInstitucion("Universidad Católica del Uruguay"),
             DTNivel.BRONCE,
             manejadorEvento.obtenerEdicion("EXPOAGRO25").obtenerTipoRegistro("General"),
             15000,

@@ -16,6 +16,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
     private JTextArea txtInfo;
     private JButton btnRegistrar;
     private JButton btnCancelar;
+    private JTextField txtCodigoPatrocinio;
 
     private List<DTEvento> eventos;
     private String[][] edicionesPorEvento;
@@ -32,19 +33,30 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         controladorEvento = new ControladorEvento();
         controladorUsuario = fabrica.getInstance().getIControladorUsuario();
 
-        JPanel panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JPanel panelSeleccion = new JPanel();
+        panelSeleccion.setLayout(new BoxLayout(panelSeleccion, BoxLayout.Y_AXIS));
+        JPanel panelEventoEdicion = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lblEvento = new JLabel("Evento:");
         comboEventos = new JComboBox<>();
-        panelSeleccion.add(lblEvento);
-        panelSeleccion.add(comboEventos);
+        panelEventoEdicion.add(lblEvento);
+        panelEventoEdicion.add(comboEventos);
         JLabel lblEdicion = new JLabel("Edición:");
         comboEdiciones = new JComboBox<>();
-        panelSeleccion.add(lblEdicion);
-        panelSeleccion.add(comboEdiciones);
+        panelEventoEdicion.add(lblEdicion);
+        panelEventoEdicion.add(comboEdiciones);
+        panelSeleccion.add(panelEventoEdicion);
+        // Panel para tipo y costo en una línea
+        JPanel panelTipoCosto = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lblTipo = new JLabel("Tipo de Registro:");
         comboTipos = new JComboBox<>();
-        panelSeleccion.add(lblTipo);
-        panelSeleccion.add(comboTipos);
+        JLabel lblCosto = new JLabel("Costo:");
+        JTextField txtCosto = new JTextField(8);
+        txtCosto.setEditable(false);
+        panelTipoCosto.add(lblTipo);
+        panelTipoCosto.add(comboTipos);
+        panelTipoCosto.add(lblCosto);
+        panelTipoCosto.add(txtCosto);
+        panelSeleccion.add(panelTipoCosto);
         add(panelSeleccion, BorderLayout.NORTH);
 
         // Panel para el combo de asistentes debajo
@@ -53,6 +65,13 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         comboAsistentes = new JComboBox<>();
         panelAsistentes.add(lblAsistente);
         panelAsistentes.add(comboAsistentes);
+        // Campo para código de patrocinio (solo visible si corresponde)
+        JLabel lblCodigoPatrocinio = new JLabel("Código Patrocinio:");
+        txtCodigoPatrocinio = new JTextField(12);
+        lblCodigoPatrocinio.setVisible(false);
+        txtCodigoPatrocinio.setVisible(false);
+        panelAsistentes.add(lblCodigoPatrocinio);
+        panelAsistentes.add(txtCodigoPatrocinio);
         add(panelAsistentes, BorderLayout.CENTER);
 
         txtInfo = new JTextArea(5, 40);
@@ -66,10 +85,22 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         panelBotones.add(btnCancelar);
         add(panelBotones, BorderLayout.PAGE_END);
 
-        comboEventos.addActionListener(e -> cargarEdiciones());
-        comboEdiciones.addActionListener(e -> cargarTipos());
-        comboTipos.addActionListener(e -> mostrarInfo());
-        comboAsistentes.addActionListener(e -> mostrarInfo());
+        comboEventos.addActionListener(e -> {
+            cargarEdiciones();
+            actualizarVisibilidadCodigoPatrocinio();
+        });
+        comboEdiciones.addActionListener(e -> {
+            cargarTipos();
+            actualizarVisibilidadCodigoPatrocinio();
+        });
+        comboTipos.addActionListener(e -> {
+            mostrarInfo();
+            actualizarCosto(txtCosto);
+        });
+        comboAsistentes.addActionListener(e -> {
+            mostrarInfo();
+            actualizarVisibilidadCodigoPatrocinio();
+        });
 
         btnRegistrar.addActionListener(e -> registrar());
         btnCancelar.addActionListener(e -> this.dispose());
@@ -129,6 +160,11 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         if (comboTipos.getItemCount() > 0) {
             comboTipos.setSelectedIndex(0);
         }
+        // Actualizar costo después de cargar tipos
+        JPanel panelSeleccion = (JPanel) getContentPane().getComponent(0);
+        JPanel panelTipoCosto = (JPanel) panelSeleccion.getComponent(1);
+        JTextField txtCosto = (JTextField) panelTipoCosto.getComponent(3);
+        actualizarCosto(txtCosto);
         mostrarInfo();
     }
 
@@ -167,7 +203,33 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
                 }
             }
         }
-        txtInfo.setText("Cupo disponible: " + cupoDisponible + (yaRegistrado ? "\nEl usuario ya está registrado a esta edición." : ""));
+        txtInfo.setText("Cupo disponible: " + cupoDisponible +
+            "\nCosto: " + tipo.getCosto() +
+            (yaRegistrado ? "\nEl usuario ya está registrado a esta edición." : ""));
+    }
+
+    private void actualizarCosto(JTextField txtCosto) {
+        int idxEvento = comboEventos.getSelectedIndex();
+        int idxEdicion = comboEdiciones.getSelectedIndex();
+        int idxTipo = comboTipos.getSelectedIndex();
+        if (idxEvento < 0 || idxEdicion < 0 || idxTipo < 0) {
+            txtCosto.setText("");
+            return;
+        }
+        String nombreEvento = eventos.get(idxEvento).getNombre();
+        String nombreEdicion = (String) comboEdiciones.getSelectedItem();
+        String nombreTipo = (String) comboTipos.getSelectedItem();
+        Ediciones edicion = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
+        if (edicion == null) {
+            txtCosto.setText("");
+            return;
+        }
+        TipoRegistro tipo = edicion.getTipoRegistro(nombreTipo);
+        if (tipo == null) {
+            txtCosto.setText("");
+            return;
+        }
+        txtCosto.setText(String.valueOf(tipo.getCosto()));
     }
 
     private void registrar() {
@@ -183,6 +245,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         String nombreEdicion = (String) comboEdiciones.getSelectedItem();
         String nombreTipo = (String) comboTipos.getSelectedItem();
         String nicknameAsistente = (String) comboAsistentes.getSelectedItem();
+        String codigoPatrocinioIngresado = txtCodigoPatrocinio.getText().trim();
         Ediciones edicion = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
         TipoRegistro tipo = edicion.getTipoRegistro(nombreTipo);
         logica.Usuario usuario = usuarios.get(idxAsistente);
@@ -213,18 +276,60 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
                 return;
             }
         }
+        float costo = tipo.getCosto();
+        // Lógica de patrocinio: si el usuario pertenece a una institución patrocinadora de la edición y el código es correcto, costo = 0
+        boolean esPatrocinado = false;
+        String codigoPatrocinioValido = null;
+        if (usuario.getInstitucion() != null) {
+            for (Patrocinio pat : edicion.getPatrocinios()) {
+                if (pat.getInstitucion().getNombre().equalsIgnoreCase(usuario.getInstitucion().getNombre())) {
+                    codigoPatrocinioValido = pat.getCodigoPatrocinio();
+                    if (!codigoPatrocinioValido.isEmpty() && codigoPatrocinioValido.equalsIgnoreCase(codigoPatrocinioIngresado)) {
+                        esPatrocinado = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (esPatrocinado) {
+            costo = 0;
+        }
         try {
-            // Obtener los objetos necesarios
             LocalDate fechaRegistro = LocalDate.now();
-            float costo = tipo.getCosto();
             LocalDate fechaInicio = edicion.getFechaInicio();
             StringBuilder sb = new StringBuilder();
             sb.append(usuario.getNickname() + " "+ edicion.getNombre());
-            controladorEvento.altaRegistroEdicionEvento(sb.toString() ,usuario, controladorEvento.consultaEvento(nombreEvento) ,edicion, tipo, fechaRegistro, costo, fechaInicio);
+            controladorEvento.altaRegistroEdicionEvento(sb.toString(), usuario, controladorEvento.consultaEvento(nombreEvento), edicion, tipo, fechaRegistro, costo, fechaInicio);
             JOptionPane.showMessageDialog(this, "Registro realizado correctamente.");
             this.dispose();
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error al registrar: " + ex.getMessage());
         }
+    }
+
+    private void actualizarVisibilidadCodigoPatrocinio() {
+        int idxEvento = comboEventos.getSelectedIndex();
+        int idxEdicion = comboEdiciones.getSelectedIndex();
+        int idxAsistente = comboAsistentes.getSelectedIndex();
+        if (idxEvento < 0 || idxEdicion < 0 || idxAsistente < 0) {
+            txtCodigoPatrocinio.setVisible(false);
+            ((JLabel) ((JPanel) txtCodigoPatrocinio.getParent()).getComponent(2)).setVisible(false);
+            return;
+        }
+        String nombreEvento = eventos.get(idxEvento).getNombre();
+        String nombreEdicion = (String) comboEdiciones.getSelectedItem();
+        Ediciones edicion = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
+        logica.Usuario usuario = usuarios.get(idxAsistente);
+        boolean mostrar = false;
+        if (edicion != null && usuario != null && usuario.getInstitucion() != null) {
+            for (Patrocinio pat : edicion.getPatrocinios()) {
+                if (pat.getInstitucion().getNombre().equalsIgnoreCase(usuario.getInstitucion().getNombre())) {
+                    mostrar = true;
+                    break;
+                }
+            }
+        }
+        txtCodigoPatrocinio.setVisible(mostrar);
+        ((JLabel) ((JPanel) txtCodigoPatrocinio.getParent()).getComponent(2)).setVisible(mostrar);
     }
 }
