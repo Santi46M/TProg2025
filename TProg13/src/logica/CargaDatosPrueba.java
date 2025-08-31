@@ -2,6 +2,7 @@ package logica;
 
 
 import excepciones.AltaRegistroPorOrganizadorException;
+import excepciones.CategoriaYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.InstitucionYaExisteException;
 import excepciones.TipoRegistroYaExisteException;
@@ -115,7 +116,7 @@ public class CargaDatosPrueba {
         controlador.AltaInstitucion("Agencia Nacional de Investigación e Innovación (ANII)", "Fomenta la investigación y la innovación en Uruguay", "https://anii.org.uy");
     }
 
-    public static void cargarCategorias() {
+    public static void cargarCategorias() throws CategoriaYaExisteException {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         //CA01
         controlador.AltaCategoria("Tecnología");

@@ -203,7 +203,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         }
         // Realizar alta
         try {
-            controladorEvento.altaRegistroEdicionEvento(asistente, edicion, tipo, java.time.LocalDate.now(), tipo.getCosto(), edicion.getFechaInicio());
+            controladorEvento.altaRegistroEdicionEvento("a", asistente, edicion, tipo, java.time.LocalDate.now(), tipo.getCosto(), edicion.getFechaInicio());
             JOptionPane.showMessageDialog(this, "Registro exitoso.");
             mostrarInfo();
         } catch (Exception ex) {

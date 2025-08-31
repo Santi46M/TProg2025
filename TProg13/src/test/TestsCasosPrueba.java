@@ -1,7 +1,11 @@
 package test;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -17,57 +21,39 @@ public class TestsCasosPrueba {
     static private IControladorUsuario cUsuario = fabrica.getIControladorUsuario();
     static private IControladorEvento cEvento = fabrica.getIControladorEvento();
 
-    /*@BeforeAll
-    static void cargarDatosFabrica() {
-        // Verifica que no lance excepciones
-        assertDoesNotThrow(() -> fabrica.cargarUsuariosDesdeCSV());
-    }*/
-    
-    
+    @BeforeAll
+    static void cargarDatosPrueba() throws Exception {
+    	CargaDatosPrueba.cargarInstitucionesEjemplo();
+    	CargaDatosPrueba.cargarCategorias();
+    	CargaDatosPrueba.cargarEventosEjemplo();
+    	CargaDatosPrueba.cargarUsuariosEjemplo();
+    	CargaDatosPrueba.cargarEdicionesEjemplo();
+    	CargaDatosPrueba.cargarTipoRegistroEjemplo();
+    	CargaDatosPrueba.cargarPatrociniosEjemplo();
+    	CargaDatosPrueba.cargarRegistrosEjemplo();
+    	CargaDatosPrueba.logResumenDatos();
+    }
+     
     @Test
-    void testLogResumenDatos() {
-        assertDoesNotThrow(() -> CargaDatosPrueba.logResumenDatos());
+    void testCategoriaYaExiste() {
+        assertTrue(cEvento.getManejadorAux().existeCategoria("Tecnología"));
     }
     
     @Test
-    void testCargarInstituciones() {
-        assertDoesNotThrow(() -> CargaDatosPrueba.cargarInstitucionesEjemplo());
-    }
-    
-    @Test
-    void testCargarCategorias() {
-        assertDoesNotThrow(() -> CargaDatosPrueba.cargarCategorias());
-    }
-
-    @Test
-    void testCargarEventos() {
-        assertDoesNotThrow(() -> CargaDatosPrueba.cargarEventosEjemplo());
-    }
-
-    @Test
-    void testCargarUsuarios() {
-        assertDoesNotThrow(() -> CargaDatosPrueba.cargarUsuariosEjemplo());
-    }
-    
-    @Test
-    void testCargarEdiciones() {
-        assertDoesNotThrow(() -> CargaDatosPrueba.cargarEdicionesEjemplo());
-    }
-
-    @Test
-    void testCargarTipoRegistro() {
-        assertDoesNotThrow(() -> CargaDatosPrueba.cargarTipoRegistroEjemplo());
-    }
-
-    @Test
-    void testCargarRegistros() {
-        assertDoesNotThrow(() -> CargaDatosPrueba.cargarRegistrosEjemplo());
-    }
-
-    @Test
-    void testCargarPatrocinios() {
-        assertDoesNotThrow(() -> CargaDatosPrueba.cargarPatrociniosEjemplo());
-    }
-    
+	void testClienteYaExisteNickname() { 
+       Assertions.assertThrows(
+    		   UsuarioYaExisteException.class, () -> {cUsuario.AltaUsuario(
+    				   "atorres",
+    				   "Ana",
+    				   "atorres@gmail.com",
+    				   null,
+    				   null,
+    				   "Torres",
+    				   java.time.LocalDate.of(1990, 5, 12),
+    				   "Facultad de Ingeniería",
+    				   false
+    			  );}
+    		);
+	}
 
 }

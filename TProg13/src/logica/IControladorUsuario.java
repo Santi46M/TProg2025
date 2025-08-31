@@ -11,7 +11,9 @@ import java.util.Map;
 import java.util.Set;
 
 public interface IControladorUsuario {
-
+	public manejadorAuxiliar getManejadorAux();
+	public ManejadorEvento getManejadorEvento();
+	public manejadorUsuario getManejadorUsuario();
     // Crear usuarios
     public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador) throws UsuarioYaExisteException;
     public Organizador ingresarOrganizador(String nickname, String nombre, String email, String desc, String link);

@@ -142,9 +142,32 @@ public class main {
         itemCargaDatos.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    CargaDatosPrueba.cargarInstitucionesEjemplo();
+                    //CargaDatosPrueba.cargarInstitucionesEjemplo();
+                    //CargaDatosPrueba.cargarCategorias();
+                    //CargaDatosPrueba.cargarEventosEjemplo();
+                    //CargaDatosPrueba.cargarUsuariosEjemplo();
+                    //CargaDatosPrueba.cargarEdicionesEjemplo();
+                    //CargaDatosPrueba.cargarTipoRegistroEjemplo();
+                    //CargaDatosPrueba.cargarPatrociniosEjemplo();
+                    //CargaDatosPrueba.cargarRegistrosEjemplo();
+                    CargaDatosPrueba.logResumenDatos();
+
+                    // 📌 cartel de confirmación
+                    JOptionPane.showMessageDialog(
+                        null, 
+                        "Datos iniciales cargados correctamente ✅", 
+                        "Éxito", 
+                        JOptionPane.INFORMATION_MESSAGE
+                    );
+
                 } catch (Exception e1) {
                     e1.printStackTrace();
+                    JOptionPane.showMessageDialog(
+                        null, 
+                        "Ocurrió un error al cargar los datos:\n" + e1.getMessage(), 
+                        "Error", 
+                        JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         });
@@ -244,7 +267,7 @@ public class main {
         menuEvento.add(itemAltaEvento);
         itemAltaEvento.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                altaEventoFrame.cargarCategorias();
+                //altaEventoFrame.cargarCategorias();
                 altaEventoFrame.setVisible(true);
             }
         });
@@ -252,7 +275,7 @@ public class main {
         menuEvento.add(itemAltaTipoRegistro);
         itemAltaTipoRegistro.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                altaTipoRegistroFrame.cargarEventos();
+                //altaTipoRegistroFrame.cargarEventos();
                 altaTipoRegistroFrame.setVisible(true);
                 altaTipoRegistroFrame.toFront();
             }

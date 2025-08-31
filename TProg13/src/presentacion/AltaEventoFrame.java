@@ -17,6 +17,7 @@ public class AltaEventoFrame extends JInternalFrame {
     private JPanel panelCategorias;
     private java.util.List<JCheckBox> checkBoxesCategorias;
     
+   /* 
     public void cargarCategorias() {
         panelCategorias.removeAll();
         checkBoxesCategorias.clear();
@@ -33,6 +34,7 @@ public class AltaEventoFrame extends JInternalFrame {
         panelCategorias.revalidate();
         panelCategorias.repaint();
     }
+    */
     
     public AltaEventoFrame(JDesktopPane desktopPane) {//, ConsultaEventoFrame[] consultaEventoFrameRef) {
         super("Alta de Evento", true, true, true, true);
@@ -40,7 +42,7 @@ public class AltaEventoFrame extends JInternalFrame {
        // this.consultaEventoFrameRef = consultaEventoFrameRef;
         setBounds(new Rectangle(50, 50, 450, 300));
         setVisible(true);
-
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[3];
         gridBagLayout.rowHeights = new int[6];
@@ -141,7 +143,7 @@ public class AltaEventoFrame extends JInternalFrame {
         getContentPane().add(scrollCategorias, gbc_panelCategorias);
 
         checkBoxesCategorias = new java.util.ArrayList<>();
-        cargarCategorias();
+        //cargarCategorias();
 
         // Botones
         JButton btnAceptar = new JButton("Aceptar");

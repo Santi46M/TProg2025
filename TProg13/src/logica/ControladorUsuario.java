@@ -15,6 +15,18 @@ public class ControladorUsuario implements IControladorUsuario {
 	manejadorUsuario manejador = manejadorUsuario.getInstancia();
 	ManejadorEvento manejadorEv = ManejadorEvento.getInstancia();
     manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
+    
+	public manejadorAuxiliar getManejadorAux() {
+		return manejadorAux;
+	}
+	
+	public ManejadorEvento getManejadorEvento() {
+		return manejadorEv;
+	}
+	
+	public manejadorUsuario getManejadorUsuario() {
+		return manejador;
+	}
 	
 	public Organizador ingresarOrganizador(String nickname, String nombre, String email, String desc, String link) {
         

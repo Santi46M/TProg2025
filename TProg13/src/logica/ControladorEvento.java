@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.*;
 
 import excepciones.AltaRegistroPorOrganizadorException;
+import excepciones.CategoriaYaExisteException;
 import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.NombreEdicionEnUsoException;
@@ -17,6 +18,19 @@ import excepciones.UsuarioNoEsAsistente;
 public class ControladorEvento implements IControladorEvento{
 	ManejadorEvento manejador = ManejadorEvento.getInstancia();
 	manejadorUsuario mUsuario = manejadorUsuario.getInstancia();
+	manejadorAuxiliar mAux = manejadorAuxiliar.getInstancia();
+	
+	public manejadorAuxiliar getManejadorAux() {
+		return mAux;
+	}
+	
+	public ManejadorEvento getManejadorEvento() {
+		return manejador;
+	}
+	
+	public manejadorUsuario getManejadorUsuario() {
+		return mUsuario;
+	}
 
     public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias) throws EventoYaExisteException {
         if (categorias == null || categorias.getCategorias() == null || categorias.getCategorias().isEmpty()) {
@@ -84,13 +98,15 @@ public class ControladorEvento implements IControladorEvento{
     }
     */
     
-    public void AltaCategoria(String nombre) {
+    public void AltaCategoria(String nombre) throws CategoriaYaExisteException {
     	manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
         if (manejadorAux.existeCategoria(nombre)) {
-            throw new RuntimeException("Ya existe la categoría: " + nombre);
+            throw new CategoriaYaExisteException("Ya existe la categoría: " + nombre);
         }
+        else {
         Categoria categoria = new Categoria(nombre);
         manejadorAux.agregarCategoria(nombre, categoria);
+        }
     }
     /*
     facu public List<DTEvento> ListarEventos() {
@@ -398,7 +414,7 @@ public class ControladorEvento implements IControladorEvento{
 		
 	}
 	
-	public void altaRegistroEdicionEvento(Usuario usuario, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
+	/*public void altaRegistroEdicionEvento(Usuario usuario, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
         if (!(usuario instanceof Asistente)) {
             throw new RuntimeException("El usuario debe ser un asistente para registrarse a una edición.");
         }
@@ -430,5 +446,5 @@ public class ControladorEvento implements IControladorEvento{
         ManejadorEvento.getInstancia().agregarRegistro(nuevoRegistro);
         asistente.addRegistro(nuevoRegistro.getId(), nuevoRegistro);
         edicion.getRegistros().put(nuevoRegistro.getId(), nuevoRegistro);
-    }
+    }*/
 }

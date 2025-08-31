@@ -14,6 +14,7 @@ public class AltaEdicionEvento extends JInternalFrame {
     public AltaEdicionEvento(logica.IControladorUsuario controladorUsuario) {
 		super("Alta de Edición de Evento", true, true, true, true);
 		this.controladorUsuario = controladorUsuario;
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(new Rectangle(60, 60, 550, 400));
 		setVisible(true);
 

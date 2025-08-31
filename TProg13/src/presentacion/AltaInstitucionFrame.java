@@ -10,6 +10,7 @@ public class AltaInstitucionFrame extends JInternalFrame {
 
     public AltaInstitucionFrame(Set<String> nombresExistentes) {
         super("Alta de Institución", true, true, true, true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(220, 220, 400, 250);
         setVisible(true);
         setLayout(new BorderLayout());

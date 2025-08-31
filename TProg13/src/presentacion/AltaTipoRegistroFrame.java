@@ -22,6 +22,7 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
         super("Alta de Tipo de Registro", true, true, true, true);
         this.controlador = controlador;
         setBounds(120, 120, 500, 350);
+        //setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
         // Panel selección evento y edición
@@ -85,15 +86,15 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
         panelBotones.add(btnCancelar);
         add(panelBotones, BorderLayout.SOUTH);
 
-        comboEventos.addActionListener(e -> cargarEdiciones());
+       // comboEventos.addActionListener(e -> cargarEdiciones());
         btnAceptar.addActionListener(e -> altaTipoRegistro());
         btnCancelar.addActionListener(e -> this.dispose());
 
-        cargarEventos();
+        //cargarEventos();
     }
 
     private java.util.List<logica.DTEvento> eventosDTO;
-    public void cargarEventos() {
+   /* public void cargarEventos() {
         try {
             eventosDTO = controlador.listarEventos();
             comboEventos.removeAllItems();
@@ -121,7 +122,7 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
             }
         }
     }
-
+*/
     private void altaTipoRegistro() {
         int idxEvento = comboEventos.getSelectedIndex();
         int idxEdicion = comboEdiciones.getSelectedIndex();
