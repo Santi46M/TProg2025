@@ -92,13 +92,6 @@ public class main {
         desktopPane.add(registroEdicionEventoFrame);
         desktopPane.add(altaEdicionEventoFrame);
         
-        try {
-            CargaDatosPrueba.cargar();
-            System.out.println("Datos de prueba cargados correctamente.");
-        } catch (Exception ex) {
-            System.err.println("Error al cargar datos de prueba: " + ex.getMessage());
-            ex.printStackTrace();
-        }
     }
 
     private void initialize() {
@@ -122,6 +115,22 @@ public class main {
         JMenu menuSistema = new JMenu("Sistema");
         menuBar.add(menuSistema);
 
+        JMenuItem itemCargaDatos = new JMenuItem("Cargar Datos Iniciales");
+        menuSistema.add(itemCargaDatos);
+
+        itemCargaDatos.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    CargaDatosPrueba.cargar();
+                    System.out.println("Datos de prueba cargados correctamente.");
+                } catch (Exception ex) {
+                    System.err.println("Error al cargar datos de prueba: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+            }
+        });
+        
         JMenu menuUsuario = new JMenu("Usuario");
         menuBar.add(menuUsuario);
         JMenu menuEvento = new JMenu("Evento");
