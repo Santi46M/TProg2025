@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.*;
 
+import excepciones.AltaRegistroPorOrganizadorException;
 import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.NombreEdicionEnUsoException;
@@ -176,7 +177,7 @@ public class ControladorEvento implements IControladorEvento{
 	        // agregamos la edicion al usuario
 	        mUsuario.findOrganizador(usuario.getNickname()).agregarEdicion(nuevaEdicion);
     		}
-    		else throw new EdicionYaExisteException(nombre);
+    		else throw new EdicionYaExisteException("La Edicion " + nombre + " ya existe");
     	}
     	else throw new EventoYaExisteException(evento.getNombre());
     }
@@ -211,10 +212,10 @@ public class ControladorEvento implements IControladorEvento{
         return evento;
     }
 
-    public void altaRegistroEdicionEvento(String idRegistro, Usuario usuario, Eventos evento, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
+    public void altaRegistroEdicionEvento(String idRegistro, Usuario usuario, Eventos evento, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) throws AltaRegistroPorOrganizadorException{
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         if (usuario.esOrganizador(usuario)) {
-        	throw new RuntimeException("Un organizador no puede realizar un registro a una edición.");
+        	throw new AltaRegistroPorOrganizadorException ("El Usuario " + usuario.getNickname() + " no puede realizar un registro a una edición por ser Organizador.");
         }
         if (edicion == null) {
             throw new RuntimeException("No se encontró la edición especificada.");

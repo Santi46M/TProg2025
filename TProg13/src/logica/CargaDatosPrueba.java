@@ -1,10 +1,12 @@
 package logica;
 
 
+import excepciones.AltaRegistroPorOrganizadorException;
 import excepciones.EventoYaExisteException;
 import excepciones.InstitucionYaExisteException;
 import excepciones.TipoRegistroYaExisteException;
 import excepciones.UsuarioYaExisteException;
+import excepciones.AltaRegistroPorOrganizadorException;
 
 public class CargaDatosPrueba {
     public static void cargar() throws Exception {
@@ -19,7 +21,7 @@ public class CargaDatosPrueba {
         logResumenDatos();
     }
 
-    private static void logResumenDatos() {
+    public static void logResumenDatos() {
         // Categorías
         var categorias = logica.manejadorAuxiliar.getInstancia().listarCategorias();
         System.out.println("\nResumen de datos cargados:");
@@ -104,7 +106,7 @@ public class CargaDatosPrueba {
     public static Usuario US03, US07, US09, US12, US13, US14, US15;
 
     // Cargar instituciones y guardar en variables globales
-    private static void cargarInstitucionesEjemplo() throws InstitucionYaExisteException {
+    public static void cargarInstitucionesEjemplo() throws InstitucionYaExisteException {
         logica.ControladorUsuario controlador = new logica.ControladorUsuario();
         controlador.AltaInstitucion("Facultad de Ingeniería", "Facultad de Ingeniería de la Universidad de la República", "https://www.fing.edu.uy");
         controlador.AltaInstitucion("ORT Uruguay", "Universidad privada enfocada en tecnología y gestión", "https://ort.edu.uy");
@@ -113,7 +115,7 @@ public class CargaDatosPrueba {
         controlador.AltaInstitucion("Agencia Nacional de Investigación e Innovación (ANII)", "Fomenta la investigación y la innovación en Uruguay", "https://anii.org.uy");
     }
 
-    private static void cargarCategorias() {
+    public static void cargarCategorias() {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         //CA01
         controlador.AltaCategoria("Tecnología");
@@ -145,7 +147,7 @@ public class CargaDatosPrueba {
         }
     }
     
-    private static void cargarEventosEjemplo() throws EventoYaExisteException {
+    public static void cargarEventosEjemplo() throws EventoYaExisteException {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         java.util.List<String> catEv01 = java.util.Arrays.asList("Tecnología", "Innovación");
         java.util.List<String> catEv02 = java.util.Arrays.asList("Literatura", "Cultura");
@@ -187,7 +189,7 @@ public class CargaDatosPrueba {
     }
     
 
-    private static java.time.LocalDate parseFecha(String fecha) {
+    public static java.time.LocalDate parseFecha(String fecha) {
         String[] partes = fecha.split("/");
         int dia = Integer.parseInt(partes[0]);
         int mes = Integer.parseInt(partes[1]);
@@ -195,7 +197,7 @@ public class CargaDatosPrueba {
         return java.time.LocalDate.of(anio, mes, dia);
     }
     
-    private static void cargarUsuariosEjemplo() throws UsuarioYaExisteException {
+    public static void cargarUsuariosEjemplo() throws UsuarioYaExisteException {
         logica.ControladorUsuario controlador = new logica.ControladorUsuario();
         // Asistentes
         controlador.AltaUsuario("atorres", "Ana", "atorres@gmail.com", null, null, "Torres", java.time.LocalDate.of(1990, 5, 12), "Facultad de Ingeniería", false);
@@ -221,7 +223,7 @@ public class CargaDatosPrueba {
         controlador.AltaUsuario("mec", "Ministerio de Educación y Cultura", "mec@mec.gub.uy", "Institución pública promotora de cultura.", "https://mec.gub.uy", null, null, null, true);
     }
     
-    private static void cargarEdicionesEjemplo() throws Exception {
+    public static void cargarEdicionesEjemplo() throws Exception {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         logica.manejadorUsuario manejadorUsuario = logica.manejadorUsuario.getInstancia();
@@ -300,7 +302,7 @@ public class CargaDatosPrueba {
         System.out.println("Ediciones de evento de ejemplo dadas de alta.");
     }
     
-    private static void cargarTipoRegistroEjemplo() throws TipoRegistroYaExisteException {
+    public static void cargarTipoRegistroEjemplo() throws TipoRegistroYaExisteException {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         //TR01 - General para MONROCK25
@@ -356,7 +358,7 @@ public class CargaDatosPrueba {
         System.out.println("Tipos de registro de ejemplo dados de alta.");
     }
     
-    private static void cargarRegistrosEjemplo() {
+    public static void cargarRegistrosEjemplo() throws AltaRegistroPorOrganizadorException {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         logica.manejadorUsuario manejadorUsuario = logica.manejadorUsuario.getInstancia();        // Formato: idRegistro, usuario, evento, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio
@@ -365,14 +367,14 @@ public class CargaDatosPrueba {
         controlador.altaRegistroEdicionEvento("RE03", manejadorUsuario.getUsuarios().get("sofirod"), manejadorEvento.obtenerEvento("Conferencia de Tecnología"), manejadorEvento.obtenerEdicion("WS26"), manejadorEvento.obtenerEdicion("WS26").obtenerTipoRegistro("Estudiante"), java.time.LocalDate.of(2025, 8, 21), 300, java.time.LocalDate.of(2026, 1, 13));
         controlador.altaRegistroEdicionEvento("RE04", manejadorUsuario.getUsuarios().get("atorres"), manejadorEvento.obtenerEvento("Maratón de Montevideo"), manejadorEvento.obtenerEdicion("MARATON25"), manejadorEvento.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 42K"), java.time.LocalDate.of(2025, 3, 3), 1200, java.time.LocalDate.of(2025, 9, 14));
         controlador.altaRegistroEdicionEvento("RE05", manejadorUsuario.getUsuarios().get("msilva"), manejadorEvento.obtenerEvento("Conferencia de Tecnología"), manejadorEvento.obtenerEdicion("MWC"), manejadorEvento.obtenerEdicion("MWC").obtenerTipoRegistro("Full"), java.time.LocalDate.of(2025, 8, 22), 750, java.time.LocalDate.of(2025, 12, 12));
-//        controlador.altaRegistroEdicionEvento("RE06", manejadorUsuario.getUsuarios().get("udelar"), manejadorEvento.obtenerEvento("Maratón de Montevideo"), manejadorEvento.obtenerEdicion("MARATON25"), manejadorEvento.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 10K"), java.time.LocalDate.of(2025, 4, 9), 500, java.time.LocalDate.of(2025, 9, 14));
-//        controlador.altaRegistroEdicionEvento("RE07", manejadorUsuario.getUsuarios().get("mec"), manejadorEvento.obtenerEvento("Maratón de Montevideo"), manejadorEvento.obtenerEdicion("MARATON25"), manejadorEvento.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 21K"), java.time.LocalDate.of(2025, 4, 10), 800, java.time.LocalDate.of(2025, 9, 14));
-//        controlador.altaRegistroEdicionEvento("RE08", manejadorUsuario.getUsuarios().get("miseventos"), manejadorEvento.obtenerEvento("Montevideo Comics"), manejadorEvento.obtenerEdicion("COMICS25"), manejadorEvento.obtenerEdicion("COMICS25").obtenerTipoRegistro("Cosplayer"), java.time.LocalDate.of(2025, 8, 3), 500, java.time.LocalDate.of(2025, 8, 4));
-//        controlador.altaRegistroEdicionEvento("RE09", manejadorUsuario.getUsuarios().get("techcorp"), manejadorEvento.obtenerEvento("Montevideo Comics"), manejadorEvento.obtenerEdicion("COMICS24"), manejadorEvento.obtenerEdicion("COMICS24").obtenerTipoRegistro("General"), java.time.LocalDate.of(2024, 7, 16), 600, java.time.LocalDate.of(2024, 7, 18));
+        controlador.altaRegistroEdicionEvento("RE06", manejadorUsuario.getUsuarios().get("udelar"), manejadorEvento.obtenerEvento("Maratón de Montevideo"), manejadorEvento.obtenerEdicion("MARATON25"), manejadorEvento.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 10K"), java.time.LocalDate.of(2025, 4, 9), 500, java.time.LocalDate.of(2025, 9, 14));
+        controlador.altaRegistroEdicionEvento("RE07", manejadorUsuario.getUsuarios().get("mec"), manejadorEvento.obtenerEvento("Maratón de Montevideo"), manejadorEvento.obtenerEdicion("MARATON25"), manejadorEvento.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 21K"), java.time.LocalDate.of(2025, 4, 10), 800, java.time.LocalDate.of(2025, 9, 14));
+        controlador.altaRegistroEdicionEvento("RE08", manejadorUsuario.getUsuarios().get("miseventos"), manejadorEvento.obtenerEvento("Montevideo Comics"), manejadorEvento.obtenerEdicion("COMICS25"), manejadorEvento.obtenerEdicion("COMICS25").obtenerTipoRegistro("Cosplayer"), java.time.LocalDate.of(2025, 8, 3), 500, java.time.LocalDate.of(2025, 8, 4));
+        controlador.altaRegistroEdicionEvento("RE09", manejadorUsuario.getUsuarios().get("techcorp"), manejadorEvento.obtenerEvento("Montevideo Comics"), manejadorEvento.obtenerEdicion("COMICS24"), manejadorEvento.obtenerEdicion("COMICS24").obtenerTipoRegistro("General"), java.time.LocalDate.of(2024, 7, 16), 600, java.time.LocalDate.of(2024, 7, 18));
         System.out.println("Registros de ejemplo dados de alta.");
     }
     
-    private static void cargarPatrociniosEjemplo() {
+    public static void cargarPatrociniosEjemplo() {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         logica.ControladorUsuario controladorUsuario = new logica.ControladorUsuario();

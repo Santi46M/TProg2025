@@ -122,7 +122,7 @@ public class ControladorUsuario implements IControladorUsuario {
         if (u == null) {
             throw new UsuarioNoExisteException(nickname);
         }
-
+        else {
         // Datos básicos
         DTDatosUsuario dto = new DTDatosUsuario(u.getNickname(), u.getNombre(), u.getEmail());
         System.out.println(" llega a obtener datos" );
@@ -155,7 +155,7 @@ public class ControladorUsuario implements IControladorUsuario {
 //                }
         }
 
-        return dto;
+        return dto;}
     }
     public static Set<DTEdicion> listarEdicionesAPartirDeOrganizador(Organizador o) {
         Set<DTEdicion> lista = new HashSet<>();
@@ -186,28 +186,29 @@ public class ControladorUsuario implements IControladorUsuario {
         if (u == null) {
             throw new UsuarioNoExisteException(nickname);
         }
-
-        // Datos básicos
-        String nick = u.getNickname();
-        String nombre = u.getNombre();
-        String correo = u.getEmail();
-
-        if (u instanceof Organizador o) {
-            Set<DTEdicion> ediciones = listarEdicionesAPartirDeOrganizador(o);
-
-            // Ejemplo de llamada a detalle de una edición seleccionada:
-            for (DTEdicion dtEd : ediciones) {
-            	DTEdicion detalle = consultaEdicionEvento(dtEd.getNombre());
-                // ahora podés exponer o almacenar el detalle
-            }
-
-        } else if (u instanceof Asistente a) {
-            Map<String, Registro> registros = a.getRegistros();
-            // Ejemplo de llamada a detalle de un registro seleccionado:
-            for (Registro reg : registros.values()) {
-                DTRegistro detalle = consultaRegistro(reg.getId());
-                // ahora podés exponer o almacenar el detalle
-            }
+        else if (u != null) {
+	        // Datos básicos
+	        String nick = u.getNickname();
+	        String nombre = u.getNombre();
+	        String correo = u.getEmail();
+	
+	        if (u instanceof Organizador o) {
+	            Set<DTEdicion> ediciones = listarEdicionesAPartirDeOrganizador(o);
+	
+	            // Ejemplo de llamada a detalle de una edición seleccionada:
+	            for (DTEdicion dtEd : ediciones) {
+	            	DTEdicion detalle = consultaEdicionEvento(dtEd.getNombre());
+	                // ahora podés exponer o almacenar el detalle
+	            }
+	
+	        } else if (u instanceof Asistente a) {
+	            Map<String, Registro> registros = a.getRegistros();
+	            // Ejemplo de llamada a detalle de un registro seleccionado:
+	            for (Registro reg : registros.values()) {
+	                DTRegistro detalle = consultaRegistro(reg.getId());
+	                // ahora podés exponer o almacenar el detalle
+	            }
+	        }
         }
     }
 

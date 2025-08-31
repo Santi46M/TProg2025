@@ -8,6 +8,7 @@ import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.NombreEdicionEnUsoException;
 import excepciones.TipoRegistroYaExisteException;
+import excepciones.AltaRegistroPorOrganizadorException;
 
 public interface IControladorEvento {
 	public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias) throws EventoYaExisteException;
@@ -17,7 +18,7 @@ public interface IControladorEvento {
     public void AltaEdicionEvento(Eventos evento, Usuario organizador, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais)throws EdicionYaExisteException, EventoYaExisteException;
     public DTEdicion consultaEdicionEvento(String siglaEvento, String siglaEdicion);
     public Eventos consultaEvento(String nombreEvento);
-    public void altaRegistroEdicionEvento(String idRegistro, Usuario usuario, Eventos evento, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio);
+    public void altaRegistroEdicionEvento(String idRegistro, Usuario usuario, Eventos evento, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) throws AltaRegistroPorOrganizadorException;
     public List<DTEvento> listarEventos();
     public void altaEdicionEvento(String nombreEvento, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String organizador,String ciudad,String pais) throws NombreEdicionEnUsoException;
     public List<String> listarEdicionesEvento(String nombreEvento);

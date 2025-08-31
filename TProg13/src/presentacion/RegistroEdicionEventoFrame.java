@@ -25,6 +25,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
 
     public RegistroEdicionEventoFrame() {
         super("Registro a Edición de Evento", true, true, true, true);
+        setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
         setBounds(180, 180, 600, 350);
         setVisible(false);
         setLayout(new BorderLayout());

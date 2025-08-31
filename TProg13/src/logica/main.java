@@ -10,7 +10,7 @@ import java.awt.event.ActionListener;
 import java.util.Map;
 import java.util.HashMap;
 import presentacion.*;
-
+import logica.CargaDatosPrueba;
 import logica.fabrica;
 import logica.CargaDatosPrueba;
 
@@ -137,6 +137,17 @@ public class main {
         JMenu menuEvento = new JMenu("Evento");
         menuBar.add(menuEvento);
 
+        JMenuItem itemCargaDatos = new JMenuItem("Cargar Datos Iniciales");
+        menuSistema.add(itemCargaDatos);
+        itemCargaDatos.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    CargaDatosPrueba.cargarInstitucionesEjemplo();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
 
         JMenuItem itemAltaUsuario = new JMenuItem("Alta de Usuario");
         menuUsuario.add(itemAltaUsuario);
