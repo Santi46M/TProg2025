@@ -19,6 +19,7 @@ public class Ediciones {
     private String pais;
     private Map<String, TipoRegistro> tiposRegistro = new HashMap<>();
     private Set<Patrocinio> patrocinios = new HashSet<>();
+    private Map<String, Registro> registros = new HashMap<>();
 
     public Ediciones(Eventos evento, String nombre, String sigla,
                      LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
@@ -129,6 +130,10 @@ public class Ediciones {
             if (p.getCodigoPatrocinio().equals(codigo)) return p;
         }
         return null;
+    }
+
+    public Map<String, Registro> getRegistros() {
+        return registros;
     }
 
     // Devuelve el tipo de registro por nombre, buscando en el manejador de eventos si no está en el mapa local

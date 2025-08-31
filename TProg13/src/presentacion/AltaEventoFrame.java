@@ -14,6 +14,26 @@ public class AltaEventoFrame extends JInternalFrame {
     public void setAbrirConsultaRunnable(Runnable r) { this.abrirConsultaRunnable = r; }
     private JDesktopPane desktopPane;
     //private ConsultaEventoFrame[] consultaEventoFrameRef;
+    private JPanel panelCategorias;
+    private java.util.List<JCheckBox> checkBoxesCategorias;
+    
+    public void cargarCategorias() {
+        panelCategorias.removeAll();
+        checkBoxesCategorias.clear();
+        try {
+            java.util.List<String> categorias = new java.util.ArrayList<>(logica.manejadorAuxiliar.getInstancia().listarCategorias());
+            for (String cat : categorias) {
+                JCheckBox check = new JCheckBox(cat);
+                checkBoxesCategorias.add(check);
+                panelCategorias.add(check);
+            }
+        } catch (Exception ex) {
+            panelCategorias.add(new JLabel("No se pudieron cargar las categorías."));
+        }
+        panelCategorias.revalidate();
+        panelCategorias.repaint();
+    }
+    
     public AltaEventoFrame(JDesktopPane desktopPane) {//, ConsultaEventoFrame[] consultaEventoFrameRef) {
         super("Alta de Evento", true, true, true, true);
         this.desktopPane = desktopPane;
@@ -110,7 +130,7 @@ public class AltaEventoFrame extends JInternalFrame {
         getContentPane().add(lblCategoria, gbc_lblCategoria);
 
         // Panel dinámico de categorías
-        JPanel panelCategorias = new JPanel();
+        panelCategorias = new JPanel();
         panelCategorias.setLayout(new BoxLayout(panelCategorias, BoxLayout.Y_AXIS));
         JScrollPane scrollCategorias = new JScrollPane(panelCategorias);
         scrollCategorias.setPreferredSize(new Dimension(200, 80));
@@ -120,19 +140,8 @@ public class AltaEventoFrame extends JInternalFrame {
         gbc_panelCategorias.fill = GridBagConstraints.BOTH;
         getContentPane().add(scrollCategorias, gbc_panelCategorias);
 
-        // Cargar categorías dinámicamente
-        java.util.List<JCheckBox> checkBoxesCategorias = new java.util.ArrayList<>();
-        try {
-            logica.ControladorEvento controlador = new logica.ControladorEvento();
-            java.util.List<String> categorias = new java.util.ArrayList<>(logica.manejadorAuxiliar.getInstancia().listarCategorias());
-            for (String cat : categorias) {
-                JCheckBox check = new JCheckBox(cat);
-                checkBoxesCategorias.add(check);
-                panelCategorias.add(check);
-            }
-        } catch (Exception ex) {
-            panelCategorias.add(new JLabel("No se pudieron cargar las categorías."));
-        }
+        checkBoxesCategorias = new java.util.ArrayList<>();
+        cargarCategorias();
 
         // Botones
         JButton btnAceptar = new JButton("Aceptar");

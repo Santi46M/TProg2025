@@ -2,81 +2,177 @@ package presentacion;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import logica.ControladorEvento;
-import logica.Ediciones;
-import logica.Eventos;
-import logica.TipoRegistro;
-import logica.Patrocinio;
-import java.util.List;
 
 public class ConsultaEdicionEventoFrame extends JInternalFrame {
     private JComboBox<String> comboEventos;
     private JComboBox<String> comboEdiciones;
-    private JTextArea txtDetalles;
+    private DefaultListModel<String> listModel;
+    private JTextArea txtDatos;
+    private JLabel lblCategorias;
+    private String[][] datosEventos;
+    private String[][] categoriasEventos;
+    private String[][] edicionesEventos;
     private JList<String> listTiposRegistro;
     private JList<String> listPatrocinios;
+    private JTextArea txtDetalle;
+    private DefaultListModel<String> modelTiposRegistro;
+    private DefaultListModel<String> modelPatrocinios;
 
     public ConsultaEdicionEventoFrame() {
         super("Consulta Edición de Evento", true, true, true, true);
-        setBounds(100, 100, 700, 500);
+        setBounds(100, 100, 800, 500);
         setLayout(new BorderLayout());
 
-        JPanel panelTop = new JPanel(new FlowLayout());
-        panelTop.add(new JLabel("Evento:"));
+        JPanel panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JLabel lblEvento = new JLabel("Evento:");
         comboEventos = new JComboBox<>();
-        comboEdiciones = new JComboBox<>(); // Inicializar antes de cargarEventos
-        cargarEventos();
-        panelTop.add(comboEventos);
-        panelTop.add(new JLabel("Edición:"));
-        panelTop.add(comboEdiciones);
-        JButton btnConsultar = new JButton("Consultar");
-        panelTop.add(btnConsultar);
-        add(panelTop, BorderLayout.NORTH);
+        panelSeleccion.add(lblEvento);
+        panelSeleccion.add(comboEventos);
+        JLabel lblEdicion = new JLabel("Edición:");
+        comboEdiciones = new JComboBox<>();
+        panelSeleccion.add(lblEdicion);
+        panelSeleccion.add(comboEdiciones);
+        add(panelSeleccion, BorderLayout.NORTH);
 
-        JPanel panelCenter = new JPanel(new GridLayout(1, 3));
-        txtDetalles = new JTextArea();
-        txtDetalles.setEditable(false);
-        panelCenter.add(new JScrollPane(txtDetalles));
+        JPanel panelCentral = new JPanel(new GridLayout(1, 3));
+        JPanel panelDatos = new JPanel(new BorderLayout());
+        txtDatos = new JTextArea(8, 30);
+        txtDatos.setEditable(false);
+        panelDatos.add(new JScrollPane(txtDatos), BorderLayout.CENTER);
+        lblCategorias = new JLabel();
+        panelDatos.add(lblCategorias, BorderLayout.SOUTH);
+        panelCentral.add(panelDatos);
 
-        listTiposRegistro = new JList<>();
-        panelCenter.add(new JScrollPane(listTiposRegistro));
-        listPatrocinios = new JList<>();
-        panelCenter.add(new JScrollPane(listPatrocinios));
-        add(panelCenter, BorderLayout.CENTER);
+        // Panel tipos de registro
+        JPanel panelTipos = new JPanel(new BorderLayout());
+        panelTipos.add(new JLabel("Tipos de Registro"), BorderLayout.NORTH);
+        modelTiposRegistro = new DefaultListModel<>();
+        listTiposRegistro = new JList<>(modelTiposRegistro);
+        panelTipos.add(new JScrollPane(listTiposRegistro), BorderLayout.CENTER);
+        panelCentral.add(panelTipos);
 
-        comboEventos.addActionListener(e -> cargarEdiciones());
-        btnConsultar.addActionListener(e -> mostrarDetallesEdicion());
-        //listTiposRegistro.addListSelectionListener(e -> mostrarDetalleTipoRegistro());
-        //listPatrocinios.addListSelectionListener(e -> mostrarDetallePatrocinio());
+        // Panel patrocinios
+        JPanel panelPatrocinios = new JPanel(new BorderLayout());
+        panelPatrocinios.add(new JLabel("Patrocinios"), BorderLayout.NORTH);
+        modelPatrocinios = new DefaultListModel<>();
+        listPatrocinios = new JList<>(modelPatrocinios);
+        panelPatrocinios.add(new JScrollPane(listPatrocinios), BorderLayout.CENTER);
+        panelCentral.add(panelPatrocinios);
+
+        add(panelCentral, BorderLayout.CENTER);
+
+        // Panel detalle
+        JPanel panelDetalle = new JPanel(new BorderLayout());
+        txtDetalle = new JTextArea(5, 60);
+        txtDetalle.setEditable(false);
+        panelDetalle.add(new JLabel("Detalle"), BorderLayout.NORTH);
+        panelDetalle.add(new JScrollPane(txtDetalle), BorderLayout.CENTER);
+        add(panelDetalle, BorderLayout.SOUTH);
+
+        comboEventos.addActionListener(e -> cargarEdicionesEvento());
+        comboEdiciones.addActionListener(e -> mostrarDatosEdicion());
+        listTiposRegistro.addListSelectionListener(e -> mostrarDetalleTipoRegistro());
+        listPatrocinios.addListSelectionListener(e -> mostrarDetallePatrocinio());
     }
 
-    private void cargarEventos() {
-        comboEventos.removeAllItems();
-        List<logica.DTEvento> eventos = new ControladorEvento().listarEventos();
-        for (logica.DTEvento e : eventos) comboEventos.addItem(e.getNombre());
-        cargarEdiciones();
+    public void cargarEventos() {
+        try {
+            logica.ControladorEvento controlador = new logica.ControladorEvento();
+            java.util.List<logica.DTEvento> eventos = controlador.listarEventos();
+            String[] eventosArr = new String[eventos.size()];
+            datosEventos = new String[eventos.size()][1];
+            categoriasEventos = new String[eventos.size()][];
+            edicionesEventos = new String[eventos.size()][];
+            for (int i = 0; i < eventos.size(); i++) {
+                logica.DTEvento ev = eventos.get(i);
+                eventosArr[i] = ev.getNombre();
+                datosEventos[i][0] = ev.getDescripcion();
+                categoriasEventos[i] = ev.getCategorias().toArray(new String[0]);
+                edicionesEventos[i] = ev.getEdiciones().toArray(new String[0]);
+            }
+            comboEventos.setModel(new DefaultComboBoxModel<>(eventosArr));
+            comboEventos.revalidate();
+            comboEventos.repaint();
+            if (eventosArr.length > 0) {
+                comboEventos.setSelectedIndex(0);
+                mostrarDatosEvento();
+            } else {
+                txtDatos.setText("");
+                lblCategorias.setText("");
+                modelTiposRegistro.clear();
+                modelPatrocinios.clear();
+                txtDetalle.setText("");
+            }
+        } catch (Exception ex) {
+            comboEventos.setModel(new DefaultComboBoxModel<>(new String[]{"No hay eventos"}));
+            comboEventos.revalidate();
+            comboEventos.repaint();
+            txtDatos.setText("");
+            lblCategorias.setText("");
+            modelTiposRegistro.clear();
+            modelPatrocinios.clear();
+            txtDetalle.setText("");
+        }
     }
 
-    private void cargarEdiciones() {
+    private void cargarEdicionesEvento() {
+        int idx = comboEventos.getSelectedIndex();
         comboEdiciones.removeAllItems();
-        String evento = (String) comboEventos.getSelectedItem();
-        if (evento == null) return;
-        List<String> ediciones = new ControladorEvento().listarEdicionesEvento(evento);
-        for (String ed : ediciones) comboEdiciones.addItem(ed);
-    }
-
-    private void mostrarDetallesEdicion() {
-        String evento = (String) comboEventos.getSelectedItem();
-        String edicion = (String) comboEdiciones.getSelectedItem();
-        if (evento == null || edicion == null) {
-            txtDetalles.setText("Seleccione evento y edición.");
+        txtDatos.setText("");
+        lblCategorias.setText("");
+        if (idx < 0 || edicionesEventos == null || idx >= edicionesEventos.length) {
             return;
         }
-        Ediciones edi = new ControladorEvento().obtenerEdicion(evento, edicion);
+        String[] ediciones = edicionesEventos[idx];
+        for (String ed : ediciones) {
+            comboEdiciones.addItem(ed);
+        }
+        if (ediciones.length > 0) {
+            comboEdiciones.setSelectedIndex(0);
+            mostrarDatosEdicion();
+        }
+    }
+
+    private void mostrarDatosEvento() {
+        int idx = comboEventos.getSelectedIndex();
+        if (idx < 0 || datosEventos == null || idx >= datosEventos.length) {
+            txtDatos.setText("");
+            lblCategorias.setText("");
+            modelTiposRegistro.clear();
+            modelPatrocinios.clear();
+            txtDetalle.setText("");
+            return;
+        }
+        txtDatos.setText(datosEventos[idx][0]);
+        StringBuilder cats = new StringBuilder("Categorías: ");
+        for (String cat : categoriasEventos[idx]) {
+            cats.append(cat).append(", ");
+        }
+        if (cats.length() > 12) cats.setLength(cats.length() - 2); // quitar última coma
+        lblCategorias.setText(cats.toString());
+        modelTiposRegistro.clear();
+        modelPatrocinios.clear();
+        txtDetalle.setText("");
+    }
+
+    private void mostrarDatosEdicion() {
+        int idxEvento = comboEventos.getSelectedIndex();
+        int idxEd = comboEdiciones.getSelectedIndex();
+        modelTiposRegistro.clear();
+        modelPatrocinios.clear();
+        txtDetalle.setText("");
+        if (idxEvento < 0 || idxEd < 0 || edicionesEventos == null || idxEvento >= edicionesEventos.length) {
+            txtDatos.setText("");
+            lblCategorias.setText("");
+            return;
+        }
+        String[] ediciones = edicionesEventos[idxEvento];
+        if (idxEd >= ediciones.length) return;
+        String nombreEdicion = ediciones[idxEd];
+        String nombreEvento = comboEventos.getItemAt(idxEvento);
+        logica.Ediciones edi = new logica.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
         if (edi == null) {
-            txtDetalles.setText("No se encontró la edición.");
+            txtDatos.setText("No se encontró la edición.");
             return;
         }
         StringBuilder sb = new StringBuilder();
@@ -87,47 +183,61 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         sb.append("Ciudad: ").append(edi.getCiudad()).append("\n");
         sb.append("País: ").append(edi.getPais()).append("\n");
         sb.append("Organizador: ").append(edi.getOrganizador() != null ? edi.getOrganizador().getNickname() : "").append("\n");
-        txtDetalles.setText(sb.toString());
-        // Tipos de registro
-        DefaultListModel<String> modelTipos = new DefaultListModel<>();
-        for (TipoRegistro tr : edi.getTiposRegistro()) {
-            modelTipos.addElement(tr.getNombre());
+        txtDatos.setText(sb.toString());
+        // Cargar tipos de registro
+        for (logica.TipoRegistro tr : edi.getTiposRegistro()) {
+            modelTiposRegistro.addElement(tr.getNombre());
         }
-        listTiposRegistro.setModel(modelTipos);
-        // Patrocinios
-        DefaultListModel<String> modelPats = new DefaultListModel<>();
-        for (Patrocinio p : edi.getPatrocinios()) {
-            modelPats.addElement(p.getCodigoPatrocinio());
+        // Cargar patrocinios
+        for (logica.Patrocinio p : edi.getPatrocinios()) {
+            modelPatrocinios.addElement(p.getCodigoPatrocinio());
         }
-        listPatrocinios.setModel(modelPats);
     }
-    
-    /*
+
     private void mostrarDetalleTipoRegistro() {
-        String evento = (String) comboEventos.getSelectedItem();
-        String edicion = (String) comboEdiciones.getSelectedItem();
-        String tipo = listTiposRegistro.getSelectedValue();
-        if (evento == null || edicion == null || tipo == null) return;
-        Ediciones edi = new ControladorEvento().obtenerEdicion(evento, edicion);
+        int idxEvento = comboEventos.getSelectedIndex();
+        int idxEd = comboEdiciones.getSelectedIndex();
+        int idxTipo = listTiposRegistro.getSelectedIndex();
+        txtDetalle.setText("");
+        if (idxEvento < 0 || idxEd < 0 || idxTipo < 0) return;
+        String[] ediciones = edicionesEventos[idxEvento];
+        if (idxEd >= ediciones.length) return;
+        String nombreEdicion = ediciones[idxEd];
+        String nombreEvento = comboEventos.getItemAt(idxEvento);
+        String nombreTipo = modelTiposRegistro.get(idxTipo);
+        logica.Ediciones edi = new logica.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
         if (edi == null) return;
-        TipoRegistro tr = edi.getTiposRegistro().get(tipo);
+        logica.TipoRegistro tr = edi.getTipoRegistro(nombreTipo);
         if (tr == null) return;
-        JOptionPane.showMessageDialog(this, "Tipo de Registro:\nNombre: " + tr.getNombre() + "\nDescripción: " + tr.getDescripcion() + "\nCosto: " + tr.getCosto() + "\nCupo: " + tr.getCupo());
+        StringBuilder sb = new StringBuilder();
+        sb.append("Tipo de Registro: ").append(tr.getNombre()).append("\n");
+        sb.append("Descripción: ").append(tr.getDescripcion()).append("\n");
+        sb.append("Cupo: ").append(tr.getCupo()).append("\n");
+        sb.append("Costo: ").append(tr.getCosto()).append("\n");
+        txtDetalle.setText(sb.toString());
     }
 
     private void mostrarDetallePatrocinio() {
-        String evento = (String) comboEventos.getSelectedItem();
-        String edicion = (String) comboEdiciones.getSelectedItem();
-        String codPat = listPatrocinios.getSelectedValue();
-        if (evento == null || edicion == null || codPat == null) return;
-        Ediciones edi = new ControladorEvento().obtenerEdicion(evento, edicion);
+        int idxEvento = comboEventos.getSelectedIndex();
+        int idxEd = comboEdiciones.getSelectedIndex();
+        int idxPat = listPatrocinios.getSelectedIndex();
+        txtDetalle.setText("");
+        if (idxEvento < 0 || idxEd < 0 || idxPat < 0) return;
+        String[] ediciones = edicionesEventos[idxEvento];
+        if (idxEd >= ediciones.length) return;
+        String nombreEdicion = ediciones[idxEd];
+        String nombreEvento = comboEventos.getItemAt(idxEvento);
+        String codigoPat = modelPatrocinios.get(idxPat);
+        logica.Ediciones edi = new logica.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
         if (edi == null) return;
-        for (Patrocinio p : edi.getPatrocinios()) {
-            if (p.getCodigoPatrocinio().equals(codPat)) {
-                JOptionPane.showMessageDialog(this, "Patrocinio:\nCódigo: " + p.getCodigoPatrocinio() + "\nInstitución: " + (p.getInstitucion() != null ? p.getInstitucion().getNombre() : "") + "\nNivel: " + (p.getNivel() != null ? p.getNivel().toString() : "") + "\nAporte: " + p.getAporte() + "\nCantidad Registros: " + p.getCantidadRegistros());
-                break;
-            }
-        }
+        logica.Patrocinio p = edi.getPatrocinio(codigoPat);
+        if (p == null) return;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Patrocinio: ").append(p.getCodigoPatrocinio()).append("\n");
+        sb.append("Institución: ").append(p.getInstitucion() != null ? p.getInstitucion().getNombre() : "").append("\n");
+        sb.append("Nivel: ").append(p.getNivel() != null ? p.getNivel().toString() : "").append("\n");
+        sb.append("Aporte: ").append(p.getAporte()).append("\n");
+        sb.append("Cantidad Registros: ").append(p.getCantidadRegistros()).append("\n");
+        txtDetalle.setText(sb.toString());
     }
-    */
 }

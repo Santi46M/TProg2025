@@ -18,10 +18,9 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
     private JTextField txtCosto;
     private JTextField txtCupo;
 
-    public AltaTipoRegistroFrame(ControladorEvento controlador, List<Eventos> eventos) {
+    public AltaTipoRegistroFrame(ControladorEvento controlador) {
         super("Alta de Tipo de Registro", true, true, true, true);
         this.controlador = controlador;
-        this.listaEventos = eventos;
         setBounds(120, 120, 500, 350);
         setLayout(new BorderLayout());
 
@@ -29,7 +28,6 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
         JPanel panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lblEvento = new JLabel("Evento:");
         comboEventos = new JComboBox<>();
-        for (Eventos ev : eventos) comboEventos.addItem(ev.getNombre());
         panelSeleccion.add(lblEvento);
         panelSeleccion.add(comboEventos);
         JLabel lblEdicion = new JLabel("Edición:");
@@ -91,18 +89,34 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
         btnAceptar.addActionListener(e -> altaTipoRegistro());
         btnCancelar.addActionListener(e -> this.dispose());
 
-        if (comboEventos.getItemCount() > 0) {
-            comboEventos.setSelectedIndex(0);
-            cargarEdiciones();
+        cargarEventos();
+    }
+
+    private java.util.List<logica.DTEvento> eventosDTO;
+    public void cargarEventos() {
+        try {
+            eventosDTO = controlador.listarEventos();
+            comboEventos.removeAllItems();
+            for (logica.DTEvento ev : eventosDTO) {
+                comboEventos.addItem(ev.getNombre());
+            }
+            if (comboEventos.getItemCount() > 0) {
+                comboEventos.setSelectedIndex(0);
+                cargarEdiciones();
+            }
+        } catch (Exception ex) {
+            comboEventos.setModel(new DefaultComboBoxModel<>(new String[]{"No hay eventos"}));
+            comboEdiciones.setModel(new DefaultComboBoxModel<>(new String[]{}));
         }
     }
 
     private void cargarEdiciones() {
         comboEdiciones.removeAllItems();
         int idx = comboEventos.getSelectedIndex();
-        if (idx >= 0) {
-            Eventos evento = listaEventos.get(idx);
-            for (String ed : evento.getEdiciones().keySet()) {
+        if (idx >= 0 && eventosDTO != null && idx < eventosDTO.size()) {
+            logica.DTEvento evento = eventosDTO.get(idx);
+            java.util.List<String> ediciones = evento.getEdiciones();
+            for (String ed : ediciones) {
                 comboEdiciones.addItem(ed);
             }
         }
@@ -111,13 +125,13 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
     private void altaTipoRegistro() {
         int idxEvento = comboEventos.getSelectedIndex();
         int idxEdicion = comboEdiciones.getSelectedIndex();
-        if (idxEvento < 0 || idxEdicion < 0) {
+        if (idxEvento < 0 || idxEdicion < 0 || eventosDTO == null || idxEvento >= eventosDTO.size()) {
             JOptionPane.showMessageDialog(this, "Debe seleccionar un evento y una edición.");
             return;
         }
-        Eventos evento = listaEventos.get(idxEvento);
+        logica.DTEvento eventoDTO = eventosDTO.get(idxEvento);
         String nombreEdicion = (String) comboEdiciones.getSelectedItem();
-        Ediciones edicion = evento.obtenerEdicion(nombreEdicion);
+        logica.Ediciones edicion = controlador.obtenerEdicion(eventoDTO.getNombre(), nombreEdicion);
         String nombre = txtNombre.getText().trim();
         String descripcion = txtDescripcion.getText().trim();
         String costoStr = txtCosto.getText().trim();

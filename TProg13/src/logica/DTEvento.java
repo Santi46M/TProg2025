@@ -1,18 +1,23 @@
 package logica;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class DTEvento {
     private String nombre;
     private String sigla;
     private String descripcion;
     private LocalDate fecha;
+    private List<String> categorias;
+    private List<String> ediciones;
 
-    public DTEvento(String nombre, String sigla, String descripcion, LocalDate fecha) {
+    public DTEvento(String nombre, String sigla, String descripcion, LocalDate fecha, List<String> categorias, List<String> ediciones) {
         this.nombre = nombre;
         this.sigla = sigla;
         this.descripcion = descripcion;
         this.fecha = fecha;
+        this.categorias = categorias;
+        this.ediciones = ediciones;
     }
 
     // Getters
@@ -31,5 +36,12 @@ public class DTEvento {
     public LocalDate getFecha() {
         return fecha;
     }
-}
 
+    public List<String> getCategorias() {
+        return categorias;
+    }
+
+    public List<String> getEdiciones() {
+        return ediciones;
+    }
+}

@@ -18,8 +18,80 @@ public class CargaDatosPrueba {
         cargarUsuariosEjemplo();
         cargarEdicionesEjemplo();
         cargarTipoRegistroEjemplo();
-        cargarRegistrosEjemplo();
+        cargarRegistrosEjemplo(); // ACTIVADO para que los registros de ejemplo estén disponibles
         cargarPatrociniosEjemplo();
+        logResumenDatos();
+    }
+
+    private static void logResumenDatos() {
+        // Categorías
+        var categorias = logica.manejadorAuxiliar.getInstancia().listarCategorias();
+        System.out.println("\nResumen de datos cargados:");
+        System.out.println("Categorías: " + categorias.size());
+        for (String cat : categorias) {
+            System.out.println("  - " + cat);
+        }
+        // Instituciones (solo nombres)
+        var instituciones = logica.manejadorUsuario.getInstancia().getInstituciones();
+        System.out.println("Instituciones: " + instituciones.size());
+        for (String nombre : instituciones) {
+            System.out.println("  - " + nombre);
+        }
+        // Eventos
+        var eventos = logica.ManejadorEvento.getInstancia().obtenerEventos();
+        System.out.println("Eventos: " + eventos.size());
+        for (var ev : eventos.values()) {
+            System.out.println("  - " + ev.getNombre() + " (" + ev.getSigla() + ")");
+        }
+        // Usuarios
+        var usuarios = logica.manejadorUsuario.getInstancia().getUsuarios();
+        System.out.println("Usuarios: " + usuarios.size());
+        for (var us : usuarios.values()) {
+            System.out.println("  - " + us.getNickname() + " (" + us.getNombre() + ")");
+        }
+        // Ediciones (desde cada evento)
+        int totalEdiciones = 0;
+        for (var ev : eventos.values()) {
+            totalEdiciones += ev.getEdiciones().size();
+        }
+        System.out.println("Ediciones: " + totalEdiciones);
+        for (var ev : eventos.values()) {
+            for (var ed : ev.getEdiciones().values()) {
+                System.out.println("  - " + ed.getNombre());
+            }
+        }
+        // Tipos de registro (desde cada edición)
+        int totalTipos = 0;
+        for (var ev : eventos.values()) {
+            for (var ed : ev.getEdiciones().values()) {
+                totalTipos += ed.getTiposRegistro().size();
+            }
+        }
+        /*
+        System.out.println("Tipos de registro: " + totalTipos);
+        for (var ev : eventos.values()) {
+            for (var ed : ev.getEdiciones().values()) {
+                for (var tr : ed.getTiposRegistro().values()) {
+                    System.out.println("  - " + tr.getNombre() + " (edición: " + ed.getCodigo() + ")");
+                }
+            }
+        }
+        */
+        // Registros
+        var registros = logica.ManejadorEvento.getInstancia().obtenerRegistros();
+        System.out.println("Registros: " + registros.size());
+        for (var reg : registros.values()) {
+            System.out.println("  - " + reg.getId() + " (usuario: " + reg.getUsuario().getNickname() + ", edición: " + ", tipo: " + reg.getTipoRegistro().getNombre() + ")");
+        }
+        // Patrocinios (desde manejadorAuxiliar)
+        /*
+        var patrocinios = logica.manejadorAuxiliar.getInstancia().getPatrocinios();
+        System.out.println("Patrocinios: " + patrocinios.size());
+        for (var pat : patrocinios) {
+            System.out.println("  - " + pat.getCodigoPatrocinio() + " (institución: " + pat.getInstitucion().getNombre() + ", edición: " + pat.getEdicion().getCodigo() + ")");
+        }
+        */
+        System.out.println("\n--- Fin del resumen de datos cargados ---\n");
     }
 
     // Variables globales para instituciones y categorías

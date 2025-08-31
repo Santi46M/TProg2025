@@ -74,9 +74,8 @@ public class ConsultaUsuario extends JInternalFrame {
         
         btnCancelar.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // En caso de cancelar, limpiamos el vector de usuarios y escondemos el iframe
-            	usuarios.clear();
-                setVisible(false);
+                // En caso de cancelar, destruimos el frame para forzar su recreación
+                dispose();
             }
         });
 
@@ -302,6 +301,127 @@ public class ConsultaUsuario extends JInternalFrame {
 
 
                     
+                } else {
+                    // Obtenemos el usuario desde el controlador
+                    Usuario usuario = controlUsr.listarUsuarios().get(usuarioSeleccionado);
+                    JPanel panelContenedor1 = new JPanel(new BorderLayout());
+                    panelDatos.add(panelContenedor1, BorderLayout.CENTER);
+                    JTextArea txtDatos = new JTextArea(6, 40);
+                    txtDatos.setEditable(false);
+                    panelContenedor1.add(new JScrollPane(txtDatos), BorderLayout.NORTH);
+                    DefaultListModel<String> listModel = new DefaultListModel<>();
+                    JList<String> listExtra = new JList<>(listModel);
+                    JScrollPane scrollExtra = new JScrollPane(listExtra);
+                    panelContenedor1.add(scrollExtra, BorderLayout.CENTER);
+                    JButton btnVerDetalle = new JButton("Ver Detalle");
+                    panelContenedor1.add(btnVerDetalle, BorderLayout.SOUTH);
+                    JLabel lblExtra = new JLabel();
+                    panelContenedor1.add(lblExtra, BorderLayout.WEST);
+                    // Mostrar datos básicos
+                    txtDatos.setText(usuario.toString());
+                    // Si es asistente, mostrar registros
+                    if (usuario instanceof Asistente) {
+                        lblExtra.setText("Registros a ediciones:");
+                        Asistente asistente = (Asistente) usuario;
+                        java.util.Map<String, Registro> registros = asistente.getRegistros();
+                        java.util.List<Registro> listaRegistros = new java.util.ArrayList<>(registros.values());
+                        for (Registro reg : listaRegistros) {
+                            listModel.addElement(reg.getId() + " - " + reg.getEdicion().getNombre());
+                        }
+                        btnVerDetalle.setEnabled(listModel.size() > 0);
+                        listExtra.addListSelectionListener(ev2 -> {
+                            int idx = listExtra.getSelectedIndex();
+                            if (idx < 0) return;
+                            Registro reg = listaRegistros.get(idx);
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("Registro ID: ").append(reg.getId()).append("\n");
+                            sb.append("Evento: ").append(reg.getEdicion().getEvento().getNombre()).append("\n");
+                            sb.append("Edición: ").append(reg.getEdicion().getNombre()).append("\n");
+                            sb.append("Tipo de Registro: ").append(reg.getTipoRegistro().getNombre()).append("\n");
+                            sb.append("Fecha: ").append(reg.getFechaInicio()).append("\n");
+                            sb.append("Costo: ").append(reg.getTipoRegistro().getCosto()).append("\n");
+                            sb.append("Cupo: ").append(reg.getTipoRegistro().getCupo()).append("\n");
+                            txtDatos.setText(sb.toString());
+                        });
+                        btnVerDetalle.addActionListener(ev2 -> {
+                            int idx = listExtra.getSelectedIndex();
+                            if (idx < 0) return;
+                            Registro reg = listaRegistros.get(idx);
+                            Ediciones ed = reg.getEdicion();
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("Edición: ").append(ed.getNombre()).append("\n");
+                            sb.append("Sigla: ").append(ed.getSigla()).append("\n");
+                            sb.append("Fechas: ").append(ed.getFechaInicio()).append(" a ").append(ed.getFechaFin()).append("\n");
+                            sb.append("Fecha alta: ").append(ed.getFechaAlta()).append("\n");
+                            sb.append("Ciudad: ").append(ed.getCiudad()).append("\n");
+                            sb.append("País: ").append(ed.getPais()).append("\n");
+                            sb.append("Organizador: ").append(ed.getOrganizador() != null ? ed.getOrganizador().getNickname() : "").append("\n");
+                            txtDatos.setText(sb.toString());
+                        });
+                    } else {
+                        // En caso de que sea organizador es similar la lógica, pero obtenemos otros campos
+                    	DTDatosUsuario datos = null;
+    					try {
+    						datos = controlUsr.obtenerDatosUsuario(usuarioSeleccionado);
+    					} catch (UsuarioNoExisteException e1) {
+    						// TODO Auto-generated catch block
+    						// Este caso no pasa, ya que chequee antes que existiera en la lista
+    						e1.printStackTrace();
+    					}
+
+//    					JOptionPane.showMessageDialog(this,datos.getNickname() ,title, JOptionPane.INFORMATION_MESSAGE);
+    					System.out.println(datos.getNickname());
+    					txtNick.setText(datos.getNickname());
+    					System.out.println(datos.getNombre());
+                        txtNombre.setText(datos.getNombre());
+                        System.out.println(datos.getEmail());
+                        txtCorreo.setText(datos.getEmail());
+
+
+                        JPanel panelOrganizador = new JPanel(new GridLayout(0, 2, 10, 10)); 
+                        panelDatosUsuario.add(panelOrganizador);
+
+                        JLabel lblDesc = new JLabel("Descripción:");
+                        lblDesc.setBounds(93, 11, 89, 14);
+                        panelOrganizador.add(lblDesc);
+
+                        JTextArea txtDesc = new JTextArea(datos.getDesc());
+                        txtDesc.setBounds(238, 6, 161, 22);
+                        txtDesc.setEditable(false);
+                        panelOrganizador.add(txtDesc);
+
+                        JLabel lblLink = new JLabel("Link:");
+                        lblLink.setBounds(93, 36, 121, 14);
+                        panelOrganizador.add(lblLink);
+                        
+                        JTextArea txtLink = new JTextArea(datos.getLink());
+                        txtLink.setBounds(237, 31, 161, 22);
+                        txtLink.setEditable(false);
+                        panelOrganizador.add(txtLink);
+                        
+
+                        String[] columnNames = {"Nombre", "Sigla", "Fecha Inicio", "Fecha Fin", "Fecha Alta", "Ciudad", "País"};
+
+                        Object[][] datosEdicion = new Object[datos.getEdiciones().size()][columnNames.length];
+                        int i = 0;
+                        for (DTEdicion ed : datos.getEdiciones()) {
+                        	System.out.println("Entra" + ed.getNombre());
+                        	datosEdicion[i][0] = ed.getNombre();
+                        	datosEdicion[i][1] = ed.getSigla();
+                        	datosEdicion[i][2] = ed.getFechaInicio();
+                        	datosEdicion[i][3] = ed.getFechaFin();
+                        	datosEdicion[i][4] = ed.getFechaAlta();
+                        	datosEdicion[i][5] = ed.getCiudad();
+                        	datosEdicion[i][6] = ed.getPais();
+                            i++;
+                        }
+
+                        JTable table = new JTable(datosEdicion, columnNames);
+                        JScrollPane scrollPane = new JScrollPane(table);
+                        panelDatosUsuario.add(scrollPane);
+                        panelDatosUsuario.revalidate();
+                        panelDatosUsuario.repaint();
+                    }
                 }
                 // Mostramos el panel que tiene los datos
                 cardLayout.show(getContentPane(), "DATOS");
