@@ -106,9 +106,10 @@ public class main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
+        frame.setLayout(new BorderLayout());
         desktopPane = new JDesktopPane();
         desktopPane.setBounds(0, 0, 800, 600);
-        frame.getContentPane().add(desktopPane);
+        frame.getContentPane().add(desktopPane, BorderLayout.CENTER);
 
 
         JMenuBar menuBar = new JMenuBar();
