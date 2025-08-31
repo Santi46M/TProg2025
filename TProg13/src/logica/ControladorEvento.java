@@ -24,6 +24,7 @@ import excepciones.ValorPatrocinioExcedidoException;
 public class ControladorEvento implements IControladorEvento{
 	ManejadorEvento manejador = ManejadorEvento.getInstancia();
 	manejadorUsuario mUsuario = manejadorUsuario.getInstancia();
+	
 
     public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias) throws EventoYaExisteException {
         if (categorias == null || categorias.getCategorias() == null || categorias.getCategorias().isEmpty()) {

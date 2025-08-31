@@ -17,7 +17,7 @@ public class fabrica {
 
     private static fabrica instancia;
 
-    private fabrica() {
+    public fabrica() {
     };
 
     public static fabrica getInstance() {
@@ -29,6 +29,10 @@ public class fabrica {
 
     public IControladorUsuario getIControladorUsuario() {
         return new ControladorUsuario();
+    }
+    
+    public IControladorEvento getIControladorEvento() {
+        return new ControladorEvento();
     }
     
     public void cargarUsuariosDesdeCSV() throws UsuarioTipoIncorrectoException {

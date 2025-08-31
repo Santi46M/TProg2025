@@ -19,7 +19,7 @@ public class CargaDatosPrueba {
         logResumenDatos();
     }
 
-    private static void logResumenDatos() {
+    public static void logResumenDatos() {
         // Categorías
         var categorias = logica.manejadorAuxiliar.getInstancia().listarCategorias();
         System.out.println("\nResumen de datos cargados:");
@@ -88,7 +88,7 @@ public class CargaDatosPrueba {
     public static Usuario US03, US07, US09, US12, US13, US14, US15;
 
     // Cargar instituciones y guardar en variables globales
-    private static void cargarInstitucionesEjemplo() throws InstitucionYaExisteException {
+    public static void cargarInstitucionesEjemplo() throws InstitucionYaExisteException {
         logica.ControladorUsuario controlador = new logica.ControladorUsuario();
         controlador.AltaInstitucion("Facultad de Ingeniería", "Facultad de Ingeniería de la Universidad de la República", "https://www.fing.edu.uy");
         controlador.AltaInstitucion("ORT Uruguay", "Universidad privada enfocada en tecnología y gestión", "https://ort.edu.uy");
@@ -97,7 +97,7 @@ public class CargaDatosPrueba {
         controlador.AltaInstitucion("Agencia Nacional de Investigación e Innovación (ANII)", "Fomenta la investigación y la innovación en Uruguay", "https://anii.org.uy");
     }
 
-    private static void cargarCategorias() {
+    public static void cargarCategorias() {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         //CA01
         controlador.AltaCategoria("Tecnología");
@@ -129,7 +129,7 @@ public class CargaDatosPrueba {
         }
     }
     
-    private static void cargarEventosEjemplo() throws EventoYaExisteException {
+    public static void cargarEventosEjemplo() throws EventoYaExisteException {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         java.util.List<String> catEv01 = java.util.Arrays.asList("Tecnología", "Innovación");
         java.util.List<String> catEv02 = java.util.Arrays.asList("Literatura", "Cultura");
@@ -171,7 +171,7 @@ public class CargaDatosPrueba {
     }
     
 
-    private static java.time.LocalDate parseFecha(String fecha) {
+    public static java.time.LocalDate parseFecha(String fecha) {
         String[] partes = fecha.split("/");
         int dia = Integer.parseInt(partes[0]);
         int mes = Integer.parseInt(partes[1]);
@@ -179,7 +179,7 @@ public class CargaDatosPrueba {
         return java.time.LocalDate.of(anio, mes, dia);
     }
     
-    private static void cargarUsuariosEjemplo() throws UsuarioYaExisteException {
+    public static void cargarUsuariosEjemplo() throws UsuarioYaExisteException {
         logica.ControladorUsuario controlador = new logica.ControladorUsuario();
         manejadorUsuario manejador = manejadorUsuario.getInstancia();
         // Asistentes
@@ -206,7 +206,7 @@ public class CargaDatosPrueba {
         controlador.AltaUsuario("mec", "Ministerio de Educación y Cultura", "mec@mec.gub.uy", "Institución pública promotora de cultura.", "https://mec.gub.uy", null, null, null, true);
     }
     
-    private static void cargarEdicionesEjemplo() throws Exception {
+    public static void cargarEdicionesEjemplo() throws Exception {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         logica.manejadorUsuario manejadorUsuario = logica.manejadorUsuario.getInstancia();
@@ -285,7 +285,7 @@ public class CargaDatosPrueba {
         System.out.println("Ediciones de evento de ejemplo dadas de alta.");
     }
     
-    private static void cargarTipoRegistroEjemplo() throws TipoRegistroYaExisteException {
+    public static void cargarTipoRegistroEjemplo() throws TipoRegistroYaExisteException {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         //TR01 - General para MONROCK25
@@ -341,7 +341,7 @@ public class CargaDatosPrueba {
         System.out.println("Tipos de registro de ejemplo dados de alta.");
     }
     
-    private static void cargarRegistrosEjemplo() {
+    public static void cargarRegistrosEjemplo() {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         logica.manejadorUsuario manejadorUsuario = logica.manejadorUsuario.getInstancia();        // Formato: idRegistro, usuario, evento, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio
@@ -357,7 +357,7 @@ public class CargaDatosPrueba {
         System.out.println("Registros de ejemplo dados de alta.");
     }
     
-    private static void cargarPatrociniosEjemplo() throws ValorPatrocinioExcedidoException {
+    public static void cargarPatrociniosEjemplo() throws ValorPatrocinioExcedidoException {
         logica.ControladorEvento controlador = new logica.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         // Alta de patrocinios con los parámetros correctos, pasando directamente los objetos

@@ -88,4 +88,8 @@ public class manejadorUsuario {
 		return institucionesMap.get(nombre);
 	}
 	
+	public boolean existeInstitucion(String nombre) {
+		return instituciones.contains(nombre);
+	}
+	
 }
