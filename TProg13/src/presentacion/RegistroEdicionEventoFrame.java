@@ -25,7 +25,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
     private ControladorEvento controladorEvento;
     private IControladorUsuario controladorUsuario;
 
-    public RegistroEdicionEventoFrame() {
+    public RegistroEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento iCE) {
         super("Registro a Edición de Evento", true, true, true, true);
         setBounds(180, 180, 600, 350);
         setVisible(false);

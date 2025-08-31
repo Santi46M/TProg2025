@@ -7,7 +7,7 @@ import com.toedter.calendar.JDateChooser;
 import excepciones.UsuarioNoExisteException;
 
 import java.util.*;
-import logica.IControladorUsuario;
+
 import logica.*;
 import java.util.Map;
 import java.util.Vector;
@@ -45,7 +45,7 @@ public class AltaUsuarioFrame extends JInternalFrame {
     private JTextField txtDescripcion;
     private JTextField txtWeb;
 
-    public AltaUsuarioFrame(IControladorUsuario icu) {
+    public AltaUsuarioFrame(IControladorUsuario icu, IControladorEvento iCE) {
         controlUsr = icu;
     	
     	// Ventana alta de usuario

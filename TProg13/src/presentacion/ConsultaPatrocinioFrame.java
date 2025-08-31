@@ -1,6 +1,10 @@
 package presentacion;
 
 import javax.swing.*;
+
+import logica.IControladorEvento;
+import logica.IControladorUsuario;
+
 import java.awt.*;
 
 public class ConsultaPatrocinioFrame extends JInternalFrame {
@@ -14,7 +18,7 @@ public class ConsultaPatrocinioFrame extends JInternalFrame {
     private String[][] patrociniosPorEdicion;
     private String[][] datosPatrocinio;
 
-    public ConsultaPatrocinioFrame() {
+    public ConsultaPatrocinioFrame(IControladorUsuario iCU, IControladorEvento iCE) {
         super("Consulta de Patrocinio", true, true, true, true);
         setBounds(220, 220, 500, 320);
         setVisible(false);

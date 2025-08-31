@@ -5,6 +5,7 @@ import javax.swing.*;
 import excepciones.RegistroNoExiste;
 import excepciones.UsuarioNoExisteException;
 import logica.DTRegistro;
+import logica.IControladorEvento;
 import logica.IControladorUsuario;
 
 import java.awt.*;
@@ -19,7 +20,7 @@ public class ConsultaRegistroFrame extends JInternalFrame {
 	private IControladorUsuario controlUsr;
 	private DTRegistro datos;
 	
-    public ConsultaRegistroFrame(IControladorUsuario icu) {
+    public ConsultaRegistroFrame(IControladorUsuario icu, IControladorEvento iCE) {
         super("Consulta de Registro", true, true, true, true);
         setBounds(200, 200, 500, 300);
         setVisible(true);

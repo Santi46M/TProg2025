@@ -4,12 +4,14 @@ import javax.swing.*;
 import java.awt.*;
 import logica.ControladorEvento;
 import logica.Eventos;
+import logica.IControladorEvento;
+import logica.IControladorUsuario;
 import logica.Ediciones;
 import excepciones.TipoRegistroYaExisteException;
 import java.util.List;
 
 public class AltaTipoRegistroFrame extends JInternalFrame {
-    private ControladorEvento controlador;
+    private IControladorEvento controlador;
     private List<Eventos> listaEventos;
     private JComboBox<String> comboEventos;
     private JComboBox<String> comboEdiciones;
@@ -18,7 +20,7 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
     private JTextField txtCosto;
     private JTextField txtCupo;
 
-    public AltaTipoRegistroFrame(ControladorEvento controlador) {
+    public AltaTipoRegistroFrame(IControladorUsuario iCU, IControladorEvento controlador) {
         super("Alta de Tipo de Registro", true, true, true, true);
         this.controlador = controlador;
         setBounds(120, 120, 500, 350);

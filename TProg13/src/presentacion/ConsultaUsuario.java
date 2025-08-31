@@ -19,7 +19,7 @@ public class ConsultaUsuario extends JInternalFrame {
     private JPanel panelSeleccion;
     private JPanel panelDatos;
     private CardLayout cardLayout;
-    public ConsultaUsuario(IControladorUsuario icu) {
+    public ConsultaUsuario(IControladorUsuario icu, IControladorEvento iCE) {
     	controlUsr = icu;
         cardLayout = new CardLayout();
         getContentPane().setLayout(cardLayout);

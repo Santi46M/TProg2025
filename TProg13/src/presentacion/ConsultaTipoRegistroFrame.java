@@ -5,6 +5,8 @@ import java.awt.*;
 import logica.ControladorEvento;
 import logica.DTEvento;
 import logica.Ediciones;
+import logica.IControladorEvento;
+import logica.IControladorUsuario;
 import logica.TipoRegistro;
 import java.util.List;
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ public class ConsultaTipoRegistroFrame extends JInternalFrame {
     private List<String> edicionesActuales;
     private List<TipoRegistro> tiposActuales;
 
-    public ConsultaTipoRegistroFrame() {
+    public ConsultaTipoRegistroFrame(IControladorUsuario iCU, IControladorEvento iCE) {
         super("Consulta de Tipo de Registro", true, true, true, true);
         setBounds(150, 150, 500, 350);
         setLayout(new BorderLayout());

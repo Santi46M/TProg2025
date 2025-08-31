@@ -1,6 +1,10 @@
 package presentacion;
 
 import javax.swing.*;
+
+import logica.IControladorEvento;
+import logica.IControladorUsuario;
+
 import java.awt.*;
 
 public class ConsultaEdicionEventoFrame extends JInternalFrame {
@@ -18,7 +22,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
     private DefaultListModel<String> modelTiposRegistro;
     private DefaultListModel<String> modelPatrocinios;
 
-    public ConsultaEdicionEventoFrame() {
+    public ConsultaEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento ICE) {
         super("Consulta Edición de Evento", true, true, true, true);
         setBounds(100, 100, 800, 500);
         setLayout(new BorderLayout());

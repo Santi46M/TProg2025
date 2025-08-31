@@ -1,6 +1,10 @@
 package presentacion;
 
 import javax.swing.*;
+
+import logica.IControladorEvento;
+import logica.IControladorUsuario;
+
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -8,8 +12,9 @@ import java.util.Set;
 public class AltaInstitucionFrame extends JInternalFrame {
     private Set<String> nombresInstituciones = new HashSet<>(); 
 
-    public AltaInstitucionFrame(Set<String> nombresExistentes) {
+    public AltaInstitucionFrame(IControladorUsuario ICU, IControladorEvento iCE) {
         super("Alta de Institución", true, true, true, true);
+    	Set<String> nombresExistentes = ICU.getInstituciones();
         setBounds(220, 220, 400, 250);
         setVisible(true);
         setLayout(new BorderLayout());

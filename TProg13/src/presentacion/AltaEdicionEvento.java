@@ -7,6 +7,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import com.toedter.calendar.JDateChooser;
 
+import logica.IControladorEvento;
+
 public class AltaEdicionEvento extends JInternalFrame {
 	private JComboBox<String> comboEvento;
 	private JComboBox<String> comboOrganizador;
@@ -15,7 +17,7 @@ public class AltaEdicionEvento extends JInternalFrame {
 	private JDateChooser dateChooserFin;
 	private JDateChooser dateChooserAlta;
 	
-    public AltaEdicionEvento(logica.IControladorUsuario controladorUsuario) {
+    public AltaEdicionEvento(logica.IControladorUsuario controladorUsuario, IControladorEvento iCE) {
 		super("Alta de Edición de Evento", true, true, true, true);
 		this.controladorUsuario = controladorUsuario;
 		setBounds(new Rectangle(60, 60, 550, 400));

@@ -13,9 +13,12 @@ import excepciones.*;
 import logica.fabrica;
 import logica.IControladorEvento;
 import logica.IControladorUsuario;
+import logica.ManejadorEvento;
 import logica.CargaDatosPrueba;
 import logica.manejadorAuxiliar;
 import logica.manejadorUsuario;
+
+
 public class TestCasosPrueba {
 
     static private fabrica fabrica = new fabrica();
@@ -24,6 +27,7 @@ public class TestCasosPrueba {
     static private IControladorEvento cEvento = fabrica.getIControladorEvento();
     static private manejadorAuxiliar mAux = manejadorAuxiliar.getInstancia();
     static private manejadorUsuario mUsr = manejadorUsuario.getInstancia();
+    static private ManejadorEvento mEv = ManejadorEvento.getInstancia();
 
     @BeforeAll
     static void cargarDatosPrueba() throws Exception {
@@ -44,25 +48,60 @@ public class TestCasosPrueba {
     }
     
     @Test
-	void testClienteYaExisteNickname() { 
-       Assertions.assertThrows(
-    		   UsuarioYaExisteException.class, () -> {cUsuario.AltaUsuario(
-    				   "atorres",
-    				   "Ana",
-    				   "atorres@gmail.com",
-    				   null,
-    				   null,
-    				   "Torres",
-    				   java.time.LocalDate.of(1990, 5, 12),
-    				   "Facultad de Ingeniería",
-    				   false
-    			  );}
-    		);
-	}
+   	void testUsuarioYaExisteNickname() { 
+          Assertions.assertThrows(
+       		   UsuarioYaExisteException.class, () -> {cUsuario.AltaUsuario(
+       				   "atorres",
+       				   "Ana",
+       				   "atorres@gmail.com",
+       				   null,
+       				   null,
+       				   "Torres",
+       				   java.time.LocalDate.of(1990, 5, 12),
+       				   "Facultad de Ingeniería",
+       				   false
+       			  );}
+       		);
+   	}
+    
+    @Test
+   	void testUsuarioYaExisteEmail() { 
+    	UsuarioYaExisteException ex = Assertions.assertThrows(
+       		   UsuarioYaExisteException.class, () -> {cUsuario.AltaUsuario(
+       				   "paniTorres",
+       				   "pani",
+       				   "atorres@gmail.com",
+       				   null,
+       				   null,
+       				   "Torres",
+       				   java.time.LocalDate.of(1990, 5, 12),
+       				   "Facultad de Ingeniería",
+       				   false
+       			  );}
+       		);
+          Assertions.assertEquals("Ya existe un usuario con ese email", ex.getMessage());
+   	}
     
     @Test 
     void testInstitucionYaExistente(){
     	assertTrue(mUsr.existeInstitucion("ORT Uruguay"));
     }
 
+    @Test
+    void testEventoYaExiste() {
+    	assertTrue(mEv.existeEvento("Montevideo Comics"));
+    }
+    
+    @Test
+    void testEventoNoExiste() {
+    	assertFalse(mEv.existeEvento("eventoPrueba"));
+    }
+    
+    @Test
+    void testConsultaUsuarioNoExistente() {
+    	
+    }
+    
+    @Test
+    void test
 }

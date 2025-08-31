@@ -1,6 +1,10 @@
 package presentacion;
 
 import javax.swing.*;
+
+import logica.IControladorEvento;
+import logica.IControladorUsuario;
+
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,7 +29,7 @@ public class AltaPatrocinioFrame extends JInternalFrame {
     private Set<String> codigosPatrocinio = new HashSet<>();
     private Set<String> patrociniosInstitucionEdicion = new HashSet<>();
 
-    public AltaPatrocinioFrame() {
+    public AltaPatrocinioFrame(IControladorUsuario iCU, IControladorEvento iCE) {
         super("Alta de Patrocinio", true, true, true, true);
         setBounds(250, 250, 600, 400);
         setVisible(false);

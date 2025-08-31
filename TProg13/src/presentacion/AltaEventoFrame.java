@@ -7,13 +7,15 @@ import java.time.LocalDate;
 import java.util.Date;
 import excepciones.EventoYaExisteException;
 import logica.ControladorEvento;
+import logica.IControladorEvento;
+import logica.IControladorUsuario;
 import logica.DTCategorias;
 import com.toedter.calendar.JDateChooser;
 
 public class AltaEventoFrame extends JInternalFrame {
     private Runnable abrirConsultaRunnable;
     public void setAbrirConsultaRunnable(Runnable r) { this.abrirConsultaRunnable = r; }
-    private JDesktopPane desktopPane;
+    //private JDesktopPane desktopPane;
     //private ConsultaEventoFrame[] consultaEventoFrameRef;
     private JPanel panelCategorias;
     private java.util.List<JCheckBox> checkBoxesCategorias;
@@ -35,12 +37,13 @@ public class AltaEventoFrame extends JInternalFrame {
         panelCategorias.repaint();
     }
     
-    public AltaEventoFrame(JDesktopPane desktopPane) {//, ConsultaEventoFrame[] consultaEventoFrameRef) {
+    public AltaEventoFrame(IControladorUsuario iCU, IControladorEvento iCE) {//, ConsultaEventoFrame[] consultaEventoFrameRef) {
         super("Alta de Evento", true, true, true, true);
-        this.desktopPane = desktopPane;
+        //this.desktopPane = desktopPane;
        // this.consultaEventoFrameRef = consultaEventoFrameRef;
         setBounds(new Rectangle(50, 50, 450, 300));
         setVisible(true);
+        
 
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[3];

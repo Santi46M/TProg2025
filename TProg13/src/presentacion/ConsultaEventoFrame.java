@@ -3,6 +3,7 @@ package presentacion;
 import javax.swing.*;
 import java.awt.*;
 import logica.IControladorEvento;
+import logica.IControladorUsuario;
 
 public class ConsultaEventoFrame extends JInternalFrame {
     private IControladorEvento controladorEvento;
@@ -15,7 +16,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
     private String[][] categoriasEventos;
     private String[][] edicionesEventos;
 
-    public ConsultaEventoFrame(IControladorEvento controladorEvento) {
+    public ConsultaEventoFrame(IControladorUsuario iCU, IControladorEvento controladorEvento) {
         super("Consulta de Evento", true, true, true, true);
         this.controladorEvento = controladorEvento;
         setBounds(100, 100, 600, 400);

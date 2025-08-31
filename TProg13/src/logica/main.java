@@ -13,6 +13,7 @@ public class main {
     private JFrame frame;
     private JDesktopPane desktopPane;
     private IControladorUsuario ICU;
+    private IControladorEvento ICE;
     private AltaUsuarioFrame creUsrInternalFrame;
     private ConsultaUsuario conUsrInternalFrame;
     private ConsultaEventoFrame consultaEventoFrame;
@@ -44,31 +45,32 @@ public class main {
     public main() {
         initialize();
         ICU = fabrica.getInstance().getIControladorUsuario();
-        creUsrInternalFrame = new AltaUsuarioFrame(ICU);
+        ICE = fabrica.getInstance().getIControladorEvento();
+        creUsrInternalFrame = new AltaUsuarioFrame(ICU, ICE);
         creUsrInternalFrame.setVisible(false);
-        conUsrInternalFrame = new ConsultaUsuario(ICU);
+        conUsrInternalFrame = new ConsultaUsuario(ICU, ICE);
         conUsrInternalFrame.setVisible(false);
-        consultaEventoFrame = new ConsultaEventoFrame(new logica.ControladorEvento());
+        consultaEventoFrame = new ConsultaEventoFrame(ICU, ICE);
         consultaEventoFrame.setVisible(false);
-        consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame();
+        consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame(ICU, ICE);
         consultaEdicionEventoFrame.setVisible(false);
-        consultaTipoRegistroFrame = new ConsultaTipoRegistroFrame();
+        consultaTipoRegistroFrame = new ConsultaTipoRegistroFrame(ICU, ICE);
         consultaTipoRegistroFrame.setVisible(false);
-        consultaRegistroFrame = new ConsultaRegistroFrame(ICU);
+        consultaRegistroFrame = new ConsultaRegistroFrame(ICU, ICE);
         consultaRegistroFrame.setVisible(false);
-        consultaPatrocinioFrame = new ConsultaPatrocinioFrame();
+        consultaPatrocinioFrame = new ConsultaPatrocinioFrame(ICU, ICE);
         consultaPatrocinioFrame.setVisible(false);
-        altaEventoFrame = new AltaEventoFrame(desktopPane);
+        altaEventoFrame = new AltaEventoFrame(ICU, ICE);
         altaEventoFrame.setVisible(false);
-        altaTipoRegistroFrame = new AltaTipoRegistroFrame(new logica.ControladorEvento());
+        altaTipoRegistroFrame = new AltaTipoRegistroFrame(ICU, ICE);
         altaTipoRegistroFrame.setVisible(false);
-        altaPatrocinioFrame = new AltaPatrocinioFrame();
+        altaPatrocinioFrame = new AltaPatrocinioFrame(ICU, ICE);
         altaPatrocinioFrame.setVisible(false);
-        altaInstitucionFrame = new AltaInstitucionFrame(new java.util.HashSet<>());
+        altaInstitucionFrame = new AltaInstitucionFrame(ICU, ICE);
         altaInstitucionFrame.setVisible(false);
-        registroEdicionEventoFrame = new RegistroEdicionEventoFrame();
+        registroEdicionEventoFrame = new RegistroEdicionEventoFrame(ICU, ICE);
         registroEdicionEventoFrame.setVisible(false);
-        altaEdicionEventoFrame = new AltaEdicionEvento(ICU);
+        altaEdicionEventoFrame = new AltaEdicionEvento(ICU, ICE);
         altaEdicionEventoFrame.setVisible(false);
         
         frame.getContentPane().setLayout(null);
@@ -100,12 +102,12 @@ public class main {
     	
         frame = new JFrame();
         frame.setTitle("Eventos.uy");
-        frame.setBounds(100, 100, 800, 600);
+        frame.setBounds(200, 200, 800, 660);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().setLayout(null);
 
         desktopPane = new JDesktopPane();
-        desktopPane.setBounds(0, 50, 800, 550);
+        desktopPane.setBounds(0, 0, 800, 600);
         frame.getContentPane().add(desktopPane);
 
 
@@ -127,7 +129,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (creUsrInternalFrame == null || creUsrInternalFrame.isClosed()) {
-                        creUsrInternalFrame = new AltaUsuarioFrame(ICU);
+                        creUsrInternalFrame = new AltaUsuarioFrame(ICU, ICE);
                         desktopPane.add(creUsrInternalFrame);
                     }
                     creUsrInternalFrame.cargarInstituciones();
@@ -144,7 +146,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (conUsrInternalFrame == null || conUsrInternalFrame.isClosed()) {
-                        conUsrInternalFrame = new ConsultaUsuario(ICU);
+                        conUsrInternalFrame = new ConsultaUsuario(ICU, ICE);
                         desktopPane.add(conUsrInternalFrame);
                     }
                     conUsrInternalFrame.cargarUsuarios();
@@ -164,7 +166,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (altaInstitucionFrame == null || altaInstitucionFrame.isClosed()) {
-                        altaInstitucionFrame = new AltaInstitucionFrame(new java.util.HashSet<>());
+                        altaInstitucionFrame = new AltaInstitucionFrame(ICU, ICE);
                         desktopPane.add(altaInstitucionFrame);
                     }
                     altaInstitucionFrame.setVisible(true);
@@ -180,7 +182,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (consultaEventoFrame == null || consultaEventoFrame.isClosed()) {
-                        consultaEventoFrame = new ConsultaEventoFrame(new logica.ControladorEvento());
+                        consultaEventoFrame = new ConsultaEventoFrame(ICU, ICE);
                         desktopPane.add(consultaEventoFrame);
                     }
                     consultaEventoFrame.cargarEventos();
@@ -197,7 +199,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (consultaEdicionEventoFrame == null || consultaEdicionEventoFrame.isClosed()) {
-                        consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame();
+                        consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame(ICU, ICE);
                         desktopPane.add(consultaEdicionEventoFrame);
                     }
                     consultaEdicionEventoFrame.cargarEventos();
@@ -214,7 +216,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (consultaTipoRegistroFrame == null || consultaTipoRegistroFrame.isClosed()) {
-                        consultaTipoRegistroFrame = new ConsultaTipoRegistroFrame();
+                        consultaTipoRegistroFrame = new ConsultaTipoRegistroFrame(ICU, ICE);
                         desktopPane.add(consultaTipoRegistroFrame);
                     }
                     consultaTipoRegistroFrame.cargarEventos();
@@ -231,7 +233,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (consultaRegistroFrame == null || consultaRegistroFrame.isClosed()) {
-                        consultaRegistroFrame = new ConsultaRegistroFrame(ICU);
+                        consultaRegistroFrame = new ConsultaRegistroFrame(ICU, ICE);
                         desktopPane.add(consultaRegistroFrame);
                     }
                     consultaRegistroFrame.cargarUsuarios();
@@ -248,7 +250,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (consultaPatrocinioFrame == null || consultaPatrocinioFrame.isClosed()) {
-                        consultaPatrocinioFrame = new ConsultaPatrocinioFrame();
+                        consultaPatrocinioFrame = new ConsultaPatrocinioFrame(ICU, ICE);
                         desktopPane.add(consultaPatrocinioFrame);
                     }
                     consultaPatrocinioFrame.cargarDatos();
@@ -265,7 +267,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (altaEventoFrame == null || altaEventoFrame.isClosed()) {
-                        altaEventoFrame = new AltaEventoFrame(desktopPane);
+                        altaEventoFrame = new AltaEventoFrame(ICU, ICE);
                         desktopPane.add(altaEventoFrame);
                     }
                     altaEventoFrame.cargarCategorias();
@@ -282,7 +284,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (altaTipoRegistroFrame == null || altaTipoRegistroFrame.isClosed()) {
-                        altaTipoRegistroFrame = new AltaTipoRegistroFrame(new logica.ControladorEvento());
+                        altaTipoRegistroFrame = new AltaTipoRegistroFrame(ICU, ICE);
                         desktopPane.add(altaTipoRegistroFrame);
                     }
                     altaTipoRegistroFrame.cargarEventos();
@@ -299,7 +301,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (altaPatrocinioFrame == null || altaPatrocinioFrame.isClosed()) {
-                        altaPatrocinioFrame = new AltaPatrocinioFrame();
+                        altaPatrocinioFrame = new AltaPatrocinioFrame(ICU, ICE);
                         desktopPane.add(altaPatrocinioFrame);
                     }
                     altaPatrocinioFrame.cargarDatos();
@@ -316,7 +318,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (altaEdicionEventoFrame == null || altaEdicionEventoFrame.isClosed()) {
-                        altaEdicionEventoFrame = new AltaEdicionEvento(ICU);
+                        altaEdicionEventoFrame = new AltaEdicionEvento(ICU, ICE);
                         desktopPane.add(altaEdicionEventoFrame);
                     }
                     altaEdicionEventoFrame.cargarEventos();
@@ -334,7 +336,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (registroEdicionEventoFrame == null || registroEdicionEventoFrame.isClosed()) {
-                        registroEdicionEventoFrame = new RegistroEdicionEventoFrame();
+                        registroEdicionEventoFrame = new RegistroEdicionEventoFrame(ICU, ICE);
                         desktopPane.add(registroEdicionEventoFrame);
                     }
                     registroEdicionEventoFrame.cargarDatos(); // <-- Llenar combos correctamente
