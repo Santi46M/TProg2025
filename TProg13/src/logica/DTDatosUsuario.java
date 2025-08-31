@@ -41,8 +41,8 @@ public class DTDatosUsuario {
     public void setFechaNac(LocalDate fechaNac) { this.fechaNac = fechaNac; }
     public void setDesc(String desc) { this.desc = desc; }
     public void setLink(String link) { this.link = link; }
-    public void addRegistro(DTRegistro registro) {
-        this.registros.add(registro);
+    public void setRegistros(Set<DTRegistro> registros) {
+        this.registros = registros;
     }
 
     public void setEdicion(Set<DTEdicion> edicion) {

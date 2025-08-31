@@ -133,31 +133,28 @@ public class ControladorUsuario implements IControladorUsuario {
             Asistente a = (Asistente) u;
             dto.setApellido(a.getApellido());
             dto.setFechaNac(a.getFechaDeNacimiento());
-            Map<String, Registro> registros = a.getRegistros();
-            System.out.println(" llega a es asistente" );
-            
-            // Ejemplo de llamada a detalle de un registro seleccionado:
-            for (Registro reg : registros.values()) {
-            	System.out.println("Entra para registro " + reg.getId());
-            	DTRegistro detalle = obtenerDatosRegistros(reg.getId());
-            	dto.addRegistro(detalle);
-            }
-
+            dto.setRegistros(obtenerRegistrosAsistente(a));
         } else if (u instanceof Organizador) {
             Organizador o = (Organizador) u;
             dto.setDesc(o.getDesc());
             dto.setLink(o.getLink());
             System.out.println(" llega a es org" );
             dto.setEdicion(listarEdicionesAPartirDeOrganizador(o));
-//            Set<DTEdicion> ediciones = listarEdicionesAPartirDeOrganizador(o);
-//            	// Ejemplo de llamada a detalle de una edición seleccionada:
-//                for (DTEdicion dtEd : ediciones) {
-//                      DTEdicion detalle =  obtenerDatosEdicionEvento(dtEd.getNombre());
-//                      dto.addEdicion(detalle);
-//                }
         }
 
         return dto;
+    }
+    
+    public Set<DTRegistro> obtenerRegistrosAsistente(Asistente asist){
+    	Set<DTRegistro> dtr = new HashSet<>();
+    	Map<String, Registro> registros = asist.getRegistros();
+        for (Registro reg : registros.values()) {
+//        	System.out.println("Entra para registro " + reg.getId());
+        	DTRegistro detalle = obtenerDatosRegistros(reg.getId());
+        	dtr.add(detalle);
+        }
+    	
+    	return dtr;
     }
     public static Set<DTEdicion> listarEdicionesAPartirDeOrganizador(Organizador o) {
         Set<DTEdicion> lista = new HashSet<>();
@@ -214,7 +211,7 @@ public class ControladorUsuario implements IControladorUsuario {
     }
 
 
-private DTRegistro obtenerDatosRegistros(String id) {
+public DTRegistro obtenerDatosRegistros(String id) {
 	// TODO Auto-generated method stub
 	DTRegistro dto = null;
 	if (manejadorEv.existeRegistro(id)) {
@@ -224,6 +221,12 @@ private DTRegistro obtenerDatosRegistros(String id) {
 	return dto;
 }
 
+public boolean esAsistente(String nickname) {
+	if ((listarAsistentes() != null) && (listarAsistentes().containsKey(nickname))) {
+		return true;
+	}
+	return false;
+}
     
 private DTRegistro consultaRegistro(String id) {
 	return null;

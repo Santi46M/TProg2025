@@ -66,7 +66,7 @@ public class main {
         consultaEdicionEventoFrame.setVisible(false);
         consultaTipoRegistroFrame = new ConsultaTipoRegistroFrame();
         consultaTipoRegistroFrame.setVisible(false);
-        consultaRegistroFrame = new ConsultaRegistroFrame(new String[0], new String[0][0], new String[0][0]);
+        consultaRegistroFrame = new ConsultaRegistroFrame(ICU);
         consultaRegistroFrame.setVisible(false);
         consultaPatrocinioFrame = new ConsultaPatrocinioFrame(new String[0], new String[0][0], new String[0][0], new String[0][0]);
         consultaPatrocinioFrame.setVisible(false);
@@ -218,7 +218,8 @@ public class main {
         menuEvento.add(itemConsultaRegistro);
         itemConsultaRegistro.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                consultaRegistroFrame.setVisible(true);
+            	consultaRegistroFrame.cargarUsuarios();
+            	consultaRegistroFrame.setVisible(true);
             }
         });
         JMenuItem itemConsultaPatrocinio = new JMenuItem("Consulta de Patrocinio");

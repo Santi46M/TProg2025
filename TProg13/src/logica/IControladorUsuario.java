@@ -33,6 +33,9 @@ public interface IControladorUsuario {
 
     // Consulta
     public DTDatosUsuario obtenerDatosUsuario(String nickname) throws UsuarioNoExisteException;
+    public Set<DTRegistro> obtenerRegistrosAsistente(Asistente asist);
+    public DTRegistro obtenerDatosRegistros(String id);
+    public boolean esAsistente(String nickname);
 
     // Categorías
     public void AltaCategoriaSinGUI(String nombre) throws CategoriaYaExisteException;
