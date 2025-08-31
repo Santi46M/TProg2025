@@ -2,19 +2,15 @@ package logica;
 
 import java.util.List;
 import java.time.LocalDate;
-import logica.Eventos;
-import logica.ManejadorEvento;
-import logica.manejadorUsuario;
-import logica.manejadorAuxiliar;
 import java.util.ArrayList;
 import java.util.*;
 
 import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.NombreEdicionEnUsoException;
-import excepciones.EventoYaExisteException;
-import excepciones.EdicionYaExisteException;
+import excepciones.RegistroNoExiste;
 import excepciones.TipoRegistroYaExisteException;
+import excepciones.UsuarioNoEsAsistente;
 
 
 public class ControladorEvento implements IControladorEvento{
@@ -379,19 +375,19 @@ public class ControladorEvento implements IControladorEvento{
     
     public DTRegistro consultaRegistro(Usuario u, String idRegistro) {
         if (!(u instanceof Asistente)) {
-            throw new UsuarioNoEsAsistenteException(u.getNickname());
+            throw new UsuarioNoEsAsistente(u.getNickname());
         }
 
         Asistente a = (Asistente) u;
         Registro r = a.getRegistros().get(idRegistro);
 
         if (r == null) {
-            throw new RegistroNoExisteException(idRegistro);
+            throw new RegistroNoExiste(idRegistro);
         }
 
         return new DTRegistro(r.getId(), u.getNombre(), r.getEdicion().getNombre(), r.getTipoRegistro().getNombre(), r.getFechaRegistro(), r.getCosto(), r.getFechaInicio());
     }
-}
+
 
 	@Override
 	public void altaEdicionEvento(String nombreEvento, String nombre, String sigla, String desc, LocalDate fechaInicio,
@@ -435,4 +431,3 @@ public class ControladorEvento implements IControladorEvento{
         edicion.getRegistros().put(nuevoRegistro.getId(), nuevoRegistro);
     }
 }
->>>>>>> Stashed changes

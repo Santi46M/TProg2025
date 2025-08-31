@@ -1,16 +1,12 @@
 package presentacion;
 
 import com.toedter.calendar.JDateChooser;
-import com.toedter.calendar.JCalendar;
-import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.*;
@@ -18,9 +14,6 @@ import javax.swing.*;
 
 public class MainFrame extends JFrame {
     private static final long serialVersionUID = 1L;
-    private JPanel contentPane;
-    private JTextField textField;
-    private JTextField textField_1;
     private JDesktopPane desktopPane;
 
     public static void main(String[] args) {

@@ -1,9 +1,5 @@
 package logica;
 
-import logica.*;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 
 import excepciones.EventoYaExisteException;
 import excepciones.InstitucionYaExisteException;
@@ -201,7 +197,6 @@ public class CargaDatosPrueba {
     
     private static void cargarUsuariosEjemplo() throws UsuarioYaExisteException {
         logica.ControladorUsuario controlador = new logica.ControladorUsuario();
-        manejadorUsuario manejador = manejadorUsuario.getInstancia();
         // Asistentes
         controlador.AltaUsuario("atorres", "Ana", "atorres@gmail.com", null, null, "Torres", java.time.LocalDate.of(1990, 5, 12), "Facultad de Ingeniería", false);
         controlador.AltaUsuario("msilva", "Martin", "martin.silva@fing.edu.uy", null, null, "Silva", java.time.LocalDate.of(1987, 8, 21), "Facultad de Ingeniería", false);

@@ -54,6 +54,7 @@ public class AltaUsuarioFrame extends JInternalFrame {
         setMaximizable(true);
         setIconifiable(true);
         setClosable(true);
+        setDefaultCloseOperation(JInternalFrame.HIDE_ON_CLOSE);
         setBounds(100, 100, 500, 400);
         getContentPane().setLayout(null);
 
