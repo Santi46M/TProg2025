@@ -11,8 +11,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-
 public class main {
+
+    // ==== Paleta (podés ajustarla) ====
+    private static final Color P_BG_APP   = new Color(240, 248, 255); // fondo app (azul muy claro)
+    private static final Color P_MENU_BG  = new Color(230, 236, 246); // fondo menú
+    private static final Color P_MENU_FG  = new Color(25, 25, 25);    // texto menú
+    // ===================================
 
     private JFrame frame;
     private JDesktopPane desktopPane;
@@ -32,19 +37,30 @@ public class main {
     private RegistroEdicionEventoFrame registroEdicionEventoFrame;
     private AltaEdicionEvento altaEdicionEventoFrame;
 
-
+    // ---------- Arranque con Look&Feel ----------
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    main window = new main();
-                    window.frame.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
+        try {
+            boolean puesto = false;
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    puesto = true;
+                    break;
                 }
+            }
+            if (!puesto) UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignore) {}
+
+        EventQueue.invokeLater(() -> {
+            try {
+                main window = new main();
+                window.frame.setVisible(true);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
+    // --------------------------------------------
 
     public main() {
         initialize();
@@ -76,7 +92,7 @@ public class main {
         registroEdicionEventoFrame.setVisible(false);
         altaEdicionEventoFrame = new AltaEdicionEvento(ICU, ICE);
         altaEdicionEventoFrame.setVisible(false);
-        
+
         frame.getContentPane().setLayout(null);
         desktopPane.add(creUsrInternalFrame);
         desktopPane.add(conUsrInternalFrame);
@@ -91,12 +107,9 @@ public class main {
         desktopPane.add(altaInstitucionFrame);
         desktopPane.add(registroEdicionEventoFrame);
         desktopPane.add(altaEdicionEventoFrame);
-        
     }
 
     private void initialize() {
-    	
-    	
         frame = new JFrame();
         frame.setTitle("Eventos.uy");
         frame.setBounds(200, 200, 800, 660);
@@ -106,18 +119,49 @@ public class main {
         frame.setLayout(new BorderLayout());
         desktopPane = new JDesktopPane();
         desktopPane.setBounds(0, 0, 800, 600);
+        desktopPane.setBackground(P_BG_APP); // <<< color de fondo del escritorio
         frame.getContentPane().add(desktopPane, BorderLayout.CENTER);
 
-
         JMenuBar menuBar = new JMenuBar();
+        // Colorear menú (algunos L&F pueden ignorarlo parcialmente)
+        menuBar.setOpaque(true);
+        menuBar.setBackground(P_MENU_BG);
+        menuBar.setForeground(P_MENU_FG);
         frame.setJMenuBar(menuBar);
 
         JMenu menuSistema = new JMenu("Sistema");
+        styleMenu(menuSistema);
         menuBar.add(menuSistema);
 
-        JMenuItem itemCargaDatos = new JMenuItem("Cargar Datos Iniciales");
-        menuSistema.add(itemCargaDatos);
+        // ---- Submenú Apariencia (cambio de L&F en runtime) ----
+        JMenu menuApariencia = new JMenu("Apariencia");
+        styleMenu(menuApariencia);
+        menuSistema.add(menuApariencia);
 
+        JMenuItem miNimbus = new JMenuItem("Nimbus");
+        styleMenuItem(miNimbus);
+        miNimbus.addActionListener(e -> cambiarLookAndFeel("Nimbus"));
+        menuApariencia.add(miNimbus);
+
+        JMenuItem miMetal = new JMenuItem("Metal");
+        styleMenuItem(miMetal);
+        miMetal.addActionListener(e -> cambiarLookAndFeel("Metal"));
+        menuApariencia.add(miMetal);
+
+        JMenuItem miWindows = new JMenuItem("Windows");
+        styleMenuItem(miWindows);
+        miWindows.addActionListener(e -> cambiarLookAndFeel("Windows"));
+        menuApariencia.add(miWindows);
+
+        JMenuItem miSistema = new JMenuItem("Del sistema");
+        styleMenuItem(miSistema);
+        miSistema.addActionListener(e -> cambiarLookAndFeel("System"));
+        menuApariencia.add(miSistema);
+        // --------------------------------------------------------
+
+        JMenuItem itemCargaDatos = new JMenuItem("Cargar Datos Iniciales");
+        styleMenuItem(itemCargaDatos);
+        menuSistema.add(itemCargaDatos);
         itemCargaDatos.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -130,14 +174,16 @@ public class main {
                 }
             }
         });
-        
+
         JMenu menuUsuario = new JMenu("Usuario");
+        styleMenu(menuUsuario);
         menuBar.add(menuUsuario);
         JMenu menuEvento = new JMenu("Evento");
+        styleMenu(menuEvento);
         menuBar.add(menuEvento);
 
-
         JMenuItem itemAltaUsuario = new JMenuItem("Alta de Usuario");
+        styleMenuItem(itemAltaUsuario);
         menuUsuario.add(itemAltaUsuario);
         itemAltaUsuario.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -154,7 +200,9 @@ public class main {
                 }
             }
         });
+
         JMenuItem itemConsultaUsuario = new JMenuItem("Consulta de Usuario");
+        styleMenuItem(itemConsultaUsuario);
         menuUsuario.add(itemConsultaUsuario);
         itemConsultaUsuario.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -173,8 +221,10 @@ public class main {
                 }
             }
         });
-        // Mover Alta de Institución al menú Usuario
+
+        // Alta de Institución dentro de Usuario
         JMenuItem itemAltaInstitucion = new JMenuItem("Alta de Institución");
+        styleMenuItem(itemAltaInstitucion);
         menuUsuario.add(itemAltaInstitucion);
         itemAltaInstitucion.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -190,7 +240,9 @@ public class main {
                 }
             }
         });
+
         JMenuItem itemConsultaEvento = new JMenuItem("Consulta de Evento");
+        styleMenuItem(itemConsultaEvento);
         menuEvento.add(itemConsultaEvento);
         itemConsultaEvento.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -207,7 +259,9 @@ public class main {
                 }
             }
         });
+
         JMenuItem itemConsultaEdicion = new JMenuItem("Consulta de Edición de Evento");
+        styleMenuItem(itemConsultaEdicion);
         menuEvento.add(itemConsultaEdicion);
         itemConsultaEdicion.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -224,7 +278,9 @@ public class main {
                 }
             }
         });
+
         JMenuItem itemConsultaTipoRegistro = new JMenuItem("Consulta de Tipo de Registro");
+        styleMenuItem(itemConsultaTipoRegistro);
         menuEvento.add(itemConsultaTipoRegistro);
         itemConsultaTipoRegistro.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -241,7 +297,9 @@ public class main {
                 }
             }
         });
+
         JMenuItem itemConsultaRegistro = new JMenuItem("Consulta de Registro");
+        styleMenuItem(itemConsultaRegistro);
         menuEvento.add(itemConsultaRegistro);
         itemConsultaRegistro.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -258,7 +316,9 @@ public class main {
                 }
             }
         });
+
         JMenuItem itemConsultaPatrocinio = new JMenuItem("Consulta de Patrocinio");
+        styleMenuItem(itemConsultaPatrocinio);
         menuEvento.add(itemConsultaPatrocinio);
         itemConsultaPatrocinio.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -275,7 +335,9 @@ public class main {
                 }
             }
         });
+
         JMenuItem itemAltaEvento = new JMenuItem("Alta de Evento");
+        styleMenuItem(itemAltaEvento);
         menuEvento.add(itemAltaEvento);
         itemAltaEvento.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -292,7 +354,9 @@ public class main {
                 }
             }
         });
+
         JMenuItem itemAltaTipoRegistro = new JMenuItem("Alta de Tipo de Registro");
+        styleMenuItem(itemAltaTipoRegistro);
         menuEvento.add(itemAltaTipoRegistro);
         itemAltaTipoRegistro.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -309,7 +373,9 @@ public class main {
                 }
             }
         });
+
         JMenuItem itemAltaPatrocinio = new JMenuItem("Alta de Patrocinio");
+        styleMenuItem(itemAltaPatrocinio);
         menuEvento.add(itemAltaPatrocinio);
         itemAltaPatrocinio.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -326,7 +392,9 @@ public class main {
                 }
             }
         });
+
         JMenuItem itemAltaEdicionEvento = new JMenuItem("Alta de Edición de Evento");
+        styleMenuItem(itemAltaEdicionEvento);
         menuEvento.add(itemAltaEdicionEvento);
         itemAltaEdicionEvento.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -344,7 +412,9 @@ public class main {
                 }
             }
         });
+
         JMenuItem itemRegistroEdicionEvento = new JMenuItem("Registro/Edición de Evento");
+        styleMenuItem(itemRegistroEdicionEvento);
         menuEvento.add(itemRegistroEdicionEvento);
         itemRegistroEdicionEvento.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -362,6 +432,63 @@ public class main {
             }
         });
     }
+
+    // ===== Helpers de estilo para menús =====
+    private void styleMenu(JMenu m) {
+        m.setOpaque(true);
+        m.setBackground(P_MENU_BG);
+        m.setForeground(P_MENU_FG);
+    }
+    private void styleMenuItem(JMenuItem mi) {
+        mi.setOpaque(true);
+        mi.setBackground(P_MENU_BG);
+        mi.setForeground(P_MENU_FG);
+    }
+
+    // ===== Cambio de Look&Feel en runtime =====
+    private void cambiarLookAndFeel(String nombre) {
+        try {
+            String clase = null;
+            if ("System".equalsIgnoreCase(nombre)) {
+                clase = UIManager.getSystemLookAndFeelClassName();
+            } else {
+                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    if (info.getName().equalsIgnoreCase(nombre)) {
+                        clase = info.getClassName();
+                        break;
+                    }
+                }
+            }
+            if (clase == null) {
+                JOptionPane.showMessageDialog(frame,
+                    "El Look&Feel \"" + nombre + "\" no está disponible en este sistema.",
+                    "Apariencia", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            UIManager.setLookAndFeel(clase);
+            SwingUtilities.updateComponentTreeUI(frame);
+
+            // Reaplicar colores (algunos L&F pisan backgrounds)
+            if (frame.getJMenuBar() != null) {
+                frame.getJMenuBar().setOpaque(true);
+                frame.getJMenuBar().setBackground(P_MENU_BG);
+                frame.getJMenuBar().setForeground(P_MENU_FG);
+                for (MenuElement e : frame.getJMenuBar().getSubElements()) {
+                    if (e.getComponent() instanceof JMenu m) styleMenu(m);
+                    if (e.getComponent() instanceof JMenuItem mi) styleMenuItem(mi);
+                }
+            }
+            desktopPane.setBackground(P_BG_APP);
+            frame.pack();             // si tu layout lo permite
+            frame.setSize(800, 660);  // mantener tamaño
+            frame.repaint();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(frame, "No se pudo aplicar el Look&Feel.\n" + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    // =========================================
 
     private String[] getEventos() {
         // Carga dinámica como en AltaEdicionEvento
