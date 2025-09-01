@@ -1,4 +1,4 @@
-package logica;
+        package logica;
 
 import excepciones.EventoYaExisteException;
 import excepciones.InstitucionYaExisteException;

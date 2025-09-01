@@ -9,12 +9,9 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.*;
-
 
 public class MainFrame extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -23,7 +20,21 @@ public class MainFrame extends JFrame {
     private JTextField textField_1;
     private JDesktopPane desktopPane;
 
+    // ---------- Arranque con Look&Feel ----------
     public static void main(String[] args) {
+        // Intentar Nimbus; si no, el del sistema
+        try {
+            boolean puesto = false;
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    puesto = true;
+                    break;
+                }
+            }
+            if (!puesto) UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception ignore) {}
+
         EventQueue.invokeLater(() -> {
             try {
                 MainFrame frame = new MainFrame();
@@ -47,6 +58,27 @@ public class MainFrame extends JFrame {
 
         JMenu menuSistema = new JMenu("Sistema");
         menuBar.add(menuSistema);
+
+        // ---------- Submenú Look&Feel ----------
+        JMenu menuApariencia = new JMenu("Apariencia (Look&Feel)");
+        menuSistema.add(menuApariencia);
+
+        JMenuItem miNimbus = new JMenuItem("Nimbus");
+        miNimbus.addActionListener(e -> cambiarLookAndFeel("Nimbus"));
+        menuApariencia.add(miNimbus);
+
+        JMenuItem miMetal = new JMenuItem("Metal");
+        miMetal.addActionListener(e -> cambiarLookAndFeel("Metal"));
+        menuApariencia.add(miMetal);
+
+        JMenuItem miWindows = new JMenuItem("Windows");
+        miWindows.addActionListener(e -> cambiarLookAndFeel("Windows"));
+        menuApariencia.add(miWindows);
+
+        JMenuItem miSistema = new JMenuItem("Del sistema");
+        miSistema.addActionListener(e -> cambiarLookAndFeel("System"));
+        menuApariencia.add(miSistema);
+        // --------------------------------------
 
         JMenu menuUsuario = new JMenu("Usuario");
         menuBar.add(menuUsuario);
@@ -72,6 +104,46 @@ public class MainFrame extends JFrame {
 
         abrirBienvenida();
     }
+
+    // ---------- Utilidades Look&Feel ----------
+    private void cambiarLookAndFeel(String nombre) {
+        try {
+            String clase = null;
+            if ("System".equalsIgnoreCase(nombre)) {
+                clase = UIManager.getSystemLookAndFeelClassName();
+            } else {
+                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    if (info.getName().equalsIgnoreCase(nombre)) {
+                        clase = info.getClassName();
+                        break;
+                    }
+                }
+            }
+            if (clase == null) {
+                JOptionPane.showMessageDialog(this,
+                        "El Look&Feel \"" + nombre + "\" no está disponible en este sistema.",
+                        "Apariencia", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            UIManager.setLookAndFeel(clase);
+            // Actualizar todo el árbol de componentes
+            SwingUtilities.updateComponentTreeUI(this);
+            if (getJMenuBar() != null) SwingUtilities.updateComponentTreeUI(getJMenuBar());
+            for (JInternalFrame f : desktopPane.getAllFrames()) {
+                SwingUtilities.updateComponentTreeUI(f);
+            }
+            // Opcional: revalidar/repaint
+            this.pack(); // si tu layout lo permite; si no, se puede omitir
+            this.setSize(803, 563); // mantener tamaño deseado
+            this.repaint();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this,
+                    "No se pudo aplicar el Look&Feel.\n" + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    // -----------------------------------------
 
     private void abrirAltaUsuario() {
         JInternalFrame internalFrame = new JInternalFrame("Alta de Usuario");
