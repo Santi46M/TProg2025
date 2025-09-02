@@ -6,7 +6,6 @@ import logica.CargaDatosPrueba;
 import logica.IControladorEvento;
 import logica.IControladorUsuario;
 import logica.fabrica;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -157,6 +156,7 @@ public class main {
         styleMenuItem(miSistema);
         miSistema.addActionListener(e -> cambiarLookAndFeel("System"));
         menuApariencia.add(miSistema);
+
         // --------------------------------------------------------
 
         JMenuItem itemCargaDatos = new JMenuItem("Cargar Datos Iniciales");
