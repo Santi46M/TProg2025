@@ -1,4 +1,4 @@
-package logica;
+package logica.Manejadores;
 
 
 import java.util.HashMap;
@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
 
+
+import logica.Clases.*;
 public class manejadorUsuario {
 	private static manejadorUsuario instancia; //singleton
 	private Map<String, Usuario> usuarios = new HashMap<String, Usuario>();

@@ -2,8 +2,8 @@ package presentacion;
 
 import javax.swing.*;
 
-import logica.IControladorEvento;
-import logica.IControladorUsuario;
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
@@ -191,16 +191,16 @@ public class AltaPatrocinioFrame extends JInternalFrame {
             }
             // --- ALTA REAL DEL PATROCINIO EN LA LÓGICA ---
             try {
-                logica.ControladorEvento controlador = new logica.ControladorEvento();
+                logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
                 String nombreEvento = comboEventos.getItemAt(idxEvento);
                 String nombreEdicion = comboEdiciones.getItemAt(idxEdicion);
                 String nombreInstitucion = comboInstituciones.getItemAt(idxInstitucion);
                 String tipoRegistroGratuito = comboTipoGratuito.getItemAt(idxTipoGratuito);
                 // Obtener objetos reales
-                logica.Ediciones edicion = controlador.obtenerEdicion(nombreEvento, nombreEdicion);
-                logica.Institucion institucion = logica.manejadorUsuario.getInstancia().findInstitucion(nombreInstitucion);
-                logica.TipoRegistro tipoRegistro = edicion != null ? edicion.getTipoRegistro(tipoRegistroGratuito) : null;
-                logica.DTNivel nivelEnum = logica.DTNivel.valueOf(nivel.toUpperCase());
+                logica.Clases.Ediciones edicion = controlador.obtenerEdicion(nombreEvento, nombreEdicion);
+                logica.Clases.Institucion institucion = logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion(nombreInstitucion);
+                logica.Clases.TipoRegistro tipoRegistro = edicion != null ? edicion.getTipoRegistro(tipoRegistroGratuito) : null;
+                logica.Enumerados.DTNivel nivelEnum = logica.Enumerados.DTNivel.valueOf(nivel.toUpperCase());
                 java.time.LocalDate fechaHoy = java.time.LocalDate.now();
                 controlador.AltaPatrocinio(
                     edicion,
@@ -238,22 +238,22 @@ public class AltaPatrocinioFrame extends JInternalFrame {
 
     public void cargarDatos() {
         // Cargar eventos y datos auxiliares desde la lógica
-        logica.ControladorEvento controlador = new logica.ControladorEvento();
-        java.util.List<logica.DTEvento> listaEventos = controlador.listarEventos();
+        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
+        java.util.List<logica.Datatypes.DTEvento> listaEventos = controlador.listarEventos();
         eventos = new String[listaEventos.size()];
         edicionesPorEvento = new String[listaEventos.size()][];
         java.util.List<String[]> tiposList = new java.util.ArrayList<>();
         java.util.List<Double> costosList = new java.util.ArrayList<>();
         for (int i = 0; i < listaEventos.size(); i++) {
-            logica.DTEvento ev = listaEventos.get(i);
+            logica.Datatypes.DTEvento ev = listaEventos.get(i);
             eventos[i] = ev.getNombre();
             java.util.List<String> eds = controlador.listarEdicionesEvento(ev.getNombre());
             edicionesPorEvento[i] = eds.toArray(new String[0]);
             for (String ed : eds) {
-                logica.Ediciones edi = controlador.obtenerEdicion(ev.getNombre(), ed);
+                logica.Clases.Ediciones edi = controlador.obtenerEdicion(ev.getNombre(), ed);
                 java.util.List<String> tipos = new java.util.ArrayList<>();
                 if (edi != null) {
-                    for (logica.TipoRegistro tr : edi.getTiposRegistro()) {
+                    for (logica.Clases.TipoRegistro tr : edi.getTiposRegistro()) {
                         tipos.add(tr.getNombre());
                         costosList.add((double) tr.getCosto());
                     }
@@ -263,14 +263,14 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         }
         tiposPorEdicion = tiposList.toArray(new String[0][0]);
         costosTipoRegistro = costosList.stream().mapToDouble(Double::doubleValue).toArray();
-        instituciones = logica.manejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
+        instituciones = logica.Manejadores.manejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
         codigosPatrocinio = new HashSet<>();
-        for (var p : logica.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+        for (var p : logica.Manejadores.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
             if (p != null && p.getCodigoPatrocinio() != null)
                 codigosPatrocinio.add(p.getCodigoPatrocinio().toLowerCase());
         }
         patrociniosInstitucionEdicion = new HashSet<>();
-        for (var p : logica.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+        for (var p : logica.Manejadores.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
             if (p != null && p.getInstitucion() != null && p.getEdicion() != null && p.getInstitucion().getNombre() != null && p.getEdicion().getNombre() != null)
                 patrociniosInstitucionEdicion.add(p.getInstitucion().getNombre().toLowerCase() + "-" + p.getEdicion().getNombre().toLowerCase());
         }

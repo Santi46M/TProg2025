@@ -11,12 +11,11 @@ import org.junit.jupiter.api.Test;
 
 import excepciones.*;
 import logica.fabrica;
-import logica.IControladorEvento;
-import logica.IControladorUsuario;
-import logica.ManejadorEvento;
+import logica.Interfaces.*;
+import logica.Manejadores.ManejadorEvento;
 import logica.CargaDatosPrueba;
-import logica.manejadorAuxiliar;
-import logica.manejadorUsuario;
+import logica.Manejadores.*;
+
 
 
 public class TestCasosPrueba {

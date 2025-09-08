@@ -6,7 +6,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import excepciones.UsuarioTipoIncorrectoException;
-
+import logica.Interfaces.*;
+import logica.Controladores.*;
 /**
  * Fábrica para la construcción de un controlador de usuarios (uno distinto para cada invocación).
  * Se implementa en base al patrón Singleton.

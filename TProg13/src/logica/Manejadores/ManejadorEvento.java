@@ -1,10 +1,12 @@
-package logica;
+package logica.Manejadores;
 
 //import usuario.Eventos;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import logica.Clases.*;
 
 public class ManejadorEvento {
     private static ManejadorEvento instancia = null;

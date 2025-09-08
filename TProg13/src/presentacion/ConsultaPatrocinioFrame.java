@@ -2,8 +2,7 @@ package presentacion;
 
 import javax.swing.*;
 
-import logica.IControladorEvento;
-import logica.IControladorUsuario;
+import logica.Interfaces.*;
 
 import java.awt.*;
 
@@ -51,24 +50,24 @@ public class ConsultaPatrocinioFrame extends JInternalFrame {
 
     public void cargarDatos() {
         // Cargar eventos y datos auxiliares desde la lógica
-        logica.ControladorEvento controlador = new logica.ControladorEvento();
-        java.util.List<logica.DTEvento> listaEventos = controlador.listarEventos();
+        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
+        java.util.List<logica.Datatypes.DTEvento> listaEventos = controlador.listarEventos();
         eventos = new String[listaEventos.size()];
         edicionesPorEvento = new String[listaEventos.size()][];
         java.util.List<String[]> patsList = new java.util.ArrayList<>();
         java.util.List<String[]> datosList = new java.util.ArrayList<>();
         for (int i = 0; i < listaEventos.size(); i++) {
-            logica.DTEvento ev = listaEventos.get(i);
+            logica.Datatypes.DTEvento ev = listaEventos.get(i);
             eventos[i] = ev.getNombre();
             java.util.List<String> eds = controlador.listarEdicionesEvento(ev.getNombre());
             edicionesPorEvento[i] = eds.toArray(new String[0]);
             // Para cada edición, cargar patrocinios y datos
             for (String ed : eds) {
-                logica.Ediciones edi = controlador.obtenerEdicion(ev.getNombre(), ed);
+                logica.Clases.Ediciones edi = controlador.obtenerEdicion(ev.getNombre(), ed);
                 java.util.List<String> pats = new java.util.ArrayList<>();
                 java.util.List<String> datosPat = new java.util.ArrayList<>();
                 if (edi != null) {
-                    for (logica.Patrocinio p : edi.getPatrocinios()) {
+                    for (logica.Clases.Patrocinio p : edi.getPatrocinios()) {
                         pats.add(p.getCodigoPatrocinio());
                         String datos = "Institución: " + (p.getInstitucion() != null ? p.getInstitucion().getNombre() : "") +
                                 "\nNivel: " + (p.getNivel() != null ? p.getNivel().toString() : "") +

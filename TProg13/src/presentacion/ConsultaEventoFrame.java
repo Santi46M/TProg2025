@@ -2,8 +2,8 @@ package presentacion;
 
 import javax.swing.*;
 import java.awt.*;
-import logica.IControladorEvento;
-import logica.IControladorUsuario;
+import logica.Interfaces.*;
+
 
 public class ConsultaEventoFrame extends JInternalFrame {
     private IControladorEvento controladorEvento;
@@ -55,13 +55,13 @@ public class ConsultaEventoFrame extends JInternalFrame {
 
     public void cargarEventos() {
         try {
-            java.util.List<logica.DTEvento> eventos = controladorEvento.listarEventos();
+            java.util.List<logica.Datatypes.DTEvento> eventos = controladorEvento.listarEventos();
             String[] eventosArr = new String[eventos.size()];
             datosEventos = new String[eventos.size()][1];
             categoriasEventos = new String[eventos.size()][];
             edicionesEventos = new String[eventos.size()][];
             for (int i = 0; i < eventos.size(); i++) {
-                logica.DTEvento ev = eventos.get(i);
+                logica.Datatypes.DTEvento ev = eventos.get(i);
                 eventosArr[i] = ev.getNombre();
                 datosEventos[i][0] = ev.getDescripcion();
                 categoriasEventos[i] = ev.getCategorias().toArray(new String[0]);
@@ -118,7 +118,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
         }
         String nombreEvento = comboEventos.getItemAt(idxEvento);
         String nombreEdicion = edicionesEventos[idxEvento][idxEd];
-        logica.Ediciones edi = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
+        logica.Clases.Ediciones edi = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
         if (edi == null) {
             txtEdicion.setText("No se encontró la edición.");
             return;

@@ -6,6 +6,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import logica.*;
+import logica.Clases.*;
+import logica.Controladores.ControladorEvento;
+import logica.Datatypes.DTEvento;
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
+
 import java.time.LocalDate;
 
 public class RegistroEdicionEventoFrame extends JInternalFrame {
@@ -21,7 +27,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
     private List<DTEvento> eventos;
     private String[][] edicionesPorEvento;
     private String[][] tiposPorEdicion;
-    private List<logica.Usuario> usuarios; // Cambiado para almacenar todos los usuarios
+    private List<logica.Clases.Usuario> usuarios; // Cambiado para almacenar todos los usuarios
     private ControladorEvento controladorEvento;
     private IControladorUsuario controladorUsuario;
 
@@ -117,10 +123,10 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
             comboEventos.setSelectedIndex(0);
         }
         // Cargar todos los usuarios SIEMPRE
-        Map<String, logica.Usuario> mapUsuarios = controladorUsuario.listarUsuarios();
+        Map<String, logica.Clases.Usuario> mapUsuarios = controladorUsuario.listarUsuarios();
         usuarios = new ArrayList<>(mapUsuarios.values());
         comboAsistentes.removeAllItems();
-        for (logica.Usuario u : usuarios) {
+        for (logica.Clases.Usuario u : usuarios) {
             comboAsistentes.addItem(u.getNickname());
         }
         if (comboAsistentes.getItemCount() > 0) {
@@ -192,7 +198,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         }
         int cupoDisponible = tipo.getCupo() - cantidadRegistrados;
         // Verificar si el usuario ya está registrado
-        logica.Usuario usuario = usuarios.get(idxAsistente);
+        logica.Clases.Usuario usuario = usuarios.get(idxAsistente);
         boolean yaRegistrado = false;
         if (usuario instanceof Asistente) {
             Asistente asistente = (Asistente) usuario;
@@ -248,7 +254,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         String codigoPatrocinioIngresado = txtCodigoPatrocinio.getText().trim();
         Ediciones edicion = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
         TipoRegistro tipo = edicion.getTipoRegistro(nombreTipo);
-        logica.Usuario usuario = usuarios.get(idxAsistente);
+        logica.Clases.Usuario usuario = usuarios.get(idxAsistente);
         if (edicion == null || tipo == null || usuario == null) {
             JOptionPane.showMessageDialog(this, "Datos inválidos para el registro.");
             return;
@@ -319,7 +325,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         String nombreEvento = eventos.get(idxEvento).getNombre();
         String nombreEdicion = (String) comboEdiciones.getSelectedItem();
         Ediciones edicion = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
-        logica.Usuario usuario = usuarios.get(idxAsistente);
+        logica.Clases.Usuario usuario = usuarios.get(idxAsistente);
         boolean mostrar = false;
         if (edicion != null && usuario != null && usuario.getInstitucion() != null) {
             for (Patrocinio pat : edicion.getPatrocinios()) {

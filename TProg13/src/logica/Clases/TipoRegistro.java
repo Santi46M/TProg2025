@@ -1,4 +1,4 @@
-package logica;
+package logica.Clases;
 
 public class TipoRegistro {
     private String nombre;

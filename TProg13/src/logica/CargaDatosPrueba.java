@@ -1,11 +1,14 @@
-        package logica;
+package logica;
 
 import excepciones.EventoYaExisteException;
 import excepciones.InstitucionYaExisteException;
 import excepciones.TipoRegistroYaExisteException;
 import excepciones.UsuarioYaExisteException;
 import excepciones.ValorPatrocinioExcedidoException;
-
+import logica.Manejadores.*;
+import logica.Datatypes.*;
+import logica.Enumerados.*;
+import logica.Clases.*;
 public class CargaDatosPrueba {
     public static void cargar() throws Exception {
         cargarCategorias();
@@ -21,26 +24,26 @@ public class CargaDatosPrueba {
 
     public static void logResumenDatos() {
         // Categorías
-        var categorias = logica.manejadorAuxiliar.getInstancia().listarCategorias();
+        var categorias = logica.Manejadores.manejadorAuxiliar.getInstancia().listarCategorias();
         System.out.println("\nResumen de datos cargados:");
         System.out.println("Categorías: " + categorias.size());
         for (String cat : categorias) {
             System.out.println("  - " + cat);
         }
         // Instituciones
-        var instituciones = logica.manejadorUsuario.getInstancia().getInstituciones();
+        var instituciones = logica.Manejadores.manejadorUsuario.getInstancia().getInstituciones();
         System.out.println("Instituciones: " + instituciones.size());
         for (String nombre : instituciones) {
             System.out.println("  - " + nombre);
         }
         // Eventos
-        var eventos = logica.ManejadorEvento.getInstancia().obtenerEventos();
+        var eventos = logica.Manejadores.ManejadorEvento.getInstancia().obtenerEventos();
         System.out.println("Eventos: " + eventos.size());
         for (var ev : eventos.values()) {
             System.out.println("  - " + ev.getNombre() + " (" + ev.getSigla() + ")");
         }
         // Usuarios
-        var usuarios = logica.manejadorUsuario.getInstancia().getUsuarios();
+        var usuarios = logica.Manejadores.manejadorUsuario.getInstancia().getUsuarios();
         System.out.println("Usuarios: " + usuarios.size());
         for (var us : usuarios.values()) {
             System.out.println("  - " + us.getNickname() + " (" + us.getNombre() + ")");
@@ -65,7 +68,7 @@ public class CargaDatosPrueba {
         }
 
         // Registros
-        var registros = logica.ManejadorEvento.getInstancia().obtenerRegistros();
+        var registros = logica.Manejadores.ManejadorEvento.getInstancia().obtenerRegistros();
         System.out.println("Registros: " + registros.size());
         for (var reg : registros.values()) {
             System.out.println("  - " + reg.getId() + " (usuario: " + reg.getUsuario().getNickname() + ", edición: " + ", tipo: " + reg.getTipoRegistro().getNombre() + ")");
@@ -89,7 +92,7 @@ public class CargaDatosPrueba {
 
     // Cargar instituciones y guardar en variables globales
     public static void cargarInstitucionesEjemplo() throws InstitucionYaExisteException {
-        logica.ControladorUsuario controlador = new logica.ControladorUsuario();
+        logica.Controladores.ControladorUsuario controlador = new logica.Controladores.ControladorUsuario();
         controlador.AltaInstitucion("Facultad de Ingeniería", "Facultad de Ingeniería de la Universidad de la República", "https://www.fing.edu.uy");
         controlador.AltaInstitucion("ORT Uruguay", "Universidad privada enfocada en tecnología y gestión", "https://ort.edu.uy");
         controlador.AltaInstitucion("Universidad Católica del Uruguay", "Institución de educación superior privada", "https://ucu.edu.uy");
@@ -98,7 +101,7 @@ public class CargaDatosPrueba {
     }
 
     public static void cargarCategorias() {
-        logica.ControladorEvento controlador = new logica.ControladorEvento();
+        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         //CA01
         controlador.AltaCategoria("Tecnología");
         //CA02
@@ -124,13 +127,13 @@ public class CargaDatosPrueba {
         //CA12
         controlador.AltaCategoria("Investigación");
         System.out.println("Categorías creadas:");
-        for (String cat : logica.manejadorAuxiliar.getInstancia().listarCategorias()) {
+        for (String cat : logica.Manejadores.manejadorAuxiliar.getInstancia().listarCategorias()) {
             System.out.println(cat);
         }
     }
     
     public static void cargarEventosEjemplo() throws EventoYaExisteException {
-        logica.ControladorEvento controlador = new logica.ControladorEvento();
+        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         java.util.List<String> catEv01 = java.util.Arrays.asList("Tecnología", "Innovación");
         java.util.List<String> catEv02 = java.util.Arrays.asList("Literatura", "Cultura");
         java.util.List<String> catEv03 = java.util.Arrays.asList("Música");
@@ -155,7 +158,7 @@ public class CargaDatosPrueba {
         System.out.println("Eventos de ejemplo dados de alta.");
         // Listar todos los eventos cargados
         System.out.println("Eventos cargados:");
-        for (Eventos ev : logica.ManejadorEvento.getInstancia().obtenerEventos().values()) {
+        for (Eventos ev : logica.Manejadores.ManejadorEvento.getInstancia().obtenerEventos().values()) {
             System.out.println("Nombre: " + ev.getNombre());
             System.out.println("Sigla: " + ev.getSigla());
             System.out.println("Descripción: " + ev.getDescripcion());
@@ -180,7 +183,7 @@ public class CargaDatosPrueba {
     }
     
     public static void cargarUsuariosEjemplo() throws UsuarioYaExisteException {
-        logica.ControladorUsuario controlador = new logica.ControladorUsuario();
+        logica.Controladores.ControladorUsuario controlador = new logica.Controladores.ControladorUsuario();
         manejadorUsuario manejador = manejadorUsuario.getInstancia();
         // Asistentes
         controlador.AltaUsuario("atorres", "Ana", "atorres@gmail.com", null, null, "Torres", java.time.LocalDate.of(1990, 5, 12), "Facultad de Ingeniería", false);
@@ -207,9 +210,9 @@ public class CargaDatosPrueba {
     }
     
     public static void cargarEdicionesEjemplo() throws Exception {
-        logica.ControladorEvento controlador = new logica.ControladorEvento();
+        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
-        logica.manejadorUsuario manejadorUsuario = logica.manejadorUsuario.getInstancia();
+        logica.Manejadores.manejadorUsuario manejadorUsuario = logica.Manejadores.manejadorUsuario.getInstancia();
         // Helper para obtener evento y validar
         Eventos ev;
         // EDEV01
@@ -286,7 +289,7 @@ public class CargaDatosPrueba {
     }
     
     public static void cargarTipoRegistroEjemplo() throws TipoRegistroYaExisteException {
-        logica.ControladorEvento controlador = new logica.ControladorEvento();
+        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         //TR01 - General para MONROCK25
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MONROCK25"), "General", "Acceso general a Montevideo Rock (2 días)", 1500, 2000);
@@ -342,9 +345,9 @@ public class CargaDatosPrueba {
     }
     
     public static void cargarRegistrosEjemplo() {
-        logica.ControladorEvento controlador = new logica.ControladorEvento();
+        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
-        logica.manejadorUsuario manejadorUsuario = logica.manejadorUsuario.getInstancia();        // Formato: idRegistro, usuario, evento, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio
+        logica.Manejadores.manejadorUsuario manejadorUsuario = logica.Manejadores.manejadorUsuario.getInstancia();        // Formato: idRegistro, usuario, evento, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio
         controlador.altaRegistroEdicionEvento("atorres MONROCK25", manejadorUsuario.getUsuarios().get("atorres"), manejadorEvento.obtenerEvento("Montevideo Rock"), manejadorEvento.obtenerEdicion("MONROCK25"), manejadorEvento.obtenerEdicion("MONROCK25").obtenerTipoRegistro("VIP"), java.time.LocalDate.of(2025, 5, 14), 4000, java.time.LocalDate.of(2025, 11, 20));
         controlador.altaRegistroEdicionEvento("atorres MARATON24", manejadorUsuario.getUsuarios().get("atorres"), manejadorEvento.obtenerEvento("Maratón de Montevideo"), manejadorEvento.obtenerEdicion("MARATON24"), manejadorEvento.obtenerEdicion("MARATON24").obtenerTipoRegistro("Corredor 21K"), java.time.LocalDate.of(2024, 7, 30), 500, java.time.LocalDate.of(2024, 9, 14));
         controlador.altaRegistroEdicionEvento("sofirod WS26", manejadorUsuario.getUsuarios().get("sofirod"), manejadorEvento.obtenerEvento("Conferencia de Tecnología"), manejadorEvento.obtenerEdicion("WS26"), manejadorEvento.obtenerEdicion("WS26").obtenerTipoRegistro("Estudiante"), java.time.LocalDate.of(2025, 8, 21), 300, java.time.LocalDate.of(2026, 1, 13));
@@ -358,11 +361,11 @@ public class CargaDatosPrueba {
     }
     
     public static void cargarPatrociniosEjemplo() throws ValorPatrocinioExcedidoException {
-        logica.ControladorEvento controlador = new logica.ControladorEvento();
+        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         controlador.AltaPatrocinio(
             manejadorEvento.obtenerEdicion("CONFTECH26"),
-            logica.manejadorUsuario.getInstancia().findInstitucion("Facultad de Ingeniería"),
+            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Facultad de Ingeniería"),
             DTNivel.ORO,
             manejadorEvento.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("Estudiante"),
             20000,
@@ -372,7 +375,7 @@ public class CargaDatosPrueba {
         );
         controlador.AltaPatrocinio(
             manejadorEvento.obtenerEdicion("CONFTECH26"),
-            logica.manejadorUsuario.getInstancia().findInstitucion("Agencia Nacional de Investigación e Innovación (ANII)"),
+            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Agencia Nacional de Investigación e Innovación (ANII)"),
             DTNivel.PLATA,
             manejadorEvento.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("General"),
             10000,
@@ -382,7 +385,7 @@ public class CargaDatosPrueba {
         );
         controlador.AltaPatrocinio(
             manejadorEvento.obtenerEdicion("MARATON25"),
-            logica.manejadorUsuario.getInstancia().findInstitucion("Antel"),
+            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Antel"),
             DTNivel.PLATINO,
             manejadorEvento.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 10K"),
             25000,
@@ -392,7 +395,7 @@ public class CargaDatosPrueba {
         );
         controlador.AltaPatrocinio(
             manejadorEvento.obtenerEdicion("EXPOAGRO25"),
-            logica.manejadorUsuario.getInstancia().findInstitucion("Universidad Católica del Uruguay"),
+            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Universidad Católica del Uruguay"),
             DTNivel.BRONCE,
             manejadorEvento.obtenerEdicion("EXPOAGRO25").obtenerTipoRegistro("General"),
             15000,

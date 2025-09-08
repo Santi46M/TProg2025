@@ -4,9 +4,8 @@ import javax.swing.*;
 
 import excepciones.RegistroNoExiste;
 import excepciones.UsuarioNoExisteException;
-import logica.DTRegistro;
-import logica.IControladorEvento;
-import logica.IControladorUsuario;
+import logica.Datatypes.DTRegistro;
+import logica.Interfaces.*;
 
 import java.awt.*;
 import java.util.Set;

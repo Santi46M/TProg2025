@@ -1,6 +1,7 @@
-package logica;
+package logica.Clases;
 
 import java.time.LocalDate;
+import logica.Enumerados.DTNivel;
 
 public class Patrocinio {
     private Ediciones edicion;

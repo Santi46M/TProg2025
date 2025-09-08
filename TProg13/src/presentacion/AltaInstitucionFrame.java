@@ -2,8 +2,10 @@ package presentacion;
 
 import javax.swing.*;
 
-import logica.IControladorEvento;
-import logica.IControladorUsuario;
+import logica.Controladores.ControladorEvento;
+import logica.Interfaces.*;
+import logica.Datatypes.*;
+
 
 import java.awt.*;
 import java.util.HashSet;
@@ -75,8 +77,8 @@ public class AltaInstitucionFrame extends JInternalFrame {
             }
             // Alta real de la institución
             try {
-                logica.Institucion institucion = new logica.Institucion(nombre, descripcion, sitioWeb);
-                logica.manejadorUsuario.getInstancia().addInstitucion(institucion);
+                logica.Clases.Institucion institucion = new logica.Clases.Institucion(nombre, descripcion, sitioWeb);
+                logica.Manejadores.manejadorUsuario.getInstancia().addInstitucion(institucion);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error al crear la institución: " + ex.getMessage());
                 return;

@@ -2,12 +2,11 @@ package presentacion;
 
 import javax.swing.*;
 import java.awt.*;
-import logica.ControladorEvento;
-import logica.DTEvento;
-import logica.Ediciones;
-import logica.IControladorEvento;
-import logica.IControladorUsuario;
-import logica.TipoRegistro;
+import logica.Controladores.ControladorEvento;
+import logica.Datatypes.DTEvento;
+import logica.Clases.Ediciones;
+import logica.Interfaces.*;
+import logica.Clases.TipoRegistro;
 import java.util.List;
 import java.util.ArrayList;
 

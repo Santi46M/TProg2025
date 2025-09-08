@@ -1,4 +1,4 @@
-package logica;
+package logica.Interfaces;
 
 import excepciones.UsuarioYaExisteException;
 import excepciones.InstitucionYaExisteException;
@@ -9,6 +9,9 @@ import excepciones.CategoriaYaExisteException;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
+
+import logica.Clases.*;
+import logica.Datatypes.*;
 
 public interface IControladorUsuario {
 

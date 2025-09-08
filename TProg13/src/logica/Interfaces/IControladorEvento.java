@@ -1,8 +1,11 @@
-package logica;
+package logica.Interfaces;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import logica.Clases.*;
+import logica.Datatypes.*;
+import logica.Enumerados.*;
 
 import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;

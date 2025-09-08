@@ -1,4 +1,4 @@
-package logica;
+package logica.Datatypes;
 
 public class DTTipoRegistro {
     private String nombre;

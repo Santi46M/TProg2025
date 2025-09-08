@@ -6,10 +6,9 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Date;
 import excepciones.EventoYaExisteException;
-import logica.ControladorEvento;
-import logica.IControladorEvento;
-import logica.IControladorUsuario;
-import logica.DTCategorias;
+import logica.Controladores.ControladorEvento;
+import logica.Interfaces.*;
+import logica.Datatypes.*;
 import com.toedter.calendar.JDateChooser;
 
 public class AltaEventoFrame extends JInternalFrame {
@@ -24,7 +23,7 @@ public class AltaEventoFrame extends JInternalFrame {
         panelCategorias.removeAll();
         checkBoxesCategorias.clear();
         try {
-            java.util.List<String> categorias = new java.util.ArrayList<>(logica.manejadorAuxiliar.getInstancia().listarCategorias());
+            java.util.List<String> categorias = new java.util.ArrayList<>(logica.Manejadores.manejadorAuxiliar.getInstancia().listarCategorias());
             for (String cat : categorias) {
                 JCheckBox check = new JCheckBox(cat);
                 checkBoxesCategorias.add(check);

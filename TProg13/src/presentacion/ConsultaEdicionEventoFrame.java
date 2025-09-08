@@ -2,8 +2,7 @@ package presentacion;
 
 import javax.swing.*;
 
-import logica.IControladorEvento;
-import logica.IControladorUsuario;
+import logica.Interfaces.*;
 
 import java.awt.*;
 
@@ -81,14 +80,14 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
 
     public void cargarEventos() {
         try {
-            logica.ControladorEvento controlador = new logica.ControladorEvento();
-            java.util.List<logica.DTEvento> eventos = controlador.listarEventos();
+            logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
+            java.util.List<logica.Datatypes.DTEvento> eventos = controlador.listarEventos();
             String[] eventosArr = new String[eventos.size()];
             datosEventos = new String[eventos.size()][1];
             categoriasEventos = new String[eventos.size()][];
             edicionesEventos = new String[eventos.size()][];
             for (int i = 0; i < eventos.size(); i++) {
-                logica.DTEvento ev = eventos.get(i);
+                logica.Datatypes.DTEvento ev = eventos.get(i);
                 eventosArr[i] = ev.getNombre();
                 datosEventos[i][0] = ev.getDescripcion();
                 categoriasEventos[i] = ev.getCategorias().toArray(new String[0]);
@@ -174,7 +173,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         if (idxEd >= ediciones.length) return;
         String nombreEdicion = ediciones[idxEd];
         String nombreEvento = comboEventos.getItemAt(idxEvento);
-        logica.Ediciones edi = new logica.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
+        logica.Clases.Ediciones edi = new logica.Controladores.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
         if (edi == null) {
             txtDatos.setText("No se encontró la edición.");
             return;
@@ -189,11 +188,11 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         sb.append("Organizador: ").append(edi.getOrganizador() != null ? edi.getOrganizador().getNickname() : "").append("\n");
         txtDatos.setText(sb.toString());
         // Cargar tipos de registro
-        for (logica.TipoRegistro tr : edi.getTiposRegistro()) {
+        for (logica.Clases.TipoRegistro tr : edi.getTiposRegistro()) {
             modelTiposRegistro.addElement(tr.getNombre());
         }
         // Cargar patrocinios
-        for (logica.Patrocinio p : edi.getPatrocinios()) {
+        for (logica.Clases.Patrocinio p : edi.getPatrocinios()) {
             modelPatrocinios.addElement(p.getCodigoPatrocinio());
         }
     }
@@ -209,9 +208,9 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         String nombreEdicion = ediciones[idxEd];
         String nombreEvento = comboEventos.getItemAt(idxEvento);
         String nombreTipo = modelTiposRegistro.get(idxTipo);
-        logica.Ediciones edi = new logica.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
+        logica.Clases.Ediciones edi = new logica.Controladores.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
         if (edi == null) return;
-        logica.TipoRegistro tr = edi.getTipoRegistro(nombreTipo);
+        logica.Clases.TipoRegistro tr = edi.getTipoRegistro(nombreTipo);
         if (tr == null) return;
         StringBuilder sb = new StringBuilder();
         sb.append("Tipo de Registro: ").append(tr.getNombre()).append("\n");
@@ -232,9 +231,9 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         String nombreEdicion = ediciones[idxEd];
         String nombreEvento = comboEventos.getItemAt(idxEvento);
         String codigoPat = modelPatrocinios.get(idxPat);
-        logica.Ediciones edi = new logica.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
+        logica.Clases.Ediciones edi = new logica.Controladores.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
         if (edi == null) return;
-        logica.Patrocinio p = edi.getPatrocinio(codigoPat);
+        logica.Clases.Patrocinio p = edi.getPatrocinio(codigoPat);
         if (p == null) return;
         StringBuilder sb = new StringBuilder();
         sb.append("Patrocinio: ").append(p.getCodigoPatrocinio()).append("\n");

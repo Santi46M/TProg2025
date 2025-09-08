@@ -1,4 +1,4 @@
-package logica;
+package logica.Clases;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import logica.Datatypes.DTEdicion;
 
 public class Organizador extends Usuario {
     private String desc;
@@ -37,14 +38,14 @@ public class Organizador extends Usuario {
                 e.getFechaInicio(),
                 e.getFechaFin(),
                 e.getFechaAlta(),
-                this.getNombre(), // nombre del organizador
+                this.getNombre(), 
                 e.getCiudad(),
                 e.getPais()
             ));
         }
         return lista;
     }
-    //Agregar una edicion
+
     public void agregarEdicion(Ediciones ed) {
     	ediciones.put(ed.getNombre(), ed);
     }

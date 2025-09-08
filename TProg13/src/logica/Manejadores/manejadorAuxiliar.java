@@ -1,11 +1,11 @@
-package logica;
+package logica.Manejadores;
 
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
-import logica.Categoria;
+import logica.Clases.*;
 
 public class manejadorAuxiliar {
 	private static manejadorAuxiliar instancia; //singleton

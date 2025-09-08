@@ -1,4 +1,4 @@
-package logica;
+package logica.Controladores;
 
 import java.util.List;
 import java.time.LocalDate;
@@ -14,6 +14,11 @@ import excepciones.PatrocinioYaExisteException;
 import excepciones.ValorPatrocinioExcedidoException;
 import excepciones.FechasCruzadasException;
 
+import logica.Manejadores.*;
+import logica.Interfaces.IControladorEvento;
+import logica.Clases.*;
+import logica.Datatypes.*;
+import logica.Enumerados.*;
 
 public class ControladorEvento implements IControladorEvento{
 	ManejadorEvento manejador = ManejadorEvento.getInstancia();

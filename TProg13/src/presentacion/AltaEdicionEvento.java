@@ -7,17 +7,17 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import com.toedter.calendar.JDateChooser;
 
-import logica.IControladorEvento;
+import logica.Interfaces.*;
 
 public class AltaEdicionEvento extends JInternalFrame {
 	private JComboBox<String> comboEvento;
 	private JComboBox<String> comboOrganizador;
-	private logica.IControladorUsuario controladorUsuario;
+	private logica.Interfaces.IControladorUsuario controladorUsuario;
 	private JDateChooser dateChooserInicio;
 	private JDateChooser dateChooserFin;
 	private JDateChooser dateChooserAlta;
 	
-    public AltaEdicionEvento(logica.IControladorUsuario controladorUsuario, IControladorEvento iCE) {
+    public AltaEdicionEvento(IControladorUsuario controladorUsuario, IControladorEvento iCE) {
 		super("Alta de Edición de Evento", true, true, true, true);
 		this.controladorUsuario = controladorUsuario;
 		setBounds(new Rectangle(60, 60, 550, 400));
@@ -213,12 +213,12 @@ public class AltaEdicionEvento extends JInternalFrame {
 				LocalDate fInicio = fechaInicioDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 				LocalDate fFin = fechaFinDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 				LocalDate fAlta = fechaAltaDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
-				logica.ControladorEvento controladorEvento = new logica.ControladorEvento();
-				logica.ManejadorEvento manejadorEvento = logica.ManejadorEvento.getInstancia();
-				logica.Eventos evento = manejadorEvento.obtenerEvento(eventoNombre);
-				logica.Organizador organizador = null;
+				logica.Controladores.ControladorEvento controladorEvento = new logica.Controladores.ControladorEvento();
+				logica.Manejadores.ManejadorEvento manejadorEvento = logica.Manejadores.ManejadorEvento.getInstancia();
+				logica.Clases.Eventos evento = manejadorEvento.obtenerEvento(eventoNombre);
+				logica.Clases.Organizador organizador = null;
 				if (controladorUsuario != null) {
-					java.util.Map<String, logica.Organizador> orgs = controladorUsuario.listarOrganizadores();
+					java.util.Map<String, logica.Clases.Organizador> orgs = controladorUsuario.listarOrganizadores();
 					organizador = orgs.get(organizadorNick);
 				}
 				if (evento == null || organizador == null) {
@@ -240,10 +240,10 @@ public class AltaEdicionEvento extends JInternalFrame {
 
 	public void cargarEventos() {
 		try {
-			logica.ControladorEvento controlador = new logica.ControladorEvento();
-			java.util.List<logica.DTEvento> eventos = controlador.listarEventos();
+			logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
+			java.util.List<logica.Datatypes.DTEvento> eventos = controlador.listarEventos();
 			comboEvento.removeAllItems();
-			for (logica.DTEvento ev : eventos) {
+			for (logica.Datatypes.DTEvento ev : eventos) {
 				comboEvento.addItem(ev.getNombre());
 			}
 			if (comboEvento.getItemCount() > 0) {
@@ -258,7 +258,7 @@ public class AltaEdicionEvento extends JInternalFrame {
 		try {
 			comboOrganizador.removeAllItems();
 			if (controladorUsuario != null) {
-				java.util.Map<String, logica.Organizador> orgs = controladorUsuario.listarOrganizadores();
+				java.util.Map<String, logica.Clases.Organizador> orgs = controladorUsuario.listarOrganizadores();
 				for (String nick : orgs.keySet()) {
 					comboOrganizador.addItem(nick);
 				}

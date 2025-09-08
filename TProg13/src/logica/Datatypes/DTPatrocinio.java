@@ -1,4 +1,5 @@
-package logica;
+package logica.Datatypes;
+import logica.Enumerados.*;
 import java.time.LocalDate;
 public class DTPatrocinio {
     private String codigo;

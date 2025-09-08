@@ -3,8 +3,7 @@ package presentacion;
 import javax.swing.*;
 import excepciones.UsuarioNoExisteException;
 import logica.CargaDatosPrueba;
-import logica.IControladorEvento;
-import logica.IControladorUsuario;
+import logica.Interfaces.*;
 import logica.fabrica;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -41,7 +40,7 @@ public class main {
         try {
             boolean puesto = false;
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("Metal".equals(info.getName())) {
                     UIManager.setLookAndFeel(info.getClassName());
                     puesto = true;
                     break;
@@ -133,29 +132,6 @@ public class main {
         menuBar.add(menuSistema);
 
         // ---- Submenú Apariencia (cambio de L&F en runtime) ----
-        JMenu menuApariencia = new JMenu("Apariencia");
-        styleMenu(menuApariencia);
-        menuSistema.add(menuApariencia);
-
-        JMenuItem miNimbus = new JMenuItem("Nimbus");
-        styleMenuItem(miNimbus);
-        miNimbus.addActionListener(e -> cambiarLookAndFeel("Nimbus"));
-        menuApariencia.add(miNimbus);
-
-        JMenuItem miMetal = new JMenuItem("Metal");
-        styleMenuItem(miMetal);
-        miMetal.addActionListener(e -> cambiarLookAndFeel("Metal"));
-        menuApariencia.add(miMetal);
-
-        JMenuItem miWindows = new JMenuItem("Windows");
-        styleMenuItem(miWindows);
-        miWindows.addActionListener(e -> cambiarLookAndFeel("Windows"));
-        menuApariencia.add(miWindows);
-
-        JMenuItem miSistema = new JMenuItem("Del sistema");
-        styleMenuItem(miSistema);
-        miSistema.addActionListener(e -> cambiarLookAndFeel("System"));
-        menuApariencia.add(miSistema);
 
         // --------------------------------------------------------
 
@@ -492,8 +468,8 @@ public class main {
 
     private String[] getEventos() {
         // Carga dinámica como en AltaEdicionEvento
-        logica.ControladorEvento controlador = new logica.ControladorEvento();
-        java.util.List<logica.DTEvento> eventos = controlador.listarEventos();
+        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
+        java.util.List<logica.Datatypes.DTEvento> eventos = controlador.listarEventos();
         String[] nombres = new String[eventos.size()];
         for (int i = 0; i < eventos.size(); i++) {
             nombres[i] = eventos.get(i).getNombre();
@@ -501,8 +477,8 @@ public class main {
         return nombres;
     }
     private String[][] getEdicionesPorEvento() {
-        logica.ControladorEvento controlador = new logica.ControladorEvento();
-        java.util.List<logica.DTEvento> eventos = controlador.listarEventos();
+        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
+        java.util.List<logica.Datatypes.DTEvento> eventos = controlador.listarEventos();
         String[][] ediciones = new String[eventos.size()][];
         for (int i = 0; i < eventos.size(); i++) {
             java.util.List<String> eds = controlador.listarEdicionesEvento(eventos.get(i).getNombre());
@@ -511,12 +487,12 @@ public class main {
         return ediciones;
     }
     private String[][] getTiposPorEdicion() {
-        var eventos = logica.ManejadorEvento.getInstancia().obtenerEventos();
+        var eventos = logica.Manejadores.ManejadorEvento.getInstancia().obtenerEventos();
         java.util.List<String[]> tiposList = new java.util.ArrayList<>();
         for (var e : eventos.values()) {
             for (var ed : e.getEdiciones().values()) {
                 java.util.List<String> nombres = new java.util.ArrayList<>();
-                for (logica.TipoRegistro tipo : ed.getTiposRegistro()) {
+                for (logica.Clases.TipoRegistro tipo : ed.getTiposRegistro()) {
                     nombres.add(tipo.getNombre());
                 }
                 tiposList.add(nombres.toArray(new String[0]));
@@ -526,10 +502,10 @@ public class main {
     }
     private double[] getCostosTipoRegistro() {
         java.util.List<Double> costos = new java.util.ArrayList<>();
-        var eventos = logica.ManejadorEvento.getInstancia().obtenerEventos();
+        var eventos = logica.Manejadores.ManejadorEvento.getInstancia().obtenerEventos();
         for (var e : eventos.values()) {
             for (var ed : e.getEdiciones().values()) {
-                for (logica.TipoRegistro tipo : ed.getTiposRegistro()) {
+                for (logica.Clases.TipoRegistro tipo : ed.getTiposRegistro()) {
                     costos.add((double) tipo.getCosto());
                 }
             }
@@ -538,11 +514,11 @@ public class main {
     }
 
     private String[] getInstituciones() {
-        return logica.manejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
+        return logica.Manejadores.manejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
     }
     private java.util.Set<String> getCodigosPatrocinio() {
         java.util.Set<String> codigos = new java.util.HashSet<>();
-        for (var p : logica.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+        for (var p : logica.Manejadores.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
             if (p != null && p.getCodigoPatrocinio() != null)
                 codigos.add(p.getCodigoPatrocinio().toLowerCase());
         }
@@ -550,14 +526,14 @@ public class main {
     }
     private java.util.Set<String> getPatrociniosInstitucionEdicion() {
         java.util.Set<String> claves = new java.util.HashSet<>();
-        for (var p : logica.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+        for (var p : logica.Manejadores.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
             if (p != null && p.getInstitucion() != null && p.getEdicion() != null && p.getInstitucion().getNombre() != null && p.getEdicion().getNombre() != null)
                 claves.add(p.getInstitucion().getNombre().toLowerCase() + "-" + p.getEdicion().getNombre().toLowerCase());
         }
         return claves;
     }
     private String[][] getPatrociniosPorEdicion() {
-        var eventos = logica.ManejadorEvento.getInstancia().obtenerEventos();
+        var eventos = logica.Manejadores.ManejadorEvento.getInstancia().obtenerEventos();
         java.util.List<String[]> patrociniosList = new java.util.ArrayList<>();
         for (var e : eventos.values()) {
             for (var ed : e.getEdiciones().values()) {
@@ -571,7 +547,7 @@ public class main {
         return patrociniosList.toArray(new String[0][0]);
     }
     private String[][] getDatosPatrocinio() {
-        var eventos = logica.ManejadorEvento.getInstancia().obtenerEventos();
+        var eventos = logica.Manejadores.ManejadorEvento.getInstancia().obtenerEventos();
         java.util.List<String[]> datosList = new java.util.ArrayList<>();
         for (var e : eventos.values()) {
             for (var ed : e.getEdiciones().values()) {
