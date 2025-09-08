@@ -58,10 +58,8 @@ public class ControladorUsuario implements IControladorUsuario {
     }
 
     public void AltaInstitucion(String nombre, String descripcion, String link) throws InstitucionYaExisteException {
-
         if (manejador.findInstitucion(nombre) != null) {
-            throw new InstitucionYaExisteException(nombre);
-        }
+            throw new InstitucionYaExisteException (nombre);        }
 
         Institucion nuevaInstitucion = new Institucion(nombre, descripcion, link);
         manejador.addInstitucion(nuevaInstitucion);

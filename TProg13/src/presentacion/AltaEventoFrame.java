@@ -17,24 +17,18 @@ public class AltaEventoFrame extends JInternalFrame {
     public void setAbrirConsultaRunnable(Runnable r) { this.abrirConsultaRunnable = r; }
     //private JDesktopPane desktopPane;
     //private ConsultaEventoFrame[] consultaEventoFrameRef;
-    private JPanel panelCategorias;
-    private java.util.List<JCheckBox> checkBoxesCategorias;
+    private JComboBox<String> comboCategorias;
     
     public void cargarCategorias() {
-        panelCategorias.removeAll();
-        checkBoxesCategorias.clear();
+        comboCategorias.removeAllItems();
         try {
             java.util.List<String> categorias = new java.util.ArrayList<>(logica.manejadorAuxiliar.getInstancia().listarCategorias());
             for (String cat : categorias) {
-                JCheckBox check = new JCheckBox(cat);
-                checkBoxesCategorias.add(check);
-                panelCategorias.add(check);
+                comboCategorias.addItem(cat);
             }
         } catch (Exception ex) {
-            panelCategorias.add(new JLabel("No se pudieron cargar las categorías."));
+            comboCategorias.addItem("No se pudieron cargar las categorías.");
         }
-        panelCategorias.revalidate();
-        panelCategorias.repaint();
     }
     
     public AltaEventoFrame(IControladorUsuario iCU, IControladorEvento iCE) {//, ConsultaEventoFrame[] consultaEventoFrameRef) {
@@ -132,18 +126,13 @@ public class AltaEventoFrame extends JInternalFrame {
         gbc_lblCategoria.gridy = 4;
         getContentPane().add(lblCategoria, gbc_lblCategoria);
 
-        // Panel dinámico de categorías
-        panelCategorias = new JPanel();
-        panelCategorias.setLayout(new BoxLayout(panelCategorias, BoxLayout.Y_AXIS));
-        JScrollPane scrollCategorias = new JScrollPane(panelCategorias);
-        scrollCategorias.setPreferredSize(new Dimension(200, 80));
-        GridBagConstraints gbc_panelCategorias = new GridBagConstraints();
-        gbc_panelCategorias.gridx = 1;
-        gbc_panelCategorias.gridy = 4;
-        gbc_panelCategorias.fill = GridBagConstraints.BOTH;
-        getContentPane().add(scrollCategorias, gbc_panelCategorias);
+        comboCategorias = new JComboBox<>();
+        GridBagConstraints gbc_comboCategorias = new GridBagConstraints();
+        gbc_comboCategorias.gridx = 1;
+        gbc_comboCategorias.gridy = 4;
+        gbc_comboCategorias.fill = GridBagConstraints.HORIZONTAL;
+        getContentPane().add(comboCategorias, gbc_comboCategorias);
 
-        checkBoxesCategorias = new java.util.ArrayList<>();
         cargarCategorias();
 
         // Botones
@@ -166,19 +155,15 @@ public class AltaEventoFrame extends JInternalFrame {
             String descripcion = txtDescripcion.getText().trim();
             java.util.Date fechaDate = dateChooserFecha.getDate();
             String sigla = txtSigla.getText().trim();
-            java.util.List<String> categoriasSeleccionadas = new java.util.ArrayList<>();
-            for (JCheckBox check : checkBoxesCategorias) {
-                if (check.isSelected()) {
-                    categoriasSeleccionadas.add(check.getText());
-                }
-            }
-            if (nombre.isEmpty() || descripcion.isEmpty() || fechaDate == null || sigla.isEmpty() || categoriasSeleccionadas.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Todos los campos deben estar completos y debe seleccionar al menos una Categoría.");
+            String categoriaSeleccionada = (String) comboCategorias.getSelectedItem();
+            if (nombre.isEmpty() || descripcion.isEmpty() || fechaDate == null || sigla.isEmpty() || categoriaSeleccionada == null || categoriaSeleccionada.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Todos los campos deben estar completos y debe seleccionar una Categoría.");
                 return;
             }
             try {
                 java.time.LocalDate fechaAlta = fechaDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
                 ControladorEvento controlador = new ControladorEvento();
+                java.util.List<String> categoriasSeleccionadas = java.util.Collections.singletonList(categoriaSeleccionada);
                 DTCategorias dtCategorias = new DTCategorias(categoriasSeleccionadas);
                 controlador.AltaEvento(nombre, descripcion, fechaAlta, sigla, dtCategorias);
                 JOptionPane.showMessageDialog(this, "Evento registrado con éxito.");

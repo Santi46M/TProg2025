@@ -13,6 +13,8 @@ import excepciones.UsuarioNoEsAsistente;
 import excepciones.PatrocinioYaExisteException;
 import excepciones.ValorPatrocinioExcedidoException;
 import excepciones.FechasCruzadasException;
+import excepciones.CupoTipoRegistroInvalidoException;
+import excepciones.CostoTipoRegistroInvalidoException;
 
 
 public class ControladorEvento implements IControladorEvento{
@@ -39,9 +41,15 @@ public class ControladorEvento implements IControladorEvento{
         manejador.agregarEvento(nuevoEvento);
     }
 
-    public void AltaTipoRegistro(Ediciones edicion, String nombre, String descripcion, int costo, int cupo) throws TipoRegistroYaExisteException {
+    public void AltaTipoRegistro(Ediciones edicion, String nombre, String descripcion, int costo, int cupo) throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
         if (edicion.obtenerTipoRegistro(nombre) != null) {
             throw new TipoRegistroYaExisteException(nombre);
+        }
+        if (cupo <= 0 || cupo > Integer.MAX_VALUE) {
+            throw new CupoTipoRegistroInvalidoException(cupo);
+        }
+        if (costo < 0 || costo > Integer.MAX_VALUE) {
+            throw new CostoTipoRegistroInvalidoException(costo);
         }
         TipoRegistro tipo = new TipoRegistro(edicion, nombre, descripcion, costo, cupo);
         edicion.agregarTipoRegistro(nombre, tipo);

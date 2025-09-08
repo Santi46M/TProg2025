@@ -19,10 +19,18 @@ public class ConsultaRegistroFrame extends JInternalFrame {
 	private Vector<String> usuarios;
 	private IControladorUsuario controlUsr;
 	private DTRegistro datos;
+	private JComboBox<String> comboRegistros;
+	private JTextField txtId;
+	private JTextField txtUsuario;
+	private JTextField txtEdicion;
+	private JTextField txtTipoRegistro;
+	private JTextField txtFechaRegistro;
+	private JTextField txtCosto;
+	private JTextField txtFechaInicio;
 	
     public ConsultaRegistroFrame(IControladorUsuario icu, IControladorEvento iCE) {
         super("Consulta de Registro", true, true, true, true);
-        setBounds(200, 200, 500, 300);
+        setBounds(200, 200, 500, 350);
         setVisible(true);
         setLayout(new BorderLayout());
         controlUsr = icu;
@@ -36,20 +44,47 @@ public class ConsultaRegistroFrame extends JInternalFrame {
         panelSeleccion.add(lblUsuario);
         panelSeleccion.add(comboUsuarios);
         JLabel lblRegistro = new JLabel("Registro:");
-        JComboBox<String> comboRegistros = new JComboBox<>();
+        comboRegistros = new JComboBox<>();
         panelSeleccion.add(lblRegistro);
         panelSeleccion.add(comboRegistros);
         add(panelSeleccion, BorderLayout.NORTH);
 
-        JTextArea txtDatos = new JTextArea(8, 40);
-        txtDatos.setEditable(false);
-        add(new JScrollPane(txtDatos), BorderLayout.CENTER);
+        JPanel panelDatos = new JPanel(new GridLayout(0, 2, 10, 10));
+        panelDatos.add(new JLabel("Identificador:"));
+        txtId = new JTextField();
+        txtId.setEditable(false);
+        panelDatos.add(txtId);
+        panelDatos.add(new JLabel("Usuario:"));
+        txtUsuario = new JTextField();
+        txtUsuario.setEditable(false);
+        panelDatos.add(txtUsuario);
+        panelDatos.add(new JLabel("Edición:"));
+        txtEdicion = new JTextField();
+        txtEdicion.setEditable(false);
+        panelDatos.add(txtEdicion);
+        panelDatos.add(new JLabel("Tipo de registro:"));
+        txtTipoRegistro = new JTextField();
+        txtTipoRegistro.setEditable(false);
+        panelDatos.add(txtTipoRegistro);
+        panelDatos.add(new JLabel("Fecha de registro:"));
+        txtFechaRegistro = new JTextField();
+        txtFechaRegistro.setEditable(false);
+        panelDatos.add(txtFechaRegistro);
+        panelDatos.add(new JLabel("Costo:"));
+        txtCosto = new JTextField();
+        txtCosto.setEditable(false);
+        panelDatos.add(txtCosto);
+        panelDatos.add(new JLabel("Fecha de inicio:"));
+        txtFechaInicio = new JTextField();
+        txtFechaInicio.setEditable(false);
+        panelDatos.add(txtFechaInicio);
+        add(panelDatos, BorderLayout.CENTER);
 
         // Actualizar registros al seleccionar usuario
         comboUsuarios.addActionListener(e -> {
             String idx = (String) comboUsuarios.getSelectedItem();
             comboRegistros.removeAllItems();
-            txtDatos.setText("");
+            limpiarCampos();
             if (idx == null) return;
             
             // Obtenemos los registros del usuario
@@ -60,27 +95,6 @@ public class ConsultaRegistroFrame extends JInternalFrame {
                     String idRegistro = reg.getId();
                 	comboRegistros.addItem(idRegistro);
                 }
-             // Mostrar datos al seleccionar registro
-                comboRegistros.addActionListener(ep -> {
-//                    int idxUsuario = comboUsuarios.getSelectedIndex();
-                    String idRegistro = (String) comboRegistros.getSelectedItem();
-                    txtDatos.setText("");
-//                    if (idxUsuario < 0 || idxRegistro < 0) return;
-//                    txtDatos.setText(datosRegistro[idxUsuario][idxRegistro]);
-                    // Obtenemos la info del registro
-                    DTRegistro datos = controlUsr.obtenerDatosRegistros(idRegistro);
-                    if (datos != null) {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("Identificador: " + datos.getId() +"\n");
-                        sb.append("Usuario: " + datos.getUsuario() +"\n");
-                        sb.append("Edición: " + datos.getEdicion() +"\n");
-                        sb.append("Tipo de registro: " + datos.getTipoRegistro() +"\n");
-                        sb.append("Fecha de registro: " + datos.getFechaRegistro().toString() +"\n");
-                        sb.append("Costo: " + datos.getCosto() +"\n");
-                        sb.append("Fecha de inicio: " + datos.getFechaInicio().toString() +"\n");
-                        txtDatos.setText(sb.toString());
-                    }
-                });
             }else {
             	System.out.println("es organizador");
             	// Manejo de error, se solicitó el registro de un organizador
@@ -92,7 +106,21 @@ public class ConsultaRegistroFrame extends JInternalFrame {
 
         });
 
-
+        comboRegistros.addActionListener(e -> {
+            String idRegistro = (String) comboRegistros.getSelectedItem();
+            limpiarCampos();
+            if (idRegistro == null) return;
+            DTRegistro datos = controlUsr.obtenerDatosRegistros(idRegistro);
+            if (datos != null) {
+                txtId.setText(datos.getId());
+                txtUsuario.setText(datos.getUsuario());
+                txtEdicion.setText(datos.getEdicion());
+                txtTipoRegistro.setText(datos.getTipoRegistro());
+                txtFechaRegistro.setText(datos.getFechaRegistro().toString());
+                txtCosto.setText(String.valueOf(datos.getCosto()));
+                txtFechaInicio.setText(datos.getFechaInicio().toString());
+            }
+        });
     }
     
     public void cargarUsuarios() throws RegistroNoExiste {
@@ -103,4 +131,14 @@ public class ConsultaRegistroFrame extends JInternalFrame {
 		model = new DefaultComboBoxModel<String>(usuarios);
 		comboUsuarios.setModel(model);
     	}
+
+    private void limpiarCampos() {
+        txtId.setText("");
+        txtUsuario.setText("");
+        txtEdicion.setText("");
+        txtTipoRegistro.setText("");
+        txtFechaRegistro.setText("");
+        txtCosto.setText("");
+        txtFechaInicio.setText("");
+    }
 }
