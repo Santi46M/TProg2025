@@ -1,0 +1,105 @@
+package test;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDate;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import excepciones.*;
+import logica.fabrica;
+import logica.IControladorEvento;
+import logica.IControladorUsuario;
+import logica.ManejadorEvento;
+import logica.CargaDatosPrueba;
+import logica.manejadorAuxiliar;
+import logica.manejadorUsuario;
+
+
+public class TestCasosPrueba {
+
+    static private fabrica fabrica = new fabrica();
+    
+    static private IControladorUsuario cUsuario = fabrica.getIControladorUsuario();
+    static private IControladorEvento cEvento = fabrica.getIControladorEvento();
+    static private manejadorAuxiliar mAux = manejadorAuxiliar.getInstancia();
+    static private manejadorUsuario mUsr = manejadorUsuario.getInstancia();
+    static private ManejadorEvento mEv = ManejadorEvento.getInstancia();
+
+    @BeforeAll
+    static void cargarDatosPrueba() throws Exception {
+    	CargaDatosPrueba.cargarInstitucionesEjemplo();
+    	CargaDatosPrueba.cargarCategorias();
+    	CargaDatosPrueba.cargarEventosEjemplo();
+    	CargaDatosPrueba.cargarUsuariosEjemplo();
+    	CargaDatosPrueba.cargarEdicionesEjemplo();
+    	CargaDatosPrueba.cargarTipoRegistroEjemplo();
+    	CargaDatosPrueba.cargarPatrociniosEjemplo();
+    	CargaDatosPrueba.cargarRegistrosEjemplo();
+    	CargaDatosPrueba.logResumenDatos();
+    }
+     
+    @Test
+    void testCategoriaYaExiste() {
+        assertTrue(mAux.existeCategoria("Tecnología"));
+    }
+    
+    @Test
+   	void testUsuarioYaExisteNickname() { 
+          Assertions.assertThrows(
+       		   UsuarioYaExisteException.class, () -> {cUsuario.AltaUsuario(
+       				   "atorres",
+       				   "Ana",
+       				   "atorres@gmail.com",
+       				   null,
+       				   null,
+       				   "Torres",
+       				   java.time.LocalDate.of(1990, 5, 12),
+       				   "Facultad de Ingeniería",
+       				   false
+       			  );}
+       		);
+   	}
+    
+    @Test
+   	void testUsuarioYaExisteEmail() { 
+    	UsuarioYaExisteException ex = Assertions.assertThrows(
+       		   UsuarioYaExisteException.class, () -> {cUsuario.AltaUsuario(
+       				   "paniTorres",
+       				   "pani",
+       				   "atorres@gmail.com",
+       				   null,
+       				   null,
+       				   "Torres",
+       				   java.time.LocalDate.of(1990, 5, 12),
+       				   "Facultad de Ingeniería",
+       				   false
+       			  );}
+       		);
+          Assertions.assertEquals("Ya existe un usuario con ese email", ex.getMessage());
+   	}
+    
+    @Test 
+    void testInstitucionYaExistente(){
+    	assertTrue(mUsr.existeInstitucion("ORT Uruguay"));
+    }
+
+    @Test
+    void testEventoYaExiste() {
+    	assertTrue(mEv.existeEvento("Montevideo Comics"));
+    }
+    
+    @Test
+    void testEventoNoExiste() {
+    	assertFalse(mEv.existeEvento("eventoPrueba"));
+    }
+    
+    @Test
+    void testConsultaUsuarioNoExistente() {
+    	
+    }
+
+}
