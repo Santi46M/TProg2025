@@ -58,13 +58,13 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         gbc.gridx = 0;
         gbc.gridy++;
 
-        JLabel lblTipo = new JLabel("Tipo de Registro:");
-        comboTipos = new JComboBox<>();
-        panelSeleccion.add(lblTipo, gbc);
-        gbc.gridx = 1;
-        panelSeleccion.add(comboTipos, gbc);
-        gbc.gridx = 0;
-        gbc.gridy++;
+//        JLabel lblTipo = new JLabel("Tipo de Registro:");
+//        comboTipos = new JComboBox<>();
+//        panelSeleccion.add(lblTipo, gbc);
+//        gbc.gridx = 1;
+//        panelSeleccion.add(comboTipos, gbc);
+//        gbc.gridx = 0;
+//        gbc.gridy++;
 
         JLabel lblInstitucion = new JLabel("Institución:");
         comboInstituciones = new JComboBox<>();
@@ -133,14 +133,18 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         btnAceptar.addActionListener(e -> {
             int idxEvento = comboEventos.getSelectedIndex();
             int idxEdicion = comboEdiciones.getSelectedIndex();
-            int idxTipo = comboTipos.getSelectedIndex();
+//            int idxTipo = comboTipos.getSelectedIndex();
             int idxTipoGratuito = comboTipoGratuito.getSelectedIndex();
             int idxInstitucion = comboInstituciones.getSelectedIndex();
             String nivel = (String) comboNivel.getSelectedItem();
             String aporteStr = txtAporte.getText().trim();
             String cantidadGratuitosStr = txtCantidadGratuitos.getText().trim();
             String codigo = txtCodigo.getText().trim();
-            if (idxEvento < 0 || idxEdicion < 0 || idxTipo < 0 || idxTipoGratuito < 0 || idxInstitucion < 0 || nivel == null || aporteStr.isEmpty() || cantidadGratuitosStr.isEmpty() || codigo.isEmpty()) {
+//            if (idxEvento < 0 || idxEdicion < 0 || idxTipo < 0 || idxTipoGratuito < 0 || idxInstitucion < 0 || nivel == null || aporteStr.isEmpty() || cantidadGratuitosStr.isEmpty() || codigo.isEmpty()) {
+//                JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.");
+//                return;
+//            }
+            if (idxEvento < 0 || idxEdicion < 0 || idxTipoGratuito < 0 || idxInstitucion < 0 || nivel == null || aporteStr.isEmpty() || cantidadGratuitosStr.isEmpty() || codigo.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.");
                 return;
             }
@@ -149,8 +153,22 @@ public class AltaPatrocinioFrame extends JInternalFrame {
             try {
                 aporte = Double.parseDouble(aporteStr);
                 cantidadGratuitos = Integer.parseInt(cantidadGratuitosStr);
+//                if (cantidadGratuitos < 0) {
+//                    throw new NumberFormatException("La cantidad de gratuitos no puede ser negativa");
+//                }
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Aporte y cantidad deben ser numéricos.");
+                return;
+            }
+            
+            try {
+                cantidadGratuitos = Integer.parseInt(cantidadGratuitosStr);
+                if (cantidadGratuitos < 0) {
+                    throw new NumberFormatException("La cantidad de gratuitos no puede ser negativa");
+                }
+            	
+            } catch (Exception ex) {
+            	JOptionPane.showMessageDialog(this, ex.getMessage());
                 return;
             }
             if (codigosPatrocinio.contains(codigo.toLowerCase())) {
@@ -163,7 +181,10 @@ public class AltaPatrocinioFrame extends JInternalFrame {
                 return;
             }
             double costoTipo = costosTipoRegistro.length > idxTipoGratuito ? costosTipoRegistro[idxTipoGratuito] : 0.0;
+            System.out.println("costo del tipo: " + costoTipo);
             double totalGratis = costoTipo * cantidadGratuitos;
+            System.out.println("cant gratis: " + cantidadGratuitos);
+            System.out.println("total gratis: " + totalGratis);
             if (totalGratis > aporte * 0.2) {
                 JOptionPane.showMessageDialog(this, "El costo de los registros gratuitos supera el 20% del aporte económico. Modifique los valores o cancele.");
                 return;
@@ -264,7 +285,7 @@ public class AltaPatrocinioFrame extends JInternalFrame {
             cargarTipos();
         } else {
             comboEdiciones.removeAllItems();
-            comboTipos.removeAllItems();
+//            comboTipos.removeAllItems();
             comboTipoGratuito.removeAllItems();
         }
     }
@@ -277,7 +298,7 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         if (comboEdiciones.getItemCount() > 0) comboEdiciones.setSelectedIndex(0);
     }
     private void cargarTipos() {
-        comboTipos.removeAllItems();
+//        comboTipos.removeAllItems();
         comboTipoGratuito.removeAllItems();
         int idxEvento = comboEventos.getSelectedIndex();
         int idxEdicion = comboEdiciones.getSelectedIndex();
@@ -288,10 +309,10 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         idxTipo += idxEdicion;
         if (idxEvento < 0 || idxEdicion < 0 || tiposPorEdicion == null || tiposPorEdicion.length <= idxTipo) return;
         for (String tipo : tiposPorEdicion[idxTipo]) {
-            comboTipos.addItem(tipo);
+//            comboTipos.addItem(tipo);
             comboTipoGratuito.addItem(tipo);
         }
-        if (comboTipos.getItemCount() > 0) comboTipos.setSelectedIndex(0);
+//        if (comboTipos.getItemCount() > 0) comboTipos.setSelectedIndex(0);
         if (comboTipoGratuito.getItemCount() > 0) comboTipoGratuito.setSelectedIndex(0);
     }
 }
