@@ -13,19 +13,17 @@ import java.util.Vector;
 public class ConsultaRegistroFrame extends JInternalFrame {
     // Definimos algunos paneles como atributos
     private JPanel panelSeleccion;
-    private JComboBox<String> comboUsuarios;
+    private JComboBox<String> comboAsistentes;
     private JComboBox<String> comboRegistros;
-    private Vector<String> usuarios;
+    private Vector<String> asistentes;
     private IControladorUsuario controlUsr;
 
     // Detalle
     private JTextField txtId;
-    private JTextField txtUsuario;
     private JTextField txtEdicion;
     private JTextField txtTipoRegistro;
     private JTextField txtFechaRegistro;
     private JTextField txtCosto;
-    private JTextField txtFechaInicio;
 
     // --- Constructor normal
     public ConsultaRegistroFrame(IControladorUsuario icu, IControladorEvento iCE) {
@@ -36,16 +34,16 @@ public class ConsultaRegistroFrame extends JInternalFrame {
 
         // Barra superior
         panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel lblUsuario = new JLabel("Usuario:");
-        usuarios = new Vector<>();
-        usuarios.addAll(controlUsr.listarUsuarios().keySet());
-        comboUsuarios = new JComboBox<>(usuarios);
+        JLabel lblAsistente = new JLabel("Asistente:");
+        asistentes = new Vector<>();
+        asistentes.addAll(controlUsr.listarAsistentes().keySet());
+        comboAsistentes = new JComboBox<>(asistentes);
 
         JLabel lblRegistro = new JLabel("Registro:");
         comboRegistros = new JComboBox<>();
 
-        panelSeleccion.add(lblUsuario);
-        panelSeleccion.add(comboUsuarios);
+        panelSeleccion.add(lblAsistente);
+        panelSeleccion.add(comboAsistentes);
         panelSeleccion.add(lblRegistro);
         panelSeleccion.add(comboRegistros);
         add(panelSeleccion, BorderLayout.NORTH);
@@ -54,9 +52,6 @@ public class ConsultaRegistroFrame extends JInternalFrame {
         JPanel panelDatos = new JPanel(new GridLayout(0, 2, 10, 10));
         panelDatos.add(new JLabel("Identificador:"));
         txtId = new JTextField(); txtId.setEditable(false); panelDatos.add(txtId);
-
-        panelDatos.add(new JLabel("Usuario:"));
-        txtUsuario = new JTextField(); txtUsuario.setEditable(false); panelDatos.add(txtUsuario);
 
         panelDatos.add(new JLabel("Edición:"));
         txtEdicion = new JTextField(); txtEdicion.setEditable(false); panelDatos.add(txtEdicion);
@@ -70,26 +65,18 @@ public class ConsultaRegistroFrame extends JInternalFrame {
         panelDatos.add(new JLabel("Costo:"));
         txtCosto = new JTextField(); txtCosto.setEditable(false); panelDatos.add(txtCosto);
 
-        panelDatos.add(new JLabel("Fecha de inicio:"));
-        txtFechaInicio = new JTextField(); txtFechaInicio.setEditable(false); panelDatos.add(txtFechaInicio);
-
         add(panelDatos, BorderLayout.CENTER);
 
         // Listeners
-        comboUsuarios.addActionListener(e -> {
-            String nick = (String) comboUsuarios.getSelectedItem();
+        comboAsistentes.addActionListener(e -> {
+            String nick = (String) comboAsistentes.getSelectedItem();
             comboRegistros.removeAllItems();
             limpiarCampos();
             if (nick == null) return;
-
-            if (controlUsr.esAsistente(nick)) {
-                Set<DTRegistro> registrosPorUsuario =
-                        controlUsr.obtenerRegistrosAsistente(controlUsr.listarAsistentes().get(nick));
-                for (DTRegistro reg : registrosPorUsuario) {
-                    comboRegistros.addItem(reg.getId());
-                }
-            } else {
-                // organizador no tiene registros
+            Set<DTRegistro> registrosPorUsuario =
+                    controlUsr.obtenerRegistrosAsistente(controlUsr.listarAsistentes().get(nick));
+            for (DTRegistro reg : registrosPorUsuario) {
+                comboRegistros.addItem(reg.getId());
             }
             panelSeleccion.revalidate();
             panelSeleccion.repaint();
@@ -102,12 +89,10 @@ public class ConsultaRegistroFrame extends JInternalFrame {
             DTRegistro datos = controlUsr.obtenerDatosRegistros(idRegistro);
             if (datos != null) {
                 txtId.setText(datos.getId());
-                txtUsuario.setText(datos.getUsuario());
                 txtEdicion.setText(datos.getEdicion());
                 txtTipoRegistro.setText(datos.getTipoRegistro());
                 txtFechaRegistro.setText(String.valueOf(datos.getFechaRegistro()));
                 txtCosto.setText(String.valueOf(datos.getCosto()));
-                txtFechaInicio.setText(String.valueOf(datos.getFechaInicio()));
             }
         });
 
@@ -121,9 +106,9 @@ public class ConsultaRegistroFrame extends JInternalFrame {
                                  String idRegistroPreseleccionado) {
         this(icu, iCE); // construye UI y listeners
 
-        // Seteamos el usuario (esto dispara el listener y carga los registros)
+        // Seteamos el asistente (esto dispara el listener y carga los registros)
         if (nickPreseleccionado != null) {
-            comboUsuarios.setSelectedItem(nickPreseleccionado);
+            comboAsistentes.setSelectedItem(nickPreseleccionado);
         }
 
         // Después que el combo de registros se cargue, seleccionamos el registro
@@ -132,22 +117,20 @@ public class ConsultaRegistroFrame extends JInternalFrame {
         }
     }
 
-    public void cargarUsuarios() throws RegistroNoExiste {
-        // Este método se usa para refrescar los usuarios al entrar al caso de uso
+    public void cargarAsistentes() throws RegistroNoExiste {
+        // Este método se usa para refrescar los asistentes al entrar al caso de uso
         DefaultComboBoxModel<String> model;
-        usuarios.clear();
-        usuarios.addAll(controlUsr.listarUsuarios().keySet());
-        model = new DefaultComboBoxModel<>(usuarios);
-        comboUsuarios.setModel(model);
+        asistentes.clear();
+        asistentes.addAll(controlUsr.listarAsistentes().keySet());
+        model = new DefaultComboBoxModel<>(asistentes);
+        comboAsistentes.setModel(model);
     }
 
     private void limpiarCampos() {
         txtId.setText("");
-        txtUsuario.setText("");
         txtEdicion.setText("");
         txtTipoRegistro.setText("");
         txtFechaRegistro.setText("");
         txtCosto.setText("");
-        txtFechaInicio.setText("");
     }
 }

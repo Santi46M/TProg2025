@@ -67,8 +67,8 @@ public class AltaInstitucionFrame extends JInternalFrame {
             String nombre = txtNombre.getText().trim();
             String descripcion = txtDescripcion.getText().trim();
             String sitioWeb = txtSitioWeb.getText().trim();
-            if (nombre.isEmpty() || descripcion.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "El nombre y la descripción son obligatorios.");
+            if (nombre.isEmpty() || descripcion.isEmpty() || sitioWeb.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "El nombre, la descripción y el sitio web son obligatorios.");
                 return;
             }
             if (nombresInstituciones.contains(nombre.toLowerCase())) {

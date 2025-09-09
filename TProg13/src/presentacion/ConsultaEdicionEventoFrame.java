@@ -31,9 +31,14 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
     private JComboBox<String> comboTiposRegistro;
     private JComboBox<String> comboPatrocinios;
 
-    private String[][] edicionesEventos;   // por índice de evento
+    private String[][] edicionesEventos;
     private boolean cambiando = false;
+    private JPanel panelGridRegistros;
+    private JScrollPane scrollGridRegistros;
 
+    /**
+     * @wbp.parser.constructor
+     */
     public ConsultaEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento ICE) {
         super("Consulta Edición de Evento", true, true, true, true);
         this.iCU = iCU;
@@ -52,7 +57,6 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         panelSeleccion.add(comboEdiciones);
         getContentPane().add(panelSeleccion, BorderLayout.NORTH);
 
-        // Datos (alineados en 2 columnas)
         JPanel panelDatos = new JPanel(new GridLayout(0, 2, 8, 6));
         add(panelDatos, BorderLayout.CENTER);
 
@@ -65,15 +69,18 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         panelDatos.add(labelR("País:"));            txtPais          = roField(panelDatos);
         panelDatos.add(labelR("Organizador:"));     txtOrganizador   = roField(panelDatos);
 
-        panelDatos.add(labelR("Tipos de Registro:"));
         comboTiposRegistro = new JComboBox<>();
-        panelDatos.add(wrap(comboTiposRegistro));
-
-        panelDatos.add(labelR("Patrocinios:"));
         comboPatrocinios = new JComboBox<>();
-        panelDatos.add(wrap(comboPatrocinios));
 
-        // Listeners
+        panelGridRegistros = new JPanel();
+        panelGridRegistros.setLayout(new GridLayout(0, 3, 8, 2)); // 3 columnas
+        panelGridRegistros.add(new JLabel("Asistente", SwingConstants.CENTER));
+        panelGridRegistros.add(new JLabel("Tipo de registro", SwingConstants.CENTER));
+        panelGridRegistros.add(new JLabel("Costo", SwingConstants.CENTER));
+        scrollGridRegistros = new JScrollPane(panelGridRegistros);
+        panelDatos.add(new JLabel("Registros de la edición:"));
+        panelDatos.add(scrollGridRegistros);
+
         comboEventos.addActionListener(e -> { if (!cambiando) cargarEdicionesEvento(); });
         comboEdiciones.addActionListener(e -> { if (!cambiando) mostrarDatosEdicion(); });
 
@@ -106,7 +113,9 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         cargarEventos();
     }
 
-    // constructor con preselección (evento+edición por nombre)
+    /**
+     * @wbp.parser.constructor
+     */
     public ConsultaEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento ICE,
                                       String nombreEvento, String nombreEdicion) {
         this(iCU, ICE);
@@ -116,7 +125,9 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         mostrarDatosEdicion();
     }
 
-    // constructor con preselección por SIGLA
+    /**
+     * @wbp.parser.constructor
+     */
     public ConsultaEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento ICE, String siglaEdicion) {
         this(iCU, ICE);
         if (siglaEdicion == null || siglaEdicion.isEmpty()) return;
@@ -195,6 +206,18 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
 
         comboPatrocinios.removeAllItems();
         for (Patrocinio p : ed.getPatrocinios()) comboPatrocinios.addItem(p.getCodigoPatrocinio());
+
+        panelGridRegistros.removeAll();
+        panelGridRegistros.add(new JLabel("Asistente", SwingConstants.CENTER));
+        panelGridRegistros.add(new JLabel("Tipo de registro", SwingConstants.CENTER));
+        panelGridRegistros.add(new JLabel("Costo", SwingConstants.CENTER));
+        for (logica.Clases.Registro reg : ed.getRegistros().values()) {
+            panelGridRegistros.add(new JLabel(reg.getUsuario().getNickname()));
+            panelGridRegistros.add(new JLabel(reg.getTipoRegistro().getNombre()));
+            panelGridRegistros.add(new JLabel(String.valueOf(reg.getCosto())));
+        }
+        panelGridRegistros.revalidate();
+        panelGridRegistros.repaint();
     }
 
     // helpers
@@ -210,6 +233,12 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         txtOrganizador.setText("");
         comboTiposRegistro.removeAllItems();
         comboPatrocinios.removeAllItems();
+        panelGridRegistros.removeAll();
+        panelGridRegistros.add(new JLabel("Asistente", SwingConstants.CENTER));
+        panelGridRegistros.add(new JLabel("Tipo de registro", SwingConstants.CENTER));
+        panelGridRegistros.add(new JLabel("Costo", SwingConstants.CENTER));
+        panelGridRegistros.revalidate();
+        panelGridRegistros.repaint();
     }
 
     private void seleccionarItemPorTexto(JComboBox<String> combo, String texto) {

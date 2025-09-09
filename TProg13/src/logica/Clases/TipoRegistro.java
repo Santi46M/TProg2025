@@ -3,11 +3,11 @@ package logica.Clases;
 public class TipoRegistro {
     private String nombre;
     private String descripcion;
-    private int costo;
+    private float costo;
     private int cupo;
     private Ediciones edicion;
 
-    public TipoRegistro(Ediciones edicion, String nombre, String descripcion, int costo, int cupo) {
+    public TipoRegistro(Ediciones edicion, String nombre, String descripcion, float costo, int cupo) {
         this.edicion = edicion;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -31,7 +31,7 @@ public class TipoRegistro {
       this.descripcion = descripcion;
     }
 
-    public int getCosto() {
+    public float getCosto() {
         return costo;
     }
 

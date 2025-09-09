@@ -49,4 +49,5 @@ public interface IControladorUsuario {
     public String getRegistroSeleccionadoId();
     public DTRegistro obtenerRegistroSeleccionado();
     public String getUsuarioSeleccionadoNickname();
+	void modificarDatosUsuario(String nickname, String nombre, String descripcion, String link, String apellido, java.time.LocalDate fechaNacimiento, String institucion) throws excepciones.UsuarioNoExisteException, excepciones.UsuarioTipoIncorrectoException;
 }

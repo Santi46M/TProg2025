@@ -4,8 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import logica.Interfaces.*;
 
-
-
 public class ConsultaEventoFrame extends JInternalFrame {
     private IControladorEvento controladorEvento;
     private JComboBox<String> comboEventos;
@@ -19,6 +17,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
     private String[][] categoriasEventos;
     private String[][] edicionesEventos;
     private JTextField txtFecha;
+    private JTextField txtSigla; 
 
     public ConsultaEventoFrame(IControladorUsuario iCU, IControladorEvento controladorEvento) {
         super("Consulta de Evento", true, true, true, true);
@@ -121,6 +120,26 @@ public class ConsultaEventoFrame extends JInternalFrame {
         txtFecha.setColumns(20);
         panelCampos.add(txtFecha, gbcFechaField);
 
+        // Sigla
+        GridBagConstraints gbcSiglaLabel = new GridBagConstraints();
+        gbcSiglaLabel.insets = new Insets(5, 5, 5, 5);
+        gbcSiglaLabel.anchor = GridBagConstraints.WEST;
+        gbcSiglaLabel.fill = GridBagConstraints.HORIZONTAL;
+        gbcSiglaLabel.gridx = 0;
+        gbcSiglaLabel.gridy = 4;
+        panelCampos.add(new JLabel("Sigla:"), gbcSiglaLabel);
+
+        GridBagConstraints gbcSiglaField = new GridBagConstraints();
+        gbcSiglaField.insets = new Insets(5, 5, 5, 5);
+        gbcSiglaField.anchor = GridBagConstraints.WEST;
+        gbcSiglaField.fill = GridBagConstraints.HORIZONTAL;
+        gbcSiglaField.gridx = 1;
+        gbcSiglaField.gridy = 4;
+        txtSigla = new JTextField();
+        txtSigla.setEditable(false);
+        txtSigla.setColumns(20);
+        panelCampos.add(txtSigla, gbcSiglaField);
+
         panelDatos.add(panelCampos);
         panelDatos.add(Box.createVerticalStrut(10));
         JPanel panelEdiciones = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -184,6 +203,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
             txtDescripcion.setText("");
             txtFecha.setText("");
             lblCategorias.setText("");
+            txtSigla.setText("");
             comboEdiciones.setModel(new DefaultComboBoxModel<>(new String[]{}));
             return;
         }
@@ -196,6 +216,17 @@ public class ConsultaEventoFrame extends JInternalFrame {
         }
         if (cats.length() > 2) cats.setLength(cats.length() - 2);
         lblCategorias.setText(cats.toString());
+        // Obtener la sigla del evento
+        String sigla = "";
+        try {
+            java.util.List<logica.Datatypes.DTEvento> eventos = controladorEvento.listarEventos();
+            if (idx < eventos.size()) {
+                sigla = eventos.get(idx).getSigla();
+            }
+        } catch (Exception ex) {
+            sigla = "";
+        }
+        txtSigla.setText(sigla);
         comboEdiciones.setModel(new DefaultComboBoxModel<>(edicionesEventos[idx]));
         comboEdiciones.revalidate();
         comboEdiciones.repaint();

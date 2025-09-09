@@ -35,6 +35,10 @@ public class Asistente extends Usuario {
     	this.institucion = institucion;
     }
     
+    public void setInstitucion(Institucion institucion) {
+        this.institucion = institucion;
+    }
+    
     public String getApellido() {
         return apellido;
     }

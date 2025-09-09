@@ -141,12 +141,13 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
             JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios.");
             return;
         }
-        int costo, cupo;
+        float costo;
+        int cupo;
         try {
-            costo = Integer.parseInt(costoStr);
+            costo = Float.parseFloat(costoStr);
             cupo = Integer.parseInt(cupoStr);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Costo y cupo deben ser números enteros.");
+            JOptionPane.showMessageDialog(this, "Costo debe ser un número decimal y cupo debe ser un número entero.");
             return;
         }
         try {
@@ -158,6 +159,10 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
             if (resp == JOptionPane.NO_OPTION) {
                 dispose();
             }
+        } catch (excepciones.CupoTipoRegistroInvalidoException ex) {
+            JOptionPane.showMessageDialog(this, "Cupo inválido: " + ex.getMessage());
+        } catch (excepciones.CostoTipoRegistroInvalidoException ex) {
+            JOptionPane.showMessageDialog(this, "Costo inválido: " + ex.getMessage());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }

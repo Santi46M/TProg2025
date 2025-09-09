@@ -8,6 +8,7 @@ import logica.fabrica;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import logica.Controladores.ControladorUsuario;
 
 public class main {
 
@@ -34,6 +35,7 @@ public class main {
     private AltaInstitucionFrame altaInstitucionFrame;
     private RegistroEdicionEventoFrame registroEdicionEventoFrame;
     private AltaEdicionEvento altaEdicionEventoFrame;
+    private ModificarDatosUsuarioFrame modificarDatosUsuarioFrame;
 
     // ---------- Arranque con Look&Feel ----------
     public static void main(String[] args) {
@@ -143,10 +145,9 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     CargaDatosPrueba.cargar();
-                    System.out.println("Datos de prueba cargados correctamente.");
+                    // Eliminado el print de confirmación
                 } catch (Exception ex) {
-                    System.err.println("Error al cargar datos de prueba: " + ex.getMessage());
-                    ex.printStackTrace();
+                    // Eliminado el print de error
                 }
             }
         });
@@ -209,6 +210,52 @@ public class main {
                     }
                     altaInstitucionFrame.setVisible(true);
                     altaInstitucionFrame.toFront();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        JMenuItem itemModificarUsuario = new JMenuItem("Modificar Datos de Usuario");
+        styleMenuItem(itemModificarUsuario);
+        menuUsuario.add(itemModificarUsuario);
+        itemModificarUsuario.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    // Obtener usuarios y sus datos
+                    java.util.Map<String, logica.Clases.Usuario> usuariosMap = ICU.listarUsuarios();
+                    String[] usuarios = usuariosMap.keySet().toArray(new String[0]);
+                    String[][] datosUsuarios = new String[usuarios.length][7];
+                    for (int i = 0; i < usuarios.length; i++) {
+                        logica.Clases.Usuario u = usuariosMap.get(usuarios[i]);
+                        datosUsuarios[i][0] = u.getNickname();
+                        datosUsuarios[i][1] = u.getEmail();
+                        datosUsuarios[i][2] = u.getNombre();
+                        if (u instanceof logica.Clases.Asistente) {
+                            logica.Clases.Asistente a = (logica.Clases.Asistente) u;
+                            datosUsuarios[i][3] = a.getApellido() != null ? a.getApellido() : "";
+                            datosUsuarios[i][4] = a.getFechaDeNacimiento() != null ? a.getFechaDeNacimiento().toString() : "";
+                            datosUsuarios[i][5] = "";
+                            datosUsuarios[i][6] = a.getInstitucion() != null ? a.getInstitucion().getNombre() : "";
+                        } else if (u instanceof logica.Clases.Organizador) {
+                            logica.Clases.Organizador o = (logica.Clases.Organizador) u;
+                            datosUsuarios[i][3] = "";
+                            datosUsuarios[i][4] = "";
+                            datosUsuarios[i][5] = o.getDesc() != null ? o.getDesc() : "";
+                            datosUsuarios[i][6] = o.getLink() != null ? o.getLink() : "";
+                        } else {
+                            datosUsuarios[i][3] = "";
+                            datosUsuarios[i][4] = "";
+                            datosUsuarios[i][5] = "";
+                            datosUsuarios[i][6] = "";
+                        }
+                    }
+                    if (modificarDatosUsuarioFrame == null || modificarDatosUsuarioFrame.isClosed()) {
+                        modificarDatosUsuarioFrame = new ModificarDatosUsuarioFrame(ICU, usuarios, datosUsuarios);
+                        desktopPane.add(modificarDatosUsuarioFrame);
+                    }
+                    modificarDatosUsuarioFrame.setVisible(true);
+                    modificarDatosUsuarioFrame.toFront();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
@@ -288,7 +335,6 @@ public class main {
                         consultaRegistroFrame = new ConsultaRegistroFrame(ICU, ICE);
                         desktopPane.add(consultaRegistroFrame);
                     }
-                    consultaRegistroFrame.cargarUsuarios();
                     consultaRegistroFrame.setVisible(true);
                     consultaRegistroFrame.toFront();
                 } catch (Exception ex) {

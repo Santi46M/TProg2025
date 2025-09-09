@@ -27,7 +27,7 @@ public class ConsultaTipoRegistroFrame extends JInternalFrame {
      */
     public ConsultaTipoRegistroFrame(IControladorUsuario iCU, IControladorEvento iCE) {
         super("Consulta de Tipo de Registro", true, true, true, true);
-        setBounds(150, 150, 500, 350);
+        setBounds(150, 150, 700, 350); // Agrandado horizontalmente
         getContentPane().setLayout(new BorderLayout());
 
         JPanel panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));

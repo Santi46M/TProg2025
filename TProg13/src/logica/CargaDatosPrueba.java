@@ -25,58 +25,6 @@ public class CargaDatosPrueba {
     }
 
     public static void logResumenDatos() {
-        // Categorías
-        var categorias = logica.Manejadores.manejadorAuxiliar.getInstancia().listarCategorias();
-        System.out.println("\nResumen de datos cargados:");
-        System.out.println("Categorías: " + categorias.size());
-        for (String cat : categorias) {
-            System.out.println("  - " + cat);
-        }
-        // Instituciones
-        var instituciones = logica.Manejadores.manejadorUsuario.getInstancia().getInstituciones();
-        System.out.println("Instituciones: " + instituciones.size());
-        for (String nombre : instituciones) {
-            System.out.println("  - " + nombre);
-        }
-        // Eventos
-        var eventos = logica.Manejadores.ManejadorEvento.getInstancia().obtenerEventos();
-        System.out.println("Eventos: " + eventos.size());
-        for (var ev : eventos.values()) {
-            System.out.println("  - " + ev.getNombre() + " (" + ev.getSigla() + ")");
-        }
-        // Usuarios
-        var usuarios = logica.Manejadores.manejadorUsuario.getInstancia().getUsuarios();
-        System.out.println("Usuarios: " + usuarios.size());
-        for (var us : usuarios.values()) {
-            System.out.println("  - " + us.getNickname() + " (" + us.getNombre() + ")");
-        }
-        // Ediciones
-        int totalEdiciones = 0;
-        for (var ev : eventos.values()) {
-            totalEdiciones += ev.getEdiciones().size();
-        }
-        System.out.println("Ediciones: " + totalEdiciones);
-        for (var ev : eventos.values()) {
-            for (var ed : ev.getEdiciones().values()) {
-                System.out.println("  - " + ed.getNombre());
-            }
-        }
-        // Tipos de registro
-        int totalTipos = 0;
-        for (var ev : eventos.values()) {
-            for (var ed : ev.getEdiciones().values()) {
-                totalTipos += ed.getTiposRegistro().size();
-            }
-        }
-
-        // Registros
-        var registros = logica.Manejadores.ManejadorEvento.getInstancia().obtenerRegistros();
-        System.out.println("Registros: " + registros.size());
-        for (var reg : registros.values()) {
-            System.out.println("  - " + reg.getId() + " (usuario: " + reg.getUsuario().getNickname() + ", edición: " + ", tipo: " + reg.getTipoRegistro().getNombre() + ")");
-        }
-
-        System.out.println("\n--- Fin del resumen de datos cargados ---\n");
     }
 
     // Variables globales para instituciones y categorías
@@ -128,10 +76,6 @@ public class CargaDatosPrueba {
         controlador.AltaCategoria("Moda");
         //CA12
         controlador.AltaCategoria("Investigación");
-        System.out.println("Categorías creadas:");
-        for (String cat : logica.Manejadores.manejadorAuxiliar.getInstancia().listarCategorias()) {
-            System.out.println(cat);
-        }
     }
     
     public static void cargarEventosEjemplo() throws EventoYaExisteException {
@@ -157,22 +101,6 @@ public class CargaDatosPrueba {
         controlador.AltaEvento("Expointer Uruguay", "Exposición internacional agropecuaria y ganadera", java.time.LocalDate.of(2024, 12, 12), "EXPOAGRO", new DTCategorias(catEv06));
         // EV07
         controlador.AltaEvento("Montevideo Fashion Week", "Pasarela de moda uruguaya e internacional", java.time.LocalDate.of(2025, 7, 20), "MFASHION", new DTCategorias(catEv07));
-        System.out.println("Eventos de ejemplo dados de alta.");
-        // Listar todos los eventos cargados
-        System.out.println("Eventos cargados:");
-        for (Eventos ev : logica.Manejadores.ManejadorEvento.getInstancia().obtenerEventos().values()) {
-            System.out.println("Nombre: " + ev.getNombre());
-            System.out.println("Sigla: " + ev.getSigla());
-            System.out.println("Descripción: " + ev.getDescripcion());
-            System.out.println("Fecha: " + ev.getFecha());
-            System.out.print("Categorías: ");
-            if (ev.getCategorias() != null) {
-                for (Categoria cat : ev.getCategorias().values()) {
-                    System.out.print(cat.getNombre() + " ");
-                }
-            }
-            System.out.println("\n----------------------");
-        }
     }
     
 
@@ -287,7 +215,6 @@ public class CargaDatosPrueba {
                 "Web Summit 2026", "WS26", "", parseFecha("13/01/2026"), parseFecha("01/02/2026"), parseFecha("04/06/2025"), "Lisboa", "Portugal"
             );
         }
-        System.out.println("Ediciones de evento de ejemplo dadas de alta.");
     }
     
     public static void cargarTipoRegistroEjemplo() throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
@@ -343,7 +270,6 @@ public class CargaDatosPrueba {
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("WS26"), "General", "Acceso general", 650, 5);
         //TR25 - Estudiante para WS26
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("WS26"), "Estudiante", "Acceso para estudiantes", 300, 1);
-        System.out.println("Tipos de registro de ejemplo dados de alta.");
     }
     
     public static void cargarRegistrosEjemplo() {
@@ -359,7 +285,6 @@ public class CargaDatosPrueba {
         controlador.altaRegistroEdicionEvento("mec MARATON25", manejadorUsuario.getUsuarios().get("mec"), manejadorEvento.obtenerEvento("Maratón de Montevideo"), manejadorEvento.obtenerEdicion("MARATON25"), manejadorEvento.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 21K"), java.time.LocalDate.of(2025, 4, 10), 800, java.time.LocalDate.of(2025, 9, 14));
         controlador.altaRegistroEdicionEvento("miseventos COMICS25", manejadorUsuario.getUsuarios().get("miseventos"), manejadorEvento.obtenerEvento("Montevideo Comics"), manejadorEvento.obtenerEdicion("COMICS25"), manejadorEvento.obtenerEdicion("COMICS25").obtenerTipoRegistro("Cosplayer"), java.time.LocalDate.of(2025, 8, 3), 500, java.time.LocalDate.of(2025, 8, 4));
         controlador.altaRegistroEdicionEvento("techcorp COMICS24", manejadorUsuario.getUsuarios().get("techcorp"), manejadorEvento.obtenerEvento("Montevideo Comics"), manejadorEvento.obtenerEdicion("COMICS24"), manejadorEvento.obtenerEdicion("COMICS24").obtenerTipoRegistro("General"), java.time.LocalDate.of(2024, 7, 16), 600, java.time.LocalDate.of(2024, 7, 18));
-        System.out.println("Registros de ejemplo dados de alta.");
     }
     
     public static void cargarPatrociniosEjemplo() throws ValorPatrocinioExcedidoException {
@@ -405,7 +330,6 @@ public class CargaDatosPrueba {
             10,
             "EXPOCAT"
         );
-        System.out.println("Patrocinios de ejemplo dados de alta.");
     }
     
 }

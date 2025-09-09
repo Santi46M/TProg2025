@@ -48,14 +48,14 @@ public class ControladorEvento implements IControladorEvento {
         manejador.agregarEvento(nuevoEvento);
     }
 
-    public void AltaTipoRegistro(Ediciones edicion, String nombre, String descripcion, int costo, int cupo) throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
+    public void AltaTipoRegistro(Ediciones edicion, String nombre, String descripcion, float costo, int cupo) throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
         if (edicion.obtenerTipoRegistro(nombre) != null) {
             throw new TipoRegistroYaExisteException(nombre);
         }
         if (cupo <= 0 || cupo > Integer.MAX_VALUE) {
             throw new CupoTipoRegistroInvalidoException(cupo);
         }
-        if (costo < 0 || costo > Integer.MAX_VALUE) {
+        if (costo < 0 || costo > Float.MAX_VALUE) {
             throw new CostoTipoRegistroInvalidoException(costo);
         }
         TipoRegistro tipo = new TipoRegistro(edicion, nombre, descripcion, costo, cupo);
@@ -74,7 +74,7 @@ public class ControladorEvento implements IControladorEvento {
                 return;
             }
         }
-        int valorRegistros = cantidadRegistros * tipoRegistro.getCosto();
+        float valorRegistros = cantidadRegistros * tipoRegistro.getCosto();
         if (valorRegistros > (aporte * 0.2)) {
             throw new ValorPatrocinioExcedidoException();
         }
@@ -157,17 +157,18 @@ public class ControladorEvento implements IControladorEvento {
                 }
             }
             if (yaRegistrado) {
-                return;
+                throw new RuntimeException("El usuario ya está registrado a esta edición.");
             }
             if (cantidadRegistrados >= tipoRegistro.getCupo()) {
-                return;
+                throw new excepciones.CupoTipoRegistroInvalidoException(tipoRegistro.getCupo());
             }
             Registro nuevoRegistro = new Registro(idRegistro, usuario, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio);
             manejadorEvento.agregarRegistro(nuevoRegistro);
+            edicion.agregarRegistro(idRegistro, nuevoRegistro); // <-- Agrega el registro a la edición
             Asistente asist = (Asistente) usuario;
             asist.addRegistro(idRegistro, nuevoRegistro);
         } else {
-            System.out.println("es organizador");
+
         }
     }
 
@@ -261,4 +262,3 @@ public class ControladorEvento implements IControladorEvento {
         return null;
     }
 }
-

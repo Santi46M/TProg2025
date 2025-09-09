@@ -225,4 +225,27 @@ public class ControladorUsuario implements IControladorUsuario {
         }
         return obtenerDatosRegistros(registroSeleccionadoId);
     }
+
+    public void modificarDatosUsuario(String nickname, String nombre, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion) throws UsuarioNoExisteException, UsuarioTipoIncorrectoException {
+        Usuario u = manejador.findUsuario(nickname);
+        if (u == null) {
+            throw new UsuarioNoExisteException(nickname);
+        }
+        u.setNombre(nombre);
+        if (u instanceof Organizador) {
+            Organizador o = (Organizador) u;
+            o.setDesc(descripcion);
+            o.setLink(link);
+        } else if (u instanceof Asistente) {
+            Asistente a = (Asistente) u;
+            a.setApellido(apellido);
+            a.setFechaDeNacimiento(fechaNacimiento);
+            if (institucion != null && !institucion.isEmpty()) {
+                Institucion inst = manejador.findInstitucion(institucion);
+                a.setInstitucion(inst);
+            }
+        } else {
+            throw new UsuarioTipoIncorrectoException(nickname);
+        }
+    }
 }

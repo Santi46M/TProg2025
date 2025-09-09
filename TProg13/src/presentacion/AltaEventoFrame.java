@@ -14,19 +14,22 @@ import com.toedter.calendar.JDateChooser;
 public class AltaEventoFrame extends JInternalFrame {
     private Runnable abrirConsultaRunnable;
     public void setAbrirConsultaRunnable(Runnable r) { this.abrirConsultaRunnable = r; }
-    //private JDesktopPane desktopPane;
-    //private ConsultaEventoFrame[] consultaEventoFrameRef;
-    private JComboBox<String> comboCategorias;
+    private JList<String> listCategorias;
+    private DefaultListModel<String> listModelCategorias;
+    private java.util.List<Boolean> categoriasSeleccionadasFlags;
     
     public void cargarCategorias() {
-        comboCategorias.removeAllItems();
+        listModelCategorias.clear();
+        categoriasSeleccionadasFlags = new java.util.ArrayList<>();
         try {
             java.util.List<String> categorias = new java.util.ArrayList<>(logica.Manejadores.manejadorAuxiliar.getInstancia().listarCategorias());
             for (String cat : categorias) {
-                comboCategorias.addItem(cat);
+                listModelCategorias.addElement(cat);
+                categoriasSeleccionadasFlags.add(false);
             }
         } catch (Exception ex) {
-            comboCategorias.addItem("No se pudieron cargar las categorías.");
+            listModelCategorias.addElement("No se pudieron cargar las categorías.");
+            categoriasSeleccionadasFlags.add(false);
         }
     }
     
@@ -123,12 +126,36 @@ public class AltaEventoFrame extends JInternalFrame {
         gbc_lblCategoria.gridy = 4;
         getContentPane().add(lblCategoria, gbc_lblCategoria);
 
-        comboCategorias = new JComboBox<>();
-        GridBagConstraints gbc_comboCategorias = new GridBagConstraints();
-        gbc_comboCategorias.gridx = 1;
-        gbc_comboCategorias.gridy = 4;
-        gbc_comboCategorias.fill = GridBagConstraints.HORIZONTAL;
-        getContentPane().add(comboCategorias, gbc_comboCategorias);
+        listModelCategorias = new DefaultListModel<>();
+        listCategorias = new JList<>(listModelCategorias);
+        listCategorias.setCellRenderer(new ListCellRenderer<String>() {
+            @Override
+            public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus) {
+                JCheckBox checkBox = new JCheckBox(value, categoriasSeleccionadasFlags.get(index));
+                checkBox.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
+                checkBox.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
+                return checkBox;
+            }
+        });
+        listCategorias.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        listCategorias.setVisibleRowCount(5);
+        listCategorias.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int index = listCategorias.locationToIndex(e.getPoint());
+                if (index >= 0 && index < categoriasSeleccionadasFlags.size()) {
+                    categoriasSeleccionadasFlags.set(index, !categoriasSeleccionadasFlags.get(index));
+                    listCategorias.repaint();
+                }
+            }
+        });
+        JScrollPane scrollCategorias = new JScrollPane(listCategorias);
+        scrollCategorias.setPreferredSize(new Dimension(200, 80));
+        GridBagConstraints gbc_listCategorias = new GridBagConstraints();
+        gbc_listCategorias.gridx = 1;
+        gbc_listCategorias.gridy = 4;
+        gbc_listCategorias.fill = GridBagConstraints.HORIZONTAL;
+        getContentPane().add(scrollCategorias, gbc_listCategorias);
 
         cargarCategorias();
 
@@ -152,15 +179,19 @@ public class AltaEventoFrame extends JInternalFrame {
             String descripcion = txtDescripcion.getText().trim();
             java.util.Date fechaDate = dateChooserFecha.getDate();
             String sigla = txtSigla.getText().trim();
-            String categoriaSeleccionada = (String) comboCategorias.getSelectedItem();
-            if (nombre.isEmpty() || descripcion.isEmpty() || fechaDate == null || sigla.isEmpty() || categoriaSeleccionada == null || categoriaSeleccionada.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Todos los campos deben estar completos y debe seleccionar una Categoría.");
+            java.util.List<String> categoriasSeleccionadas = new java.util.ArrayList<>();
+            for (int i = 0; i < listModelCategorias.size(); i++) {
+                if (categoriasSeleccionadasFlags.get(i)) {
+                    categoriasSeleccionadas.add(listModelCategorias.get(i));
+                }
+            }
+            if (nombre.isEmpty() || descripcion.isEmpty() || fechaDate == null || sigla.isEmpty() || categoriasSeleccionadas.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Todos los campos deben estar completos y debe seleccionar al menos una Categoría.");
                 return;
             }
             try {
                 java.time.LocalDate fechaAlta = fechaDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
                 ControladorEvento controlador = new ControladorEvento();
-                java.util.List<String> categoriasSeleccionadas = java.util.Collections.singletonList(categoriaSeleccionada);
                 DTCategorias dtCategorias = new DTCategorias(categoriasSeleccionadas);
                 controlador.AltaEvento(nombre, descripcion, fechaAlta, sigla, dtCategorias);
                 JOptionPane.showMessageDialog(this, "Evento registrado con éxito.");

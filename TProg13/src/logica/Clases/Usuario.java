@@ -29,17 +29,18 @@ public abstract class Usuario {
         return this.nombre;
     }
 
-    /*public void setNombre(String nombre) {
+    public void setNombre(String nombre) {
         this.nombre = nombre;
-    }*/
+    }
 
     public String getEmail() {
         return this.email;
     }
 
-    /*public void setEmail(String email) {
-        this.email = email;
-    }*/
+    // Si necesitas setEmail, descomenta y usa:
+    // public void setEmail(String email) {
+    //     this.email = email;
+    // }
     
     public boolean esAsistente(Usuario u) {
     	if (u instanceof Asistente) {

@@ -82,9 +82,7 @@ public class manejadorUsuario {
 	public Boolean findCorreo(String correo) {
 		for (Map.Entry<String, Usuario> i : usuarios.entrySet()){
 			Usuario u = i.getValue();
-			System.out.println(u.getEmail());
 			if(u.getEmail().equals(correo)) {
-				System.out.println("se encontro");
 				return true;
 				
 			}

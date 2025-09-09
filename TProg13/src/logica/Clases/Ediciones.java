@@ -140,4 +140,8 @@ public class Ediciones {
         if (tipo != null) return tipo;
         return null;
     }
+
+    public void agregarRegistro(String id, Registro registro) {
+        this.registros.put(id, registro);
+    }
 }
