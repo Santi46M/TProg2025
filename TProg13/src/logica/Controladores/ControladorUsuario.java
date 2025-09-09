@@ -41,10 +41,10 @@ public class ControladorUsuario implements IControladorUsuario {
 
         // verificar unicidad de nickname y correo
         if (manejador.findUsuario(nickname) != null) {
-            throw new UsuarioYaExisteException(nickname);
+            throw new UsuarioYaExisteException("El nickname " + nickname + " ya está en uso");
         }
         if (manejador.findCorreo(correo)) {
-            throw new UsuarioYaExisteException(correo);
+            throw new UsuarioYaExisteException("El correo" + correo + " ya está en uso");
         }
 
         Usuario nuevoUsuario;
@@ -61,7 +61,7 @@ public class ControladorUsuario implements IControladorUsuario {
 
     public void AltaInstitucion(String nombre, String descripcion, String link) throws InstitucionYaExisteException {
         if (manejador.findInstitucion(nombre) != null) {
-            throw new InstitucionYaExisteException (nombre);        }
+            throw new InstitucionYaExisteException ("La institución " + nombre + " ya existe");        }
 
         Institucion nuevaInstitucion = new Institucion(nombre, descripcion, link);
         manejador.addInstitucion(nuevaInstitucion);
@@ -83,10 +83,10 @@ public class ControladorUsuario implements IControladorUsuario {
         return manejador.getInstituciones();
     }
 
-    public void actualizarAsistente(String nickname, String apellido, LocalDate fechaNacimiento) throws UsuarioYaExisteException, UsuarioTipoIncorrectoException {
+    public void actualizarAsistente(String nickname, String apellido, LocalDate fechaNacimiento) throws UsuarioYaExisteException, UsuarioTipoIncorrectoException, UsuarioNoExisteException {
         Usuario u = manejador.findUsuario(nickname);
         if (u == null) {
-            throw new UsuarioYaExisteException(nickname);
+            throw new UsuarioNoExisteException(nickname);
         }
         if (!(u instanceof Asistente)) {
             throw new UsuarioTipoIncorrectoException(nickname);
