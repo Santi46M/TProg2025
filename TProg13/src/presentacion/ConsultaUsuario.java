@@ -156,6 +156,15 @@ public class ConsultaUsuario extends JInternalFrame {
             JTextArea txtFecha = new JTextArea(String.valueOf(datos.getFechaNac()));
             txtFecha.setEditable(false);
             panelAsistente.add(txtFecha);
+            
+            if (datos.getInstitucion() != null) {
+                // Nuevo campo Institución
+                panelAsistente.add(new JLabel("Institución:"));
+                JTextArea txtInstitucion = new JTextArea(datos.getInstitucion());
+                txtInstitucion.setEditable(false);
+                panelAsistente.add(txtInstitucion);
+            }
+
 
             // Combo de registros
             DefaultComboBoxModel<String> modelReg = new DefaultComboBoxModel<>();

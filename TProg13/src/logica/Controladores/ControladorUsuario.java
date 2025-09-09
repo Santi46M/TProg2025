@@ -41,10 +41,10 @@ public class ControladorUsuario implements IControladorUsuario {
 
         // verificar unicidad de nickname y correo
         if (manejador.findUsuario(nickname) != null) {
-            throw new UsuarioYaExisteException(nickname);
+            throw new UsuarioYaExisteException("El usuario con nickname " + nickname + " ya esta registrado");
         }
         if (manejador.findCorreo(correo)) {
-            throw new UsuarioYaExisteException(correo);
+        	throw new UsuarioYaExisteException("El usuario con correo " + correo + " ya esta registrado");
         }
 
         Usuario nuevoUsuario;
@@ -124,6 +124,7 @@ public class ControladorUsuario implements IControladorUsuario {
             dto.setApellido(a.getApellido());
             dto.setFechaNac(a.getFechaDeNacimiento());
             dto.setRegistros(obtenerRegistrosAsistente(a));
+            dto.setInstitucion(obtenerInstitucion(a));
         } else if (u instanceof Organizador) {
             Organizador o = (Organizador) u;
             dto.setDesc(o.getDesc());
@@ -131,6 +132,15 @@ public class ControladorUsuario implements IControladorUsuario {
             dto.setEdicion(listarEdicionesAPartirDeOrganizador(o));
         }
         return dto;
+    }
+    
+    public String obtenerInstitucion(Asistente asist) {
+    	Institucion inst = asist.getInstitucion();
+    	if (inst != null) {
+    		String nombreInstitucion = inst.getNombre();
+    		return nombreInstitucion;
+    	}
+    	return null;
     }
     
     public Set<DTRegistro> obtenerRegistrosAsistente(Asistente asist){
