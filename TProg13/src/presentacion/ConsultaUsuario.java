@@ -17,6 +17,8 @@ public class ConsultaUsuario extends JInternalFrame {
 
     private final IControladorUsuario controlUsr;
     private final IControladorEvento  controlEvt;
+    
+    
 
     private Vector<String> usuarios;
     private JComboBox<String> comboUsuarios;
@@ -31,6 +33,8 @@ public class ConsultaUsuario extends JInternalFrame {
     public ConsultaUsuario(IControladorUsuario icu, IControladorEvento iCE) {
         this.controlUsr = icu;
         this.controlEvt  = iCE;
+        
+        setSize(500, 300);
 
         cardLayout = new CardLayout();
         getContentPane().setLayout(cardLayout);
@@ -48,7 +52,6 @@ public class ConsultaUsuario extends JInternalFrame {
         setMaximizable(true);
         setIconifiable(true);
         setClosable(true);
-        setBounds(new Rectangle(300, 300, 520, 210));
 
         JLabel label = new JLabel("Seleccione un usuario:");
         label.setBounds(50, 51, 180, 20);
@@ -165,7 +168,10 @@ public class ConsultaUsuario extends JInternalFrame {
                 panelAsistente.add(txtInstitucion);
             }
 
-
+            JLabel lblRegistros = new JLabel("Registros:");
+            lblRegistros.setFont(lblRegistros.getFont().deriveFont(Font.BOLD)); // opcional: en negrita
+            panelDatosUsuario.add(lblRegistros);
+            
             // Combo de registros
             DefaultComboBoxModel<String> modelReg = new DefaultComboBoxModel<>();
             java.util.List<DTRegistro> listaRegs = new java.util.ArrayList<>(datos.getRegistros());
@@ -216,6 +222,11 @@ public class ConsultaUsuario extends JInternalFrame {
             txtLink.setEditable(false);
             panelOrganizador.add(txtLink);
 
+            JLabel lblRegistros = new JLabel("Ediciones:");
+            lblRegistros.setFont(lblRegistros.getFont().deriveFont(Font.BOLD)); // opcional: en negrita
+            panelDatosUsuario.add(lblRegistros);
+            
+            
             // Combo de ediciones
             DefaultComboBoxModel<String> modelEd = new DefaultComboBoxModel<>();
             java.util.List<DTEdicion> listaEds = new java.util.ArrayList<>(datos.getEdiciones());
