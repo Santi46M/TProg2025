@@ -45,6 +45,7 @@ public class ControladorUsuario implements IControladorUsuario {
         }
         if (manejador.findCorreo(correo)) {
         	throw new UsuarioYaExisteException("El usuario con correo " + correo + " ya esta registrado");
+
         }
 
         Usuario nuevoUsuario;
@@ -61,7 +62,7 @@ public class ControladorUsuario implements IControladorUsuario {
 
     public void AltaInstitucion(String nombre, String descripcion, String link) throws InstitucionYaExisteException {
         if (manejador.findInstitucion(nombre) != null) {
-            throw new InstitucionYaExisteException (nombre);        }
+            throw new InstitucionYaExisteException ("La institución " + nombre + " ya existe");        }
 
         Institucion nuevaInstitucion = new Institucion(nombre, descripcion, link);
         manejador.addInstitucion(nuevaInstitucion);
@@ -83,10 +84,10 @@ public class ControladorUsuario implements IControladorUsuario {
         return manejador.getInstituciones();
     }
 
-    public void actualizarAsistente(String nickname, String apellido, LocalDate fechaNacimiento) throws UsuarioYaExisteException, UsuarioTipoIncorrectoException {
+    public void actualizarAsistente(String nickname, String apellido, LocalDate fechaNacimiento) throws UsuarioYaExisteException, UsuarioTipoIncorrectoException, UsuarioNoExisteException {
         Usuario u = manejador.findUsuario(nickname);
         if (u == null) {
-            throw new UsuarioYaExisteException(nickname);
+            throw new UsuarioNoExisteException(nickname);
         }
         if (!(u instanceof Asistente)) {
             throw new UsuarioTipoIncorrectoException(nickname);

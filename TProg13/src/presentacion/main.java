@@ -441,7 +441,7 @@ public class main {
 
         JMenuItem itemRegistroEdicionEvento = new JMenuItem("Registro/Edición de Evento");
         styleMenuItem(itemRegistroEdicionEvento);
-        menuEvento.add(itemRegistroEdicionEvento);
+        menuUsuario.add(itemRegistroEdicionEvento);
         itemRegistroEdicionEvento.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
