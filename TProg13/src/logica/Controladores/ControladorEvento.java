@@ -247,4 +247,18 @@ public class ControladorEvento implements IControladorEvento {
             ed.getPais()
         );
     }
+    @Override
+    public Ediciones obtenerEdicionPorSigla(String sigla) {
+        return manejador.obtenerEdicion(sigla);
+    }
+    
+    @Override
+    public String encontrarEventoPorSigla(String siglaEdicion) {
+        Ediciones ed = manejador.obtenerEdicion(siglaEdicion);
+        if (ed != null && ed.getEvento() != null) {
+            return ed.getEvento().getNombre();
+        }
+        return null;
+    }
 }
+

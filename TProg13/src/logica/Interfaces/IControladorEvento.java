@@ -10,6 +10,9 @@ import excepciones.EventoYaExisteException;
 import excepciones.FechasCruzadasException;
 import excepciones.TipoRegistroYaExisteException;
 import excepciones.ValorPatrocinioExcedidoException;
+import logica.Clases.*;
+import logica.Datatypes.*;
+import logica.Enumerados.*;
 
 public interface IControladorEvento {
 	public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias) throws EventoYaExisteException;
@@ -28,4 +31,6 @@ public interface IControladorEvento {
 
     public String getEdicionSeleccionadaSigla();
     public DTEdicion obtenerEdicionSeleccionada();
+    Ediciones obtenerEdicionPorSigla(String sigla);
+    public String encontrarEventoPorSigla(String siglaEdicion);
 }

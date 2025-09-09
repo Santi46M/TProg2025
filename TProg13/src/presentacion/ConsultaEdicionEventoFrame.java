@@ -1,19 +1,16 @@
 package presentacion;
 
 import javax.swing.*;
-
-import logica.Interfaces.*;
-
 import java.awt.*;
-import java.util.List;
+import logica.Interfaces.*;
+import logica.Clases.*;
+import logica.Datatypes.*;
+
 
 public class ConsultaEdicionEventoFrame extends JInternalFrame {
     private JComboBox<String> comboEventos;
     private JComboBox<String> comboEdiciones;
-    private DefaultListModel<String> modelTiposRegistro;
-    private DefaultListModel<String> modelPatrocinios;
-    private JList<String> listTiposRegistro;
-    private JList<String> listPatrocinios;
+    private DefaultListModel<String> listModel;
     private JTextArea txtDatos;
     private String[][] datosEventos;
     private String[][] categoriasEventos;
@@ -38,8 +35,6 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         super("Consulta Edición de Evento", true, true, true, true);
         setBounds(100, 100, 800, 500);
         setLayout(new BorderLayout());
-        this.controlUsr = iCU;
-        this.controlEvt = ICE;
 
         JPanel panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lblEvento = new JLabel("Evento:");
@@ -139,7 +134,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
     public void cargarEventos() {
         try {
             logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
-            List<logica.Datatypes.DTEvento> eventos = controlador.listarEventos();
+            java.util.List<logica.Datatypes.DTEvento> eventos = controlador.listarEventos();
             String[] eventosArr = new String[eventos.size()];
             datosEventos = new String[eventos.size()][1];
             categoriasEventos = new String[eventos.size()][];
@@ -152,6 +147,8 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
                 edicionesEventos[i] = ev.getEdiciones().toArray(new String[0]);
             }
             comboEventos.setModel(new DefaultComboBoxModel<>(eventosArr));
+            comboEventos.revalidate();
+            comboEventos.repaint();
             if (eventosArr.length > 0) {
                 comboEventos.setSelectedIndex(0);
                 mostrarDatosEvento();
@@ -186,33 +183,6 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         }
     }
 
-    private void inicializarPreseleccion() {
-        cargando = true;
-
-        String siglaSel = controlEvt.getEdicionSeleccionadaSigla();
-        if (siglaSel != null && edicionesEventos != null) {
-            outer:
-            for (int i = 0; i < comboEventos.getItemCount(); i++) {
-                String[] eds = edicionesEventos[i];
-                if (eds == null) continue;
-                for (int j = 0; j < eds.length; j++) {
-                    if (siglaSel.equals(eds[j])) {
-                        comboEventos.setSelectedIndex(i);
-                        cargarEdicionesEvento();
-                        comboEdiciones.setSelectedIndex(j);
-                        mostrarDatosEdicion();
-                        break outer;
-                    }
-                }
-            }
-        } else {
-            cargarEdicionesEvento();
-            mostrarDatosEdicion();
-        }
-
-        cargando = false;
-    }
-
     private void cargarEdicionesEvento() {
         int idx = comboEventos.getSelectedIndex();
         comboEdiciones.removeAllItems();
@@ -220,13 +190,13 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
             return;
         }
         String[] ediciones = edicionesEventos[idx];
-        if (ediciones != null) {
-            for (String ed : ediciones) comboEdiciones.addItem(ed);
+        for (String ed : ediciones) {
+            comboEdiciones.addItem(ed);
         }
-        if (comboEdiciones.getItemCount() > 0) {
+        if (ediciones.length > 0) {
             comboEdiciones.setSelectedIndex(0);
+            mostrarDatosEdicion();
         }
-        mostrarDatosEvento();
     }
 
     private void mostrarDatosEvento() {
@@ -278,8 +248,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
             return;
         }
         String[] ediciones = edicionesEventos[idxEvento];
-        if (ediciones == null || idxEd >= ediciones.length) return;
-
+        if (idxEd >= ediciones.length) return;
         String nombreEdicion = ediciones[idxEd];
         String nombreEvento = comboEventos.getItemAt(idxEvento);
         logica.Clases.Ediciones edi = new logica.Controladores.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
@@ -295,10 +264,10 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         txtCiudad.setText(edi.getCiudad());
         txtPais.setText(edi.getPais());
         txtOrganizador.setText(edi.getOrganizador() != null ? edi.getOrganizador().getNickname() : "");
-        for (logica.TipoRegistro tr : edi.getTiposRegistro()) {
+        for (logica.Clases.TipoRegistro tr : edi.getTiposRegistro()) {
             comboTiposRegistro.addItem(tr.getNombre());
         }
-        for (logica.Patrocinio p : edi.getPatrocinios()) {
+        for (logica.Clases.Patrocinio p : edi.getPatrocinios()) {
             comboPatrocinios.addItem(p.getCodigoPatrocinio());
         }
     }
@@ -338,6 +307,55 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
             framePat.toFront();
         } else {
             framePat.setVisible(true);
+        }
+    }
+    
+ // --- constructor con SIGLA de edición (preselección directa) ---
+    public ConsultaEdicionEventoFrame(IControladorUsuario iCU,
+                                      IControladorEvento ICE,
+                                      String siglaEdicion) {
+        // usa el constructor base para armar la UI
+        this(iCU, ICE);
+
+        // cargar la lista de eventos/ediciones
+        cargarEventos();
+
+        if (siglaEdicion == null || siglaEdicion.isEmpty()) return;
+
+        // 1) Recupero la edición por sigla (para saber su nombre legible)
+        logica.Clases.Ediciones ed = ICE.obtenerEdicionPorSigla(siglaEdicion);
+        if (ed == null) return;
+        String nombreEdicion = ed.getNombre();
+
+        // 2) Averiguo a qué evento pertenece esa edición
+        // (si ya implementaste ambos, podés usar cualquiera de los dos)
+        String nombreEvento = ICE.encontrarEventoPorSigla(siglaEdicion);
+        if (nombreEvento == null || nombreEvento.isEmpty()) {
+            // alternativa por NOMBRE si preferís:
+            // nombreEvento = ICE.encontrarEventoPorEdicion(nombreEdicion);
+            return;
+        }
+
+        // 3) Selecciono el evento en el combo
+        seleccionarItemPorTexto(comboEventos, nombreEvento);
+
+        // 4) Cargo ediciones de ese evento y selecciono la edición
+        cargarEdicionesEvento();
+        seleccionarItemPorTexto(comboEdiciones, nombreEdicion);
+
+        // 5) Muestro datos de la edición
+        mostrarDatosEdicion();
+    }
+
+    // helper
+    private void seleccionarItemPorTexto(JComboBox<String> combo, String texto) {
+        if (texto == null) return;
+        for (int i = 0; i < combo.getItemCount(); i++) {
+            String it = combo.getItemAt(i);
+            if (texto.equals(it)) {
+                combo.setSelectedIndex(i);
+                return;
+            }
         }
     }
 }

@@ -182,19 +182,17 @@ public class main {
         menuUsuario.add(itemConsultaUsuario);
         itemConsultaUsuario.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
-                    if (conUsrInternalFrame == null || conUsrInternalFrame.isClosed()) {
-                        conUsrInternalFrame = new ConsultaUsuario(ICU, ICE);
-                        desktopPane.add(conUsrInternalFrame);
-                    }
-                    conUsrInternalFrame.cargarUsuarios();
-                    conUsrInternalFrame.setVisible(true);
-                    conUsrInternalFrame.toFront();
-                } catch (UsuarioNoExisteException ex) {
-                    ex.printStackTrace();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
+            	try {
+            	    if (conUsrInternalFrame == null || conUsrInternalFrame.isClosed()) {
+            	        conUsrInternalFrame = new ConsultaUsuario(ICU, ICE);
+            	        desktopPane.add(conUsrInternalFrame);
+            	    }
+            	    conUsrInternalFrame.cargarUsuarios();  // ya NO lanza UsuarioNoExisteException
+            	    conUsrInternalFrame.setVisible(true);
+            	    conUsrInternalFrame.toFront();
+            	} catch (Exception ex) {
+            	    ex.printStackTrace();   // o log
+            	}
             }
         });
 
@@ -236,24 +234,30 @@ public class main {
             }
         });
 
-        JMenuItem itemConsultaEdicion = new JMenuItem("Consulta de Edición de Evento");
-        styleMenuItem(itemConsultaEdicion);
-        menuEvento.add(itemConsultaEdicion);
-        itemConsultaEdicion.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    if (consultaEdicionEventoFrame == null || consultaEdicionEventoFrame.isClosed()) {
-                        consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame(ICU, ICE);
-                        desktopPane.add(consultaEdicionEventoFrame);
-                    }
-                    consultaEdicionEventoFrame.cargarEventos();
-                    consultaEdicionEventoFrame.setVisible(true);
-                    consultaEdicionEventoFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-        });
+     // Campo en tu clase principal
+      //  private ConsultaEventoFrame consultaEventoFrame;
+
+        // En el action del menú:
+      
+
+     // En el bloque donde armás el menú Evento:
+     JMenuItem itemConsultaEdicion = new JMenuItem("Consulta de Edición de Evento");
+     styleMenuItem(itemConsultaEdicion);
+     menuEvento.add(itemConsultaEdicion);
+
+     itemConsultaEdicion.addActionListener(e -> {
+         try {
+             if (consultaEdicionEventoFrame == null || consultaEdicionEventoFrame.isClosed()) {
+                 consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame(ICU, ICE);
+                 desktopPane.add(consultaEdicionEventoFrame);
+             }
+             consultaEdicionEventoFrame.cargarEventos(); // <- ahora existe en tu clase
+             consultaEdicionEventoFrame.setVisible(true);
+             consultaEdicionEventoFrame.toFront();
+         } catch (Exception ex) {
+             ex.printStackTrace();
+         }
+     });
 
         JMenuItem itemConsultaTipoRegistro = new JMenuItem("Consulta de Tipo de Registro");
         styleMenuItem(itemConsultaTipoRegistro);

@@ -5,6 +5,7 @@ import java.awt.*;
 import logica.Interfaces.*;
 
 
+
 public class ConsultaEventoFrame extends JInternalFrame {
     private IControladorEvento controladorEvento;
     private JComboBox<String> comboEventos;
@@ -134,12 +135,27 @@ public class ConsultaEventoFrame extends JInternalFrame {
     private void abrirConsultaEdicion() {
         int idxEvento = comboEventos.getSelectedIndex();
         int idxEd = comboEdiciones.getSelectedIndex();
-        if (idxEvento < 0 || idxEd < 0 || edicionesEventos == null || idxEvento >= edicionesEventos.length || idxEd >= edicionesEventos[idxEvento].length) {
+        if (idxEvento < 0 || idxEd < 0 || edicionesEventos == null
+                || idxEvento >= edicionesEventos.length
+                || idxEd >= edicionesEventos[idxEvento].length) {
             return;
         }
-        String nombreEvento = comboEventos.getItemAt(idxEvento);
+
+        String nombreEvento  = comboEventos.getItemAt(idxEvento);
         String nombreEdicion = edicionesEventos[idxEvento][idxEd];
-        ConsultaEdicionEventoFrame frameEdicion = new ConsultaEdicionEventoFrame(controladorUsuario, controladorEvento, nombreEvento, nombreEdicion);
+
+        logica.Clases.Ediciones ed = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
+        if (ed == null) {
+            JOptionPane.showMessageDialog(this, "No se encontró la edición seleccionada.");
+            return;
+        }
+        String sigla = ed.getSigla();
+
+        controladorEvento.seleccionarEdicion(sigla);
+
+        ConsultaEdicionEventoFrame frameEdicion =
+                new ConsultaEdicionEventoFrame(controladorUsuario, controladorEvento, sigla);
+
         JDesktopPane desktop = getDesktopPane();
         if (desktop != null) {
             desktop.add(frameEdicion);
