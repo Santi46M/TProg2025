@@ -50,7 +50,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         panelSeleccion.add(new JLabel("Edición:"));
         comboEdiciones = new JComboBox<>();
         panelSeleccion.add(comboEdiciones);
-        add(panelSeleccion, BorderLayout.NORTH);
+        getContentPane().add(panelSeleccion, BorderLayout.NORTH);
 
         // Datos (alineados en 2 columnas)
         JPanel panelDatos = new JPanel(new GridLayout(0, 2, 8, 6));
