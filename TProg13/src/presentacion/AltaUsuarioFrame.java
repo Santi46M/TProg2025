@@ -303,7 +303,7 @@ public class AltaUsuarioFrame extends JInternalFrame {
                 limpiarFormulario();
                 setVisible(false);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error al registrar usuario: " + ex.getMessage(),
+                JOptionPane.showMessageDialog(this, ex.getMessage(),
                         "Registrar Usuario", JOptionPane.ERROR_MESSAGE);
             }
         }

@@ -4,12 +4,14 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
+
 public class DTDatosUsuario {
 	private String nickname;
     private String nombre;
     private String email;
     private String apellido;       // si es Asistente
     private LocalDate fechaNac;    // si es Asistente
+    private String nombreInstitucion;
     private String desc;           // si es Organizador
     private String link;           // si es Organizador
     // Agrego para el método obtenerDatosUsuario
@@ -33,6 +35,7 @@ public class DTDatosUsuario {
     public LocalDate getFechaNac() { return fechaNac; }
     public String getDesc() { return desc; }
     public String getLink() { return link; }
+    public String getInstitucion() {return nombreInstitucion;}
     public Set<DTRegistro> getRegistros() { return registros; }
     public Set<DTEdicion> getEdiciones() { return ediciones; }
     
@@ -41,6 +44,7 @@ public class DTDatosUsuario {
     public void setFechaNac(LocalDate fechaNac) { this.fechaNac = fechaNac; }
     public void setDesc(String desc) { this.desc = desc; }
     public void setLink(String link) { this.link = link; }
+    public void setInstitucion(String inst) {this.nombreInstitucion = inst;};
     public void setRegistros(Set<DTRegistro> registros) {
         this.registros = registros;
     }
