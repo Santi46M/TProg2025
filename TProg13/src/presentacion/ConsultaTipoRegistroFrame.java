@@ -16,17 +16,20 @@ public class ConsultaTipoRegistroFrame extends JInternalFrame {
     private JComboBox<String> comboEdiciones;
     private JComboBox<String> comboTipos;
     private JTextField txtNombre;
-    private JTextField txtDescripcion;
+    private JTextArea txtDescripcion;
     private JTextField txtCupo;
     private JTextField txtCosto;
     private List<DTEvento> eventosDTO;
     private List<String> edicionesActuales;
     private List<TipoRegistro> tiposActuales;
 
+    /**
+     * @wbp.parser.constructor
+     */
     public ConsultaTipoRegistroFrame(IControladorUsuario iCU, IControladorEvento iCE) {
         super("Consulta de Tipo de Registro", true, true, true, true);
         setBounds(150, 150, 500, 350);
-        setLayout(new BorderLayout());
+        getContentPane().setLayout(new BorderLayout());
 
         JPanel panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lblEvento = new JLabel("Evento:");
@@ -41,29 +44,84 @@ public class ConsultaTipoRegistroFrame extends JInternalFrame {
         comboTipos = new JComboBox<>();
         panelSeleccion.add(lblTipo);
         panelSeleccion.add(comboTipos);
-        add(panelSeleccion, BorderLayout.NORTH);
+        getContentPane().add(panelSeleccion, BorderLayout.NORTH);
 
         JPanel panelDatos = new JPanel();
         panelDatos.setLayout(new BoxLayout(panelDatos, BoxLayout.Y_AXIS));
-        JPanel panelCampos = new JPanel(new GridLayout(0, 2, 10, 10));
+        JPanel panelCampos = new JPanel(new GridBagLayout());
         panelDatos.add(panelCampos);
-        panelCampos.add(new JLabel("Nombre:"));
+
+        GridBagConstraints gbcNombreLabel = new GridBagConstraints();
+        gbcNombreLabel.insets = new Insets(2, 2, 2, 2);
+        gbcNombreLabel.anchor = GridBagConstraints.WEST;
+        gbcNombreLabel.gridx = 0;
+        gbcNombreLabel.gridy = 0;
+        panelCampos.add(new JLabel("Nombre:"), gbcNombreLabel);
+
+        GridBagConstraints gbcNombreField = new GridBagConstraints();
+        gbcNombreField.insets = new Insets(2, 2, 2, 2);
+        gbcNombreField.fill = GridBagConstraints.HORIZONTAL;
+        gbcNombreField.gridx = 1;
+        gbcNombreField.gridy = 0;
         txtNombre = new JTextField();
         txtNombre.setEditable(false);
-        panelCampos.add(txtNombre);
-        panelCampos.add(new JLabel("Descripción:"));
-        txtDescripcion = new JTextField();
+        txtNombre.setColumns(15);
+        panelCampos.add(txtNombre, gbcNombreField);
+
+        GridBagConstraints gbcDescLabel = new GridBagConstraints();
+        gbcDescLabel.insets = new Insets(2, 2, 2, 2);
+        gbcDescLabel.anchor = GridBagConstraints.WEST;
+        gbcDescLabel.gridx = 0;
+        gbcDescLabel.gridy = 1;
+        panelCampos.add(new JLabel("Descripción:"), gbcDescLabel);
+
+        GridBagConstraints gbcDescField = new GridBagConstraints();
+        gbcDescField.insets = new Insets(2, 2, 2, 2);
+        gbcDescField.fill = GridBagConstraints.BOTH;
+        gbcDescField.gridx = 1;
+        gbcDescField.gridy = 1;
+        txtDescripcion = new JTextArea(3, 20);
         txtDescripcion.setEditable(false);
-        panelCampos.add(txtDescripcion);
-        panelCampos.add(new JLabel("Cupo:"));
+        txtDescripcion.setLineWrap(true);
+        txtDescripcion.setWrapStyleWord(true);
+        JScrollPane scrollDesc = new JScrollPane(txtDescripcion);
+        panelCampos.add(scrollDesc, gbcDescField);
+
+        GridBagConstraints gbcCupoLabel = new GridBagConstraints();
+        gbcCupoLabel.insets = new Insets(2, 2, 2, 2);
+        gbcCupoLabel.anchor = GridBagConstraints.WEST;
+        gbcCupoLabel.gridx = 0;
+        gbcCupoLabel.gridy = 2;
+        panelCampos.add(new JLabel("Cupo:"), gbcCupoLabel);
+
+        GridBagConstraints gbcCupoField = new GridBagConstraints();
+        gbcCupoField.insets = new Insets(2, 2, 2, 2);
+        gbcCupoField.fill = GridBagConstraints.HORIZONTAL;
+        gbcCupoField.gridx = 1;
+        gbcCupoField.gridy = 2;
         txtCupo = new JTextField();
         txtCupo.setEditable(false);
-        panelCampos.add(txtCupo);
-        panelCampos.add(new JLabel("Costo:"));
+        txtCupo.setColumns(10);
+        panelCampos.add(txtCupo, gbcCupoField);
+
+        GridBagConstraints gbcCostoLabel = new GridBagConstraints();
+        gbcCostoLabel.insets = new Insets(2, 2, 2, 2);
+        gbcCostoLabel.anchor = GridBagConstraints.WEST;
+        gbcCostoLabel.gridx = 0;
+        gbcCostoLabel.gridy = 3;
+        panelCampos.add(new JLabel("Costo:"), gbcCostoLabel);
+
+        GridBagConstraints gbcCostoField = new GridBagConstraints();
+        gbcCostoField.insets = new Insets(2, 2, 2, 2);
+        gbcCostoField.fill = GridBagConstraints.HORIZONTAL;
+        gbcCostoField.gridx = 1;
+        gbcCostoField.gridy = 3;
         txtCosto = new JTextField();
         txtCosto.setEditable(false);
-        panelCampos.add(txtCosto);
-        add(panelDatos, BorderLayout.CENTER);
+        txtCosto.setColumns(10);
+        panelCampos.add(txtCosto, gbcCostoField);
+
+        getContentPane().add(panelDatos, BorderLayout.CENTER);
 
         comboEventos.addActionListener(e -> cargarEdiciones());
         comboEdiciones.addActionListener(e -> cargarTipos());

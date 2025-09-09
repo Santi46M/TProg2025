@@ -33,8 +33,6 @@ public class AltaEventoFrame extends JInternalFrame {
     
     public AltaEventoFrame(IControladorUsuario iCU, IControladorEvento iCE) {//, ConsultaEventoFrame[] consultaEventoFrameRef) {
         super("Alta de Evento", true, true, true, true);
-        //this.desktopPane = desktopPane;
-       // this.consultaEventoFrameRef = consultaEventoFrameRef;
         setBounds(new Rectangle(50, 50, 450, 300));
         setVisible(true);
         
