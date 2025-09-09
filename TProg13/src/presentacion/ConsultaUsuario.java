@@ -14,9 +14,10 @@ import logica.Clases.*;
 import logica.Datatypes.*;
 
 public class ConsultaUsuario extends JInternalFrame {
-	private IControladorUsuario controlUsr;
-	private Vector<String> usuarios;
-	private JComboBox<String> comboUsuarios;
+    private IControladorUsuario controlUsr;
+    private IControladorEvento controlEvt;
+    private Vector<String> usuarios;
+    private JComboBox<String> comboUsuarios;
     private JButton btnCerrar;
     private JPanel panelSeleccion;
     private JPanel panelDatos;
@@ -24,7 +25,8 @@ public class ConsultaUsuario extends JInternalFrame {
     private boolean habilitarAutoSeleccion = false;
 
     public ConsultaUsuario(IControladorUsuario icu, IControladorEvento iCE) {
-    	controlUsr = icu;
+        controlUsr = icu;
+        controlEvt  = iCE;
         cardLayout = new CardLayout();
         getContentPane().setLayout(cardLayout);
 
@@ -56,7 +58,7 @@ public class ConsultaUsuario extends JInternalFrame {
         
         // Agrego ese vector a un combobox para que seleccione que usuario quiere
         comboUsuarios = new JComboBox<>(usuarios);
-        comboUsuarios.setBounds(284, 49, 120, 25);
+        comboUsuarios.setBounds(284, 49, 180, 25);
         panelSeleccion.add(comboUsuarios);
         
         JButton btnCancelar = new JButton("Cancelar");
@@ -133,16 +135,19 @@ public class ConsultaUsuario extends JInternalFrame {
         Map<String, Usuario> prueba = controlUsr.listarUsuarios();
                 
         if ((controlUsr.listarAsistentes() != null) && controlUsr.listarAsistentes().containsKey(usuarioSeleccionado)) {
-        	DTDatosUsuario datos = null;
-			try {
-				datos = controlUsr.obtenerDatosUsuario(usuarioSeleccionado);
-			} catch (UsuarioNoExisteException e1) {
-				e1.printStackTrace();
-			}
+            DTDatosUsuario datos;
+            try {
+                datos = controlUsr.obtenerDatosUsuario(usuarioSeleccionado); // deja precargado el usuario
+            } catch (UsuarioNoExisteException e1) {
+                e1.printStackTrace();
+                return;
+            }
+            final DTDatosUsuario datosFinal = datos;
+            final String nickFinal = datos.getNickname();
 
-			txtNick.setText(datos.getNickname());
-            txtNombre.setText(datos.getNombre());
-            txtCorreo.setText(datos.getEmail());
+            txtNick.setText(datosFinal.getNickname());
+            txtNombre.setText(datosFinal.getNombre());
+            txtCorreo.setText(datosFinal.getEmail());
                     
             JPanel panelAsistente = new JPanel(new GridLayout(0, 2, 10, 10));
             panelDatosUsuario.add(panelAsistente);
@@ -150,48 +155,62 @@ public class ConsultaUsuario extends JInternalFrame {
             JLabel lblApellido = new JLabel("Apellido:");
             panelAsistente.add(lblApellido);
 
-            JTextArea txtApellido = new JTextArea(datos.getApellido());
+            JTextArea txtApellido = new JTextArea(datosFinal.getApellido());
             txtApellido.setEditable(false);
             panelAsistente.add(txtApellido);
 
             JLabel lblFechaNac = new JLabel("Fecha de nacimiento:");
             panelAsistente.add(lblFechaNac);
 
-            JTextArea txtFecha = new JTextArea(datos.getFechaNac().toString());
+            JTextArea txtFecha = new JTextArea(String.valueOf(datosFinal.getFechaNac()));
             txtFecha.setEditable(false);
             panelAsistente.add(txtFecha);
-                    
-            String[] columnNames = {"ID", "Edición", "Tipo", "Fecha Registro", "Costo", "Fecha Inicio"};
 
-            Object[][] dataRegistro = new Object[datos.getRegistros().size()][columnNames.length];
-            int i = 0;
-            for (DTRegistro r : datos.getRegistros()) {
-            	dataRegistro[i][0] = r.getId();
-            	dataRegistro[i][1] = r.getEdicion();
-            	dataRegistro[i][2] = r.getTipoRegistro();
-            	dataRegistro[i][3] = r.getFechaRegistro();
-                dataRegistro[i][4] = r.getCosto();
-                dataRegistro[i][5] = r.getFechaInicio();
-                i++;
+            DefaultComboBoxModel<String> modelReg = new DefaultComboBoxModel<>();
+            java.util.List<DTRegistro> listaRegs = new java.util.ArrayList<>(datosFinal.getRegistros());
+            for (DTRegistro r : listaRegs) {
+                modelReg.addElement(r.getId() + " – " + r.getEdicion() + " – " + r.getTipoRegistro());
             }
+            JComboBox<String> comboRegs = new JComboBox<>(modelReg);
+            comboRegs.setPreferredSize(new Dimension(380, 26));
+            panelDatosUsuario.add(comboRegs);
 
-            JTable table = new JTable(dataRegistro, columnNames);
-            JScrollPane scrollPane = new JScrollPane(table);
-            panelDatosUsuario.add(scrollPane);
+            comboRegs.addItemListener(ev -> {
+                if (ev.getStateChange() == java.awt.event.ItemEvent.SELECTED) {
+                    int idx = comboRegs.getSelectedIndex();
+                    if (idx >= 0) {
+                        DTRegistro r = listaRegs.get(idx);
+                        try {
+                            controlUsr.obtenerDatosUsuario(nickFinal);  // deja usuario consultado
+                            controlUsr.seleccionarRegistro(r.getId());   // deja registro seleccionado
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(this, "No se pudo seleccionar el registro: " + ex.getMessage());
+                            return;
+                        }
+                        ConsultaRegistroFrame frame = new ConsultaRegistroFrame(controlUsr, controlEvt);
+                        getDesktopPane().add(frame);
+                        frame.setVisible(true);
+                    }
+                }
+            });
+
             panelDatosUsuario.revalidate();
             panelDatosUsuario.repaint();
 
         } else if ((controlUsr.listarOrganizadores() != null) && controlUsr.listarOrganizadores().containsKey(usuarioSeleccionado)) {
-        	DTDatosUsuario datos = null;
-			try {
-				datos = controlUsr.obtenerDatosUsuario(usuarioSeleccionado);
-			} catch (UsuarioNoExisteException e1) {
-				e1.printStackTrace();
-			}
+            DTDatosUsuario datos;
+            try {
+                datos = controlUsr.obtenerDatosUsuario(usuarioSeleccionado); // deja precargado el usuario
+            } catch (UsuarioNoExisteException e1) {
+                e1.printStackTrace();
+                return;
+            }
+            final DTDatosUsuario datosFinal = datos;
+            final String nickFinal = datos.getNickname();
 
-			txtNick.setText(datos.getNickname());
-            txtNombre.setText(datos.getNombre());
-            txtCorreo.setText(datos.getEmail());
+            txtNick.setText(datosFinal.getNickname());
+            txtNombre.setText(datosFinal.getNombre());
+            txtCorreo.setText(datosFinal.getEmail());
 
             JPanel panelOrganizador = new JPanel(new GridLayout(0, 2, 10, 10)); 
             panelDatosUsuario.add(panelOrganizador);
@@ -199,35 +218,46 @@ public class ConsultaUsuario extends JInternalFrame {
             JLabel lblDesc = new JLabel("Descripción:");
             panelOrganizador.add(lblDesc);
 
-            JTextArea txtDesc = new JTextArea(datos.getDesc());
+            JTextArea txtDesc = new JTextArea(datosFinal.getDesc());
             txtDesc.setEditable(false);
             panelOrganizador.add(txtDesc);
 
             JLabel lblLink = new JLabel("Link:");
             panelOrganizador.add(lblLink);
                     
-            JTextArea txtLink = new JTextArea(datos.getLink());
+            JTextArea txtLink = new JTextArea(datosFinal.getLink());
             txtLink.setEditable(false);
             panelOrganizador.add(txtLink);
-                    
-            String[] columnNames = {"Nombre", "Sigla", "Fecha Inicio", "Fecha Fin", "Fecha Alta", "Ciudad", "País"};
 
-            Object[][] datosEdicion = new Object[datos.getEdiciones().size()][columnNames.length];
-            int i = 0;
-            for (DTEdicion ed : datos.getEdiciones()) {
-            	datosEdicion[i][0] = ed.getNombre();
-            	datosEdicion[i][1] = ed.getSigla();
-            	datosEdicion[i][2] = ed.getFechaInicio();
-            	datosEdicion[i][3] = ed.getFechaFin();
-            	datosEdicion[i][4] = ed.getFechaAlta();
-            	datosEdicion[i][5] = ed.getCiudad();
-            	datosEdicion[i][6] = ed.getPais();
-                i++;
+            DefaultComboBoxModel<String> modelEd = new DefaultComboBoxModel<>();
+            java.util.List<DTEdicion> listaEds = new java.util.ArrayList<>(datosFinal.getEdiciones());
+            for (DTEdicion ed : listaEds) {
+                modelEd.addElement(ed.getNombre() + " (" + ed.getSigla() + ")");
             }
+            JComboBox<String> comboEds = new JComboBox<>(modelEd);
+            comboEds.setPreferredSize(new Dimension(380, 26));
+            panelDatosUsuario.add(comboEds);
 
-            JTable table = new JTable(datosEdicion, columnNames);
-            JScrollPane scrollPane = new JScrollPane(table);
-            panelDatosUsuario.add(scrollPane);
+            // ni bien se selecciona, abrimos el frame de detalle (Consulta de Edición de Evento)
+            comboEds.addItemListener(ev -> {
+                if (ev.getStateChange() == java.awt.event.ItemEvent.SELECTED) {
+                    int idx = comboEds.getSelectedIndex();
+                    if (idx >= 0) {
+                        DTEdicion ed = listaEds.get(idx);
+                        try {
+                            controlUsr.obtenerDatosUsuario(nickFinal);  // deja usuario consultado
+                            controlEvt.seleccionarEdicion(ed.getSigla()); // deja edición seleccionada
+                        } catch (Exception ex) {
+                            JOptionPane.showMessageDialog(this, "No se pudo seleccionar la edición: " + ex.getMessage());
+                            return;
+                        }
+                        ConsultaEdicionEventoFrame frame = new ConsultaEdicionEventoFrame(controlUsr, controlEvt);
+                        getDesktopPane().add(frame);
+                        frame.setVisible(true);
+                    }
+                }
+            });
+
             panelDatosUsuario.revalidate();
             panelDatosUsuario.repaint();
 
@@ -239,13 +269,13 @@ public class ConsultaUsuario extends JInternalFrame {
     }
 
     public void cargarUsuarios() throws UsuarioNoExisteException {
-    	// Este método se usa para obtener los usuarios del sistema cada vez que ingresemos al caso de uso, sino solo lo obtiene al inicio y nunca más
-    	DefaultComboBoxModel<String> model;
-    	usuarios.clear();
-		usuarios.addAll(controlUsr.listarUsuarios().keySet());
-		model = new DefaultComboBoxModel<String>(usuarios);
+        // Este método se usa para obtener los usuarios del sistema cada vez que ingresemos al caso de uso, sino solo lo obtiene al inicio y nunca más
+        DefaultComboBoxModel<String> model;
+        usuarios.clear();
+        usuarios.addAll(controlUsr.listarUsuarios().keySet());
+        model = new DefaultComboBoxModel<String>(usuarios);
         habilitarAutoSeleccion = false;
-		comboUsuarios.setModel(model);
+        comboUsuarios.setModel(model);
         comboUsuarios.setSelectedIndex(-1);
         habilitarAutoSeleccion = true;
     }

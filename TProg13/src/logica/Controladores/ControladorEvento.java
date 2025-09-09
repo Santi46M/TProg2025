@@ -20,9 +20,11 @@ import logica.Clases.*;
 import logica.Datatypes.*;
 import logica.Enumerados.*;
 
-public class ControladorEvento implements IControladorEvento{
-	ManejadorEvento manejador = ManejadorEvento.getInstancia();
-	manejadorUsuario mUsuario = manejadorUsuario.getInstancia();
+public class ControladorEvento implements IControladorEvento {
+    ManejadorEvento manejador = ManejadorEvento.getInstancia();
+    manejadorUsuario mUsuario = manejadorUsuario.getInstancia();
+
+    private String edicionSeleccionadaSigla = null;
 
     public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias) throws EventoYaExisteException {
         if (categorias == null || categorias.getCategorias() == null || categorias.getCategorias().isEmpty()) {
@@ -53,7 +55,7 @@ public class ControladorEvento implements IControladorEvento{
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         manejadorEvento.agregarTipoRegistro(tipo);
     }
-    
+
     public void AltaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException {
         manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
         for (Patrocinio p : manejadorAux.listarPatrocinios()) {
@@ -72,9 +74,9 @@ public class ControladorEvento implements IControladorEvento{
         manejadorAux.agregarPatrocinio(pat);
         edicion.getPatrocinios().add(pat);
     }
-    
+
     public void AltaCategoria(String nombre) {
-    	manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
+        manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
         if (manejadorAux.existeCategoria(nombre)) {
             throw new RuntimeException("Ya existe la categoría: " + nombre);
         }
@@ -82,22 +84,23 @@ public class ControladorEvento implements IControladorEvento{
         manejadorAux.agregarCategoria(nombre, categoria);
     }
 
-    public void AltaEdicionEvento(Eventos evento, Usuario usuario, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais)throws EdicionYaExisteException, EventoYaExisteException, FechasCruzadasException {
+    public void AltaEdicionEvento(Eventos evento, Usuario usuario, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais) throws EdicionYaExisteException, EventoYaExisteException, FechasCruzadasException {
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
         if (fechaInicio.isAfter(fechaFin)) {
             throw new FechasCruzadasException("La fecha de inicio debe ser anterior a la fecha de fin.");
         }
-        if(manejador.existeEvento(evento.getNombre())){
-            if(!manejador.existeEdicion(nombre)) {
+        if (manejador.existeEvento(evento.getNombre())) {
+            if (!manejador.existeEdicion(nombre)) {
                 Ediciones nuevaEdicion = new Ediciones(evento, nombre, sigla, fechaInicio, fechaFin, fechaAlta, usuario, ciudad, pais);
                 evento.agregarEdicion(nuevaEdicion);
                 manejador.agregarEdicion(nuevaEdicion);
-                System.out.println(" da de alta la edicion" + nombre );
                 mUsuario.findOrganizador(usuario.getNickname()).agregarEdicion(nuevaEdicion);
+            } else {
+                throw new EdicionYaExisteException(nombre);
             }
-            else throw new EdicionYaExisteException(nombre);
+        } else {
+            throw new EventoYaExisteException(evento.getNombre());
         }
-        else throw new EventoYaExisteException(evento.getNombre());
     }
 
     public DTEdicion consultaEdicionEvento(String siglaEvento, String siglaEdicion) {
@@ -120,9 +123,7 @@ public class ControladorEvento implements IControladorEvento{
 
     public Eventos consultaEvento(String nombreEvento) {
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
-        Eventos evento = manejador.obtenerEvento(nombreEvento);
-        if (evento == null) return null;
-        return evento;
+        return manejador.obtenerEvento(nombreEvento);
     }
 
     public void altaRegistroEdicionEvento(String idRegistro, Usuario usuario, Eventos evento, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
@@ -157,34 +158,27 @@ public class ControladorEvento implements IControladorEvento{
             manejadorEvento.agregarRegistro(nuevoRegistro);
             Asistente asist = (Asistente) usuario;
             asist.addRegistro(idRegistro, nuevoRegistro);
-        	
-        	
-        	
-        	
-        }else {
-        	 System.out.println("es organizador");
+        } else {
+            System.out.println("es organizador");
         }
     }
-  
+
     public List<DTEvento> listarEventos() {
+        Map<String, Eventos> eventos = manejador.obtenerEventos();
+        List<DTEvento> lista = new ArrayList<>();
+        for (Eventos e : eventos.values()) {
+            lista.add(new DTEvento(
+                e.getNombre(),
+                e.getSigla(),
+                e.getDescripcion(),
+                e.getFecha(),
+                new ArrayList<>(e.getCategorias().keySet()),
+                new ArrayList<>(e.getEdiciones().keySet())
+            ));
+        }
+        return lista;
+    }
 
-	    Map<String, Eventos> eventos = manejador.obtenerEventos();
-
-	    List<DTEvento> lista = new ArrayList<>();
-	    for (Eventos e : eventos.values()) {
-	        lista.add(new DTEvento(
-	            e.getNombre(),
-	            e.getSigla(),
-	            e.getDescripcion(),
-	            e.getFecha(),
-	            new ArrayList<>(e.getCategorias().keySet()),
-	            new ArrayList<>(e.getEdiciones().keySet())
-	        ));
-	    }
-	    return lista;
-	}
-
-    
     public List<String> listarEdicionesEvento(String nombreEvento) {
         Eventos evento = manejador.obtenerEvento(nombreEvento);
         if (evento == null) return new ArrayList<>();
@@ -197,19 +191,52 @@ public class ControladorEvento implements IControladorEvento{
         return evento.obtenerEdicion(nombreEdicion);
     }
 
-    
     public DTRegistro consultaRegistro(Usuario u, String idRegistro) {
         if (!(u instanceof Asistente)) {
             throw new UsuarioNoEsAsistente(u.getNickname());
         }
-
         Asistente a = (Asistente) u;
         Registro r = a.getRegistros().get(idRegistro);
-
         if (r == null) {
             throw new RegistroNoExiste(idRegistro);
         }
+        return new DTRegistro(
+            r.getId(),
+            u.getNombre(),
+            r.getEdicion().getNombre(),
+            r.getTipoRegistro().getNombre(),
+            r.getFechaRegistro(),
+            r.getCosto(),
+            r.getFechaInicio()
+        );
+    }
 
-        return new DTRegistro(r.getId(), u.getNombre(), r.getEdicion().getNombre(), r.getTipoRegistro().getNombre(), r.getFechaRegistro(), r.getCosto(), r.getFechaInicio());
+    // --- selección de edición para consultas ---
+    public void seleccionarEdicion(String sigla) {
+        Ediciones ed = manejador.obtenerEdicion(sigla);
+        if (ed == null) {
+            throw new RuntimeException("No existe la edición con sigla: " + sigla);
+        }
+        this.edicionSeleccionadaSigla = sigla;
+    }
+
+    public String getEdicionSeleccionadaSigla() {
+        return edicionSeleccionadaSigla;
+    }
+
+    public DTEdicion obtenerEdicionSeleccionada() {
+        if (edicionSeleccionadaSigla == null) return null;
+        Ediciones ed = manejador.obtenerEdicion(edicionSeleccionadaSigla);
+        if (ed == null) return null;
+        return new DTEdicion(
+            ed.getNombre(),
+            ed.getSigla(),
+            ed.getFechaInicio(),
+            ed.getFechaFin(),
+            ed.getFechaAlta(),
+            ed.getOrganizador() != null ? ed.getOrganizador().getNickname() : null,
+            ed.getCiudad(),
+            ed.getPais()
+        );
     }
 }

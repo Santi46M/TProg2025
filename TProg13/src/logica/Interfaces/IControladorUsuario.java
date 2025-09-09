@@ -42,4 +42,11 @@ public interface IControladorUsuario {
 
     // Categorías
     public void AltaCategoriaSinGUI(String nombre) throws CategoriaYaExisteException;
+    
+
+    public void seleccionarRegistro(String id);
+
+    public String getRegistroSeleccionadoId();
+    public DTRegistro obtenerRegistroSeleccionado();
+    public String getUsuarioSeleccionadoNickname();
 }

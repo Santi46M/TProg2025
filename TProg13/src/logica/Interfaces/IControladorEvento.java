@@ -25,4 +25,9 @@ public interface IControladorEvento {
     public List<DTEvento> listarEventos();
     public List<String> listarEdicionesEvento(String nombreEvento);
     public Ediciones obtenerEdicion(String nombreEvento, String nombreEdicion);
+
+    public void seleccionarEdicion(String sigla);
+
+    public String getEdicionSeleccionadaSigla();
+    public DTEdicion obtenerEdicionSeleccionada();
 }
