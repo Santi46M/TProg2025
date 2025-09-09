@@ -77,16 +77,16 @@ public class AltaInstitucionFrame extends JInternalFrame {
             }
             // Alta real de la institución
             try {
-                logica.Clases.Institucion institucion = new logica.Clases.Institucion(nombre, descripcion, sitioWeb);
-                logica.Manejadores.manejadorUsuario.getInstancia().addInstitucion(institucion);
+                ICU.AltaInstitucion(nombre, descripcion, sitioWeb);
+            } catch (excepciones.InstitucionYaExisteException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+                return;
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error al crear la institución: " + ex.getMessage());
                 return;
             }
             nombresInstituciones.add(nombre.toLowerCase());
-            JOptionPane.showMessageDialog(this, "Institución creada con éxito:\nNombre: " + nombre +
-                    "\nDescripción: " + descripcion +
-                    (sitioWeb.isEmpty() ? "" : "\nSitio web: " + sitioWeb));
+            JOptionPane.showMessageDialog(this, "Institución creada con éxito.");
             this.dispose();
         });
 

@@ -1,5 +1,7 @@
 package logica;
 
+import excepciones.CostoTipoRegistroInvalidoException;
+import excepciones.CupoTipoRegistroInvalidoException;
 import excepciones.EventoYaExisteException;
 import excepciones.InstitucionYaExisteException;
 import excepciones.TipoRegistroYaExisteException;
@@ -288,8 +290,8 @@ public class CargaDatosPrueba {
         System.out.println("Ediciones de evento de ejemplo dadas de alta.");
     }
     
-    public static void cargarTipoRegistroEjemplo() throws TipoRegistroYaExisteException {
-        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
+    public static void cargarTipoRegistroEjemplo() throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
+        logica.ControladorEvento controlador = new logica.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         //TR01 - General para MONROCK25
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MONROCK25"), "General", "Acceso general a Montevideo Rock (2 días)", 1500, 2000);
