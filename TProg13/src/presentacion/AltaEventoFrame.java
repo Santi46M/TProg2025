@@ -8,7 +8,7 @@ import java.util.Date;
 import excepciones.EventoYaExisteException;
 import logica.Controladores.ControladorEvento;
 import logica.Interfaces.*;
-import logica.Datatypes.*;
+import logica.Datatypes.DTCategorias;
 import com.toedter.calendar.JDateChooser;
 
 public class AltaEventoFrame extends JInternalFrame {
@@ -32,8 +32,6 @@ public class AltaEventoFrame extends JInternalFrame {
     
     public AltaEventoFrame(IControladorUsuario iCU, IControladorEvento iCE) {//, ConsultaEventoFrame[] consultaEventoFrameRef) {
         super("Alta de Evento", true, true, true, true);
-        //this.desktopPane = desktopPane;
-       // this.consultaEventoFrameRef = consultaEventoFrameRef;
         setBounds(new Rectangle(50, 50, 450, 300));
         setVisible(true);
         

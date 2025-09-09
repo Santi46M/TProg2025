@@ -2,24 +2,23 @@ package presentacion;
 
 import javax.swing.*;
 import java.awt.*;
-import logica.Interfaces.*;
-import logica.Clases.*;
-import logica.Datatypes.*;
+import java.util.List;
 
+import logica.Clases.Ediciones;
+import logica.Clases.Patrocinio;
+import logica.Clases.TipoRegistro;
+import logica.Datatypes.DTEvento;
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
 
 public class ConsultaEdicionEventoFrame extends JInternalFrame {
+
+    private final IControladorUsuario iCU;
+    private final IControladorEvento  ICE;
+
     private JComboBox<String> comboEventos;
     private JComboBox<String> comboEdiciones;
-    private DefaultListModel<String> listModel;
-    private JTextArea txtDatos;
-    private String[][] datosEventos;
-    private String[][] categoriasEventos;
-    private String[][] edicionesEventos;
-    private JList<String> listTiposRegistro;
-    private JList<String> listPatrocinios;
-    private JTextArea txtDetalle;
-    private DefaultListModel<String> modelTiposRegistro;
-    private DefaultListModel<String> modelPatrocinios;
+
     private JTextField txtNombreEdicion;
     private JTextField txtSigla;
     private JTextField txtFechaInicio;
@@ -28,199 +27,179 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
     private JTextField txtCiudad;
     private JTextField txtPais;
     private JTextField txtOrganizador;
+
     private JComboBox<String> comboTiposRegistro;
     private JComboBox<String> comboPatrocinios;
 
+    private String[][] edicionesEventos;   // por índice de evento
+    private boolean cambiando = false;
+
     public ConsultaEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento ICE) {
         super("Consulta Edición de Evento", true, true, true, true);
-        setBounds(100, 100, 800, 500);
+        this.iCU = iCU;
+        this.ICE = ICE;
+
+        setBounds(100, 100, 800, 520);
         setLayout(new BorderLayout());
 
+        // Selección
         JPanel panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        JLabel lblEvento = new JLabel("Evento:");
+        panelSeleccion.add(new JLabel("Evento:"));
         comboEventos = new JComboBox<>();
-        panelSeleccion.add(lblEvento);
         panelSeleccion.add(comboEventos);
-        JLabel lblEdicion = new JLabel("Edición:");
+        panelSeleccion.add(new JLabel("Edición:"));
         comboEdiciones = new JComboBox<>();
-        panelSeleccion.add(lblEdicion);
         panelSeleccion.add(comboEdiciones);
         add(panelSeleccion, BorderLayout.NORTH);
 
-        JPanel panelCentral = new JPanel(new GridLayout(1, 2));
-        JPanel panelDatos = new JPanel();
-        panelDatos.setLayout(new BoxLayout(panelDatos, BoxLayout.Y_AXIS));
-        txtNombreEdicion = new JTextField();
-        txtNombreEdicion.setEditable(false);
-        txtSigla = new JTextField();
-        txtSigla.setEditable(false);
-        txtFechaInicio = new JTextField();
-        txtFechaInicio.setEditable(false);
-        txtFechaFin = new JTextField();
-        txtFechaFin.setEditable(false);
-        txtFechaAlta = new JTextField();
-        txtFechaAlta.setEditable(false);
-        txtCiudad = new JTextField();
-        txtCiudad.setEditable(false);
-        txtPais = new JTextField();
-        txtPais.setEditable(false);
-        txtOrganizador = new JTextField();
-        txtOrganizador.setEditable(false);
-        panelDatos.add(new JLabel("Nombre Edición:"));
-        panelDatos.add(txtNombreEdicion);
-        panelDatos.add(new JLabel("Sigla:"));
-        panelDatos.add(txtSigla);
-        panelDatos.add(new JLabel("Fecha Inicio:"));
-        panelDatos.add(txtFechaInicio);
-        panelDatos.add(new JLabel("Fecha Fin:"));
-        panelDatos.add(txtFechaFin);
-        panelDatos.add(new JLabel("Fecha Alta:"));
-        panelDatos.add(txtFechaAlta);
-        panelDatos.add(new JLabel("Ciudad:"));
-        panelDatos.add(txtCiudad);
-        panelDatos.add(new JLabel("País:"));
-        panelDatos.add(txtPais);
-        panelDatos.add(new JLabel("Organizador:"));
-        panelDatos.add(txtOrganizador);
-        // ComboBoxes debajo de los datos y con tamaño reducido
-        panelDatos.add(Box.createVerticalStrut(10));
-        panelDatos.add(new JLabel("Tipos de Registro:"));
-        comboTiposRegistro = new JComboBox<>();
-        comboTiposRegistro.setMaximumSize(new Dimension(200, 25));
-        panelDatos.add(comboTiposRegistro);
-        panelDatos.add(new JLabel("Patrocinios:"));
-        comboPatrocinios = new JComboBox<>();
-        comboPatrocinios.setMaximumSize(new Dimension(200, 25));
-        panelDatos.add(comboPatrocinios);
-        panelCentral.add(panelDatos);
-        // Elimina el panelCombos extra
-        add(panelCentral, BorderLayout.CENTER);
+        // Datos (alineados en 2 columnas)
+        JPanel panelDatos = new JPanel(new GridLayout(0, 2, 8, 6));
+        add(panelDatos, BorderLayout.CENTER);
 
-        comboEventos.addActionListener(e -> cargarEdicionesEvento());
-        comboEdiciones.addActionListener(e -> mostrarDatosEdicion());
+        panelDatos.add(labelR("Nombre Edición:"));  txtNombreEdicion = roField(panelDatos);
+        panelDatos.add(labelR("Sigla:"));           txtSigla         = roField(panelDatos);
+        panelDatos.add(labelR("Fecha Inicio:"));    txtFechaInicio   = roField(panelDatos);
+        panelDatos.add(labelR("Fecha Fin:"));       txtFechaFin      = roField(panelDatos);
+        panelDatos.add(labelR("Fecha Alta:"));      txtFechaAlta     = roField(panelDatos);
+        panelDatos.add(labelR("Ciudad:"));          txtCiudad        = roField(panelDatos);
+        panelDatos.add(labelR("País:"));            txtPais          = roField(panelDatos);
+        panelDatos.add(labelR("Organizador:"));     txtOrganizador   = roField(panelDatos);
+
+        panelDatos.add(labelR("Tipos de Registro:"));
+        comboTiposRegistro = new JComboBox<>();
+        panelDatos.add(wrap(comboTiposRegistro));
+
+        panelDatos.add(labelR("Patrocinios:"));
+        comboPatrocinios = new JComboBox<>();
+        panelDatos.add(wrap(comboPatrocinios));
+
+        // Listeners
+        comboEventos.addActionListener(e -> { if (!cambiando) cargarEdicionesEvento(); });
+        comboEdiciones.addActionListener(e -> { if (!cambiando) mostrarDatosEdicion(); });
+
         comboTiposRegistro.addActionListener(e -> {
-            if (comboTiposRegistro.getSelectedIndex() != -1 && comboTiposRegistro.isPopupVisible()) {
-                abrirConsultaTipoRegistro();
-            }
+            if (!comboTiposRegistro.isPopupVisible()) return;
+            int eIdx = comboEventos.getSelectedIndex();
+            int dIdx = comboEdiciones.getSelectedIndex();
+            int tIdx = comboTiposRegistro.getSelectedIndex();
+            if (eIdx < 0 || dIdx < 0 || tIdx < 0) return;
+            String nombreEvento  = comboEventos.getItemAt(eIdx);
+            String nombreEdicion = comboEdiciones.getItemAt(dIdx);
+            String nombreTipo    = comboTiposRegistro.getItemAt(tIdx);
+            ConsultaTipoRegistroFrame f = new ConsultaTipoRegistroFrame(iCU, ICE, nombreEvento, nombreEdicion, nombreTipo);
+            abrirEnDesktop(f);
         });
+
         comboPatrocinios.addActionListener(e -> {
-            if (comboPatrocinios.getSelectedIndex() != -1 && comboPatrocinios.isPopupVisible()) {
-                abrirConsultaPatrocinio();
-            }
+            if (!comboPatrocinios.isPopupVisible()) return;
+            int eIdx = comboEventos.getSelectedIndex();
+            int dIdx = comboEdiciones.getSelectedIndex();
+            int pIdx = comboPatrocinios.getSelectedIndex();
+            if (eIdx < 0 || dIdx < 0 || pIdx < 0) return;
+            String nombreEvento  = comboEventos.getItemAt(eIdx);
+            String nombreEdicion = comboEdiciones.getItemAt(dIdx);
+            String codigoPat     = comboPatrocinios.getItemAt(pIdx);
+            ConsultaPatrocinioFrame f = new ConsultaPatrocinioFrame(iCU, ICE, nombreEvento, nombreEdicion, codigoPat);
+            abrirEnDesktop(f);
         });
+
+        cargarEventos();
     }
 
-    public ConsultaEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento ICE, String nombreEvento, String nombreEdicion) {
+    // constructor con preselección (evento+edición por nombre)
+    public ConsultaEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento ICE,
+                                      String nombreEvento, String nombreEdicion) {
         this(iCU, ICE);
-        cargarEventos();
-        if (nombreEvento != null && nombreEdicion != null) {
-            for (int i = 0; i < comboEventos.getItemCount(); i++) {
-                if (comboEventos.getItemAt(i).equals(nombreEvento)) {
-                    comboEventos.setSelectedIndex(i);
-                    break;
-                }
-            }
-            cargarEdicionesEvento();
-            for (int j = 0; j < comboEdiciones.getItemCount(); j++) {
-                if (comboEdiciones.getItemAt(j).equals(nombreEdicion)) {
-                    comboEdiciones.setSelectedIndex(j);
-                    break;
-                }
-            }
-            mostrarDatosEdicion();
-        }
+        if (nombreEvento != null) seleccionarItemPorTexto(comboEventos, nombreEvento);
+        cargarEdicionesEvento();
+        if (nombreEdicion != null) seleccionarItemPorTexto(comboEdiciones, nombreEdicion);
+        mostrarDatosEdicion();
+    }
+
+    // constructor con preselección por SIGLA
+    public ConsultaEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento ICE, String siglaEdicion) {
+        this(iCU, ICE);
+        if (siglaEdicion == null || siglaEdicion.isEmpty()) return;
+
+        Ediciones ed = ICE.obtenerEdicionPorSigla(siglaEdicion);
+        if (ed == null) return;
+        String nombreEdicion = ed.getNombre();
+
+        String nombreEvento = ICE.encontrarEventoPorSigla(siglaEdicion);
+        if (nombreEvento == null || nombreEvento.isEmpty()) return;
+
+        seleccionarItemPorTexto(comboEventos, nombreEvento);
+        cargarEdicionesEvento();
+        seleccionarItemPorTexto(comboEdiciones, nombreEdicion);
+        mostrarDatosEdicion();
     }
 
     public void cargarEventos() {
-        try {
-            logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
-            java.util.List<logica.Datatypes.DTEvento> eventos = controlador.listarEventos();
-            String[] eventosArr = new String[eventos.size()];
-            datosEventos = new String[eventos.size()][1];
-            categoriasEventos = new String[eventos.size()][];
-            edicionesEventos = new String[eventos.size()][];
-            for (int i = 0; i < eventos.size(); i++) {
-                logica.Datatypes.DTEvento ev = eventos.get(i);
-                eventosArr[i] = ev.getNombre();
-                datosEventos[i][0] = ev.getDescripcion();
-                categoriasEventos[i] = ev.getCategorias().toArray(new String[0]);
-                edicionesEventos[i] = ev.getEdiciones().toArray(new String[0]);
-            }
-            comboEventos.setModel(new DefaultComboBoxModel<>(eventosArr));
-            comboEventos.revalidate();
-            comboEventos.repaint();
-            if (eventosArr.length > 0) {
-                comboEventos.setSelectedIndex(0);
-                mostrarDatosEvento();
-            } else {
-                txtNombreEdicion.setText("");
-                txtSigla.setText("");
-                txtFechaInicio.setText("");
-                txtFechaFin.setText("");
-                txtFechaAlta.setText("");
-                txtCiudad.setText("");
-                txtPais.setText("");
-                txtOrganizador.setText("");
-                comboEdiciones.setModel(new DefaultComboBoxModel<>(new String[]{}));
-                comboTiposRegistro.removeAllItems();
-                comboPatrocinios.removeAllItems();
-            }
-        } catch (Exception ex) {
-            comboEventos.setModel(new DefaultComboBoxModel<>(new String[]{"No hay eventos"}));
-            comboEventos.revalidate();
-            comboEventos.repaint();
-            txtNombreEdicion.setText("");
-            txtSigla.setText("");
-            txtFechaInicio.setText("");
-            txtFechaFin.setText("");
-            txtFechaAlta.setText("");
-            txtCiudad.setText("");
-            txtPais.setText("");
-            txtOrganizador.setText("");
-            comboEdiciones.setModel(new DefaultComboBoxModel<>(new String[]{}));
-            comboTiposRegistro.removeAllItems();
-            comboPatrocinios.removeAllItems();
+        List<DTEvento> eventos = ICE.listarEventos();
+        String[] arr = new String[eventos.size()];
+        edicionesEventos = new String[eventos.size()][];
+
+        for (int i = 0; i < eventos.size(); i++) {
+            DTEvento ev = eventos.get(i);
+            arr[i] = ev.getNombre();
+            edicionesEventos[i] = ev.getEdiciones().toArray(new String[0]);
         }
+
+        cambiando = true;
+        comboEventos.setModel(new DefaultComboBoxModel<>(arr));
+        if (arr.length > 0) comboEventos.setSelectedIndex(0);
+        cambiando = false;
+
+        cargarEdicionesEvento();
     }
 
     private void cargarEdicionesEvento() {
         int idx = comboEventos.getSelectedIndex();
+        cambiando = true;
         comboEdiciones.removeAllItems();
-        if (idx < 0 || edicionesEventos == null || idx >= edicionesEventos.length) {
-            return;
+        if (idx >= 0 && edicionesEventos != null && idx < edicionesEventos.length) {
+            String[] eds = edicionesEventos[idx];
+            for (String ed : eds) comboEdiciones.addItem(ed);
+            if (eds.length > 0) comboEdiciones.setSelectedIndex(0);
         }
-        String[] ediciones = edicionesEventos[idx];
-        for (String ed : ediciones) {
-            comboEdiciones.addItem(ed);
-        }
-        if (ediciones.length > 0) {
-            comboEdiciones.setSelectedIndex(0);
-            mostrarDatosEdicion();
-        }
+        cambiando = false;
+        mostrarDatosEdicion();
     }
 
-    private void mostrarDatosEvento() {
-        int idx = comboEventos.getSelectedIndex();
-        if (idx < 0 || datosEventos == null || idx >= datosEventos.length) {
-            txtNombreEdicion.setText("");
-            txtSigla.setText("");
-            txtFechaInicio.setText("");
-            txtFechaFin.setText("");
-            txtFechaAlta.setText("");
-            txtCiudad.setText("");
-            txtPais.setText("");
-            txtOrganizador.setText("");
-            comboEdiciones.setModel(new DefaultComboBoxModel<>(new String[]{}));
-            comboTiposRegistro.removeAllItems();
-            comboPatrocinios.removeAllItems();
-            return;
-        }
-        comboEdiciones.setModel(new DefaultComboBoxModel<>(edicionesEventos[idx]));
-        comboEdiciones.revalidate();
-        comboEdiciones.repaint();
+    private void mostrarDatosEdicion() {
+        int idxEvento = comboEventos.getSelectedIndex();
+        int idxEd     = comboEdiciones.getSelectedIndex();
+
+        limpiarCampos();
+
+        if (idxEvento < 0 || idxEd < 0 || edicionesEventos == null
+                || idxEvento >= edicionesEventos.length) return;
+
+        String nombreEvento  = comboEventos.getItemAt(idxEvento);
+        String nombreEdicion = comboEdiciones.getItemAt(idxEd);
+
+        Ediciones ed = ICE.obtenerEdicion(nombreEvento, nombreEdicion);
+        if (ed == null) return;
+
+        txtNombreEdicion.setText(ed.getNombre());
+        txtSigla.setText(ed.getSigla());
+        txtFechaInicio.setText(String.valueOf(ed.getFechaInicio()));
+        txtFechaFin.setText(String.valueOf(ed.getFechaFin()));
+        txtFechaAlta.setText(String.valueOf(ed.getFechaAlta()));
+        txtCiudad.setText(ed.getCiudad());
+        txtPais.setText(ed.getPais());
+        txtOrganizador.setText(ed.getOrganizador() != null ? ed.getOrganizador().getNickname() : "");
+
         comboTiposRegistro.removeAllItems();
+        for (TipoRegistro tr : ed.getTiposRegistro()) comboTiposRegistro.addItem(tr.getNombre());
+
         comboPatrocinios.removeAllItems();
-        // Limpiar campos edición
+        for (Patrocinio p : ed.getPatrocinios()) comboPatrocinios.addItem(p.getCodigoPatrocinio());
+    }
+
+    // helpers
+
+    private void limpiarCampos() {
         txtNombreEdicion.setText("");
         txtSigla.setText("");
         txtFechaInicio.setText("");
@@ -229,133 +208,45 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         txtCiudad.setText("");
         txtPais.setText("");
         txtOrganizador.setText("");
-    }
-
-    private void mostrarDatosEdicion() {
-        int idxEvento = comboEventos.getSelectedIndex();
-        int idxEd = comboEdiciones.getSelectedIndex();
         comboTiposRegistro.removeAllItems();
         comboPatrocinios.removeAllItems();
-        if (idxEvento < 0 || idxEd < 0 || edicionesEventos == null || idxEvento >= edicionesEventos.length) {
-            txtNombreEdicion.setText("");
-            txtSigla.setText("");
-            txtFechaInicio.setText("");
-            txtFechaFin.setText("");
-            txtFechaAlta.setText("");
-            txtCiudad.setText("");
-            txtPais.setText("");
-            txtOrganizador.setText("");
-            return;
-        }
-        String[] ediciones = edicionesEventos[idxEvento];
-        if (idxEd >= ediciones.length) return;
-        String nombreEdicion = ediciones[idxEd];
-        String nombreEvento = comboEventos.getItemAt(idxEvento);
-        logica.Clases.Ediciones edi = new logica.Controladores.ControladorEvento().obtenerEdicion(nombreEvento, nombreEdicion);
-        if (edi == null) {
-            txtNombreEdicion.setText("No se encontró la edición.");
-            return;
-        }
-        txtNombreEdicion.setText(edi.getNombre());
-        txtSigla.setText(edi.getSigla());
-        txtFechaInicio.setText(String.valueOf(edi.getFechaInicio()));
-        txtFechaFin.setText(String.valueOf(edi.getFechaFin()));
-        txtFechaAlta.setText(String.valueOf(edi.getFechaAlta()));
-        txtCiudad.setText(edi.getCiudad());
-        txtPais.setText(edi.getPais());
-        txtOrganizador.setText(edi.getOrganizador() != null ? edi.getOrganizador().getNickname() : "");
-        for (logica.Clases.TipoRegistro tr : edi.getTiposRegistro()) {
-            comboTiposRegistro.addItem(tr.getNombre());
-        }
-        for (logica.Clases.Patrocinio p : edi.getPatrocinios()) {
-            comboPatrocinios.addItem(p.getCodigoPatrocinio());
-        }
     }
 
-    private void abrirConsultaTipoRegistro() {
-        int idxEvento = comboEventos.getSelectedIndex();
-        int idxEd = comboEdiciones.getSelectedIndex();
-        int idxTipo = comboTiposRegistro.getSelectedIndex();
-        if (idxEvento < 0 || idxEd < 0 || idxTipo < 0) return;
-        String nombreEvento = comboEventos.getItemAt(idxEvento);
-        String nombreEdicion = comboEdiciones.getItemAt(idxEd);
-        String nombreTipo = comboTiposRegistro.getItemAt(idxTipo);
-        ConsultaTipoRegistroFrame frameTipo = new ConsultaTipoRegistroFrame(null, null, nombreEvento, nombreEdicion, nombreTipo);
-        JDesktopPane desktop = getDesktopPane();
-        if (desktop != null) {
-            desktop.add(frameTipo);
-            frameTipo.setVisible(true);
-            frameTipo.toFront();
-        } else {
-            frameTipo.setVisible(true);
-        }
-    }
-
-    private void abrirConsultaPatrocinio() {
-        int idxEvento = comboEventos.getSelectedIndex();
-        int idxEd = comboEdiciones.getSelectedIndex();
-        int idxPat = comboPatrocinios.getSelectedIndex();
-        if (idxEvento < 0 || idxEd < 0 || idxPat < 0) return;
-        String nombreEvento = comboEventos.getItemAt(idxEvento);
-        String nombreEdicion = comboEdiciones.getItemAt(idxEd);
-        String codigoPat = comboPatrocinios.getItemAt(idxPat);
-        ConsultaPatrocinioFrame framePat = new ConsultaPatrocinioFrame(null, null, nombreEvento, nombreEdicion, codigoPat);
-        JDesktopPane desktop = getDesktopPane();
-        if (desktop != null) {
-            desktop.add(framePat);
-            framePat.setVisible(true);
-            framePat.toFront();
-        } else {
-            framePat.setVisible(true);
-        }
-    }
-    
- // --- constructor con SIGLA de edición (preselección directa) ---
-    public ConsultaEdicionEventoFrame(IControladorUsuario iCU,
-                                      IControladorEvento ICE,
-                                      String siglaEdicion) {
-        // usa el constructor base para armar la UI
-        this(iCU, ICE);
-
-        // cargar la lista de eventos/ediciones
-        cargarEventos();
-
-        if (siglaEdicion == null || siglaEdicion.isEmpty()) return;
-
-        // 1) Recupero la edición por sigla (para saber su nombre legible)
-        logica.Clases.Ediciones ed = ICE.obtenerEdicionPorSigla(siglaEdicion);
-        if (ed == null) return;
-        String nombreEdicion = ed.getNombre();
-
-        // 2) Averiguo a qué evento pertenece esa edición
-        // (si ya implementaste ambos, podés usar cualquiera de los dos)
-        String nombreEvento = ICE.encontrarEventoPorSigla(siglaEdicion);
-        if (nombreEvento == null || nombreEvento.isEmpty()) {
-            // alternativa por NOMBRE si preferís:
-            // nombreEvento = ICE.encontrarEventoPorEdicion(nombreEdicion);
-            return;
-        }
-
-        // 3) Selecciono el evento en el combo
-        seleccionarItemPorTexto(comboEventos, nombreEvento);
-
-        // 4) Cargo ediciones de ese evento y selecciono la edición
-        cargarEdicionesEvento();
-        seleccionarItemPorTexto(comboEdiciones, nombreEdicion);
-
-        // 5) Muestro datos de la edición
-        mostrarDatosEdicion();
-    }
-
-    // helper
     private void seleccionarItemPorTexto(JComboBox<String> combo, String texto) {
         if (texto == null) return;
         for (int i = 0; i < combo.getItemCount(); i++) {
-            String it = combo.getItemAt(i);
-            if (texto.equals(it)) {
+            if (texto.equals(combo.getItemAt(i))) {
+                cambiando = true;
                 combo.setSelectedIndex(i);
+                cambiando = false;
                 return;
             }
         }
+    }
+
+    private JLabel labelR(String s) {
+        JLabel l = new JLabel(s);
+        l.setHorizontalAlignment(SwingConstants.LEFT);
+        return l;
+    }
+
+    private JTextField roField(JPanel parent) {
+        JTextField t = new JTextField();
+        t.setEditable(false);
+        parent.add(t);
+        return t;
+    }
+
+    private Component wrap(JComponent c) {
+        JPanel p = new JPanel(new BorderLayout());
+        p.add(c, BorderLayout.WEST);
+        return p;
+    }
+
+    private void abrirEnDesktop(JInternalFrame f) {
+        JDesktopPane desk = getDesktopPane();
+        if (desk != null) desk.add(f);
+        f.setVisible(true);
+        f.toFront();
     }
 }
