@@ -72,14 +72,19 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         comboTiposRegistro = new JComboBox<>();
         comboPatrocinios = new JComboBox<>();
 
+        // Titulo de registros
+        JLabel lblRegistros = new JLabel("Registros de la edición:");
+        panelDatos.add(lblRegistros);
+        panelDatos.add(new JLabel()); // Espacio vacío para mantener el grid
+
         panelGridRegistros = new JPanel();
         panelGridRegistros.setLayout(new GridLayout(0, 3, 8, 2)); // 3 columnas
         panelGridRegistros.add(new JLabel("Asistente", SwingConstants.CENTER));
         panelGridRegistros.add(new JLabel("Tipo de registro", SwingConstants.CENTER));
         panelGridRegistros.add(new JLabel("Costo", SwingConstants.CENTER));
         scrollGridRegistros = new JScrollPane(panelGridRegistros);
-        panelDatos.add(new JLabel("Registros de la edición:"));
         panelDatos.add(scrollGridRegistros);
+        panelDatos.add(new JLabel()); // Espacio vacío para mantener el grid
 
         comboEventos.addActionListener(e -> { if (!cambiando) cargarEdicionesEvento(); });
         comboEdiciones.addActionListener(e -> { if (!cambiando) mostrarDatosEdicion(); });
