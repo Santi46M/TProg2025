@@ -44,6 +44,9 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         this.iCU = iCU;
         this.ICE = ICE;
 
+        comboTiposRegistro = new JComboBox<>();
+        comboPatrocinios = new JComboBox<>();
+
         setBounds(100, 100, 800, 520);
         setLayout(new BorderLayout());
 
@@ -69,22 +72,21 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         panelDatos.add(labelR("País:"));            txtPais          = roField(panelDatos);
         panelDatos.add(labelR("Organizador:"));     txtOrganizador   = roField(panelDatos);
 
-        comboTiposRegistro = new JComboBox<>();
-        comboPatrocinios = new JComboBox<>();
+        panelDatos.add(labelR("Tipos de Registro:")); panelDatos.add(comboTiposRegistro);
+        panelDatos.add(labelR("Patrocinios:")); panelDatos.add(comboPatrocinios);
 
-        // Titulo de registros
         JLabel lblRegistros = new JLabel("Registros de la edición:");
         panelDatos.add(lblRegistros);
-        panelDatos.add(new JLabel()); // Espacio vacío para mantener el grid
+        panelDatos.add(new JLabel());
 
         panelGridRegistros = new JPanel();
-        panelGridRegistros.setLayout(new GridLayout(0, 3, 8, 2)); // 3 columnas
+        panelGridRegistros.setLayout(new GridLayout(0, 3, 8, 2));
         panelGridRegistros.add(new JLabel("Asistente", SwingConstants.CENTER));
         panelGridRegistros.add(new JLabel("Tipo de registro", SwingConstants.CENTER));
         panelGridRegistros.add(new JLabel("Costo", SwingConstants.CENTER));
         scrollGridRegistros = new JScrollPane(panelGridRegistros);
         panelDatos.add(scrollGridRegistros);
-        panelDatos.add(new JLabel()); // Espacio vacío para mantener el grid
+        panelDatos.add(new JLabel());
 
         comboEventos.addActionListener(e -> { if (!cambiando) cargarEdicionesEvento(); });
         comboEdiciones.addActionListener(e -> { if (!cambiando) mostrarDatosEdicion(); });

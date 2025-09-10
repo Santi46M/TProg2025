@@ -17,7 +17,6 @@ public class ConsultaPatrocinioFrame extends JInternalFrame {
     private JTextField txtFecha;
     private JTextField txtCantidadRegistros;
     private JTextField txtCodigo;
-    // Datos auxiliares para cascada
     private String[] eventos;
     private String[][] edicionesPorEvento;
     private String[][] patrociniosPorEdicion;
@@ -84,7 +83,6 @@ public class ConsultaPatrocinioFrame extends JInternalFrame {
     public ConsultaPatrocinioFrame(IControladorUsuario iCU, IControladorEvento iCE, String nombreEvento, String nombreEdicion, String codigoPatrocinio) {
         this(iCU, iCE);
         cargarDatos();
-        // Selecciona el evento, edición y patrocinio en los combos
         if (nombreEvento != null && nombreEdicion != null && codigoPatrocinio != null) {
             for (int i = 0; i < comboEventos.getItemCount(); i++) {
                 if (comboEventos.getItemAt(i).equals(nombreEvento)) {
@@ -111,7 +109,6 @@ public class ConsultaPatrocinioFrame extends JInternalFrame {
     }
 
     public void cargarDatos() {
-        // Cargar eventos y datos auxiliares desde la lógica
         logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         java.util.List<logica.Datatypes.DTEvento> listaEventos = controlador.listarEventos();
         eventos = new String[listaEventos.size()];
@@ -123,7 +120,6 @@ public class ConsultaPatrocinioFrame extends JInternalFrame {
             eventos[i] = ev.getNombre();
             java.util.List<String> eds = controlador.listarEdicionesEvento(ev.getNombre());
             edicionesPorEvento[i] = eds.toArray(new String[0]);
-            // Para cada edición, cargar patrocinios y datos
             for (String ed : eds) {
                 logica.Clases.Ediciones edi = controlador.obtenerEdicion(ev.getNombre(), ed);
                 java.util.List<String> pats = new java.util.ArrayList<>();
@@ -147,7 +143,6 @@ public class ConsultaPatrocinioFrame extends JInternalFrame {
         }
         patrociniosPorEdicion = patsList.toArray(new String[0][0]);
         datosPatrocinio = datosList.toArray(new String[0][0]);
-        // Cargar combos
         comboEventos.removeAllItems();
         for (String ev : eventos) comboEventos.addItem(ev);
         if (eventos.length > 0) {
