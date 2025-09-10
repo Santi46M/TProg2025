@@ -115,5 +115,18 @@ public class ManejadorEvento {
     public Map<String, Registro> obtenerRegistros() {
         return registros;
     }
+    
+    private static void doReset() {
+        if (instancia != null) {
+            // Limpia TODAS tus colecciones internas
+            instancia.eventos.clear();
+            // Si ediciones/categorías/tipos no existen en tu clase, borra estas líneas:
+            instancia.ediciones.clear();
+            instancia.tiposRegistro.clear();
+        }
+    }
+            public static void _test_reset() { doReset(); }
+            public static void reset()       { doReset(); }
+            public static void clear()       { doReset(); }
 
 }

@@ -40,7 +40,7 @@ class ControladorEventoListarVacioTest {
     @Test
     @DisplayName("Un evento sin ediciones lista vacío (o no nulo)")
     void listaVacia() {
-        Object cats = TestUtils.tolerantNew("logica.DTCategorias", java.util.List.of("LE-Cat"));
+        Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", java.util.List.of("LE-Cat"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"}, "SoloEvento", "d", LocalDate.now(), "SE", cats);
 
         @SuppressWarnings("unchecked")

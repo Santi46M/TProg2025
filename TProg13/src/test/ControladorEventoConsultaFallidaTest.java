@@ -25,7 +25,7 @@ class ControladorEventoConsultaFallidaTest {
         try {
             ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento","getIControladorEvento","getControladorEvento","getEvento"});
         } catch (AssertionError ignored) {
-            ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
+            ce = Class.forName("logica.Controladores.ControladorEvento").getDeclaredConstructor().newInstance();
         }
 
         // 1) consultaEvento inexistente

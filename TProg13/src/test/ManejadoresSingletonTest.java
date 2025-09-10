@@ -19,7 +19,7 @@ class ManejadoresSingletonTest {
     @DisplayName("ManejadorUsuario.getInstancia/getInstance → mismo objeto")
     void manejadorUsuarioSingleton() throws Exception {
         // Soporta logica.ManejadorUsuario y logica.manejadorUsuario
-        Class<?> clazz = TestUtils.loadAny("logica.ManejadorUsuario", "logica.manejadorUsuario");
+        Class<?> clazz = TestUtils.loadAny("logica.Manejadores.ManejadorUsuario", "logica.Manejadores.manejadorUsuario");
         Method getter = getGetter(clazz);
         Object a = getter.invoke(null);
         Object b = getter.invoke(null);
@@ -31,7 +31,7 @@ class ManejadoresSingletonTest {
     @DisplayName("ManejadorEvento.getInstancia/getInstance → mismo objeto")
     void manejadorEventoSingleton() throws Exception {
         // Soporta logica.ManejadorEvento y logica.manejadorEvento
-        Class<?> clazz = TestUtils.loadAny("logica.ManejadorEvento", "logica.manejadorEvento");
+        Class<?> clazz = TestUtils.loadAny("logica.Manejadores.ManejadorEvento", "logica.Manejadores.manejadorEvento");
         Method getter = getGetter(clazz);
         Object a = getter.invoke(null);
         Object b = getter.invoke(null);

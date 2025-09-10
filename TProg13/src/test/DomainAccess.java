@@ -11,7 +11,7 @@ final class DomainAccess {
 
     static Object getManejadorUsuario() {
         try {
-            Class<?> MU = TestUtils.loadAny("logica.ManejadorUsuario", "logica.manejadorUsuario");
+            Class<?> MU = TestUtils.loadAny("logica.Manejadores.ManejadorUsuario", "logica.Manejadores.manejadorUsuario");
             Object mu;
             try { mu = MU.getMethod("getInstancia").invoke(null); }
             catch (NoSuchMethodException e) { mu = MU.getMethod("getInstance").invoke(null); }
@@ -22,7 +22,7 @@ final class DomainAccess {
 
     static Object getManejadorEvento() {
         try {
-            Class<?> ME = TestUtils.loadAny("logica.ManejadorEvento", "logica.manejadorEvento");
+            Class<?> ME = TestUtils.loadAny("logica.Manejadores.ManejadorEvento", "logica.Manejadores.manejadorEvento");
             Object me;
             try { me = ME.getMethod("getInstancia").invoke(null); }
             catch (NoSuchMethodException e) { me = ME.getMethod("getInstance").invoke(null); }

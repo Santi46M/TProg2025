@@ -39,7 +39,7 @@ class EventosDuplicateToleranceTest {
     @Test
     @DisplayName("AltaEvento duplicado → lanza o es idempotente")
     void altaEventoDuplicado() {
-        Object cats = TestUtils.tolerantNew("logica.DTCategorias", java.util.List.of("DU-Cat"));
+        Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", java.util.List.of("DU-Cat"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"}, "DU-Ev", "d", LocalDate.now(), "DUEV", cats);
 
         try {

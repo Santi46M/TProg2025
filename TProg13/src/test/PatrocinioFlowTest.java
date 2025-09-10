@@ -59,7 +59,7 @@ class PatrocinioFlowTest {
     @DisplayName("AltaPatrocinio – crea o valida según implementación (tolerante)")
     void altaPatrocinio() throws Exception {
         // Evento + edición base
-        Object cats = TestUtils.tolerantNew("logica.DTCategorias", java.util.List.of("Pat-Cat"));
+        Object cats = TestUtils.tolerantNew("logica.Datatypes. DTCategorias", java.util.List.of("Pat-Cat"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"}, "TechDayP", "d", LocalDate.now(), "TDP", cats);
 
         LocalDate hoy = LocalDate.now();
@@ -88,7 +88,7 @@ class PatrocinioFlowTest {
         // Institución: preferimos la registrada; si no la podemos obtener, fabricamos un dummy
         Object inst = DomainAccess.obtenerInstitucion("Inst_P");
         if (inst == null) {
-            try { inst = TestUtils.tolerantNew("logica.Institucion", "Inst_P", "d", "w"); }
+            try { inst = TestUtils.tolerantNew("logica.Clases.Institucion", "Inst_P", "d", "w"); }
             catch (RuntimeException e) { inst = TestUtils.tolerantNew("logica.Institucion"); }
         }
 
@@ -96,7 +96,7 @@ class PatrocinioFlowTest {
         Object dtnivel = null;
         try { dtnivel = TestUtils.tolerantNew("logica.DTNivel", "ORO", 1, 100); }
         catch (RuntimeException e) {
-            try { dtnivel = TestUtils.tolerantNew("logica.DTNivel", "ORO"); } catch (RuntimeException ignored) {}
+            try { dtnivel = TestUtils.tolerantNew("logica.Datatypes.DTNivel", "ORO"); } catch (RuntimeException ignored) {}
         }
 
         // Llamada tolerante: tu implementación puede requerir inst registrada (lanza) o aceptar instancia suelta (no lanza)

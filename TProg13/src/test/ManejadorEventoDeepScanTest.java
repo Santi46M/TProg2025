@@ -33,7 +33,7 @@ class ManejadorEventoDeepScanTest {
                 LocalDate.of(1990,1,1),"Inst_DS", true);
         try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "DS-Cat"); } catch (Throwable ignored) {}
 
-        Object cats = TestUtils.tolerantNew("logica.DTCategorias", List.of("DS-Cat"));
+        Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("DS-Cat"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
                 "DS-Event","d", LocalDate.now(),"DSEV", cats);
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},

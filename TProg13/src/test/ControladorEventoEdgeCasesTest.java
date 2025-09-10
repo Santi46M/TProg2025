@@ -79,7 +79,7 @@ class ControladorEventoEdgeCasesTest {
         // TestUtils.tryInvoke(cu, new String[]{"AltaCategoriaSinGUI"}, "Tec");
 
         // 6) Evento base para los edge-cases
-        Object cats = TestUtils.tolerantNew("logica.DTCategorias", java.util.List.of("Tec"));
+        Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", java.util.List.of("Tec"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
                 "Conf", "Desc", java.time.LocalDate.now(), "CONF", cats);    
         }

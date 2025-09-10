@@ -24,7 +24,7 @@ class ControladorUsuarioListingsPlusTest {
         try {
             ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento","getIControladorEvento","getControladorEvento","getEvento"});
         } catch (AssertionError ignored) {
-            ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
+            ce = Class.forName("logica.Controladores.ControladorEvento").getDeclaredConstructor().newInstance();
         }
 
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_LPU", "d", "w");
@@ -69,7 +69,7 @@ class ControladorUsuarioListingsPlusTest {
                 "o1","O Uno","o1@x","d","l","Ap",
                 LocalDate.of(1990,1,1),"Inst_LPU", true);
         try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "LP-Cat"); } catch (Throwable ignored) {}
-        Object cats = TestUtils.tolerantNew("logica.DTCategorias", List.of("LP-Cat"));
+        Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("LP-Cat"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
                 "LP-Ev","d", LocalDate.now(),"LPEV", cats);
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},

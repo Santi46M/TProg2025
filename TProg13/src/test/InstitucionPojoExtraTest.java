@@ -37,9 +37,9 @@ class InstitucionPojoExtraTest {
 	    Object inst = DomainAccess.obtenerInstitucion("Inst_X");
 	    if (inst == null) {
 	        try {
-	            inst = TestUtils.tolerantNew("logica.Institucion", "Inst_X", "Desc X", "webX");
+	            inst = TestUtils.tolerantNew("logica.Clases.Institucion", "Inst_X", "Desc X", "webX");
 	        } catch (RuntimeException e) {
-	            inst = TestUtils.tolerantNew("logica.Institucion");
+	            inst = TestUtils.tolerantNew("logica.Clases.Institucion");
 	            // seteos por si existen setters
 	            try {
 	                Method m;

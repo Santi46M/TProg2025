@@ -97,5 +97,17 @@ public class manejadorUsuario {
 	public boolean existeInstitucion(String nombre) {
 		return instituciones.contains(nombre);
 	}
+	private static void doReset() {
+        if (instancia != null) {
+            instancia.usuarios.clear();
+            instancia.organizadores.clear();
+            instancia.asistentes.clear();
+            instancia.instituciones.clear();
+        }
+        instancia = null;
+    }
+    public static void _test_reset() { doReset(); }
+    public static void reset()       { doReset(); }
+    public static void clear()       { doReset(); }
 	
 }

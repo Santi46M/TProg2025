@@ -40,7 +40,7 @@ class ManejadorEventoStateMoreTest {
     @Test
     @DisplayName("getEventos/obtenerEvento/colecciones no vacías tras altas")
     void manejadorTieneCosas() throws Exception {
-        Object cats = TestUtils.tolerantNew("logica.DTCategorias", List.of("ME2-Cat"));
+        Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("ME2-Cat"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
                 "ME2-Ev","d", LocalDate.now(),"ME2", cats);
 

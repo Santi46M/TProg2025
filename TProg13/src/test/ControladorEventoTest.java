@@ -38,7 +38,7 @@ class ControladorEventoTest {
         } catch (AssertionError ignored) { /* no lo publica, instanciamos directo */ }
 
         if (ceMaybe == null) {
-            Class<?> ceClazz = Class.forName("logica.ControladorEvento");
+            Class<?> ceClazz = Class.forName("logica.Controladores.ControladorEvento");
             Constructor<?> k = ceClazz.getDeclaredConstructor();
             k.setAccessible(true);
             ce = k.newInstance();                // <-- usamos la IMPLEMENTACIÓN concreta
@@ -57,10 +57,10 @@ class ControladorEventoTest {
 
     private Object categoriasDTO(String... nombres) {
         var set = new LinkedHashSet<>(Arrays.asList(nombres));
-        try { return TestUtils.tolerantNew("logica.DTCategorias", set); }
+        try { return TestUtils.tolerantNew("logica.Datatypes.DTCategorias", set); }
         catch (RuntimeException e1) {
-            try { return TestUtils.tolerantNew("logica.DTCategorias", new ArrayList<>(set)); }
-            catch (RuntimeException e2) { return TestUtils.tolerantNew("logica.DTCategorias"); }
+            try { return TestUtils.tolerantNew("logica.Datatypes.DTCategorias", new ArrayList<>(set)); }
+            catch (RuntimeException e2) { return TestUtils.tolerantNew("logica.Datatypes.DTCategorias"); }
         }
     }
 
@@ -203,12 +203,12 @@ class ControladorEventoTest {
         Object tipo = resolverTipoRegistro(ed, "GENERAL");
         if (tipo == null) {
             // Fallback tolerante (por si tu diseño no expone listados desde la edición)
-            Class<?> TR = Class.forName("logica.TipoRegistro");
+            Class<?> TR = Class.forName("logica.Clases.TipoRegistro");
             if (TR.isEnum()) {
                 Object[] vals = TR.getEnumConstants();
                 if (vals != null && vals.length > 0) tipo = vals[0];
             } else {
-                try { tipo = TestUtils.tolerantNew("logica.TipoRegistro"); } catch (RuntimeException ignored) {}
+                try { tipo = TestUtils.tolerantNew("logica.Clases.TipoRegistro"); } catch (RuntimeException ignored) {}
             }
         }
         assumeTrue(tipo != null, "No hay TipoRegistro disponible");
@@ -242,15 +242,15 @@ class ControladorEventoTest {
         // Institución: intento obtener; si no, fabrico una instancia tolerante
         Object inst = DomainAccess.obtenerInstitucion("Inst_A");
         if (inst == null) {
-            try { inst = TestUtils.tolerantNew("logica.Institucion", "Inst_A", "desc", "web"); }
-            catch (RuntimeException e) { inst = TestUtils.tolerantNew("logica.Institucion"); }
+            try { inst = TestUtils.tolerantNew("logica.Clases.Institucion", "Inst_A", "desc", "web"); }
+            catch (RuntimeException e) { inst = TestUtils.tolerantNew("logica.Clases.Institucion"); }
         }
 
         // DTNivel (cualquiera que logremos construir)
         Object dtnivel = null;
-        try { dtnivel = TestUtils.tolerantNew("logica.DTNivel", "ORO", 1, 100); }
+        try { dtnivel = TestUtils.tolerantNew("logica.Datatypes.DTNivel", "ORO", 1, 100); }
         catch (RuntimeException e) {
-            try { dtnivel = TestUtils.tolerantNew("logica.DTNivel", "ORO"); }
+            try { dtnivel = TestUtils.tolerantNew("logica.Datatypes.DTNivel", "ORO"); }
             catch (RuntimeException ex) { /* dejamos null, probamos igual */ }
         }
 
@@ -265,7 +265,7 @@ class ControladorEventoTest {
         Object tipo = resolverTipoRegistro(ed, "SPONSOR");
         if (tipo == null) {
             // Fallback: si tu diseño usa enum, agarramos el primero disponible
-            Class<?> TR = Class.forName("logica.TipoRegistro");
+            Class<?> TR = Class.forName("logica.Clases.TipoRegistro");
             if (TR.isEnum()) {
                 Object[] vals = TR.getEnumConstants();
                 if (vals != null && vals.length > 0) tipo = vals[0];

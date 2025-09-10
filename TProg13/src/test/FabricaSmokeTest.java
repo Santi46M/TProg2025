@@ -38,7 +38,7 @@ class FabricaSmokeTest {
         // Usuario: debe existir
         Object cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario"});
         assertNotNull(cu);
-        Class<?> ICU = Class.forName("logica.IControladorUsuario");
+        Class<?> ICU = Class.forName("logica.Interfaces.IControladorUsuario");
         assertTrue(ICU.isAssignableFrom(cu.getClass()), "Debe devolver IControladorUsuario");
 
         // Evento: si no existe en fábrica, NO falla el test

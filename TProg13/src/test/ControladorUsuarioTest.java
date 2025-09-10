@@ -34,6 +34,8 @@ class ControladorUsuarioTest {
         Set<String> insts = (Set<String>) TestUtils.tryInvoke(cu, new String[]{"getInstituciones"});
         assertTrue(insts.contains("Inst_A"));
     }
+    
+    
 
     @Test
     @DisplayName("ingresarOrganizador crea dominio; aparece en listarOrganizadores (por key o por valor)")
@@ -208,7 +210,7 @@ class ControladorUsuarioTest {
         try { m = cu.getClass().getDeclaredMethod("listarEdicionesAPartirDeOrganizador", org.getClass()); }
         catch (NoSuchMethodException ignored) {
             try {
-                Class<?> CUclass = Class.forName("logica.ControladorUsuario");
+                Class<?> CUclass = Class.forName("logica.Controladores.ControladorUsuario");
                 m = CUclass.getDeclaredMethod("listarEdicionesAPartirDeOrganizador", org.getClass());
             } catch (NoSuchMethodException ignored2) { /* nada */ }
         }
