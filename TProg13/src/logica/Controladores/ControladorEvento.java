@@ -10,6 +10,7 @@ import excepciones.EventoYaExisteException;
 import excepciones.RegistroNoExiste;
 import excepciones.TipoRegistroYaExisteException;
 import excepciones.UsuarioNoEsAsistente;
+import excepciones.UsuarioYaExisteException;
 import excepciones.PatrocinioYaExisteException;
 import excepciones.ValorPatrocinioExcedidoException;
 import excepciones.FechasCruzadasException;
@@ -104,7 +105,7 @@ public class ControladorEvento implements IControladorEvento {
                 manejador.agregarEdicion(nuevaEdicion);
                 mUsuario.findOrganizador(usuario.getNickname()).agregarEdicion(nuevaEdicion);
             } else {
-                throw new EdicionYaExisteException(nombre);
+                throw new EdicionYaExisteException("El nombre de la edición " + nombre + " ya está en uso.");
             }
         } else {
             throw new EventoYaExisteException(evento.getNombre());
