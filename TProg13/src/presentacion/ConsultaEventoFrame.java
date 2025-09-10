@@ -76,6 +76,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
         txtDescripcion.setLineWrap(true);
         txtDescripcion.setWrapStyleWord(true);
         txtDescripcion.setEditable(false);
+        txtDescripcion.setBackground(txtNombre.getBackground()); // Unifica el fondo
         JScrollPane scrollDesc = new JScrollPane(txtDescripcion);
         panelCampos.add(scrollDesc, gbcDescField);
 
