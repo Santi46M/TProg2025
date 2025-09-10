@@ -231,7 +231,7 @@ public class AltaEdicionEvento extends JInternalFrame {
 			} catch (excepciones.FechasCruzadasException ex) {
 				JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de fechas", JOptionPane.ERROR_MESSAGE);
 			} catch (excepciones.EdicionYaExisteException ex) {
-				JOptionPane.showMessageDialog(this, "Edición existente: " + ex.getMessage());
+				JOptionPane.showMessageDialog(this, "Ya existe una edición con el nombre: '" + nombre + "'.");
 			} catch (Exception ex) {
 				JOptionPane.showMessageDialog(this, "Error al registrar la edición: " + ex.getMessage());
 			}

@@ -12,12 +12,9 @@ import logica.Controladores.ControladorUsuario;
 
 public class main {
 
-    // ==== Paleta (podés ajustarla) ====
-    private static final Color P_BG_APP   = new Color(240, 248, 255); // fondo app (azul muy claro)
-    private static final Color P_MENU_BG  = new Color(230, 236, 246); // fondo menú
-    private static final Color P_MENU_FG  = new Color(25, 25, 25);    // texto menú
-    // ===================================
-
+    private static final Color P_BG_APP   = new Color(240, 248, 255);
+    private static final Color P_MENU_BG  = new Color(230, 236, 246);
+    private static final Color P_MENU_FG  = new Color(25, 25, 25);
     private JFrame frame;
     private JDesktopPane desktopPane;
     private IControladorUsuario ICU;
@@ -37,7 +34,6 @@ public class main {
     private AltaEdicionEvento altaEdicionEventoFrame;
     private ModificarDatosUsuarioFrame modificarDatosUsuarioFrame;
 
-    // ---------- Arranque con Look&Feel ----------
     public static void main(String[] args) {
         try {
             boolean puesto = false;
@@ -60,7 +56,6 @@ public class main {
             }
         });
     }
-    // --------------------------------------------
 
     public main() {
         initialize();
@@ -119,11 +114,10 @@ public class main {
         frame.setLayout(new BorderLayout());
         desktopPane = new JDesktopPane();
         desktopPane.setBounds(0, 0, 800, 600);
-        desktopPane.setBackground(P_BG_APP); // <<< color de fondo del escritorio
+        desktopPane.setBackground(P_BG_APP);
         frame.getContentPane().add(desktopPane, BorderLayout.CENTER);
 
         JMenuBar menuBar = new JMenuBar();
-        // Colorear menú (algunos L&F pueden ignorarlo parcialmente)
         menuBar.setOpaque(true);
         menuBar.setBackground(P_MENU_BG);
         menuBar.setForeground(P_MENU_FG);
@@ -133,10 +127,6 @@ public class main {
         styleMenu(menuSistema);
         menuBar.add(menuSistema);
 
-        // ---- Submenú Apariencia (cambio de L&F en runtime) ----
-
-        // --------------------------------------------------------
-
         JMenuItem itemCargaDatos = new JMenuItem("Cargar Datos Iniciales");
         styleMenuItem(itemCargaDatos);
         menuSistema.add(itemCargaDatos);
@@ -145,9 +135,7 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     CargaDatosPrueba.cargar();
-                    // Eliminado el print de confirmación
                 } catch (Exception ex) {
-                    // Eliminado el print de error
                 }
             }
         });
@@ -188,16 +176,15 @@ public class main {
             	        conUsrInternalFrame = new ConsultaUsuario(ICU, ICE);
             	        desktopPane.add(conUsrInternalFrame);
             	    }
-            	    conUsrInternalFrame.cargarUsuarios();  // ya NO lanza UsuarioNoExisteException
+            	    conUsrInternalFrame.cargarUsuarios();
             	    conUsrInternalFrame.setVisible(true);
             	    conUsrInternalFrame.toFront();
             	} catch (Exception ex) {
-            	    ex.printStackTrace();   // o log
+            	    ex.printStackTrace();
             	}
             }
         });
 
-        // Alta de Institución dentro de Usuario
         JMenuItem itemAltaInstitucion = new JMenuItem("Alta de Institución");
         styleMenuItem(itemAltaInstitucion);
         menuUsuario.add(itemAltaInstitucion);
@@ -222,7 +209,6 @@ public class main {
         itemModificarUsuario.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    // Obtener usuarios y sus datos
                     java.util.Map<String, logica.Clases.Usuario> usuariosMap = ICU.listarUsuarios();
                     String[] usuarios = usuariosMap.keySet().toArray(new String[0]);
                     String[][] datosUsuarios = new String[usuarios.length][7];
@@ -281,13 +267,7 @@ public class main {
             }
         });
 
-     // Campo en tu clase principal
-      //  private ConsultaEventoFrame consultaEventoFrame;
 
-        // En el action del menú:
-      
-
-     // En el bloque donde armás el menú Evento:
      JMenuItem itemConsultaEdicion = new JMenuItem("Consulta de Edición de Evento");
      styleMenuItem(itemConsultaEdicion);
      menuEvento.add(itemConsultaEdicion);
@@ -298,7 +278,7 @@ public class main {
                  consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame(ICU, ICE);
                  desktopPane.add(consultaEdicionEventoFrame);
              }
-             consultaEdicionEventoFrame.cargarEventos(); // <- ahora existe en tu clase
+             consultaEdicionEventoFrame.cargarEventos();
              consultaEdicionEventoFrame.setVisible(true);
              consultaEdicionEventoFrame.toFront();
          } catch (Exception ex) {
@@ -327,7 +307,7 @@ public class main {
 
         JMenuItem itemConsultaRegistro = new JMenuItem("Consulta de Registro");
         styleMenuItem(itemConsultaRegistro);
-        menuEvento.add(itemConsultaRegistro);
+        menuUsuario.add(itemConsultaRegistro);
         itemConsultaRegistro.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -335,6 +315,7 @@ public class main {
                         consultaRegistroFrame = new ConsultaRegistroFrame(ICU, ICE);
                         desktopPane.add(consultaRegistroFrame);
                     }
+                    consultaRegistroFrame.cargarAsistentes(); 
                     consultaRegistroFrame.setVisible(true);
                     consultaRegistroFrame.toFront();
                 } catch (Exception ex) {
@@ -449,7 +430,7 @@ public class main {
                         registroEdicionEventoFrame = new RegistroEdicionEventoFrame(ICU, ICE);
                         desktopPane.add(registroEdicionEventoFrame);
                     }
-                    registroEdicionEventoFrame.cargarDatos(); // <-- Llenar combos correctamente
+                    registroEdicionEventoFrame.cargarDatos(); 
                     registroEdicionEventoFrame.setVisible(true);
                     registroEdicionEventoFrame.toFront();
                 } catch (Exception ex) {
@@ -459,7 +440,6 @@ public class main {
         });
     }
 
-    // ===== Helpers de estilo para menús =====
     private void styleMenu(JMenu m) {
         m.setOpaque(true);
         m.setBackground(P_MENU_BG);
@@ -471,7 +451,6 @@ public class main {
         mi.setForeground(P_MENU_FG);
     }
 
-    // ===== Cambio de Look&Feel en runtime =====
     private void cambiarLookAndFeel(String nombre) {
         try {
             String clase = null;
@@ -494,7 +473,6 @@ public class main {
             UIManager.setLookAndFeel(clase);
             SwingUtilities.updateComponentTreeUI(frame);
 
-            // Reaplicar colores (algunos L&F pisan backgrounds)
             if (frame.getJMenuBar() != null) {
                 frame.getJMenuBar().setOpaque(true);
                 frame.getJMenuBar().setBackground(P_MENU_BG);
@@ -505,8 +483,8 @@ public class main {
                 }
             }
             desktopPane.setBackground(P_BG_APP);
-            frame.pack();             // si tu layout lo permite
-            frame.setSize(800, 660);  // mantener tamaño
+            frame.pack();            
+            frame.setSize(800, 660); 
             frame.repaint();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -517,7 +495,6 @@ public class main {
     // =========================================
 
     private String[] getEventos() {
-        // Carga dinámica como en AltaEdicionEvento
         logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         java.util.List<logica.Datatypes.DTEvento> eventos = controlador.listarEventos();
         String[] nombres = new String[eventos.size()];

@@ -199,7 +199,7 @@ public class AltaEventoFrame extends JInternalFrame {
                 this.dispose();
             } catch (EventoYaExisteException ex) {
                 JOptionPane.showMessageDialog(this,
-                    "Ya existe un evento con el nombre: '" + nombre + "'.\nPor favor, elija otro nombre o cancele la operación.",
+                    "Ya existe un evento con el nombre: '" + nombre + "'.",
                     "Error - Evento ya existente", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
                 JOptionPane.showMessageDialog(this, "Error al registrar el evento: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

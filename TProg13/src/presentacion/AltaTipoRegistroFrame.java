@@ -155,14 +155,11 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
             JOptionPane.showMessageDialog(this, "Tipo de registro creado exitosamente.");
             dispose();
         } catch (TipoRegistroYaExisteException ex) {
-            int resp = JOptionPane.showConfirmDialog(this, ex.getMessage() + "\n¿Desea intentar con otro nombre?", "Nombre repetido", JOptionPane.YES_NO_OPTION);
-            if (resp == JOptionPane.NO_OPTION) {
-                dispose();
-            }
+			JOptionPane.showMessageDialog(this, "El tipo de registro " + nombre + " ya existe en esta edición.");
         } catch (excepciones.CupoTipoRegistroInvalidoException ex) {
-            JOptionPane.showMessageDialog(this, "Cupo inválido: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Cupo inválido: debe ser mayor a 0");
         } catch (excepciones.CostoTipoRegistroInvalidoException ex) {
-            JOptionPane.showMessageDialog(this, "Costo inválido: " + ex.getMessage());
+            JOptionPane.showMessageDialog(this, "Costo inválido: debe ser mayor o igual a 0");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
