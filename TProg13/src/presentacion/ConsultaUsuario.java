@@ -2,6 +2,7 @@ package presentacion;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
 
@@ -17,265 +18,340 @@ public class ConsultaUsuario extends JInternalFrame {
 
     private final IControladorUsuario controlUsr;
     private final IControladorEvento  controlEvt;
-    
-    
 
-    private Vector<String> usuarios;
+    // Barra superior
     private JComboBox<String> comboUsuarios;
 
-    private JPanel panelSeleccion;
-    private JPanel panelDatos;
-    private CardLayout cardLayout;
+    // ---- Campos comunes ----
+    private JLabel lblNick, lblNombre, lblApellido, lblCorreo, lblFechaNac, lblInstitucion;
+    private JTextField txtNick, txtNombre, txtApellido, txtCorreo, txtFechaNac, txtInstitucion;
 
-    // Flag para evitar que los listeners se disparen mientras poblamos combos
-    private boolean cargandoCombo = false;
+    // ---- Contenedor específico con CardLayout ----
+    private JPanel panelEspecifico;
+    private CardLayout cardTipo;
+
+    // ---- Card: vacío ----
+    private JPanel cardVacio;
+
+    // ---- Card: asistente ----
+    private JPanel cardAsistente;
+    private JLabel lblRegistros;
+    private JComboBox<String> comboRegs;
+    private java.util.List<DTRegistro> listaRegs = new ArrayList<>();
+
+    // ---- Card: organizador ----
+    private JPanel cardOrganizador;
+    private JLabel lblDesc, lblLink, lblEds;
+    private JTextField txtDesc, txtLink;
+    private JComboBox<String> comboEds;
+    private java.util.List<DTEdicion> listaEds = new ArrayList<>();
+
+    private boolean cargando = false;
 
     public ConsultaUsuario(IControladorUsuario icu, IControladorEvento iCE) {
         this.controlUsr = icu;
-        this.controlEvt  = iCE;
-        
-        setSize(500, 300);
+        this.controlEvt = iCE;
 
-        cardLayout = new CardLayout();
-        getContentPane().setLayout(cardLayout);
-
-        // Panel selección
-        panelSeleccion = new JPanel(null);
-        getContentPane().add(panelSeleccion, "SELECCION");
-
-        // Panel datos
-        panelDatos = new JPanel(new BorderLayout());
-        getContentPane().add(panelDatos, "DATOS");
-
-        setTitle("Listar Usuarios");
-        setResizable(true);
-        setMaximizable(true);
-        setIconifiable(true);
+        setTitle("Consulta de Usuario");
         setClosable(true);
+        setIconifiable(true);
+        setMaximizable(true);
+        setResizable(true);
+        setSize(720, 560);
+        setLayout(new BorderLayout(10, 10));
 
-        JLabel label = new JLabel("Seleccione un usuario:");
-        label.setBounds(50, 51, 180, 20);
-        label.setHorizontalAlignment(SwingConstants.RIGHT);
-        panelSeleccion.add(label);
+        // ===== Barra superior =====
+        JPanel barraSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        barraSuperior.add(new JLabel("Usuario:"));
 
-        usuarios = new Vector<>();
-        usuarios.addAll(controlUsr.listarUsuarios().keySet());
-
+        Vector<String> usuarios = new Vector<>(controlUsr.listarUsuarios().keySet());
         comboUsuarios = new JComboBox<>(usuarios);
-        comboUsuarios.setBounds(240, 49, 200, 25);
-        panelSeleccion.add(comboUsuarios);
+        comboUsuarios.setPreferredSize(new Dimension(300, 26));
+        comboUsuarios.setSelectedIndex(-1);
+        barraSuperior.add(comboUsuarios);
 
-        JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBounds(240, 109, 120, 30);
-        btnCancelar.addActionListener(e -> dispose());
-        panelSeleccion.add(btnCancelar);
+      
+        add(barraSuperior, BorderLayout.NORTH);
 
-        // ActionListener: abre los datos del usuario elegido
+        // ===== Centro con scroll =====
+        JPanel centro = new JPanel();
+        centro.setLayout(new BoxLayout(centro, BoxLayout.Y_AXIS));
+        add(new JScrollPane(centro,
+                ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
+
+        // ===== Panel datos básicos =====
+        JPanel panelComunes = new JPanel(new GridBagLayout());
+        panelComunes.setBorder(BorderFactory.createTitledBorder("Datos básicos"));
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.insets = new Insets(6, 8, 6, 8);
+        gc.fill = GridBagConstraints.HORIZONTAL;
+        gc.weightx = 1.0;
+
+        txtNick        = mkText(false);
+        txtNombre      = mkText(false);
+        txtApellido    = mkText(false);
+        txtCorreo      = mkText(false);
+        txtFechaNac    = mkText(false);
+        txtInstitucion = mkText(false);
+
+        int row = 0;
+        lblNick        = addRow(panelComunes, gc, row++, "Nickname:",            txtNick);
+        lblNombre      = addRow(panelComunes, gc, row++, "Nombre:",              txtNombre);
+        lblApellido    = addRow(panelComunes, gc, row++, "Apellido:",            txtApellido);
+        lblCorreo      = addRow(panelComunes, gc, row++, "Correo:",              txtCorreo);
+        lblFechaNac    = addRow(panelComunes, gc, row++, "Fecha de nacimiento:", txtFechaNac);
+        lblInstitucion = addRow(panelComunes, gc, row++, "Institución:",         txtInstitucion);
+
+        centro.add(panelComunes);
+
+        // ===== Panel específico (cards) =====
+        cardTipo = new CardLayout();
+        panelEspecifico = new JPanel(cardTipo);
+        panelEspecifico.setBorder(BorderFactory.createTitledBorder("Datos específicos"));
+
+        // --- VACÍO ---
+        cardVacio = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        cardVacio.add(new JLabel("Seleccione un usuario para ver detalles."));
+        panelEspecifico.add(cardVacio, "VACIO");
+
+        // --- ASISTENTE ---
+        cardAsistente = new JPanel();
+        cardAsistente.setLayout(new GridBagLayout());
+        GridBagConstraints gca = new GridBagConstraints();
+        gca.insets = new Insets(6, 8, 6, 8);
+        gca.fill = GridBagConstraints.HORIZONTAL;
+        gca.weightx = 1.0;
+
+        lblRegistros = new JLabel("Registros:");
+        gca.gridx = 0; gca.gridy = 0; gca.weightx = 0;
+        cardAsistente.add(lblRegistros, gca);
+
+        comboRegs = new JComboBox<>();
+        comboRegs.setPreferredSize(new Dimension(460, 26));
+        gca.gridx = 1; gca.gridy = 0; gca.weightx = 1.0;
+        cardAsistente.add(comboRegs, gca);
+
+        panelEspecifico.add(cardAsistente, "ASISTENTE");
+
+        comboRegs.addActionListener(ev -> {
+            if (cargando) return;
+            int idx = comboRegs.getSelectedIndex();
+            if (idx >= 0 && idx < listaRegs.size()) {
+                DTRegistro r = listaRegs.get(idx);
+                ConsultaRegistroFrame frame =
+                        new ConsultaRegistroFrame(controlUsr, controlEvt, txtNick.getText(), r.getId());
+                if (getDesktopPane() != null) getDesktopPane().add(frame);
+                frame.setVisible(true);
+                frame.toFront();
+            }
+        });
+
+        // --- ORGANIZADOR ---
+        cardOrganizador = new JPanel(new GridBagLayout());
+        GridBagConstraints gco = new GridBagConstraints();
+        gco.insets = new Insets(6, 8, 6, 8);
+        gco.fill = GridBagConstraints.HORIZONTAL;
+        gco.weightx = 1.0;
+
+        txtDesc = mkText(false);
+        txtLink = mkText(false);
+        lblDesc = addRow(cardOrganizador, gco, 0, "Descripción:", txtDesc);
+        lblLink = addRow(cardOrganizador, gco, 1, "Link:",         txtLink);
+
+        lblEds = new JLabel("Ediciones:");
+        gco.gridx = 0; gco.gridy = 2; gco.weightx = 0;
+        cardOrganizador.add(lblEds, gco);
+
+        comboEds = new JComboBox<>();
+        comboEds.setPreferredSize(new Dimension(460, 26));
+        gco.gridx = 1; gco.gridy = 2; gco.weightx = 1.0;
+        cardOrganizador.add(comboEds, gco);
+
+        panelEspecifico.add(cardOrganizador, "ORGANIZADOR");
+
+        comboEds.addActionListener(ev -> {
+            if (cargando) return;
+            int idx = comboEds.getSelectedIndex();
+            if (idx >= 0 && idx < listaEds.size()) {
+                DTEdicion ed = listaEds.get(idx);
+                ConsultaEdicionEventoFrame frame =
+                        new ConsultaEdicionEventoFrame(controlUsr, controlEvt, ed.getSigla());
+                if (getDesktopPane() != null) getDesktopPane().add(frame);
+                frame.setVisible(true);
+                frame.toFront();
+            }
+        });
+
+        centro.add(panelEspecifico);
+
+        limpiarCampos();
+        showVacio();
+
         comboUsuarios.addActionListener(e -> {
-            if (cargandoCombo) return;
+            if (cargando) return;
             String sel = (String) comboUsuarios.getSelectedItem();
             if (sel != null && !sel.isEmpty()) {
-                mostrarDatosUsuario(sel);
+                cargarUsuario(sel);
+            } else {
+                limpiarCampos();
+                showVacio();
             }
         });
     }
 
-    private void mostrarDatosUsuario(String nickname) {
-        // Cambiamos a la vista de datos
-        cardLayout.show(getContentPane(), "DATOS");
+    // ================= API esperada por el main =================
+    public void cargarUsuarios() { recargarUsuarios(); }
 
-        // Limpiamos content
-        panelDatos.removeAll();
-        setTitle("Datos del usuario");
+    public void recargarUsuarios() {
+        cargando = true;
+        Vector<String> usuarios = new Vector<>(controlUsr.listarUsuarios().keySet());
+        comboUsuarios.setModel(new DefaultComboBoxModel<>(usuarios));
+        comboUsuarios.setSelectedIndex(-1);
+        limpiarCampos();
+        showVacio();
+        cargando = false;
+    }
+    // ===========================================================
 
-        JPanel panelContenedor   = new JPanel(new BorderLayout());
-        JPanel panelDatosUsuario = new JPanel();
-        panelDatosUsuario.setLayout(new BoxLayout(panelDatosUsuario, BoxLayout.Y_AXIS));
-        panelDatos.add(panelContenedor, BorderLayout.CENTER);
-        panelContenedor.add(panelDatosUsuario, BorderLayout.CENTER);
-
-        JPanel panelInfoBasica = new JPanel(new GridLayout(0, 2, 10, 10));
-        panelDatosUsuario.add(panelInfoBasica);
-
-        JLabel lblNick   = new JLabel("Nickname:");
-        JLabel lblNombre = new JLabel("Nombre:");
-        JLabel lblCorreo = new JLabel("Correo electrónico:");
-
-        JTextArea txtNick   = new JTextArea(); txtNick.setEditable(false);
-        JTextArea txtNombre = new JTextArea(); txtNombre.setEditable(false);
-        JTextArea txtCorreo = new JTextArea(); txtCorreo.setEditable(false);
-
-        panelInfoBasica.add(lblNick);   panelInfoBasica.add(txtNick);
-        panelInfoBasica.add(lblNombre); panelInfoBasica.add(txtNombre);
-        panelInfoBasica.add(lblCorreo); panelInfoBasica.add(txtCorreo);
-
-        // Botón cerrar -> vuelve a SELECCION
-        JPanel panelSur = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton btnCerrar = new JButton("Cerrar");
-        btnCerrar.addActionListener(e -> {
-            cardLayout.show(getContentPane(), "SELECCION");
-            setTitle("Listar Usuarios");
-            // opcional: limpiar selección del combo principal
-            cargandoCombo = true;
-            comboUsuarios.setSelectedIndex(-1);
-            comboUsuarios.setSelectedItem(null);
-            cargandoCombo = false;
-        });
-        panelSur.add(btnCerrar);
-        panelContenedor.add(panelSur, BorderLayout.SOUTH);
-
+    private void cargarUsuario(String nickname) {
+        limpiarCampos();
         Map<String, Usuario> todos = controlUsr.listarUsuarios();
         if (!todos.containsKey(nickname)) {
-            JOptionPane.showMessageDialog(this, "Usuario no existe.");
+            JOptionPane.showMessageDialog(this, "El usuario no existe.");
             return;
         }
-
-        // Obtenemos DTO
         DTDatosUsuario datos;
         try {
             datos = controlUsr.obtenerDatosUsuario(nickname);
         } catch (UsuarioNoExisteException ex) {
-            JOptionPane.showMessageDialog(this, "Usuario no existe.");
+            JOptionPane.showMessageDialog(this, "El usuario no existe.");
             return;
         }
 
-        txtNick.setText(datos.getNickname());
-        txtNombre.setText(datos.getNombre());
-        txtCorreo.setText(datos.getEmail());
+        txtNick.setText(nvl(datos.getNickname()));
+        txtNombre.setText(nvl(datos.getNombre()));
+        txtCorreo.setText(nvl(datos.getEmail()));
 
-        // ¿Es asistente?
-        if (controlUsr.listarAsistentes() != null &&
-            controlUsr.listarAsistentes().containsKey(nickname)) {
+        boolean esAsistente   = controlUsr.listarAsistentes()    != null &&
+                                controlUsr.listarAsistentes().containsKey(nickname);
+        boolean esOrganizador = controlUsr.listarOrganizadores() != null &&
+                                controlUsr.listarOrganizadores().containsKey(nickname);
 
-            JPanel panelAsistente = new JPanel(new GridLayout(0, 2, 10, 10));
-            panelDatosUsuario.add(panelAsistente);
+        if (esAsistente) {
+            txtApellido.setText(nvl(datos.getApellido()));
+            txtFechaNac.setText(datos.getFechaNac() != null ? String.valueOf(datos.getFechaNac()) : "");
+            txtInstitucion.setText(nvl(datos.getInstitucion()));
+            setRowVisible(lblApellido, txtApellido, true);
+            setRowVisible(lblFechaNac, txtFechaNac, true);
+            setRowVisible(lblInstitucion, txtInstitucion, true);
 
-            panelAsistente.add(new JLabel("Apellido:"));
-            JTextArea txtApellido = new JTextArea(datos.getApellido());
-            txtApellido.setEditable(false);
-            panelAsistente.add(txtApellido);
+            setRowVisible(lblDesc, txtDesc, false);
+            setRowVisible(lblLink, txtLink, false);
+            lblEds.setVisible(false);
+            comboEds.setVisible(false);
 
-            panelAsistente.add(new JLabel("Fecha de nacimiento:"));
-            JTextArea txtFecha = new JTextArea(String.valueOf(datos.getFechaNac()));
-            txtFecha.setEditable(false);
-            panelAsistente.add(txtFecha);
-            
-            if (datos.getInstitucion() != null) {
-                // Nuevo campo Institución
-                panelAsistente.add(new JLabel("Institución:"));
-                JTextArea txtInstitucion = new JTextArea(datos.getInstitucion());
-                txtInstitucion.setEditable(false);
-                panelAsistente.add(txtInstitucion);
-            }
-
-            JLabel lblRegistros = new JLabel("Registros:");
-            lblRegistros.setFont(lblRegistros.getFont().deriveFont(Font.BOLD)); // opcional: en negrita
-            panelDatosUsuario.add(lblRegistros);
-            
-            // Combo de registros
+            listaRegs = new ArrayList<>(datos.getRegistros());
             DefaultComboBoxModel<String> modelReg = new DefaultComboBoxModel<>();
-            java.util.List<DTRegistro> listaRegs = new java.util.ArrayList<>(datos.getRegistros());
             for (DTRegistro r : listaRegs) {
                 modelReg.addElement(r.getId() + " – " + r.getEdicion() + " – " + r.getTipoRegistro());
             }
-            JComboBox<String> comboRegs = new JComboBox<>(modelReg);
-            comboRegs.setPreferredSize(new Dimension(380, 26));
-            panelDatosUsuario.add(comboRegs);
-
-            // Dejar sin selección para que elegir el primero dispare
+            comboRegs.setModel(modelReg);
             comboRegs.setSelectedIndex(-1);
-            comboRegs.setSelectedItem(null);
 
-            comboRegs.addActionListener(ev -> {
-                if (cargandoCombo) return;
-                int idx = comboRegs.getSelectedIndex();
-                if (idx >= 0) {
-                    DTRegistro r = listaRegs.get(idx);
-                    ConsultaRegistroFrame frame =
-                        new ConsultaRegistroFrame(controlUsr, controlEvt, datos.getNickname(), r.getId());
-                    if (getDesktopPane() != null) getDesktopPane().add(frame);
-                    frame.setVisible(true);
-                    frame.toFront();
+            cardTipo.show(panelEspecifico, "ASISTENTE");
 
-                    // opcional: limpiar para volver a elegir el mismo
-                    cargandoCombo = true;
-                    comboRegs.setSelectedIndex(-1);
-                    comboRegs.setSelectedItem(null);
-                    cargandoCombo = false;
-                }
-            });
+        } else if (esOrganizador) {
+            setRowVisible(lblApellido, txtApellido, false);
+            setRowVisible(lblFechaNac, txtFechaNac, false);
+            setRowVisible(lblInstitucion, txtInstitucion, false);
 
-        // ¿Es organizador?
-        } else if (controlUsr.listarOrganizadores() != null &&
-                   controlUsr.listarOrganizadores().containsKey(nickname)) {
+            txtDesc.setText(nvl(datos.getDesc()));
+            txtDesc.setToolTipText(txtDesc.getText());
+            txtLink.setText(nvl(datos.getLink()));
+            setRowVisible(lblDesc, txtDesc, true);
+            setRowVisible(lblLink, txtLink, true);
 
-            JPanel panelOrganizador = new JPanel(new GridLayout(0, 2, 10, 10));
-            panelDatosUsuario.add(panelOrganizador);
-
-            panelOrganizador.add(new JLabel("Descripción:"));
-            JTextArea txtDesc = new JTextArea(datos.getDesc());
-            txtDesc.setEditable(false);
-            panelOrganizador.add(txtDesc);
-
-            panelOrganizador.add(new JLabel("Link:"));
-            JTextArea txtLink = new JTextArea(datos.getLink());
-            txtLink.setEditable(false);
-            panelOrganizador.add(txtLink);
-
-            JLabel lblRegistros = new JLabel("Ediciones:");
-            lblRegistros.setFont(lblRegistros.getFont().deriveFont(Font.BOLD)); // opcional: en negrita
-            panelDatosUsuario.add(lblRegistros);
-            
-            
-            // Combo de ediciones
+            listaEds = new ArrayList<>(datos.getEdiciones());
             DefaultComboBoxModel<String> modelEd = new DefaultComboBoxModel<>();
-            java.util.List<DTEdicion> listaEds = new java.util.ArrayList<>(datos.getEdiciones());
             for (DTEdicion ed : listaEds) {
                 modelEd.addElement(ed.getNombre() + " (" + ed.getSigla() + ")");
             }
-            JComboBox<String> comboEds = new JComboBox<>(modelEd);
-            comboEds.setPreferredSize(new Dimension(380, 26));
-            panelDatosUsuario.add(comboEds);
-
-            // Dejar sin selección
+            comboEds.setModel(modelEd);
             comboEds.setSelectedIndex(-1);
-            comboEds.setSelectedItem(null);
+            lblEds.setVisible(true);
+            comboEds.setVisible(true);
 
-            comboEds.addActionListener(ev -> {
-                if (cargandoCombo) return;
-                int idx = comboEds.getSelectedIndex();
-                if (idx >= 0) {
-                    DTEdicion ed = listaEds.get(idx);
-                    ConsultaEdicionEventoFrame frame =
-                        new ConsultaEdicionEventoFrame(controlUsr, controlEvt, ed.getSigla());
-                    if (getDesktopPane() != null) getDesktopPane().add(frame);
-                    frame.setVisible(true);
-                    frame.toFront();
+            cardTipo.show(panelEspecifico, "ORGANIZADOR");
 
-                    // opcional: limpiar para volver a elegir el mismo
-                    cargandoCombo = true;
-                    comboEds.setSelectedIndex(-1);
-                    comboEds.setSelectedItem(null);
-                    cargandoCombo = false;
-                }
-            });
+        } else {
+            setRowVisible(lblApellido, txtApellido, false);
+            setRowVisible(lblFechaNac, txtFechaNac, false);
+            setRowVisible(lblInstitucion, txtInstitucion, false);
+            setRowVisible(lblDesc, txtDesc, false);
+            setRowVisible(lblLink, txtLink, false);
+            lblEds.setVisible(false);
+            comboEds.setVisible(false);
+            cardTipo.show(panelEspecifico, "VACIO");
         }
 
-        panelDatos.revalidate();
-        panelDatos.repaint();
+        revalidate();
+        repaint();
     }
 
-    /** Refresca la lista de usuarios y deja el combo sin selección. */
-    public void cargarUsuarios() {
-        DefaultComboBoxModel<String> model;
-        usuarios.clear();
-        usuarios.addAll(controlUsr.listarUsuarios().keySet());
-        model = new DefaultComboBoxModel<>(usuarios);
-
-        cargandoCombo = true;
-        comboUsuarios.setModel(model);
-        comboUsuarios.setSelectedIndex(-1);
-        comboUsuarios.setSelectedItem(null);
-        cargandoCombo = false;
+    private void showVacio() {
+        setRowVisible(lblApellido, txtApellido, false);
+        setRowVisible(lblFechaNac, txtFechaNac, false);
+        setRowVisible(lblInstitucion, txtInstitucion, false);
+        setRowVisible(lblDesc, txtDesc, false);
+        setRowVisible(lblLink, txtLink, false);
+        lblEds.setVisible(false);
+        comboEds.setVisible(false);
+        comboRegs.setModel(new DefaultComboBoxModel<>());
+        cardTipo.show(panelEspecifico, "VACIO");
     }
+
+    private void limpiarCampos() {
+        cargando = true;
+        txtNick.setText("");
+        txtNombre.setText("");
+        txtApellido.setText("");
+        txtCorreo.setText("");
+        txtFechaNac.setText("");
+        txtInstitucion.setText("");
+        if (txtDesc != null) txtDesc.setText("");
+        if (txtLink != null) txtLink.setText("");
+        listaRegs.clear();
+        listaEds.clear();
+        if (comboRegs != null) comboRegs.setModel(new DefaultComboBoxModel<>());
+        if (comboEds != null) comboEds.setModel(new DefaultComboBoxModel<>());
+        cargando = false;
+    }
+
+    // ===================== Helpers UI =====================
+    private static JTextField mkText(boolean editable) {
+        JTextField t = new JTextField();
+        t.setEditable(editable);
+        return t;
+    }
+
+    private static JLabel addRow(JPanel panel, GridBagConstraints gc, int row, String label, JComponent comp) {
+        JLabel lbl = new JLabel(label);
+        gc.gridx = 0; gc.gridy = row; gc.weightx = 0; gc.gridwidth = 1;
+        panel.add(lbl, gc);
+        gc.gridx = 1; gc.gridy = row; gc.weightx = 1; gc.gridwidth = 2;
+        panel.add(comp, gc);
+        return lbl;
+    }
+
+    private static void setRowVisible(JLabel label, JComponent field, boolean visible) {
+        if (label != null) label.setVisible(visible);
+        if (field != null) field.setVisible(visible);
+        if (field != null && field.getParent() != null) {
+            field.getParent().revalidate();
+            field.getParent().repaint();
+        }
+    }
+
+    private static String nvl(String s) { return s == null ? "" : s; }
 }
