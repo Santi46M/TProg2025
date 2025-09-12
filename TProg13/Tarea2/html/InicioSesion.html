@@ -2,66 +2,68 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Iniciar Sesión</title>
+  <title>Iniciar Sesión — Eventos.uy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-  <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <a class="brand" href="index.html">Eventos.uy</a>
       <nav class="main-nav">
-        <a href="#">Slogan.</a>
+        <a href="index.html#cat/tecnologia">Tecnología</a>
+        <a href="index.html#cat/arte">Arte</a>
+        <a href="index.html#cat/deporte">Deporte</a>
+        <a href="index.html#cat/ciencia">Ciencia</a>
       </nav>
       <nav class="user-nav">
-        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+        <a class="btn ghost" href="AltaUsuario.html">Registrarse</a>
       </nav>
     </div>
   </header>
 
-  <!-- Layout -->
-  <div class="container row" style="margin-top:1rem;">
-    <!-- Sidebar -->
-    <aside class="card">
-      <h3>Categorías</h3>
-      <ul>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Tecnología</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Innovación</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Literatura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Cultura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Música</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Deporte</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Salud</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Entretenimiento</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Agro</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Negocios</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Moda</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i>Investigación</a></li>
-      </ul>
-      <h3>Usuarios</h3>
-    </aside>
-
-    <!-- Main -->
-    <main>
-      <div class="card">
-        <h1>Iniciar Sesión</h1>
-        <form class="form">
-          <label for="nickname">Email o Nickname:</label>
-          <input type="text" id="nickname" name="nickname" required>
-
-          <label for="password">Contraseña:</label>
-          <input type="password" id="password" name="password" required>
-
-          <div class="actions">
-            <button type="submit" class="btn">Iniciar Sesión</button>
-          </div>
-
-          <p class="error-message hidden">Los datos ingresados no son válidos. Por favor, inténtalo de nuevo.</p>
-        </form>
+  <main class="container narrow">
+    <h1>Iniciar sesión</h1>
+    <form id="loginForm" class="card form">
+      <div class="row">
+        <div>
+          <label for="email">Correo electrónico</label>
+          <input id="email" name="email" type="email" required>
+        </div>
       </div>
-    </main>
-  </div>
+      <div class="row">
+        <div>
+          <label for="pass">Contraseña</label>
+          <input id="pass" name="pass" type="password" required>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn">Ingresar</button>
+        <a class="btn ghost" href="index.html">Cancelar</a>
+      </div>
+      <p id="error" style="color:red;display:none;">Credenciales incorrectas</p>
+    </form>
+  </main>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const error = document.getElementById('error');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const email = form.email.value.trim();
+      const pass  = form.pass.value;
+
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+      const user = usuarios.find(u => u.email === email && u.pass === pass);
+
+      if (user) {
+        sessionStorage.setItem("usuarioActivo", JSON.stringify(user));
+        window.location.href = "index.html";
+      } else {
+        error.style.display = "block";
+      }
+    });
+  </script>
 </body>
 </html>
