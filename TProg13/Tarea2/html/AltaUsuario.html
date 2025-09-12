@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Registrarse — Eventos.uy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <!-- Header simple -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html">Eventos.uy</a>
+      <nav class="main-nav">
+        <a href="index.html#cat/tecnologia">Tecnología</a>
+        <a href="index.html#cat/arte">Arte</a>
+        <a href="index.html#cat/deporte">Deporte</a>
+        <a href="index.html#cat/ciencia">Ciencia</a>
+      </nav>
+      <nav class="user-nav">
+        <a href="InicioSesion.html">Iniciar sesión</a>
+        <a class="btn" href="AltaUsuario.html">Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1>Registrarse</h1>
+    <p>Elegí tu rol y completá los datos.</p>
+
+    <!-- Un solo formulario (JS activa/desactiva campos según rol) -->
+    <form id="altaForm" class="card form" action="#" method="post" enctype="multipart/form-data">
+      <!-- Datos comunes -->
+      <fieldset>
+        <legend>Datos de cuenta</legend>
+
+        <div class="row">
+          <div>
+            <label for="nick">Nickname</label>
+            <input id="nick" name="nick" type="text" required data-required="true">
+          </div>
+          <div>
+            <label for="email">Correo electrónico</label>
+            <input id="email" name="email" type="email" required data-required="true">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="pass">Contraseña</label>
+            <input id="pass" name="pass" type="password" required data-required="true">
+          </div>
+          <div>
+            <label for="pass2">Confirmación de contraseña</label>
+            <input id="pass2" name="pass2" type="password" required data-required="true">
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" type="text" required data-required="true">
+          </div>
+          <div>
+            <label for="img">Imagen (opcional)</label>
+            <input id="img" name="img" type="file" accept="image/*">
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Tabs de rol -->
+      <section class="tabs">
+        <input type="radio" name="rolTab" id="rol-asistente" checked>
+        <input type="radio" name="rolTab" id="rol-organizador">
+
+        <div class="tablist" role="tablist" aria-label="Elegir rol">
+          <label class="tab" for="rol-asistente" role="tab" aria-controls="panel-asistente">Asistente</label>
+          <label class="tab" for="rol-organizador" role="tab" aria-controls="panel-organizador">Organizador</label>
+        </div>
+
+        <!-- Asistente -->
+        <section id="panel-asistente" class="panel" role="tabpanel" aria-labelledby="rol-asistente">
+          <fieldset data-rol="asistente">
+            <legend>Perfil de Asistente</legend>
+
+            <div class="row">
+              <div>
+                <label for="apellido">Apellido</label>
+                <input id="apellido" name="apellido" type="text" data-required="true">
+              </div>
+              <div>
+                <label for="nac">Fecha de nacimiento</label>
+                <input id="nac" name="nac" type="date" data-required="true">
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <span class="lbl">Pertenece a una institución</span>
+                <div class="inline">
+                  <label><input type="radio" name="institucion" value="si"> Sí</label>
+                  <label><input type="radio" name="institucion" value="no" checked> No</label>
+                </div>
+              </div>
+              <div data-show-if="institucion=si">
+                <label for="inst">Nombre de la institución</label>
+                <input id="inst" name="inst" type="text" placeholder="Solo si marcaste ‘Sí’">
+              </div>
+            </div>
+          </fieldset>
+        </section>
+
+        <!-- Organizador -->
+        <section id="panel-organizador" class="panel" role="tabpanel" aria-labelledby="rol-organizador">
+          <fieldset data-rol="organizador">
+            <legend>Perfil de Organizador</legend>
+
+            <div class="row">
+              <div>
+                <label for="web">Sitio web (opcional)</label>
+                <input id="web" name="web" type="url" placeholder="https://...">
+              </div>
+              <div></div>
+            </div>
+
+            <div>
+              <label for="desc">Descripción general</label>
+              <textarea id="desc" name="desc" rows="4" data-required="true"></textarea>
+            </div>
+          </fieldset>
+        </section>
+      </section>
+
+      <div class="actions">
+        <button type="submit" class="btn">Crear cuenta</button>
+        <a class="btn ghost" href="index.html">Cancelar</a>
+      </div>
+    </form>
+
+    <p><a href="index.html">← Volver al inicio</a></p>
+  </main>
+
+  <!-- JS mínimo -->
+  <script>
+  (() => {
+    const form = document.getElementById('altaForm');
+    const rAsis = document.getElementById('rol-asistente');
+    const rOrg  = document.getElementById('rol-organizador');
+
+    // Hash opcional para abrir directo una pestaña (#organizador / #asistente)
+    const hash = location.hash.replace('#','');
+    if (hash === 'organizador') rOrg.checked = true;
+    if (hash === 'asistente')   rAsis.checked = true;
+
+    // Activa/desactiva required según rol
+    function applyRole() {
+      const rol = rOrg.checked ? 'organizador' : 'asistente';
+      // Campos marcados como data-required en cada bloque
+      form.querySelectorAll('[data-rol="asistente"], [data-rol="organizador"]').forEach(block => {
+        const active = block.getAttribute('data-rol') === rol;
+        block.querySelectorAll('[data-required="true"]').forEach(el => {
+          el.toggleAttribute('required', active);
+          if (!active) el.setCustomValidity('');
+        });
+      });
+      // toggle del campo Institución (solo en asistente)
+      updateInstitucion();
+      history.replaceState(null, '', '#' + rol);
+    }
+
+    // Contraseña = confirmación
+    const pass  = form.querySelector('#pass');
+    const pass2 = form.querySelector('#pass2');
+    function checkPasswords() {
+      if (pass2.value && pass.value !== pass2.value) {
+        pass2.setCustomValidity('Las contraseñas no coinciden');
+      } else {
+        pass2.setCustomValidity('');
+      }
+    }
+    pass.addEventListener('input', checkPasswords);
+    pass2.addEventListener('input', checkPasswords);
+
+    // Mostrar/ocultar “Nombre de la institución”
+    const radiosInst = form.querySelectorAll('input[name="institucion"]');
+    const boxInst    = form.querySelector('[data-show-if="institucion=si"]');
+    function updateInstitucion() {
+      const rol = rOrg.checked ? 'organizador' : 'asistente';
+      if (!boxInst || rol !== 'asistente') {
+        boxInst?.classList.add('hidden');
+        boxInst?.querySelector('input')?.removeAttribute('required');
+        return;
+      }
+      const choice = [...radiosInst].find(r => r.checked)?.value;
+      const show = choice === 'si';
+      boxInst.classList.toggle('hidden', !show);
+      const i = boxInst.querySelector('input');
+      if (i) i.toggleAttribute('required', show);
+    }
+    radiosInst.forEach(r => r.addEventListener('change', updateInstitucion));
+
+    rAsis.addEventListener('change', applyRole);
+    rOrg .addEventListener('change', applyRole);
+    applyRole();
+
+    form.addEventListener('submit', (e) => {
+      checkPasswords();
+      updateInstitucion();
+      if (!form.reportValidity()) e.preventDefault();
+    });
+  })();
+  </script>
+</body>
+</html>
+
