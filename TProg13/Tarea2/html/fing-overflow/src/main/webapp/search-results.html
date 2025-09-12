@@ -1,0 +1,336 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Search Results</title>
+
+  <meta name="description" content="The HTML5 hello bootstrap world">
+  <meta name="author" content="eviotti">
+
+  <link rel="stylesheet" href="resources/css/bootstrap.min.css">
+
+  <script src="resources/js/font-awesome.js"></script>
+
+  <style>
+    .question-listed-metadata{
+      font-size: 12px !important;
+    }
+
+    .question-listed-stats button{
+      font-size: 13px !important;
+    }
+
+    .answer-description p{
+      font-size: 12px;
+      font-weight: normal !important;
+    }
+
+    #header{
+      border-top: 3px solid Dodgerblue;
+      border-bottom: 1px solid #e4e6e8;
+    }
+
+    .left-menu{
+      border-right: 1px solid #dee2e6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav id="header" class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="index.html">
+      <span class="" style="font-size: 25px; color: Dodgerblue;"><i class="fab fa-stack-overflow"></i></span>
+      fing <b>overflow</b>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <!-- <ul class="navbar-nav mr-auto"> -->
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Products
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#">Item1</a>
+            <a class="dropdown-item" href="#">Item2</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Item3</a>
+          </div>
+        </li>
+      </ul>
+      <form class="form-inline my-4 my-lg-0 mr-auto">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <a href="search-results.html" class="btn btn-outline-success my-2 my-sm-0">Search</a>
+      </form>
+      <ul class="navbar-nav">
+        <li class="nav-item mr-2">
+          <a class="nav-link" href="#">
+            <span class=""><i class="fas fa-inbox"></i></span>
+          </a>
+        </li>
+        <li class="nav-item mr-2">
+          <a class="nav-link" href="#">
+            <span class=""><i class="fas fa-trophy"></i></span>
+          </a>
+        </li>
+        <li class="nav-item mr-2">
+          <a class="nav-link" href="#">
+            <span class=""><i class="fas fa-clipboard-check"></i></span>
+          </a>
+        </li>
+        <li class="nav-item mr-2">
+          <a class="nav-link" href="#">
+            <span class=""><i class="fas fa-question-circle"></i></span>
+          </a>
+        </li>
+        <li class="nav-item mr-2">
+          <a class="nav-link" href="#">
+            <span class=""><i class="fas fa-bars"></i></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Left side bar -->
+      <div class="col-2 py-4 left-menu" align="left">
+        <ul class="nav nav-pills flex-column">
+          <li class="nav-item active">
+            <a class="nav-link active" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">
+              <span class=""><i class="fas fa-globe-americas"></i></span>
+              &nbsp; Fing overflow
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Tags</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Users</a>
+          </li>
+        </ul>
+      </div>
+      <!-- -->
+
+      <!-- Principal Pane -->
+      <div class="col-7 py-4" align="left">
+
+          <!-- Title -->
+          <div class="row">
+              <div class="col-9" align="left">
+                  <h2>Search Results</h2>
+              </div>
+              <div class="col-3" align="right">
+                  <button type="button" class="btn btn-primary">Ask Question</button>
+              </div>
+          </div>
+          <div class="row pt-3">
+              <div class="col-12" align="left">
+                  <p>Results for html align div left</p>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-12" align="left">
+                <form class="form-inline my-4 my-lg-0 mr-auto">
+                  <input class="form-control col-10 mr-sm-2" value="html align div left" type="search" placeholder="Search" aria-label="Search">
+                  <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                </form>
+              </div>
+          </div>
+          <div class="row pt-3">
+              <div class="col-6" align="left">
+                <p>27,048 results</p>
+              </div>
+              <div class="col-6" align="right">
+                <div class="btn-group" role="group" aria-label="Basic example">
+                  <button type="button" class="btn btn-secondary">Relevance</button>
+                  <button type="button" class="btn btn-light">Newest</button>
+
+                  <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    More button
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="#">Active</a>
+                    <a class="dropdown-item" href="#">Votes</a>
+                  </div>
+                </div>
+              </div>
+          </div>
+          <!-- -->
+
+          <!-- Question results using a table -->
+          <div class="row pt-5">
+            <div class="col-12">
+              <table class="table table-sm">
+                <tbody>
+                <!-- First result -->
+                <tr class="row">
+                  <th class="col-sm-3 py-2">
+                    <div class="row question-listed-stats">
+                      <div class="col-6 center-block">
+                          <button type="button" class="btn btn-light"><p>0 votes</p></button>
+                      </div>
+                      <div class="col-6 center-block">
+                          <button type="button" class="btn btn-success">3 answers</button>
+                      </div>
+                    </div>
+                  </th>
+                  <th class="col-md-8 py-2">
+                    <div class="row">
+                      <div class="col-12" align="left">
+                        <a href="question.html">Q: Align div class to left using style in html</a>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-12 answer-description" align="left">
+                        <p>How do I align a div class to left, center and right using style in the html itself. Here is my html code... </p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6" align="left">
+                        <button type="button" class="btn btn-sm btn-light">html</button>
+                        <button type="button" class="btn btn-sm btn-light">html5</button>
+                        <button type="button" class="btn btn-sm btn-light">bootstrap</button>
+                        <button type="button" class="btn btn-sm btn-light">class</button>
+                      </div>
+                      <div class="col-6 py-2 question-listed-metadata" align="right">
+                      asked Feb 17 by <a href="#">user11066242</a>
+                      </div>
+                    </div>
+                  </th>
+                </tr>
+
+                <!-- Second result -->
+                <tr class="row">
+                  <th class="col-sm-3 py-2">
+                    <div class="row question-listed-stats">
+                      <div class="col-6 center-block">
+                          <button type="button" class="btn btn-light">1 votes</button>
+                      </div>
+                      <div class="col-6 center-block">
+                          <button type="button" class="btn btn-success">1 answers</button>
+                      </div>
+                    </div>
+                  </th>
+                  <th class="col-md-8 py-2">
+                    <div class="row">
+                      <div class="col-12" align="left">
+                        <a href="question.html">Q: HTML Center align div with another div to left</a>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-12 answer-description" align="left">
+                        <p>I can center align 1 div in a page easy just by using the CSS, margin: auto; This works great but I am having a problem when I want to keep this div center aligned, but also have another div in … a bunch of other stuff). I have tried floating one div to the left but I get http://jsfiddle.net/E25JV/21/. As you can see they are not exactly lined up and the 1 div that is supposed to be in the …</p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6" align="left">
+                        <button type="button" class="btn btn-sm btn-light">html</button>
+                        <button type="button" class="btn btn-sm btn-light">css</button>
+                        <button type="button" class="btn btn-sm btn-light">web-deployment</button>
+                      </div>
+                      <div class="col-6 py-2 question-listed-metadata" align="right">
+                      asked Dec 5 '12 by <a href="#">Jake Runze</a>
+                      </div>
+                    </div>
+                  </th>
+                </tr>
+
+                <!-- Third result -->
+                <tr class="row">
+                  <th class="col-sm-3 py-2">
+                    <div class="row question-listed-stats">
+                      <div class="col-6 center-block">
+                          <button type="button" class="btn btn-light">0 votes</button>
+                      </div>
+                      <div class="col-6 center-block">
+                          <button type="button" class="btn btn-success">3 answers</button>
+                      </div>
+                    </div>
+                  </th>
+                  <th class="col-md-8 py-2">
+                    <div class="row">
+                      <div class="col-12" align="left">
+                        <a href="question.html">Q: Align div class to left using style in html</a>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-12 answer-description" align="left">
+                        <p>How do I align a div class to left, center and right using style in the html itself. Here is my html code... </p>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-6" align="left">
+                        <button type="button" class="btn btn-sm btn-light">html</button>
+                        <button type="button" class="btn btn-sm btn-light">html5</button>
+                        <button type="button" class="btn btn-sm btn-light">bootstrap</button>
+                        <button type="button" class="btn btn-sm btn-light">class</button>
+                      </div>
+                      <div class="col-6 py-2 question-listed-metadata" align="right">
+                      asked Feb 17 by <a href="#">user11066242</a>
+                      </div>
+                    </div>
+                  </th>
+                </tr>
+              </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Pagination buttons -->
+          <div class="row py-5">
+            <div class="col-12" align="left">
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-secondary">1</button>
+                <button type="button" class="btn btn-outline-secondary">2</button>
+                <button type="button" class="btn btn-outline-secondary">3</button>
+                <button type="button" class="btn btn-outline-secondary">4</button>
+                <button type="button" class="btn btn-outline-secondary">5</button>
+                <button type="button" class="btn btn-outline-secondary">...</button>
+                <button type="button" class="btn btn-outline-secondary">last</button>
+              </div>
+            </div>
+          </div>
+
+      </div>
+      <!-- -->
+
+      <!-- Right side bar -->
+      <div class="col-3 py-4" align="left">
+      </div>
+      <!-- -->
+
+   </div>
+
+  </div>
+
+  <footer id="sticky-footer" class="py-4 bg-dark text-white-50">
+      <div class="container text-center">
+        <span class="" style="font-size: 25px; color: Grey;">
+          <i class="fab fa-stack-overflow"></i>
+        </span>
+        <small>Copyright &copy; Fing Overflow</small>
+      </div>
+  </footer>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="resources/js/jquery-3.3.1.slim.min.js"></script>
+  <script src="resources/js/popper.min.js"></script>
+  <script src="resources/js/bootstrap.min.js"></script>
+
+</body>
+</html>

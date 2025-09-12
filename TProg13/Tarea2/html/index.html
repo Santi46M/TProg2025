@@ -1,49 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Eventos.uy</title>
-<link rel="stylesheet" href="../css/style.css">
-
+  <meta charset="UTF-8">
+  <title>Eventos.uy</title>
+  <link rel="stylesheet" href="../css/style.css">
 
 </head>
 <body>
-	<nav class="navbar">
-		<div class="contenedor-nav">
-			<a class="btn-index" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy </a>
-			<a class="texto-central"> Slogan. </a>
-			<a class="btn-login" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesion </a>
-			<a class="btn-register" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
-			<a class="btn-register" href="ModificarUsuario.html"><i class='bx bxs-user-plus'></i> Modificar datos</a>
-		</div>
-	</nav>
-	<div class = "contenedor-main">
-		
-		<div class="sidebar">
-			<h2><i class='bx bx-list-ul'></i>MENU</h2>
-			<ul>
-				<li class="titulo-menu"><a href="#"><i class='bx bx-wifi-0'></i>Categorías</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Tecnología</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Innovación</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Literatura</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Cultura</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Música</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Deporte</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Salud</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Entretenimiento</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Agro</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Negocios</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Moda</a></li>
-				<li><a href="#" ><i class='bx bx-wifi-0'></i>Investigación</a></li>
-			</ul>
-			<ul>
-				<li class="titulo-menu"><a href="#"><i class='bx bx-wifi-0'></i>Usuarios</a></li>
-			</ul>
-		</div>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <nav class="main-nav">
+        <a href="#"></a>
+      </nav>
+      <nav class="user-nav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+        <a class="btn" href="ModificarUsuario.html"><i class='bx bxs-user'></i> Modificar datos</a>
+      </nav>
+    </div>
+  </header>
 
-		<main>
+  <!-- Layout -->
+  <div class="container row" style="margin-top:1rem;">
+    <!-- Sidebar -->
+    <aside class="card">
+      <h3><i class='bx bx-list-ul'></i> Menú</h3>
+      <h4>Categorías</h4>
+      <ul>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Innovación</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Literatura</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Cultura</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Música</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Deporte</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Agro</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Moda</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Investigación</a></li>
+      </ul>
+      <h4>Usuarios</h4>
+      <ul>
+        <li><a href="#"><i class='bx bx-user'></i> Lista de usuarios</a></li>
+      </ul>
+    </aside>
 
-		</main>
-	</div>
+    <!-- Main -->
+    <main>
+      <h1>Próximos eventos</h1>
+      <div class="row">
+        <!-- Evento 1 -->
+        <div class="card">
+          <h2>Conferencia de Tecnología</h2>
+          <p><strong>Fecha:</strong> 1 de Octubre de 2025</p>
+          <p><strong>Lugar:</strong> Montevideo</p>
+          <p>Evento sobre innovación tecnológica.</p>
+          <div class="actions">
+            <a href="#" class="btn">Ver más</a>
+          </div>
+        </div>
+
+        <!-- Evento 2 -->
+        <div class="card">
+          <h2>Feria del Libro</h2>
+          <p><strong>Fecha:</strong> 2 de Enero de 2025</p>
+          <p><strong>Lugar:</strong> Punta del Este</p>
+          <p>Encuentro anual de literatura.</p>
+          <div class="actions">
+            <a href="#" class="btn">Ver más</a>
+          </div>
+        </div>
+
+        <!-- Evento 3 -->
+        <div class="card">
+          <h2>Montevideo Fashion Week</h2>
+          <p><strong>Fecha:</strong> 20 de Julio 2025</p>
+          <p><strong>Lugar:</strong> Montevideo</p>
+          <p>Pasarela de moda uruguaya e internacional.</p>
+          <div class="actions">
+            <a href="#" class="btn">Ver más</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
 </body>
 </html>

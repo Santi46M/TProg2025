@@ -1,0 +1,26 @@
+<html>
+<head>
+<script src="../js/jquery-3.3.1.min.js"></script>
+
+<script type="text/javascript">
+	function validate() {
+		var name = $("#name").val();
+
+		if (name == '') {
+			$("#error_name").show();
+		}
+
+		return false;
+	}
+</script>
+</head>
+<body>
+	<form id="submit_form" action="submit_info" method="post"
+		onsubmit="return validate()">
+		Nombre: <input id="name" name="name" /> 
+		<span id="error_name" style="display: none; color: red">Debe ingresar un nombre</span><br />
+		
+		<button type="submit">Enviar</button>
+	</form>
+</body>
+</html>

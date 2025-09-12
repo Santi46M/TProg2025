@@ -1,0 +1,318 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <title>Question</title>
+
+  <meta name="description" content="The HTML5 hello bootstrap world">
+  <meta name="author" content="eviotti">
+
+  <link rel="stylesheet" href="resources/css/bootstrap.min.css">
+
+  <script src="resources/js/font-awesome.js"></script>
+
+  <style>
+    .question-listed-metadata{
+      font-size: 12px !important;
+    }
+
+    .question-listed-stats button{
+      font-size: 13px !important;
+    }
+
+    .answer-description p{
+      font-size: 12px;
+      font-weight: normal !important;
+    }
+
+    #header{
+      border-top: 3px solid Dodgerblue;
+      border-bottom: 1px solid #e4e6e8;
+    }
+
+    .left-menu{
+      border-right: 1px solid #dee2e6;
+    }
+
+    .question-answer-block{
+      border-top: 1px solid #e4e6e8;
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav id="header" class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="index.html">
+      <span class="" style="font-size: 25px; color: Dodgerblue;"><i class="fab fa-stack-overflow"></i></span>
+      fing <b>overflow</b>
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <!-- <ul class="navbar-nav mr-auto"> -->
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Products
+          </a>
+          <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <a class="dropdown-item" href="#">Item1</a>
+            <a class="dropdown-item" href="#">Item2</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Item3</a>
+          </div>
+        </li>
+      </ul>
+      <form class="form-inline my-4 my-lg-0 mr-auto">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <a href="search-results.html" class="btn btn-outline-success my-2 my-sm-0">Search</a>
+      </form>
+      <ul class="navbar-nav">
+        <li class="nav-item mr-2">
+          <a class="nav-link" href="#">
+            <span class=""><i class="fas fa-inbox"></i></span>
+          </a>
+        </li>
+        <li class="nav-item mr-2">
+          <a class="nav-link" href="#">
+            <span class=""><i class="fas fa-trophy"></i></span>
+          </a>
+        </li>
+        <li class="nav-item mr-2">
+          <a class="nav-link" href="#">
+            <span class=""><i class="fas fa-clipboard-check"></i></span>
+          </a>
+        </li>
+        <li class="nav-item mr-2">
+          <a class="nav-link" href="#">
+            <span class=""><i class="fas fa-question-circle"></i></span>
+          </a>
+        </li>
+        <li class="nav-item mr-2">
+          <a class="nav-link" href="#">
+            <span class=""><i class="fas fa-bars"></i></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-2 py-4 left-menu" align="left">
+        <ul class="nav nav-pills flex-column">
+          <li class="nav-item active">
+            <a class="nav-link active" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">
+              <span class=""><i class="fas fa-globe-americas"></i></span>
+              &nbsp; Fing overflow
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Tags</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Users</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="col-7 py-4" align="left">
+
+        <div class="row">
+            <div class="col-9" align="left">
+                <h2>Align div class to left using style in html</h2>
+            </div>
+            <div class="col-3" align="right">
+                <button type="button" class="btn btn-primary">Ask Question</button>
+            </div>
+        </div>
+
+        <div class="row pt-3">
+            <div class="col-12" align="left">
+                <p>
+                  <span>Asked</span> 6 months ago
+                  <span>Active</span> 6 months ago
+                  <span>Viewed 38 times</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="row pt-5">
+          <div class="col-1">
+            <div class="row">
+              <div class="col-12" align="center">
+                <span><i class="fas fa-chevron-up"></i></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12" align="center">
+                <span>0</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12" align="center">
+                <span><i class="fas fa-chevron-down"></i></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12" align="center">
+                <span><i class="fas fa-star"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-11">
+            <div class="row">
+              <div class="col-12" align="left">
+                  <p>
+                    How do I align a div class to left, center and right using style in the html itself. Here is my html code:
+                  </p>
+                <img src="resources/img/code_sample1.png">
+              </div>
+            </div>
+
+            <div class="row pt-3">
+              <div class="col-6" align="left">
+                <button type="button" class="btn btn-sm btn-light">html</button>
+                <button type="button" class="btn btn-sm btn-light">html5</button>
+                <button type="button" class="btn btn-sm btn-light">bootstrap</button>
+                <button type="button" class="btn btn-sm btn-light">class</button>
+              </div>
+              <div class="col-6 py-2 question-listed-metadata" align="right">
+              asked Feb 17 by <a href="#">user11066242</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ansers section -->
+        <div class="row py-4">
+          <div class="col-12">
+              <h4> 3 Answers</h4>
+          </div>
+        </div>
+
+        <!-- Answer 1 -->
+        <div class="row py-3 question-answer-block">
+          <div class="col-1">
+            <div class="row">
+              <div class="col-12" align="center">
+                <span><i class="fas fa-chevron-up"></i></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12" align="center">
+                <span>1</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12" align="center">
+                <span><i class="fas fa-chevron-down"></i></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12" align="center">
+                <span><i class="fas fa-star"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-11">
+            <div class="row">
+              <div class="col-12" align="left">
+                <p>Use style="float: left"</p>
+                <img src="resources/img/code_sample3.png">
+                <p>If you are using bootstrap, you can use</p>
+                <img src="resources/img/code_sample4.png">
+                <p>as mentioned in <a href="#">bootstrap</a> float</p>
+              </div>
+            </div>
+
+            <div class="row pt-3">
+              <div class="col-6" align="left">
+              </div>
+              <div class="col-6 py-2 question-listed-metadata" align="right">
+              answered Feb 17 by <a href="#">Erick Kamamba</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Answer 2 -->
+        <div class="row py-3 question-answer-block">
+          <div class="col-1">
+            <div class="row">
+              <div class="col-12" align="center">
+                <span><i class="fas fa-chevron-up"></i></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12" align="center">
+                <span>0</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12" align="center">
+                <span><i class="fas fa-chevron-down"></i></span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12" align="center">
+                <span><i class="fas fa-star"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-11">
+            <div class="row">
+              <div class="col-12" align="left">
+                  <p>
+                    I prefer box model when I have another outer div:-:
+                  </p>
+                <img src="resources/img/code_sample2.png">
+              </div>
+            </div>
+
+            <div class="row pt-3">
+              <div class="col-6" align="left">
+              </div>
+              <div class="col-6 py-2 question-listed-metadata" align="right">
+              answered Feb 17 by <a href="#">Pep Zambayon</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="col-3 py-4" align="left">
+      </div>
+   </div>
+
+  </div>
+
+  <footer id="sticky-footer" class="py-4 bg-dark text-white-50">
+      <div class="container text-center">
+        <span class="" style="font-size: 25px; color: Grey;">
+          <i class="fab fa-stack-overflow"></i>
+        </span>
+        <small>Copyright &copy; Fing Overflow</small>
+      </div>
+  </footer>
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="resources/js/jquery-3.3.1.slim.min.js"></script>
+  <script src="resources/js/popper.min.js"></script>
+  <script src="resources/js/bootstrap.min.js"></script>
+
+</body>
+</html>
