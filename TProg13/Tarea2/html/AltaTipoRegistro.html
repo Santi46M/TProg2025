@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Alta de Tipo de Registro</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-grid">
+      <!-- Izquierda: buscador -->
+      <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+        <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+        <button class="btn" type="submit">Buscar</button>
+      </form>
+
+      <!-- Centro: brand -->
+      <a class="brand" href="PrincipalLogueado.html">Eventos.uy</a>
+
+      <!-- Derecha: usuario -->
+      <nav class="user-nav" aria-label="Usuario">
+        <a class="user" href="ModificarUsuario.html" title="Modificar mis datos">
+          <img src="../img/avatar.png" alt="Foto de perfil">
+          <span class="user-name">Nombre</span>
+        </a>
+        <a class="btn ghost" href="index.html">Cerrar sesión</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="form-card-altaTipoRegistro">
+      <h2>Alta de Tipo de Registro</h2>
+      <form>
+        <div class="form-group-altaTipoRegistro">
+          <label for="edicion">Edición del evento*</label>
+          <select id="edicion" name="edicion" required>
+            <option value="">-- Seleccione una edición --</option>
+            <option value="edicion1">Edición 1</option>
+            <option value="edicion2">Edición 2</option>
+            <option value="edicion3">Edición 3</option>
+          </select>
+        </div>
+
+        <div class="form-group-altaTipoRegistro">
+          <label for="nombre">Nombre*</label>
+          <input type="text" id="nombre" name="nombre" required>
+        </div>
+
+        <div class="form-group-altaTipoRegistro">
+          <label for="descripcion">Descripción*</label>
+          <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
+        </div>
+
+        <div class="form-group-altaTipoRegistro">
+          <label for="costo">Costo*</label>
+          <input type="number" id="costo" name="costo" step="0.01" min="0" required>
+        </div>
+
+        <div class="form-group-altaTipoRegistro">
+          <label for="cupo">Cupo*</label>
+          <input type="number" id="cupo" name="cupo" min="1" required>
+        </div>
+
+        <p class="form-hint-altaTipoRegistro">Los campos marcados con * son obligatorios.</p>
+
+        <div class="form-actions-altaTipoRegistro">
+          <button type="submit" class="btn-guardar-altaTipoRegistro">Guardar</button>
+          <button type="reset" class="btn-cancelar-altaTipoRegistro">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

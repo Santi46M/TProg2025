@@ -243,3 +243,97 @@ legend{ padding:0 .4rem; font-weight:700; color:#374151; }
 
 
 /* ===== FIN Alta de Evento ===== */
+
+/* ===== Alta de Tipo Registro ===== */
+
+.form-card-altaTipoRegistro {
+  border: 1px solid var(--line);
+  border-radius: .6rem;
+  padding: 1.5rem;
+  background: #fff;
+  max-width: 640px;
+  margin: 2rem auto;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.form-card-altaTipoRegistro h2 {
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink);
+}
+
+.form-group-altaTipoRegistro {
+  margin-bottom: 1rem;
+}
+
+.form-group-altaTipoRegistro label {
+  display: block;
+  margin-bottom: .4rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-group-altaTipoRegistro input,
+.form-group-altaTipoRegistro textarea,
+.form-group-altaTipoRegistro select {
+  width: 100%;
+  padding: .55rem .7rem;
+  border: 1px solid #cbd5e1;
+  border-radius: .45rem;
+  font-size: .95rem;
+  background: #fff;
+}
+
+.form-group-altaTipoRegistro small,
+.form-hint-altaTipoRegistro {
+  display: block;
+  margin-top: .3rem;
+  font-size: .8rem;
+  color: #555;
+}
+
+.form-actions-altaTipoRegistro {
+  display: flex;
+  justify-content: flex-end;
+  gap: .8rem;
+  margin-top: 1.5rem;
+}
+
+.btn-guardar-altaTipoRegistro {
+  background-color: #198754;
+  border: 1px solid #198754;
+  color: #fff;
+  font-weight: 600;
+  padding: .5rem 1rem;
+  border-radius: .5rem;
+  cursor: pointer;
+}
+
+.btn-guardar-altaTipoRegistro:hover {
+  background-color: #157347;
+  border-color: #157347;
+}
+
+.btn-cancelar-altaTipoRegistro {
+  background-color: #6c757d;
+  border: 1px solid #6c757d;
+  color: #fff;
+  font-weight: 600;
+  padding: .5rem 1rem;
+  border-radius: .5rem;
+  cursor: pointer;
+}
+
+.btn-cancelar-altaTipoRegistro:hover {
+  background-color: #5c636a;
+  border-color: #5c636a;
+}
+
+
+/* ===== FIN Alta de Tipo de Registro ===== */
+
+
+
