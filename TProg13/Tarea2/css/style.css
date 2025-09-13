@@ -147,3 +147,99 @@ legend{ padding:0 .4rem; font-weight:700; color:#374151; }
 .user img { width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid #e5e7eb; }
 .user:focus-visible { outline:2px solid #3b82f6; outline-offset:2px; border-radius:.4rem; }
 
+
+/* ===== Alta de Evento ===== */
+.form-card-altaEvento {
+  border: 1px solid var(--line);
+  border-radius: .6rem;
+  padding: 1.5rem;
+  background: #fff;
+  max-width: 640px;
+  margin: 2rem auto;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.form-card h2 {
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ink);
+}
+
+.form-group-altaEvento {
+  margin-bottom: 1rem;
+}
+
+.form-group-altaEvento label {
+  display: block;
+  margin-bottom: .4rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.form-group-altaEvento input,
+.form-group-altaEvento textarea,
+.form-group-altaEvento select {
+  width: 100%;
+  padding: .55rem .7rem;
+  border: 1px solid #cbd5e1;
+  border-radius: .45rem;
+  font-size: .95rem;
+  background: #fff;
+}
+
+.form-group-altaEvento small {
+  display: block;
+  margin-top: .3rem;
+  font-size: .8rem;
+  color: #555;
+}
+
+.form-actions-altaEvento {
+  display: flex;
+  justify-content: flex-end;
+  gap: .8rem;
+  margin-top: 1.5rem;
+}
+
+.btn-guardar-altaEvento {
+  background-color: #198754;
+  border: 1px solid #198754;
+  color: #fff;
+  font-weight: 600;
+  padding: .5rem 1rem;
+  border-radius: .5rem;
+  cursor: pointer;
+}
+
+.btn-guardar-altaEvento:hover {
+  background-color: #157347;
+  border-color: #157347;
+}
+
+.btn-cancelar-altaEvento {
+  background-color: #6c757d;
+  border: 1px solid #6c757d;
+  color: #fff;
+  font-weight: 600;
+  padding: .5rem 1rem;
+  border-radius: .5rem;
+  cursor: pointer;
+}
+
+.btn-cancelar-altaEvento:hover {
+  background-color: #5c636a;
+  border-color: #5c636a;
+}
+.form-hint-altaEvento {
+  font-size: .85rem;
+  color: #666;
+  margin-top: .5rem;
+  text-align: right;
+}
+
+
+
+/* ===== FIN Alta de Evento ===== */
