@@ -18,7 +18,7 @@
         <a href="index.html#cat/ciencia">Ciencia</a>
       </nav>
       <nav class="user-nav">
-        <a class="btn" href="InicioSesion.html">Iniciar sesión</a>
+        <a href="InicioSesion.html">Iniciar sesión</a>
         <a class="btn" href="AltaUsuario.html">Registrarse</a>
       </nav>
     </div>
@@ -94,17 +94,16 @@
               </div>
             </div>
 
-            <div class="row">
+            <!-- Institución (opcional): combo + espacio de imagen -->
+            <div class="inst-row">
               <div>
-                <span class="lbl">Pertenece a una institución</span>
-                <div class="inline">
-                  <label><input type="radio" name="institucion" value="si"> Sí</label>
-                  <label><input type="radio" name="institucion" value="no" checked> No</label>
-                </div>
-              </div>
-              <div data-show-if="institucion=si">
-                <label for="inst">Nombre de la institución</label>
-                <input id="inst" name="inst" type="text" placeholder="Solo si marcaste ‘Sí’">
+                <label for="instId">Institución (opcional)</label>
+                <select id="instId" name="instId">
+                  <option value="">Ninguna</option>
+                  <option value="inst1">Insti 1</option>
+                  <option value="inst2">Insti 2</option>
+                  <option value="inst3">Insti 3</option>
+                </select>
               </div>
             </div>
           </fieldset>
@@ -147,7 +146,7 @@
     const rAsis = document.getElementById('rol-asistente');
     const rOrg  = document.getElementById('rol-organizador');
 
-    // Hash opcional para abrir directo una pestaña (#organizador / #asistente)
+    // Pestaña por hash (#organizador / #asistente)
     const hash = location.hash.replace('#','');
     if (hash === 'organizador') rOrg.checked = true;
     if (hash === 'asistente')   rAsis.checked = true;
@@ -155,7 +154,6 @@
     // Activa/desactiva required según rol
     function applyRole() {
       const rol = rOrg.checked ? 'organizador' : 'asistente';
-      // Campos marcados como data-required en cada bloque
       form.querySelectorAll('[data-rol="asistente"], [data-rol="organizador"]').forEach(block => {
         const active = block.getAttribute('data-rol') === rol;
         block.querySelectorAll('[data-required="true"]').forEach(el => {
@@ -163,8 +161,6 @@
           if (!active) el.setCustomValidity('');
         });
       });
-      // toggle del campo Institución (solo en asistente)
-      updateInstitucion();
       history.replaceState(null, '', '#' + rol);
     }
 
@@ -172,44 +168,46 @@
     const pass  = form.querySelector('#pass');
     const pass2 = form.querySelector('#pass2');
     function checkPasswords() {
-      if (pass2.value && pass.value !== pass2.value) {
-        pass2.setCustomValidity('Las contraseñas no coinciden');
-      } else {
-        pass2.setCustomValidity('');
-      }
+      pass2.setCustomValidity(
+        pass2.value && pass.value !== pass2.value ? 'Las contraseñas no coinciden' : ''
+      );
     }
     pass.addEventListener('input', checkPasswords);
     pass2.addEventListener('input', checkPasswords);
 
-    // Mostrar/ocultar “Nombre de la institución”
-    const radiosInst = form.querySelectorAll('input[name="institucion"]');
-    const boxInst    = form.querySelector('[data-show-if="institucion=si"]');
-    function updateInstitucion() {
-      const rol = rOrg.checked ? 'organizador' : 'asistente';
-      if (!boxInst || rol !== 'asistente') {
-        boxInst?.classList.add('hidden');
-        boxInst?.querySelector('input')?.removeAttribute('required');
-        return;
+    // Preview de institución (placeholder ahora; agregá rutas cuando tengas imágenes)
+    const instSelect  = document.getElementById('instId');
+    const instPreview = document.getElementById('instPreview');
+    const instImg     = document.getElementById('instImg');
+    const instImages = {
+      inst1: '', // '../img/inst1.png'
+      inst2: '', // '../img/inst2.png'
+      inst3: ''  // '../img/inst3.png'
+    };
+    function updateInstPreview(){
+      const key = instSelect.value;
+      const src = instImages[key];
+      if (src) {
+        instImg.src = src;
+        instPreview.classList.add('has-image');
+      } else {
+        instImg.removeAttribute('src');
+        instPreview.classList.remove('has-image');
       }
-      const choice = [...radiosInst].find(r => r.checked)?.value;
-      const show = choice === 'si';
-      boxInst.classList.toggle('hidden', !show);
-      const i = boxInst.querySelector('input');
-      if (i) i.toggleAttribute('required', show);
     }
-    radiosInst.forEach(r => r.addEventListener('change', updateInstitucion));
+    instSelect.addEventListener('change', updateInstPreview);
 
     rAsis.addEventListener('change', applyRole);
     rOrg .addEventListener('change', applyRole);
+
     applyRole();
+    updateInstPreview();
 
     form.addEventListener('submit', (e) => {
       checkPasswords();
-      updateInstitucion();
       if (!form.reportValidity()) e.preventDefault();
     });
   })();
   </script>
 </body>
 </html>
-

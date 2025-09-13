@@ -12,20 +12,22 @@
 <body>
   <!-- Navbar -->
   <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index.html">Eventos.uy</a>
-      <nav class="main-nav">
-        <a href="index.html#cat/tecnologia">Tecnología</a>
-        <a href="index.html#cat/arte">Arte</a>
-        <a href="index.html#cat/deporte">Deporte</a>
-        <a href="index.html#cat/ciencia">Ciencia</a>
-      </nav>
-      <nav class="user-nav">
-        <a class="btn" href="InicioSesion.html">Iniciar sesión</a>
-        <a class="btn" href="AltaUsuario.html">Registrarse</a>
-      </nav>
-    </div>
-  </header>
+  	  <div class="container header-grid">
+
+  	    <!-- Centro: brand -->
+  	    <a class="brand" href="PrincipalLogueado.html">Eventos.uy</a>
+
+  		<!-- Derecha: usuario -->
+  		<nav class="user-nav" aria-label="Usuario">
+  		  <!-- Clic en foto o nombre => ModificarDatosUsuario -->
+  		  <a class="user" href="ModificarUsuario.html" title="Modificar mis datos">
+  		    <img src="../img/avatar.png" alt="Foto de perfil">
+  		    <span class="user-name">Nombre</span>
+  		  </a>
+  		  <a class="btn ghost" href="index.html">Cerrar sesión</a>
+  		</nav>
+  	  </div>
+  	</header>
 
   <main class="container narrow">
     <h1>Modificar Datos de Usuario</h1>

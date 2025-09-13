@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Consulta de Evento — Eventos.uy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+	<header class="site-header">
+	  <div class="container header-grid">
+	    <!-- Izquierda: buscador -->
+	    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+	      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+	      <button class="btn" type="submit">Buscar</button>
+	    </form>
+
+	    <!-- Centro: brand -->
+	    <a class="brand" href="PrincipalLogueado.html">Eventos.uy</a>
+
+		<!-- Derecha: usuario -->
+		<nav class="user-nav" aria-label="Usuario">
+		  <!-- Clic en foto o nombre => ModificarDatosUsuario -->
+		  <a class="user" href="ModificarUsuario.html" title="Modificar mis datos">
+		    <img src="../img/avatar.png" alt="Foto de perfil">
+		    <span class="user-name">Nombre</span>
+		  </a>
+		  <a class="btn ghost" href="index.html">Cerrar sesión</a>
+		</nav>
+	  </div>
+	</header>
+
+  <main class="container">
+    <!-- Layout: sidebar izquierda / contenido / ediciones derecha -->
+    <section class="layout">
+      <!-- Sidebar izquierda -->
+      <aside class="sidebar">
+        <nav class="side-group">
+          <h3>Mi Perfil</h3>
+          <a href="Perfil.html">Mi perfil</a>
+          <a href="AltaEvento.html">Alta Evento</a>
+          <a href="AltaEdicion.html">Alta Edición</a>
+          <a href="AltaInstitucion.html">Alta Institución</a>
+        </nav>
+
+        <nav class="side-group">
+          <h3>Categorías</h3>
+          <a href="index.html#cat/tecnologia">Tecnología</a>
+          <a href="index.html#cat/innovacion">Innovación</a>
+          <a href="index.html#cat/literatura">Literatura</a>
+          <a href="index.html#cat/cultura">Cultura</a>
+          <a href="index.html#cat/musica">Música</a>
+          <a href="index.html#cat/deporte">Deporte</a>
+          <a href="index.html#cat/salud">Salud</a>
+          <a href="index.html#cat/entretenimiento">Entretenimiento</a>
+          <a href="index.html#cat/negocios">Negocios</a>
+        </nav>
+      </aside>
+
+      <!-- Contenido principal: datos del evento -->
+      <article class="event-card">
+        <header class="event-header">
+          <img class="event-cover" src="../img/evento-maraton.jpg" alt="Maratón de Montevideo">
+          <div>
+            <h1 class="event-title">Maratón de Montevideo</h1>
+            <div class="event-meta">
+              <span><strong>Sigla:</strong> MARATON</span>
+              <span><strong>Fecha alta:</strong> 01/01/2022</span>
+            </div>
+            <div class="chips">
+              <span class="chip">Deporte</span>
+              <span class="chip">Salud</span>
+            </div>
+          </div>
+        </header>
+
+        <section class="event-body">
+          <h3>Descripción</h3>
+          <p>Competencia deportiva anual en la capital.</p>
+        </section>
+      </article>
+
+      <!-- Columna derecha: ediciones del evento -->
+      <aside class="editions">
+        <h3>Ediciones</h3>
+
+        <a class="edition-item" href="ConsultaEdicion.html?id=2025">
+          <img src="../img/edicion-2025.jpg" alt="">
+          <div>
+            <div class="edition-title">Maratón 2025</div>
+            <small>Montevideo — 20/04/2025</small>
+          </div>
+        </a>
+
+        <a class="edition-item" href="ConsultaEdicion.html?id=2022">
+          <img src="../img/edicion-2022.jpg" alt="">
+          <div>
+            <div class="edition-title">Maratón 2022</div>
+            <small>Montevideo — 10/04/2022</small>
+          </div>
+        </a>
+
+        <a class="edition-item" href="ConsultaEdicion.html?id=2019">
+          <img src="../img/edicion-2019.jpg" alt="">
+          <div>
+            <div class="edition-title">Maratón 2019</div>
+            <small>Montevideo — 07/04/2019</small>
+          </div>
+        </a>
+      </aside>
+    </section>
+
+    <p><a href="index.html">← Volver al inicio</a></p>
+  </main>
+</body>
+</html>
