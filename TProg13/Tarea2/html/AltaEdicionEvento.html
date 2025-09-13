@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Alta de Edición de Evento</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/AltaEdicionEvento.css">
+</head>
+<body>
+  <!-- Cabecera minimal -->
+  <header class="topbar">
+    <div class="topbar-wrap">
+      <a class="topbar-brand" href="index.html">Eventos.uy</a>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1>Alta de Edición de Evento</h1>
+    <form id="form-edicion" class="card">
+      <label>Evento existente
+        <select id="evento" required>
+          <option value="">-- Seleccionar evento --</option>
+          <option value="Evento1">Evento 1</option>
+          <option value="Evento2">Evento 2</option>
+        </select>
+      </label>
+
+      <label>Nombre único de la edición
+        <input id="nombre" type="text" required>
+      </label>
+
+      <label>Sigla
+        <input id="sigla" type="text" required>
+      </label>
+
+      <div class="row">
+        <div>
+          <label>Ciudad
+            <input id="ciudad" type="text" required>
+          </label>
+        </div>
+        <div>
+          <label>País
+            <input id="pais" type="text" required>
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Fecha de inicio
+            <input id="inicio" type="date" required>
+          </label>
+        </div>
+        <div>
+          <label>Fecha de fin
+            <input id="fin" type="date" required>
+          </label>
+        </div>
+      </div>
+
+      <label>Imagen (opcional)
+        <input id="img" type="file" accept="image/*">
+      </label>
+
+      <div class="actions">
+        <button type="submit" class="btn">Crear edición</button>
+        <a class="btn ghost" href="index.html">Cancelar</a>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    document.getElementById("form-edicion").addEventListener("submit", e => {
+      e.preventDefault();
+      const ediciones = JSON.parse(localStorage.getItem("ediciones") || "[]");
+
+      const nombre = document.getElementById("nombre").value.trim();
+
+      if (ediciones.find(e => e.nombre === nombre)) {
+        alert("El nombre de la edición ya está en uso.");
+        return;
+      }
+
+      const nueva = {
+        evento: document.getElementById("evento").value,
+        nombre,
+        sigla: document.getElementById("sigla").value,
+        ciudad: document.getElementById("ciudad").value,
+        pais: document.getElementById("pais").value,
+        inicio: document.getElementById("inicio").value,
+        fin: document.getElementById("fin").value,
+        estado: "Ingresada",
+        fechaAlta: new Date().toISOString().split("T")[0]
+      };
+
+      ediciones.push(nueva);
+      localStorage.setItem("ediciones", JSON.stringify(ediciones));
+      alert("Edición creada con éxito ✅");
+      window.location.href = "index.html";
+    });
+  </script>
+</body>
+</html>
