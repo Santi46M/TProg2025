@@ -2,3 +2,36 @@ function toggleMenu() {
 	  const sidebar = document.getElementById("sidebar");
 	  sidebar.classList.toggle("active");
 	}
+	
+	
+	document.addEventListener("DOMContentLoaded", () => {
+	  const usuario = JSON.parse(sessionStorage.getItem("usuarioActivo"));
+	  const menuList = document.getElementById("menuList");
+
+	  if (!usuario) {
+	    // 🔹 Si NO está logueado → menú básico
+	    menuList.innerHTML = `
+	      <li><a href="ConsultaEvento.html"><i class='bx bx-search'></i> Consultar Evento</a></li>
+	      <li><a href="ConsultaEdicionEvento.html"><i class='bx bx-calendar'></i> Consultar Edición</a></li>
+	      <li><a href="ConsultaTipoRegistro.html"><i class='bx bx-list-ul'></i> Tipos de Registro</a></li>
+	    `;
+	  } else if (usuario.rol === "organizador") {
+	    // 🔹 Menú para ORGANIZADOR
+	    menuList.innerHTML = `
+	      <li><a href="AltaEvento.html"><i class='bx bx-plus-circle'></i> Alta de Evento</a></li>
+	      <li><a href="AltaEdicionEvento.html"><i class='bx bx-calendar-plus'></i> Alta de Edición</a></li>
+	      <li><a href="AltaTipoRegistro.html"><i class='bx bx-detail'></i> Alta Tipo Registro</a></li>
+	      <li><a href="ConsultaEvento.html"><i class='bx bx-search'></i> Consultar Evento</a></li>
+	      <li><a href="ConsultaEdicionEvento.html"><i class='bx bx-calendar'></i> Consultar Edición</a></li>
+	      <li><a href="ConsultaTipoRegistro.html"><i class='bx bx-list-ul'></i> Tipos de Registro</a></li>
+	    `;
+	  } else if (usuario.rol === "asistente") {
+	    // 🔹 Menú para ASISTENTE
+	    menuList.innerHTML = `
+	      <li><a href="ConsultaEvento.html"><i class='bx bx-search'></i> Consultar Evento</a></li>
+	      <li><a href="ConsultaEdicionEvento.html"><i class='bx bx-calendar'></i> Consultar Edición</a></li>
+	      <li><a href="ConsultaRegistro.html"><i class='bx bx-user-check'></i> Mis Registros</a></li>
+	      <li><a href="ConsultaTipoRegistro.html"><i class='bx bx-list-ul'></i> Tipos de Registro</a></li>
+	    `;
+	  }
+	});

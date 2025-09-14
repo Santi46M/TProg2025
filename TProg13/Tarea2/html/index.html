@@ -21,14 +21,8 @@
 	<!-- Sidebar -->
 	<aside id="sidebar" class="sidebar-mobile">
 	  <h3><i class='bx bx-list-ul'></i> Menú</h3>
-	  <ul>
-	     <li><a href="AltaEvento.html"><i class='bx bx-wifi-0'></i> Alta de Evento</a></li>
-        <li><a href="AltaEdicionEvento.html"><i class='bx bx-wifi-0'></i> Alta de Edicion</a></li>
-        <li><a href="AltaTipoRegistro.html"><i class='bx bx-wifi-0'></i> Alta Tipo Registro</a></li>
-        <li><a href="ConsultaEvento.html"><i class='bx bx-wifi-0'></i> Consulta de Evento</a></li>
-        <li><a href="ConsultaEdicionEvento.html"><i class='bx bx-wifi-0'></i> Consulta de Edicion</a></li>
-        <li><a href="ConsultaRegistro.html"><i class='bx bx-wifi-0'></i> Consulta de Regitro</a></li>
-        <li><a href="ConsultaTipoRegistro.html"><i class='bx bx-wifi-0'></i> Consulta de Tipo Registro</a></li>
+	  <ul id="menuList">
+	    <!-- Aquí JS inyecta el menú según rol -->
 	  </ul>
 
 	</aside>
@@ -40,11 +34,11 @@
 	      <button class="btn" type="submit">Buscar</button>
 	    </form>
       </nav>
-<nav class="user-nav" id="userNav">
-  <!-- Estos se ocultan si hay usuario logueado -->
-  <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-  <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
-</nav>
+          <!-- 🔹 Zona dinámica de usuario -->
+    <nav class="user-nav" id="userNav">
+      <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+      <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+    </nav>
     </div>
   </header>
 
