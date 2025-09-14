@@ -38,7 +38,7 @@
 	      <button class="btn" type="submit">Buscar</button>
 	    </form>
       </nav>
-      <nav class="user-nav">
+      <nav class="user-nav" id="userNav">
         <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
         <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
       </nav>
@@ -129,22 +129,6 @@
     <p><a href="index.html">← Volver al inicio</a></p>
   </main>
    <script src="../js/Hamburgesa.js"></script>
-   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const userNav = document.getElementById("userNav");
-    const usuario = JSON.parse(sessionStorage.getItem("usuarioActivo"));
-
-    if (usuario) {
-      // Reemplaza contenido por info del usuario logueado
-      let html = `
-        <span>Hola, ${usuario.nombre}</span>
-        <a class="btn" href="ModificarUsuario.html"><i class='bx bxs-log-out'></i> Mi Perfil</a>
-        <a class="btn" href="CierreSesion.html"><i class='bx bxs-log-out'></i> Cerrar sesión</a>
-      `;
-
-      userNav.innerHTML = html;
-    }
-  });
-</script>
+<script src="../js/Login.js"></script>
 </body>
 </html>

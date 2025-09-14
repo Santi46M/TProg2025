@@ -38,10 +38,11 @@
 	      <button class="btn" type="submit">Buscar</button>
 	    </form>
       </nav>
-      <nav class="user-nav">
-        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
-      </nav>
+          <!-- 🔹 Zona dinámica de usuario -->
+    <nav class="user-nav" id="userNav">
+      <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+      <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+    </nav>
     </div>
   </header>
 
@@ -50,8 +51,8 @@
     <form id="loginForm" class="card form">
       <div class="row">
         <div>
-          <label for="email">Correo electrónico</label>
-          <input id="email" name="email" type="email" required>
+          <label for="email">Correo electrónico o Nickname</label>
+		  <input id="email" name="email" type="text" required placeholder="Correo o Nick">
         </div>
       </div>
       <div class="row">
@@ -67,56 +68,30 @@
       <p id="error" style="color:red;display:none;">Credenciales incorrectas</p>
     </form>
   </main>
+<script>
+  const form = document.getElementById('loginForm');
+  const error = document.getElementById('error');
 
-  <script>
-    const form = document.getElementById('loginForm');
-    const error = document.getElementById('error');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const emailOrNick = form.email.value.trim(); // puede ser correo o nick
+    const pass  = form.pass.value;
 
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const email = form.email.value.trim();
-      const pass  = form.pass.value;
+    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
 
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-      const user = usuarios.find(u => u.email === email && u.pass === pass);
+    const user = usuarios.find(u => 
+      (u.email === emailOrNick || u.nick === emailOrNick) && u.pass === pass
+    );
 
-      if (user) {
-        sessionStorage.setItem("usuarioActivo", JSON.stringify(user));
-        window.location.href = "index.html";
-      } else {
-        error.style.display = "block";
-      }
-    });
-  </script>
-   <script src="../js/Hamburgesa.js"></script>
-   <script>
-  // Hardcodear usuarios por defecto
-  const defaultUsers = [
-    {
-      nick: "JuanPerez",
-      email: "JPerez@eventos.uy",
-      pass: "1234",
-      rol: "asistente",
-      nombre: "Juan",
-      apellido: "Pérez",
-      nac: "1990-01-01",
-      instId: "inst1"
-    },
-    {
-      nick: "INCO",
-      email: "inco@eventos.uy",
-      pass: "abcd",
-      rol: "organizador",
-      nombre: "Instituto de Computacion",
-      desc: "Instituto mas duro de la Fing",
-      web: "https://organizador1.com"
+    if (user) {
+      sessionStorage.setItem("usuarioActivo", JSON.stringify(user));
+      window.location.href = "index.html";
+    } else {
+      error.style.display = "block";
     }
-  ];
-
-  // Guardar en localStorage solo si no existe
-  if(!localStorage.getItem("usuarios")){
-    localStorage.setItem("usuarios", JSON.stringify(defaultUsers));
-  }
+  });
 </script>
+   <script src="../js/Hamburgesa.js"></script>
+   <script src="../js/CargaUsers.js"></script>
 </body>
 </html>
