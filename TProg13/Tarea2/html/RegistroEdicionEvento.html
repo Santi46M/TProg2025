@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro a Edición de Evento</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/RegistroEdicionEvento.css">
+</head>
+<body>
+  <!-- Cabecera -->
+  <header class="topbar">
+    <div class="topbar-wrap">
+      <a class="topbar-brand" href="index.html">Eventos.uy</a>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1>Registro a Edición de Evento</h1>
+
+    <!-- Selección de evento y edición -->
+    <section class="card">
+      <label>Seleccionar evento
+        <select id="selEvento">
+          <option value="">-- Seleccionar evento --</option>
+        </select>
+      </label>
+      <label>Seleccionar edición
+        <select id="selEdicion" disabled>
+          <option value="">-- Seleccionar edición --</option>
+        </select>
+      </label>
+    </section>
+
+    <!-- Tipos de registro -->
+    <section id="boxRegistro" class="card hide">
+      <h2>Tipos de registro</h2>
+      <label>
+        <select id="tipoRegistro">
+          <option value="">-- Seleccionar tipo de registro --</option>
+        </select>
+      </label>
+
+      <!-- Código de patrocinio -->
+      <label>Código de patrocinio (opcional)
+        <input type="text" id="codigoPatrocinio"">
+      </label>
+
+      <button class="btn" id="btnRegistrar">Confirmar registro</button>
+    </section>
+
+    <!-- Resultado -->
+    <section id="boxResultado" class="card hide">
+      <h2>Resultado del registro</h2>
+      <p id="msgResultado"></p>
+    </section>
+  </main>
+
+  <script>
+  // ====== Datos de prueba ======
+  const SESION = { rol:"asistente", nick:"Juan", institucion:"FING" };
+
+  const DATA = [
+    {
+      id:"ev1", nombre:"JSConf",
+      ediciones:[
+        {
+          id:"ed1", nombre:"JSConf 2025",
+          tipos:["General","VIP"],
+          codigos:[
+            {codigo:"123", tipo:"General", institucion:"FING", usosMax:2, usados:1}
+          ]
+        }
+      ]
+    }
+  ];
+
+  // utilidades
+  const $ = s => document.querySelector(s);
+  const el = (t, attrs={}, txt) => {
+    const n=document.createElement(t);
+    Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));
+    if(txt!=null) n.textContent=txt;
+    return n;
+  };
+
+  const selEvento = $('#selEvento');
+  const selEdicion = $('#selEdicion');
+  const tipoRegistro = $('#tipoRegistro');
+  const codigoPatrocinio = $('#codigoPatrocinio');
+  const boxRegistro = $('#boxRegistro');
+  const boxResultado = $('#boxResultado');
+  const msgResultado = $('#msgResultado');
+  const btnRegistrar = $('#btnRegistrar');
+
+  // cargar eventos
+  DATA.forEach(ev=>selEvento.appendChild(el('option',{value:ev.id},ev.nombre)));
+
+  // al elegir evento → cargar ediciones
+  selEvento.addEventListener('change', ()=>{
+    selEdicion.innerHTML='<option value="">-- Seleccionar edición --</option>';
+    boxRegistro.classList.add('hide');
+    const ev = DATA.find(e=>e.id===selEvento.value);
+    if (!ev) { selEdicion.disabled=true; return; }
+    ev.ediciones.forEach(ed=>selEdicion.appendChild(el('option',{value:ed.id},ed.nombre)));
+    selEdicion.disabled=false;
+  });
+
+  // al elegir edición → mostrar tipos de registro
+  selEdicion.addEventListener('change', ()=>{
+    tipoRegistro.innerHTML='<option value="">-- Seleccionar tipo de registro --</option>';
+    boxResultado.classList.add('hide');
+    const ev = DATA.find(e=>e.id===selEvento.value);
+    const ed = ev? ev.ediciones.find(ed=>ed.id===selEdicion.value):null;
+    if (!ed) { boxRegistro.classList.add('hide'); return; }
+    ed.tipos.forEach(t=>tipoRegistro.appendChild(el('option',{value:t},t)));
+    boxRegistro.classList.remove('hide');
+  });
+
+  // registrar
+  btnRegistrar.addEventListener('click', ()=>{
+    const ev = DATA.find(e=>e.id===selEvento.value);
+    const ed = ev? ev.ediciones.find(ed=>ed.id===selEdicion.value):null;
+    if (!ed) return;
+    const tipo = tipoRegistro.value;
+    const cod = codigoPatrocinio.value.trim();
+
+    if (!tipo) { alert("Seleccioná un tipo de registro"); return; }
+
+    let costo = 100; // costo base ficticio
+    let ok = true;
+
+    if (cod) {
+      const c = ed.codigos.find(c=>c.codigo===cod);
+      if (!c) { ok=false; msgResultado.textContent="El código no existe."; }
+      else if (c.tipo!==tipo) { ok=false; msgResultado.textContent="El código no aplica a este tipo."; }
+      else if (c.institucion!==SESION.institucion) { ok=false; msgResultado.textContent="El código no corresponde a tu institución."; }
+      else if (c.usados>=c.usosMax) { ok=false; msgResultado.textContent="El código ya alcanzó su límite de usos."; }
+      else {
+        costo=0;
+        c.usados++;
+        msgResultado.textContent=`Registro exitoso con código de patrocinio. Costo = ${costo}`;
+      }
+    } else {
+      msgResultado.textContent=`Registro exitoso en tipo ${tipo}. Costo = ${costo}`;
+    }
+
+    if (ok) {
+      boxResultado.classList.remove('hide');
+    } else {
+      boxResultado.classList.remove('hide');
+    }
+  });
+  </script>
+</body>
+</html>

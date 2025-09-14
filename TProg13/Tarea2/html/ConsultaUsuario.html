@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Usuario</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/ConsultaUsuario.css">
+</head>
+<body>
+  <!-- Cabecera -->
+  <header class="topbar">
+    <div class="topbar-wrap">
+      <a class="topbar-brand" href="index.html">Eventos.uy</a>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1>Consulta de Usuario</h1>
+
+    <!-- Selector de usuario -->
+    <section class="card">
+      <label for="selUsuario">Seleccionar usuario</label>
+      <select id="selUsuario">
+        <option value="">-- Seleccionar usuario --</option>
+      </select>
+    </section>
+
+    <!-- Detalle de usuario -->
+    <section id="boxDetalle" class="card hide">
+      <div class="user-head">
+        <div>
+          <h2 id="uNombre">—</h2>
+          <p id="uDescripcion" class="muted">—</p>
+          <p><strong>Fecha de nacimiento:</strong> <span id="uFecha">—</span></p>
+          <p><strong>Rol:</strong> <span id="uRol">—</span></p>
+        </div>
+        <div id="uImgWrap"></div>
+      </div>
+
+      <div id="boxExtra" class="mt"></div>
+    </section>
+  </main>
+
+  <script>
+  // ===== Datos de prueba =====
+  const SESION = {nick:"Ana", rol:"organizador"}; // Usuario logueado
+
+  const USUARIOS = [
+    {
+      nick:"Ana", rol:"organizador",
+      nombre:"Ana Pérez", descripcion:"Organizadora de conferencias JS",
+      fecha:"1990-05-20", imagen:"https://picsum.photos/seed/ana/200/200",
+      ediciones:{
+        aceptadas:["JSConf 2025"],
+        ingresadas:["JSConf 2026"],
+        rechazadas:[]
+      }
+    },
+    {
+      nick:"Juan", rol:"asistente",
+      nombre:"Juan López", descripcion:"Estudiante de informática",
+      fecha:"2002-09-12", imagen:"https://picsum.photos/seed/juan/200/200",
+      registros:["JSConf 2025","UX Day 2025"]
+    },
+    {
+      nick:"Beto", rol:"organizador",
+      nombre:"Beto García", descripcion:"Diseñador UX",
+      fecha:"1988-03-10", imagen:"https://picsum.photos/seed/beto/200/200",
+      ediciones:{ aceptadas:["UX Day 2025"], ingresadas:["UU"], rechazadas:["UX Day 2024"] }
+    }
+  ];
+
+  // utilidades
+  const $ = s => document.querySelector(s);
+  const el = (t,attrs={},txt) => {
+    const n=document.createElement(t);
+    Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));
+    if(txt!=null) n.textContent=txt;
+    return n;
+  };
+
+  const selUsuario=$('#selUsuario');
+  const boxDetalle=$('#boxDetalle');
+  const uNombre=$('#uNombre'), uDescripcion=$('#uDescripcion'),
+        uFecha=$('#uFecha'), uRol=$('#uRol'), uImgWrap=$('#uImgWrap');
+  const boxExtra=$('#boxExtra');
+
+  // cargar usuarios
+  USUARIOS.forEach(u=>selUsuario.appendChild(el('option',{value:u.nick},u.nombre)));
+
+  selUsuario.addEventListener('change', ()=>{
+    const u=USUARIOS.find(x=>x.nick===selUsuario.value);
+    if(!u){ boxDetalle.classList.add('hide'); return; }
+    mostrarUsuario(u);
+  });
+
+  function mostrarUsuario(u){
+    uNombre.textContent=u.nombre;
+    uDescripcion.textContent=u.descripcion;
+    uFecha.textContent=u.fecha;
+    uRol.textContent=u.rol;
+    uImgWrap.innerHTML="";
+    if(u.imagen){ uImgWrap.appendChild(el('img',{src:u.imagen,alt:u.nombre})); }
+
+    // contenido extra según rol
+    boxExtra.innerHTML="";
+    if(u.rol==="organizador"){
+      const {aceptadas=[], ingresadas=[], rechazadas=[]}=u.ediciones||{};
+      const div=el('div');
+      div.innerHTML="<h3>Ediciones</h3>";
+      if(aceptadas.length) div.appendChild(el('p',{}, "Aceptadas: "+aceptadas.join(", ")));
+      if(u.nick===SESION.nick){ // si consulta su propio perfil
+        if(ingresadas.length) div.appendChild(el('p',{},"Ingresadas: "+ingresadas.join(", ")));
+        if(rechazadas.length) div.appendChild(el('p',{},"Rechazadas: "+rechazadas.join(", ")));
+      }
+      boxExtra.appendChild(div);
+    } else if(u.rol==="asistente"){
+      const regs=u.registros||[];
+      if(regs.length){
+        const div=el('div');
+        div.innerHTML="<h3>Registros</h3>";
+        const ul=el('ul');
+        regs.forEach(r=>ul.appendChild(el('li',{},r)));
+        div.appendChild(ul);
+        boxExtra.appendChild(div);
+      }
+    }
+    boxDetalle.classList.remove('hide');
+  }
+  </script>
+</body>
+</html>
