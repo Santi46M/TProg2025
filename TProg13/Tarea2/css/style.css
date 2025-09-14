@@ -415,4 +415,37 @@ legend{ padding:0 .4rem; font-weight:700; color:#374151; }
   display: none;
 }
 
+/* Botón hamburguesa */
+.hamburguesa {
+  font-size: 24px;
+  background: none ;
+  border: none ;
+  cursor: pointer ;
+  margin: 1rem ;
+  z-index: 1001 ;
+  position: relative ;
+}
+
+/* Sidebar oculto por defecto */
+.sidebar-mobile {
+
+	
+  position: fixed !important;
+  top: 0;
+  left: -250px; /* ⬅️ oculto */
+  width: 250px;
+  height: 100%;
+  background: #fff;
+  box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+  transition: left 0.3s ease;
+  padding: 1rem;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+/* Sidebar visible */
+.sidebar-mobile.active {
+  left: 0; /* aparece en pantalla */
+}
+
 /* ===== FIN Consulta de Tipo de Registro ===== */

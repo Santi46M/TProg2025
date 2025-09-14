@@ -6,27 +6,44 @@
   <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
+  <!-- Header -->
   <header class="site-header">
-    <div class="container header-grid">
-      <!-- Izquierda: buscador -->
-      <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-        <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-        <button class="btn" type="submit">Buscar</button>
-      </form>
+    <div class="container">
+     
+	<!-- Botón hamburguesa -->
+	<button class="hamburguesa" onclick="toggleMenu()">
+	  ☰
+	</button>
+	
+	<!-- Sidebar -->
+	<aside id="sidebar" class="sidebar-mobile">
+	  <h3><i class='bx bx-list-ul'></i> Menú</h3>
+	  <ul>
+	     <li><a href="AltaEvento.html"><i class='bx bx-wifi-0'></i> Alta de Evento</a></li>
+        <li><a href="AltaEdicionEvento.html"><i class='bx bx-wifi-0'></i> Alta de Edicion</a></li>
+        <li><a href="AltaTipoRegistro.html"><i class='bx bx-wifi-0'></i> Alta Tipo Registro</a></li>
+        <li><a href="ConsultaEvento.html"><i class='bx bx-wifi-0'></i> Consulta de Evento</a></li>
+        <li><a href="ConsultaEdicionEvento.html"><i class='bx bx-wifi-0'></i> Consulta de Edicion</a></li>
+        <li><a href="ConsultaRegistro.html"><i class='bx bx-wifi-0'></i> Consulta de Regitro</a></li>
+        <li><a href="ConsultaTipoRegistro.html"><i class='bx bx-wifi-0'></i> Consulta de Tipo Registro</a></li>
+	  </ul>
 
-      <!-- Centro: brand -->
-      <a class="brand" href="PrincipalLogueado.html">Eventos.uy</a>
-
-      <!-- Derecha: usuario -->
-      <nav class="user-nav" aria-label="Usuario">
-        <a class="user" href="ModificarUsuario.html" title="Modificar mis datos">
-          <img src="../img/avatar.png" alt="Foto de perfil">
-          <span class="user-name">Nombre</span>
-        </a>
-        <a class="btn ghost" href="index.html">Cerrar sesión</a>
+	</aside>
+     <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <nav class="main-nav">
+        	    <!-- Izquierda: buscador -->
+	    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+	      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+	      <button class="btn" type="submit">Buscar</button>
+	    </form>
+      </nav>
+      <nav class="user-nav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
       </nav>
     </div>
   </header>
+
 
   <main class="container">
     <section class="form-card-altaTipoRegistro">
@@ -71,5 +88,6 @@
       </form>
     </section>
   </main>
+   <script src="../js/Hamburgesa.js"></script>
 </body>
 </html>
