@@ -5,6 +5,7 @@
   <title>Cerrando sesión...</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/CierreSesion.css">
   <script>
     function cerrarSesion() {
       sessionStorage.removeItem("usuarioActivo");
@@ -17,10 +18,11 @@
 </head>
 <body>
   <main class="container narrow">
-    <div class="card" style="text-align:center; margin-top:3rem;">
-      <h1>Cerrando sesión...</h1>
-      <p>Serás redirigido al inicio en unos segundos.</p>
-    </div>
+  <div class="card" style="text-align:center; margin-top:3rem;">
+  <h1>Cerrando sesión...</h1>
+  <p>Serás redirigido al inicio en unos segundos.</p>
+  <div class="spinner"></div>
+</div>
   </main>
 </body>
 </html>
