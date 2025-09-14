@@ -18,9 +18,9 @@ function toggleMenu() {
 	  } else if (usuario.rol === "organizador") {
 	    // 🔹 Menú para ORGANIZADOR
 	    menuList.innerHTML = `
-	      <li><a href="AltaEvento.html"><i class='bx bx-plus-circle'></i> Alta de Evento</a></li>
-	      <li><a href="AltaEdicionEvento.html"><i class='bx bx-calendar-plus'></i> Alta de Edición</a></li>
-	      <li><a href="AltaTipoRegistro.html"><i class='bx bx-detail'></i> Alta Tipo Registro</a></li>
+	      <li><a href="AltaEvento.html"><i class='bx bx-plus-circle'></i> Crear Evento</a></li>
+	      <li><a href="AltaEdicionEvento.html"><i class='bx bx-calendar-plus'></i> Crear Edición</a></li>
+	      <li><a href="AltaTipoRegistro.html"><i class='bx bx-detail'></i> Crear Tipo Registro</a></li>
 	      <li><a href="ConsultaEvento.html"><i class='bx bx-search'></i> Consultar Evento</a></li>
 	      <li><a href="ConsultaEdicionEvento.html"><i class='bx bx-calendar'></i> Consultar Edición</a></li>
 	      <li><a href="ConsultaTipoRegistro.html"><i class='bx bx-list-ul'></i> Tipos de Registro</a></li>
@@ -32,6 +32,7 @@ function toggleMenu() {
 	      <li><a href="ConsultaEdicionEvento.html"><i class='bx bx-calendar'></i> Consultar Edición</a></li>
 	      <li><a href="ConsultaRegistro.html"><i class='bx bx-user-check'></i> Mis Registros</a></li>
 	      <li><a href="ConsultaTipoRegistro.html"><i class='bx bx-list-ul'></i> Tipos de Registro</a></li>
+		  <li><a href="RegistroEdicionEvento.html"><i class='bx bx-list-ul'></i> Registrarse a Edicion</a></li>
 	    `;
 	  }
 	});
