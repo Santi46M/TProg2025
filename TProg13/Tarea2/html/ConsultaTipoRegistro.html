@@ -1,124 +1,312 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Consulta de Tipo de Registro</title>
+  <title>Consulta de Tipo de Registro — Eventos.uy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+    .hidden{ display:none; }
+    .muted { color:#6b7280; }
+    .form-card-consultaTipoRegistro{ border:1px solid #e5e7eb; border-radius:.6rem; padding:1rem; background:#fff; }
+    .form-group-consultaTipoRegistro{ margin:.8rem 0; }
+    .form-group-consultaTipoRegistro label{ display:block; font-weight:600; margin-bottom:.35rem; }
+    .form-group-consultaTipoRegistro select{
+      width:100%; padding:.55rem .7rem; border:1px solid #cbd5e1; border-radius:.45rem;
+    }
+    .registro-detalles-consultaTipoRegistro{ margin-top:1rem; }
+    .registro-detalles-consultaTipoRegistro ul{ list-style:none; padding-left:0; }
+    .registro-detalles-consultaTipoRegistro li{ margin:.25rem 0; }
+    .actions{ margin-top:1rem; display:flex; gap:.75rem; }
+  </style>
 </head>
 <body>
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-     
-	<!-- Botón hamburguesa -->
-	<button class="hamburguesa" onclick="toggleMenu()">
-	  ☰
-	</button>
-	
-	<!-- Sidebar -->
-	<aside id="sidebar" class="sidebar-mobile">
-	  <h3><i class='bx bx-list-ul'></i> Menú</h3>
-	  <ul id="menuList">
-	    <!-- Aquí JS inyecta el menú según rol -->
-	  </ul>
+      <!-- Botón hamburguesa -->
+      <button class="hamburguesa" onclick="toggleMenu()">☰</button>
 
-	</aside>
-     <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <!-- Sidebar -->
+      <aside id="sidebar" class="sidebar-mobile">
+        <h3><i class='bx bx-list-ul'></i> Menú</h3>
+        <ul id="menuList"><!-- Aquí JS inyecta el menú según rol --></ul>
+      </aside>
+
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
       <nav class="main-nav">
-        	    <!-- Izquierda: buscador -->
-	    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-	      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-	      <button class="btn" type="submit">Buscar</button>
-	    </form>
+        <!-- Buscador -->
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
       </nav>
-          <!-- 🔹 Zona dinámica de usuario -->
-    <nav class="user-nav" id="userNav">
-      <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-      <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
-    </nav>
+
+      <!-- Zona dinámica de usuario -->
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
     </div>
   </header>
 
-
-  <main class="container">
+  <main class="container narrow">
     <section class="form-card-consultaTipoRegistro">
       <h2>Consulta de Tipo de Registro</h2>
+      <p class="muted" id="subtitulo">Seleccioná evento, edición y tipo.</p>
 
       <!-- Paso 1: Eventos -->
       <div class="form-group-consultaTipoRegistro">
-        <label for="evento">Seleccione un evento*</label>
-        <select id="evento" name="evento" required>
-          <option value="">-- Seleccione un evento --</option>
-          <option value="evento1">Evento 1</option>
-          <option value="evento2">Evento 2</option>
+        <label for="evento">Evento*</label>
+        <select id="evento" required>
+          <option value="">-- Seleccionar evento --</option>
         </select>
       </div>
 
       <!-- Paso 2: Ediciones aprobadas -->
       <div class="form-group-consultaTipoRegistro">
-        <label for="edicion">Seleccione una edición (Aprobada)*</label>
-        <select id="edicion" name="edicion" required>
-          <option value="">-- Seleccione una edición --</option>
-          <option value="edicion1">Edición 1</option>
-          <option value="edicion2">Edición 2</option>
+        <label for="edicion">Edición (Aprobada)*</label>
+        <select id="edicion" required disabled>
+          <option value="">-- Seleccionar edición --</option>
         </select>
       </div>
 
       <!-- Paso 3: Tipos de registro -->
       <div class="form-group-consultaTipoRegistro">
-        <label for="tipoRegistro">Seleccione un tipo de registro*</label>
-        <select id="tipoRegistro" name="tipoRegistro" required>
-          <option value="">-- Seleccione un tipo de registro --</option>
-          <option value="general">General</option>
-          <option value="estudiante">Estudiante</option>
+        <label for="tipoRegistro">Tipo de registro*</label>
+        <select id="tipoRegistro" required disabled>
+          <option value="">-- Seleccionar tipo --</option>
         </select>
       </div>
 
       <!-- Paso 4: Detalles del tipo de registro -->
-      <section id="registro-detalles-consultaTipoRegistro" class="registro-detalles-consultaTipoRegistro">
+      <section id="registro-detalles-consultaTipoRegistro" class="registro-detalles-consultaTipoRegistro hidden">
         <h3>Detalles del Tipo de Registro</h3>
-        <ul>
-          <li><strong>Nombre:</strong> </li>
-          <li><strong>Descripción:</strong></li>
-          <li><strong>Costo:</strong> </li>
-          <li><strong>Cupo:</strong></li>
+        <ul id="regList">
+          <li><strong>Nombre:</strong> <span id="regNombre">—</span></li>
+          <li><strong>Descripción:</strong> <span id="regDesc">—</span></li>
+          <li><strong>Costo:</strong> <span id="regPrecio">—</span></li>
+          <li><strong>Cupo:</strong> <span id="regCupos">—</span></li>
         </ul>
+
+        <div class="actions">
+          <a class="btn" id="volverEd" href="ConsultaEdicionEvento.html">Volver a la edición</a>
+        </div>
       </section>
-    </section>  
+    </section>
   </main>
+
   <script>
-  const tipoRegistroSelect = document.getElementById("tipoRegistro");
-  const detalles = document.getElementById("registro-detalles-consultaTipoRegistro");
-
-
-
-  tipoRegistroSelect.addEventListener("change", function () {
-	if (this.value) {
-      detalles.classList.remove("hidden");
-
-      
-      if (this.value === "general") {
-        detalles.querySelector("ul").innerHTML = `
-          <li><strong>Nombre:</strong> General</li>
-          <li><strong>Descripción:</strong> Acceso completo a todas las actividades</li>
-          <li><strong>Costo:</strong> $1500</li>
-          <li><strong>Cupo:</strong> 200</li>
-        `;
-      } else if (this.value === "estudiante") {
-        detalles.querySelector("ul").innerHTML = `
-          <li><strong>Nombre:</strong> Estudiante</li>
-          <li><strong>Descripción:</strong> Acceso a actividades con descuento</li>
-          <li><strong>Costo:</strong> $800</li>
-          <li><strong>Cupo:</strong> 100</li>
-        `;
-      }
-    } else {
-      detalles.classList.add("hidden");
+  // ============================
+  // DATA — el mismo universo que ConsultaEdicionEvento.html
+  // ============================
+  const DATA = [
+    {
+      id: "ev1", nombre: "JSConf",
+      ediciones: [
+        {
+          id:"ed1", nombre:"JSConf 2025", estado:"Aprobada",
+          ciudad:"Montevideo", pais:"Uruguay", organizador:"Ana Pérez",
+          tiposRegistros:[
+            {id:"gen", nombre:"General"},
+            {id:"vip", nombre:"VIP"}
+          ]
+        },
+        {
+          id:"ed2", nombre:"JSConf 2026", estado:"Ingresada",
+          ciudad:"Colonia", pais:"Uruguay", organizador:"Ana Pérez",
+          tiposRegistros:[{id:"gen", nombre:"General"}]
+        }
+      ]
+    },
+    {
+      id: "ev2", nombre: "UX Day",
+      ediciones: [
+        {
+          id:"ed3", nombre:"UX Day 2025", estado:"Aprobada",
+          ciudad:"Buenos Aires", pais:"Argentina", organizador:"Beto García",
+          tiposRegistros:[
+            {id:"gen", nombre:"General"},
+            {id:"est", nombre:"Estudiante"}
+          ]
+        }
+      ]
+    },
+    {
+      id: "ev3", nombre: "Data Summit",
+      ediciones: [
+        {
+          id:"ed4", nombre:"Data Summit 2024", estado:"Aprobada",
+          ciudad:"Madrid", pais:"España", organizador:"Carla López",
+          tiposRegistros:[
+            {id:"gen",  nombre:"General"},
+            {id:"prem", nombre:"Premium"}
+          ]
+        }
+      ]
+    },
+    {
+      id: "ev4", nombre: "Maratón de Montevideo",
+      ediciones: [
+        {
+          id:"ed5", nombre:"Maratón 2025", estado:"Aprobada",
+          ciudad:"Montevideo", pais:"Uruguay", organizador:"IMM",
+          tiposRegistros:[
+            {id:"k10", nombre:"10 KM"},
+            {id:"k20", nombre:"20 KM"}
+          ]
+        }
+      ]
     }
+  ];
+
+  // (Opcional) detalles por tipo (si no querés, dejá todo en '—')
+  const REG_DETAILS = {
+    gen:  { precio:'—', cupos:'—', desc:'—' },
+    vip:  { precio:'—', cupos:'—', desc:'—' },
+    est:  { precio:'—', cupos:'—', desc:'—' },
+    prem: { precio:'—', cupos:'—', desc:'—' },
+    k10:  { precio:'—', cupos:'—', desc:'Circuito 10 km.' },
+    k20:  { precio:'—', cupos:'—', desc:'Circuito 20 km.' }
+  };
+
+  // ============================
+  // Helpers
+  // ============================
+  const $ = s => document.querySelector(s);
+  const el = (t, attrs={}, txt) => {
+    const n = document.createElement(t);
+    Object.entries(attrs).forEach(([k,v]) => n.setAttribute(k,v));
+    if (txt!=null) n.textContent = txt;
+    return n;
+  };
+  const qs = new URLSearchParams(location.search);
+
+  // UI refs
+  const selEvento = $('#evento');
+  const selEdicion = $('#edicion');
+  const selTipo = $('#tipoRegistro');
+  const boxDetalle = $('#registro-detalles-consultaTipoRegistro');
+  const volverEd = $('#volverEd');
+
+  const regNombre = $('#regNombre');
+  const regDesc   = $('#regDesc');
+  const regPrecio = $('#regPrecio');
+  const regCupos  = $('#regCupos');
+
+  function findEditionById(edId){
+    for (const ev of DATA){
+      const ed = ev.ediciones.find(e => e.id === edId);
+      if (ed) return { ev, ed };
+    }
+    return null;
+  }
+
+  function getEventById(evId){ return DATA.find(e => e.id === evId); }
+
+  // ============================
+  // Carga inicial
+  // ============================
+  function cargarEventos(){
+    // solo los que tengan ediciones aprobadas
+    DATA.filter(ev => ev.ediciones.some(e => e.estado === 'Aprobada'))
+        .forEach(ev => selEvento.appendChild(el('option', {value: ev.id}, ev.nombre)));
+  }
+
+  function cargarEdiciones(evId){
+    selEdicion.innerHTML = '<option value="">-- Seleccionar edición --</option>';
+    selTipo.innerHTML    = '<option value="">-- Seleccionar tipo --</option>';
+    selTipo.disabled = true;
+
+    const ev = getEventById(evId);
+    if (!ev){ selEdicion.disabled = true; return; }
+
+    ev.ediciones.filter(e => e.estado === 'Aprobada')
+      .forEach(e => selEdicion.appendChild(el('option', {value:e.id}, e.nombre)));
+
+    selEdicion.disabled = false;
+  }
+
+  function cargarTipos(edId){
+    selTipo.innerHTML = '<option value="">-- Seleccionar tipo --</option>';
+    const ctx = findEditionById(edId);
+    if (!ctx){ selTipo.disabled = true; return; }
+    (ctx.ed.tiposRegistros || []).forEach(r => {
+      selTipo.appendChild(el('option', {value:r.id}, r.nombre));
+    });
+    selTipo.disabled = false;
+  }
+
+  function mostrarDetalles(edId, regId){
+    const ctx = findEditionById(edId);
+    if (!ctx){ boxDetalle.classList.add('hidden'); return; }
+    const reg = (ctx.ed.tiposRegistros || []).find(r => r.id === regId);
+    if (!reg){ boxDetalle.classList.add('hidden'); return; }
+
+    const d = REG_DETAILS[reg.id] || {precio:'—', cupos:'—', desc:'—'};
+    regNombre.textContent = reg.nombre;
+    regDesc.textContent   = d.desc;
+    regPrecio.textContent = d.precio;
+    regCupos.textContent  = d.cupos;
+
+    // actualizar “Volver a la edición”
+    volverEd.href = `ConsultaEdicionEvento.html?ed=${edId}`;
+
+    boxDetalle.classList.remove('hidden');
+  }
+
+  // ============================
+  // Listeners
+  // ============================
+  selEvento.addEventListener('change', () => {
+    boxDetalle.classList.add('hidden');
+    cargarEdiciones(selEvento.value);
   });
 
-</script>
- <script src="../js/Hamburgesa.js"></script>
-<script src="../js/Login.js"></script>
+  selEdicion.addEventListener('change', () => {
+    boxDetalle.classList.add('hidden');
+    cargarTipos(selEdicion.value);
+  });
+
+  selTipo.addEventListener('change', () => {
+    if (!selTipo.value){ boxDetalle.classList.add('hidden'); return; }
+    mostrarDetalles(selEdicion.value, selTipo.value);
+  });
+
+  // ============================
+  // Deep-link (?ed= & ?reg=) desde ConsultaEdicionEvento
+  // ============================
+  function preselectFromURL(){
+    const edParam  = qs.get('ed');
+    const regParam = qs.get('reg');
+
+    if (!edParam){ return; }
+
+    const ctx = findEditionById(edParam);
+    if (!ctx){ return; }
+
+    // Evento
+    selEvento.value = ctx.ev.id;
+    selEvento.dispatchEvent(new Event('change'));
+
+    // Edición
+    selEdicion.value = ctx.ed.id;
+    selEdicion.dispatchEvent(new Event('change'));
+
+    // Tipo (si viene)
+    if (regParam){
+      selTipo.value = regParam;
+      selTipo.dispatchEvent(new Event('change'));
+    }
+  }
+
+  // Init
+  cargarEventos();
+  preselectFromURL();
+  </script>
+
+  <script src="../js/Hamburgesa.js"></script>
+  <script src="../js/Login.js"></script>
 </body>
 </html>
