@@ -1,94 +1,130 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Alta de Evento</title>
-    <link rel="stylesheet" href="../css/style.css">
+  <meta charset="UTF-8">
+  <title>Crear Evento — Eventos.uy</title>
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-     
-	<!-- Botón hamburguesa -->
-	<button class="hamburguesa" onclick="toggleMenu()">
-	  ☰
-	</button>
-	
-	<!-- Sidebar -->
-	<aside id="sidebar" class="sidebar-mobile">
-	  <h3><i class='bx bx-list-ul'></i> Menú</h3>
-	  <ul id="menuList">
-	    <!-- Aquí JS inyecta el menú según rol -->
-	  </ul>
+      <!-- Botón hamburguesa -->
+      <button class="hamburguesa" onclick="toggleMenu()">☰</button>
 
-	</aside>
-     <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <!-- Sidebar -->
+      <aside id="sidebar" class="sidebar-mobile">
+        <h3><i class='bx bx-list-ul'></i> Menú</h3>
+        <ul id="menuList"><!-- Aquí JS inyecta el menú según rol --></ul>
+      </aside>
+
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
       <nav class="main-nav">
-        	    <!-- Izquierda: buscador -->
-	    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-	      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-	      <button class="btn" type="submit">Buscar</button>
-	    </form>
+        <!-- Buscador -->
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
       </nav>
-          <!-- 🔹 Zona dinámica de usuario -->
-    <nav class="user-nav" id="userNav">
-      <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-      <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
-    </nav>
+
+      <!-- 🔹 Zona dinámica de usuario -->
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
     </div>
   </header>
 
-    <main class="container">
-        <section class="form-card-altaEvento">
-            <h2>Alta de Evento</h2>
-            <form>
-                <div class="form-group-altaEvento">
-                    <label for="nombre">Nombre del evento*</label>
-                    <input type="text" id="nombreEvento" name="nombre" required>
-                </div>
+  <main class="container">
+    <section class="form-card-altaEvento">
+      <h2>Crear Evento</h2>
 
-                <div class="form-group-altaEvento">
-                    <label for="sigla">Sigla*</label>
-                    <input type="text" id="sigla" name="sigla" required>
-                </div>
+      <form id="form-alta-evento">
+        <div class="form-group-altaEvento">
+          <label for="nombre">Nombre del evento*</label>
+          <input type="text" id="nombre" name="nombre" required>
+        </div>
 
-                <div class="form-group-altaEvento">
-                    <label for="descripcion">Descripción*</label>
-                    <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
-                </div>
+        <div class="form-group-altaEvento">
+          <label for="sigla">Sigla*</label>
+          <input type="text" id="sigla" name="sigla" required>
+        </div>
 
-                <div class="form-group-altaEvento">
-                    <label for="categorias">Categorías*</label>
-                    <select id="categorias" name="categorias" multiple required>
-                        <option value="tecnologia">Tecnología</option>
-                        <option value="innovacion">Innovación</option>
-                        <option value="literatura">Literatura</option>
-                        <option value="cultura">Cultura</option>
-                        <option value="musica">Música</option>
-                        <option value="deporte">Deporte</option>
-                        <option value="salud">Salud</option>
-                        <option value="entretenimiento">Entretenimiento</option>
-                        <option value="negocios">Negocios</option>
-                    </select>
-                    <small>Puedes seleccionar más de una categoría (Ctrl+Click)</small>
-                </div>
+        <div class="form-group-altaEvento">
+          <label for="descripcion">Descripción*</label>
+          <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
+        </div>
 
-                <div class="form-group-altaEvento">
-                    <label for="imagen">Imagen (opcional)</label>
-                    <input type="file" id="imagen" name="imagen" accept="image/*">
-                </div>
-                <p class="form-hint-altaEvento">Los campos marcados con * son obligatorios.</p>
+        <!-- Categorías como checklist -->
+        <fieldset class="form-group-altaEvento">
+          <legend>Categorías*</legend>
 
-                <div class="form-actions-altaEvento">
-                    <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
-                    <button type="reset" class="btn-cancelar-altaEvento">Cancelar</button>
-                </div>
-                
-            </form>
-        </section>
-    </main>
-    <script src="../js/Hamburgesa.js"></script>
-	<script src="../js/Login.js"></script>
+          <div class="checkbox-grid">
+            <label><input type="checkbox" name="categorias" value="Tecnología"> Tecnología</label>
+            <label><input type="checkbox" name="categorias" value="Innovación"> Innovación</label>
+            <label><input type="checkbox" name="categorias" value="Literatura"> Literatura</label>
+            <label><input type="checkbox" name="categorias" value="Cultura"> Cultura</label>
+            <label><input type="checkbox" name="categorias" value="Música"> Música</label>
+            <label><input type="checkbox" name="categorias" value="Deporte"> Deporte</label>
+            <label><input type="checkbox" name="categorias" value="Salud"> Salud</label>
+            <label><input type="checkbox" name="categorias" value="Entretenimiento"> Entretenimiento</label>
+            <label><input type="checkbox" name="categorias" value="Negocios"> Negocios</label>
+          </div>
+
+          <!-- Preview de seleccionadas (usa tus estilos .chips/.chip si existen) -->
+          <div id="preview-categorias" class="chips" aria-live="polite"></div>
+          <small>Marcá una o más categorías.</small>
+        </fieldset>
+
+        <div class="form-group-altaEvento">
+          <label for="imagen">Imagen (opcional)</label>
+          <input type="file" id="imagen" name="imagen" accept="image/*">
+        </div>
+
+        <p class="form-hint-altaEvento">Los campos marcados con * son obligatorios.</p>
+
+        <div class="form-actions-altaEvento">
+          <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
+          <button type="reset" class="btn-cancelar-altaEvento">Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="../js/Hamburgesa.js"></script>
+  <script src="../js/Login.js"></script>
+
+  <script>
+  //  Preview de categorías seleccionadas + validación simple
+  (function(){
+    const form = document.getElementById('form-alta-evento');
+    const checks = [...document.querySelectorAll('input[name="categorias"]')];
+    const preview = document.getElementById('preview-categorias');
+
+    function renderPreview(){
+      const seleccionadas = checks.filter(c => c.checked).map(c => c.value);
+      preview.innerHTML = '';
+      seleccionadas.forEach(txt => {
+        const chip = document.createElement('span');
+        chip.className = 'chip';         
+        chip.textContent = txt;
+        preview.appendChild(chip);
+      });
+    }
+
+    checks.forEach(c => c.addEventListener('change', renderPreview));
+    renderPreview();
+
+    form.addEventListener('submit', (e) => {
+      const alguna = checks.some(c => c.checked);
+      if (!alguna) {
+        e.preventDefault();
+        alert('Seleccioná al menos una categoría.');
+        return;
+      }
+    });
+  })();
+  </script>
 </body>
 </html>

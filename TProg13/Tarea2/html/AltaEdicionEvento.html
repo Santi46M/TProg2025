@@ -10,44 +10,41 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-     
-	<!-- Botón hamburguesa -->
-	<button class="hamburguesa" onclick="toggleMenu()">
-	  ☰
-	</button>
-	
-	<!-- Sidebar -->
-	<aside id="sidebar" class="sidebar-mobile">
-	  <h3><i class='bx bx-list-ul'></i> Menú</h3>
-	  <ul id="menuList">
-	    <!-- Aquí JS inyecta el menú según rol -->
-	  </ul>
+      <button class="hamburguesa" onclick="toggleMenu()">☰</button>
 
-	</aside>
-     <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <aside id="sidebar" class="sidebar-mobile">
+        <h3><i class='bx bx-list-ul'></i> Menú</h3>
+        <ul id="menuList"><!-- JS inyecta el menú según rol --></ul>
+      </aside>
+
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
       <nav class="main-nav">
-        	    <!-- Izquierda: buscador -->
-	    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-	      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-	      <button class="btn" type="submit">Buscar</button>
-	    </form>
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
       </nav>
-          <!-- 🔹 Zona dinámica de usuario -->
-    <nav class="user-nav" id="userNav">
-      <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-      <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
-    </nav>
+
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
     </div>
   </header>
 
   <main class="container narrow">
     <h1>Alta de Edición de Evento</h1>
+
     <form id="form-edicion" class="card">
       <label>Evento existente
         <select id="evento" required>
           <option value="">-- Seleccionar evento --</option>
-          <option value="Evento1">Evento 1</option>
-          <option value="Evento2">Evento 2</option>
+          <!-- Hardcodeados según lo que venimos usando -->
+          <option value="ev1">JSConf</option>
+          <option value="ev2">UX Day</option>
+          <option value="ev3">Data Summit</option>
+          <option value="ev4">Maratón de Montevideo</option>
         </select>
       </label>
 
@@ -101,21 +98,25 @@
       e.preventDefault();
       const ediciones = JSON.parse(localStorage.getItem("ediciones") || "[]");
 
+      const evento = document.getElementById("evento").value;
       const nombre = document.getElementById("nombre").value.trim();
+      const sigla  = document.getElementById("sigla").value.trim();
 
-      if (ediciones.find(e => e.nombre === nombre)) {
+      if (!evento) { alert("Seleccioná un evento."); return; }
+
+      if (ediciones.find(e => e.nombre.toLowerCase() === nombre.toLowerCase())) {
         alert("El nombre de la edición ya está en uso.");
         return;
       }
 
       const nueva = {
-        evento: document.getElementById("evento").value,
-        nombre,
-        sigla: document.getElementById("sigla").value,
+        evento,                    // ev1 | ev2 | ev3 | ev4
+        nombre,                    // p.ej. "JSConf 2026"
+        sigla,                     // p.ej. "JSC26"
         ciudad: document.getElementById("ciudad").value,
-        pais: document.getElementById("pais").value,
+        pais:   document.getElementById("pais").value,
         inicio: document.getElementById("inicio").value,
-        fin: document.getElementById("fin").value,
+        fin:    document.getElementById("fin").value,
         estado: "Ingresada",
         fechaAlta: new Date().toISOString().split("T")[0]
       };
@@ -126,24 +127,24 @@
       window.location.href = "index.html";
     });
   </script>
-   <script src="../js/Hamburgesa.js"></script>
-   <script src="../js/Login.js"></script>
-   <script>
+
+  <script src="../js/Hamburgesa.js"></script>
+  <script src="../js/Login.js"></script>
+
+  <script>
+  // Header logueado (igual que lo venías usando)
   document.addEventListener("DOMContentLoaded", () => {
     const userNav = document.getElementById("userNav");
     const usuario = JSON.parse(sessionStorage.getItem("usuarioActivo"));
 
     if (usuario) {
-      // Reemplaza contenido por info del usuario logueado
-      let html = `
+      userNav.innerHTML = `
         <span>Hola, ${usuario.nombre}</span>
-        <a class="btn" href="ModificarUsuario.html"><i class='bx bxs-log-out'></i> Mi Perfil</a>
+        <a class="btn" href="ModificarUsuario.html"><i class='bx bxs-user'></i> Mi Perfil</a>
         <a class="btn" href="CierreSesion.html"><i class='bx bxs-log-out'></i> Cerrar sesión</a>
       `;
-
-      userNav.innerHTML = html;
     }
   });
-</script>
+  </script>
 </body>
 </html>
