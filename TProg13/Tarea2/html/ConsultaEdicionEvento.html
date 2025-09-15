@@ -14,12 +14,12 @@
       <!-- Botón hamburguesa -->
       <button class="hamburguesa" onclick="toggleMenu()">☰</button>
 
-      <!-- Sidebar -->
+      <!-- Sidebar mobile -->
       <aside id="sidebar" class="sidebar-mobile">
         <h3><i class='bx bx-list-ul'></i> Menú</h3>
         <ul id="menuList"><!-- Aquí JS inyecta el menú según rol --></ul>
       </aside>
-
+	  
       <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
       <nav class="main-nav">
@@ -38,49 +38,78 @@
     </div>
   </header>
 
-  <main class="container narrow">
-    <h1>Consulta de Edición de Evento</h1>
+  <main class="container">
+    <section class="layout">
+      <!-- 👉 Sidebar fijo -->
+      <aside class="sidebar">
+        <nav class="side-group">
+          <h3>Mi Perfil</h3>
+          <a href="ModificarUsuario.html">Mi perfil</a>
+          <a href="AltaEvento.html">Alta Evento</a>
+          <a href="AltaEdicionEvento.html">Alta Edición</a>
+          <a href="AltaInstitucion.html">Alta Institución</a>
+        </nav>
 
-    <!-- Selectores -->
-    <section class="card">
-      <div class="row">
-        <div>
-          <label for="selEvento">Evento</label>
-          <select id="selEvento">
-            <option value="">-- Seleccionar evento --</option>
-          </select>
-        </div>
-        <div>
-          <label for="selEdicion">Edición (Aprobada)</label>
-          <select id="selEdicion" disabled>
-            <option value="">-- Seleccionar edición --</option>
-          </select>
-        </div>
-      </div>
-    </section>
+        <nav class="side-group">
+          <h3>Categorías</h3>
+          <a href="index.html#cat/tecnologia">Tecnología</a>
+          <a href="index.html#cat/innovacion">Innovación</a>
+          <a href="index.html#cat/literatura">Literatura</a>
+          <a href="index.html#cat/cultura">Cultura</a>
+          <a href="index.html#cat/musica">Música</a>
+          <a href="index.html#cat/deporte">Deporte</a>
+          <a href="index.html#cat/salud">Salud</a>
+          <a href="index.html#cat/entretenimiento">Entretenimiento</a>
+          <a href="index.html#cat/negocios">Negocios</a>
+        </nav>
+      </aside>
 
-    <!-- Detalle -->
-    <section id="boxDetalle" class="card hide">
-      <div class="edicion-head">
-        <div class="edicion-text">
-          <h2 id="edNombre">—</h2>
-          <p class="muted" id="edUbicacion">—</p>
-          <p class="muted" id="edEstado">—</p>
-          <p><strong>Organizador:</strong> <span id="edOrganizador">—</span></p>
-        </div>
-        <div class="edicion-img" id="edImgWrap"></div>
-      </div>
+      <!-- 👉 Contenido principal -->
+      <article class="content">
+        <h1>Consulta de Edición de Evento</h1>
 
-      <div class="columns">
-        <div>
-          <h3>Tipos de registro</h3>
-          <ul id="listRegistros" class="clean"></ul>
-        </div>
-        <div>
-          <h3>Patrocinios</h3>
-          <ul id="listPatrocinios" class="clean"></ul>
-        </div>
-      </div>
+        <!-- Selectores -->
+        <section class="card">
+          <div class="row">
+            <div>
+              <label for="selEvento">Evento</label>
+              <select id="selEvento">
+                <option value="">-- Seleccionar evento --</option>
+              </select>
+            </div>
+            <div>
+              <label for="selEdicion">Edición (Aprobada)</label>
+              <select id="selEdicion" disabled>
+                <option value="">-- Seleccionar edición --</option>
+              </select>
+            </div>
+          </div>
+        </section>
+
+        <!-- Detalle -->
+        <section id="boxDetalle" class="card hide">
+          <div class="edicion-head">
+            <div class="edicion-text">
+              <h2 id="edNombre">—</h2>
+              <p class="muted" id="edUbicacion">—</p>
+              <p class="muted" id="edEstado">—</p>
+              <p><strong>Organizador:</strong> <span id="edOrganizador">—</span></p>
+            </div>
+            <div class="edicion-img" id="edImgWrap"></div>
+          </div>
+
+          <div class="columns">
+            <div>
+              <h3>Tipos de registro</h3>
+              <ul id="listRegistros" class="clean"></ul>
+            </div>
+            <div>
+              <h3>Patrocinios</h3>
+              <ul id="listPatrocinios" class="clean"></ul>
+            </div>
+          </div>
+        </section>
+      </article>
     </section>
   </main>
 
@@ -157,9 +186,6 @@
     }
   ];
 
-  // ============================
-  // Helpers
-  // ============================
   const $ = s => document.querySelector(s);
   const el = (t, attrs={}, txt) => {
     const n = document.createElement(t);
@@ -187,14 +213,10 @@
     return null;
   }
 
-  // ============================
-  // Cargar eventos
-  // ============================
   function cargarEventos() {
     DATA.forEach(ev => selEvento.appendChild(el('option', {value: ev.id}, ev.nombre)));
   }
 
-  // Evento → cargar ediciones aprobadas
   selEvento.addEventListener('change', () => {
     selEdicion.innerHTML = '<option value="">-- Seleccionar edición --</option>';
     boxDetalle.classList.add('hide');
@@ -209,7 +231,6 @@
     selEdicion.disabled = false;
   });
 
-  // Edición → mostrar detalle
   selEdicion.addEventListener('change', () => {
     const ev = DATA.find(x => x.id === selEvento.value);
     if (!ev) return;
@@ -217,20 +238,17 @@
     const ed = ev.ediciones.find(x => x.id === selEdicion.value);
     if (!ed) { boxDetalle.classList.add('hide'); return; }
 
-    // Título y metadatos
     edNombre.textContent = ed.nombre;
     edUbicacion.textContent = `${ed.ciudad}, ${ed.pais}`;
     edEstado.textContent = `Estado: ${ed.estado}`;
     edOrganizador.textContent = ed.organizador;
 
-    // Imagen
     edImgWrap.innerHTML = '';
     if (ed.imagen) {
       const img = el('img', {src: ed.imagen, alt: ed.nombre});
       edImgWrap.appendChild(img);
     }
 
-    // Tipos de registro (como enlaces a ConsultaTipoRegistro)
     listRegistros.innerHTML = '';
     (ed.tiposRegistros || []).forEach(r => {
       const li = el('li');
@@ -242,16 +260,12 @@
       listRegistros.appendChild(li);
     });
 
-    // Patrocinios
     listPatrocinios.innerHTML = '';
     (ed.patrocinios || []).forEach(p => listPatrocinios.appendChild(el('li', {}, p)));
 
     boxDetalle.classList.remove('hide');
   });
 
-  // ============================
-  // Deep-link: ?ed=edX  (opcional ?id=edX)
-  // ============================
   function preselectFromURL(){
     const params = new URLSearchParams(location.search);
     let edParam = params.get('ed') || params.get('id');
@@ -267,7 +281,6 @@
     selEdicion.dispatchEvent(new Event('change'));
   }
 
-  // Init
   cargarEventos();
   preselectFromURL();
   </script>

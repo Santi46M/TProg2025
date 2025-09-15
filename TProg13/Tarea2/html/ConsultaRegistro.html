@@ -41,30 +41,59 @@
     </div>
   </header>
   
-  <main class="container narrow">
-    <h1>Consulta de Registro</h1>
+  <main class="container">
+    <section class="layout">
+      <!-- 👉 Sidebar fijo -->
+      <aside class="sidebar">
+        <nav class="side-group">
+          <h3>Mi Perfil</h3>
+          <a href="ModificarUsuario.html">Mi perfil</a>
+          <a href="AltaEvento.html">Alta Evento</a>
+          <a href="AltaEdicionEvento.html">Alta Edición</a>
+          <a href="AltaInstitucion.html">Alta Institución</a>
+        </nav>
 
-    <!-- Selección de edición -->
-    <section class="card">
-      <label for="selEdicion">Seleccionar edición</label>
-      <select id="selEdicion">
-        <option value="">-- Seleccionar edición --</option>
-      </select>
-    </section>
+        <nav class="side-group">
+          <h3>Categorías</h3>
+          <a href="index.html#cat/tecnologia">Tecnología</a>
+          <a href="index.html#cat/innovacion">Innovación</a>
+          <a href="index.html#cat/literatura">Literatura</a>
+          <a href="index.html#cat/cultura">Cultura</a>
+          <a href="index.html#cat/musica">Música</a>
+          <a href="index.html#cat/deporte">Deporte</a>
+          <a href="index.html#cat/salud">Salud</a>
+          <a href="index.html#cat/entretenimiento">Entretenimiento</a>
+          <a href="index.html#cat/negocios">Negocios</a>
+        </nav>
+      </aside>
 
-    <!-- Lista de usuarios registrados (solo organizador) -->
-    <section id="boxUsuarios" class="card hide">
-      <h2>Usuarios registrados</h2>
-      <ul id="listaUsuarios"></ul>
-    </section>
+      <!-- 👉 Contenido principal -->
+      <article class="content">
+        <h1>Consulta de Registro</h1>
 
-    <!-- Detalle del registro -->
-    <section id="boxDetalle" class="card hide">
-      <h2>Detalle del registro</h2>
-      <p><strong>Usuario:</strong> <span id="regUsuario">—</span></p>
-      <p><strong>Fecha de registro:</strong> <span id="regFecha">—</span></p>
-      <p><strong>Tipo de registro:</strong> <span id="regTipo">—</span></p>
-      <p><strong>Patrocinio usado:</strong> <span id="regPatrocinio">—</span></p>
+        <!-- Selección de edición -->
+        <section class="card">
+          <label for="selEdicion">Seleccionar edición</label>
+          <select id="selEdicion">
+            <option value="">-- Seleccionar edición --</option>
+          </select>
+        </section>
+
+        <!-- Lista de usuarios registrados (solo organizador) -->
+        <section id="boxUsuarios" class="card hide">
+          <h2>Usuarios registrados</h2>
+          <ul id="listaUsuarios"></ul>
+        </section>
+
+        <!-- Detalle del registro -->
+        <section id="boxDetalle" class="card hide">
+          <h2>Detalle del registro</h2>
+          <p><strong>Usuario:</strong> <span id="regUsuario">—</span></p>
+          <p><strong>Fecha de registro:</strong> <span id="regFecha">—</span></p>
+          <p><strong>Tipo de registro:</strong> <span id="regTipo">—</span></p>
+          <p><strong>Patrocinio usado:</strong> <span id="regPatrocinio">—</span></p>
+        </section>
+      </article>
     </section>
   </main>
 
