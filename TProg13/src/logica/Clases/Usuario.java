@@ -1,10 +1,5 @@
 package logica.Clases;
 
-import java.time.LocalDate;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.HashMap;
 
 public abstract class Usuario {
     private String nickname;

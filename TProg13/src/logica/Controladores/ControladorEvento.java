@@ -10,7 +10,6 @@ import excepciones.EventoYaExisteException;
 import excepciones.RegistroNoExiste;
 import excepciones.TipoRegistroYaExisteException;
 import excepciones.UsuarioNoEsAsistente;
-import excepciones.UsuarioYaExisteException;
 import excepciones.PatrocinioYaExisteException;
 import excepciones.ValorPatrocinioExcedidoException;
 import excepciones.FechasCruzadasException;

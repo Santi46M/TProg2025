@@ -1,15 +1,12 @@
 package presentacion;
 
 import javax.swing.*;
-import excepciones.UsuarioNoExisteException;
 import logica.CargaDatosPrueba;
 import logica.Interfaces.*;
 import logica.fabrica;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import logica.Controladores.ControladorUsuario;
-
 public class main {
 
     private static final Color P_BG_APP   = new Color(240, 248, 255);

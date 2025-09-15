@@ -1,11 +1,9 @@
 package presentacion;
 
 import javax.swing.*;
-
 import excepciones.RegistroNoExiste;
 import logica.Datatypes.DTRegistro;
 import logica.Interfaces.*;
-
 import java.awt.*;
 import java.util.Set;
 import java.util.Vector;

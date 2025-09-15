@@ -1,12 +1,7 @@
 package presentacion;
 
 import javax.swing.*;
-
-import logica.Controladores.ControladorEvento;
 import logica.Interfaces.*;
-import logica.Datatypes.*;
-
-
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;

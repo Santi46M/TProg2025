@@ -19,27 +19,16 @@ public class ConsultaUsuario extends JInternalFrame {
     private final IControladorUsuario controlUsr;
     private final IControladorEvento  controlEvt;
 
-    // Barra superior
     private JComboBox<String> comboUsuarios;
-
-    // ---- Campos comunes ----
     private JLabel lblNick, lblNombre, lblApellido, lblCorreo, lblFechaNac, lblInstitucion;
     private JTextField txtNick, txtNombre, txtApellido, txtCorreo, txtFechaNac, txtInstitucion;
-
-    // ---- Contenedor específico con CardLayout ----
     private JPanel panelEspecifico;
     private CardLayout cardTipo;
-
-    // ---- Card: vacío ----
     private JPanel cardVacio;
-
-    // ---- Card: asistente ----
     private JPanel cardAsistente;
     private JLabel lblRegistros;
     private JComboBox<String> comboRegs;
     private java.util.List<DTRegistro> listaRegs = new ArrayList<>();
-
-    // ---- Card: organizador ----
     private JPanel cardOrganizador;
     private JLabel lblDesc, lblLink, lblEds;
     private JTextField txtDesc, txtLink;

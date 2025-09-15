@@ -2,10 +2,8 @@ package presentacion;
 
 import javax.swing.*;
 import java.awt.*;
-import logica.Controladores.ControladorEvento;
 import logica.Clases.Eventos;
 import logica.Interfaces.*;
-import logica.Clases.Ediciones;
 import excepciones.TipoRegistroYaExisteException;
 import java.util.List;
 

@@ -3,20 +3,10 @@ package presentacion;
 import javax.swing.*;
 
 import com.toedter.calendar.JDateChooser;
-
-import excepciones.UsuarioNoExisteException;
-
-import java.util.*;
 import logica.Interfaces.*;
-import logica.*;
-import java.util.Map;
 import java.util.Vector;
 import java.time.LocalDate;
 import java.time.*;
-import java.awt.*;
-import java.awt.Color;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -25,23 +15,15 @@ public class AltaUsuarioFrame extends JInternalFrame {
 	private JPanel panelAsistente;
 	private JPanel panelOrganizador;
 	private Vector<String> instituciones;
-	private JComboBox<String> comboInstitucion;
-
-	
+	private JComboBox<String> comboInstitucion;	
 	private JTextField textField;
     private JTextField textField_1;
     private JTextField textField_2;
     private JRadioButton rdbtnAsistente;
     private JRadioButton rdbtnOrganizador;
-    private ButtonGroup grupoRol; // Para poder habilitar uno solo
-    
-
-    // Campos adicionales para Asistente
+    private ButtonGroup grupoRol;
     private JTextField txtApellido;
- // private JTextField txtFechaNacimiento;
     private JDateChooser txtFechaNacimiento;
-
-    // Campos adicionales para Organizador
     private JTextField txtDescripcion;
     private JTextField txtWeb;
 
@@ -97,13 +79,11 @@ public class AltaUsuarioFrame extends JInternalFrame {
         rdbtnOrganizador.setBounds(236, 154, 109, 23);
         getContentPane().add(rdbtnOrganizador);
 
-        // Los agrupamos para que solo se pueda seleccionar uno
         grupoRol = new ButtonGroup();
         grupoRol.add(rdbtnAsistente);
         grupoRol.add(rdbtnOrganizador);
         
         
-        //Creamos un panel para asistente, en este irán los campos de apellido, fecha de nac e instituxion
         panelAsistente = new JPanel();
         panelAsistente.setLayout(null);
         panelAsistente.setBounds(20, 190, 450, 100);
@@ -132,7 +112,6 @@ public class AltaUsuarioFrame extends JInternalFrame {
         //Forzadas
         
         instituciones = new Vector<>();
-        //Agrego una opcion para que no sea necessario que tenga que elegir una institucion
         instituciones.add("Ninguna");
         instituciones.addAll(controlUsr.getInstituciones());
         comboInstitucion = new JComboBox<>(instituciones);
@@ -169,14 +148,12 @@ public class AltaUsuarioFrame extends JInternalFrame {
         //Deshabilitamos para la segunda vuelta
         toggleCamposAdicionales(false, false);
         
-        //En caso de seleccionar asistente, se habilita los campos de asistente
         rdbtnAsistente.addActionListener(e -> {
             panelAsistente.setVisible(true);
             panelOrganizador.setVisible(false);
             toggleCamposAdicionales(true, false);
         });
 
-      //En caso de seleccionar organizador, se habilita los campos de organizador
         rdbtnOrganizador.addActionListener(e -> {
             panelAsistente.setVisible(false);
             panelOrganizador.setVisible(true);
@@ -207,7 +184,6 @@ public class AltaUsuarioFrame extends JInternalFrame {
         });
     }
 
-    // Cada vez que el frame se hace visible limpiamos el formulario para asegurar estado inicial
     @Override
     public void setVisible(boolean aFlag) {
         if (aFlag) {
@@ -269,7 +245,6 @@ public class AltaUsuarioFrame extends JInternalFrame {
             	if (rdbtnOrganizador.isSelected()) {
             		controlUsr.AltaUsuario(this.textField.getText(), this.textField_1.getText(), this.textField_2.getText(), txtDescripcion.getText(), txtWeb.getText(), null, null, null, true);
             	}else {
-            	    // convertir Date -> LocalDate
             	    LocalDate fechaNac = txtFechaNacimiento.getDate()
             	                                           .toInstant()
             	                                           .atZone(ZoneId.systemDefault())
@@ -277,27 +252,7 @@ public class AltaUsuarioFrame extends JInternalFrame {
             		controlUsr.AltaUsuario(this.textField.getText(), this.textField_1.getText(), this.textField_2.getText(), "", "", txtApellido.getText(),fechaNac, null, false);
             	}
             	
-//            	Map<String,Usuario> prueba = controlUsr.listarUsuarios();
-//            	if(controlUsr.listarUsuarios().isEmpty()) {
-//                	JOptionPane.showMessageDialog(this, "no hay nada",title, JOptionPane.INFORMATION_MESSAGE);
-//            	}else {
-//            		JOptionPane.showMessageDialog(this, "TIENE",title, JOptionPane.INFORMATION_MESSAGE);
-//            	}
-//            	Map<String, Usuario> prueba = controlUsr.listarUsuarios();
-//
-//            	for (Map.Entry<String, Usuario> entry : prueba.entrySet()) {
-//            	    String clave = entry.getKey();      // el nickname o id
-//
-//            	    System.out.println("Clave: " + clave);
-//
-//            	    System.out.println("--------------");
-//            	}
 
-//            	
-//            	for (Map.Entry<String, Usuario> entrada : prueba.entrySet()) {
-//            	    String clave = entrada.getKey();
-//            	    System.out.println("Clave: " + clave);
-//            	}
             	JOptionPane.showMessageDialog(this, "El Usuario se ha creado con éxito", "Registrar Usuario",
                         JOptionPane.INFORMATION_MESSAGE);
                 limpiarFormulario();
@@ -309,19 +264,6 @@ public class AltaUsuarioFrame extends JInternalFrame {
         }
     }
 
-//    private void limpiarFormulario() {
-//        textField.setText("");
-//        textField_1.setText("");
-//        textField_2.setText("");
-//        rdbtnAsistente.setSelected(false);
-//        rdbtnOrganizador.setSelected(false);
-//        txtApellido.setText("");
-//        txtFechaNacimiento.setDate(null);
-//        txtDescripcion.setText("");
-//        txtWeb.setText("");
-//
-//        toggleCamposAdicionales(false, false);
-//    }
     
     private void limpiarFormulario() {
         textField.setText("");
@@ -337,19 +279,13 @@ public class AltaUsuarioFrame extends JInternalFrame {
         toggleCamposAdicionales(false, false);
         grupoRol.clearSelection();
 
-//        // Ocultar paneles después de limpiar
-//        for (Component comp : getContentPane().getComponents()) {
-//            if (comp instanceof JPanel) {
-//                comp.setVisible(false);
-//            }
-//        }
+
         
         panelAsistente.setVisible(false);
         panelOrganizador.setVisible(false);
     }
     
     public void cargarInstituciones() {
-    	//Agregar bien la exception
     	DefaultComboBoxModel<String> model;
     	instituciones.clear();
     	instituciones.add("Ninguna");

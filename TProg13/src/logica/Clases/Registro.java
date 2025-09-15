@@ -2,10 +2,7 @@ package logica.Clases;
 
 
 import java.time.LocalDate;
-import java.util.Set;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.HashMap;
+
 
 
 public class Registro {
@@ -17,7 +14,6 @@ public class Registro {
     private LocalDate fechaRegistro;
     private LocalDate fechaInicio;
 
-    // Constructor actualizado
     public Registro(String id, Usuario usuario, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
         this.id = id;
         this.usuario = usuario;
@@ -44,4 +40,3 @@ public class Registro {
     public LocalDate getFechaInicio() { return fechaInicio; }
     public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
 }
-// Comentario: En la lógica de alta, si se alcanza el cupo para el tipo de registro o el usuario ya está registrado en la edición, se debe informar al administrador para que decida editar o cancelar el registro.
