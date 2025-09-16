@@ -6,7 +6,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Reemplaza contenido por info del usuario logueado
     let html = `
       <span>Hola, ${usuario.nombre}</span>
-      <a class="btn" { href: ConsultaUsuario.html?usuario=${usuario.nick}}, class: 'link-reg' }"><i class='bx bxs-log-out'></i> Mi Perfil</a>
+	  <a class="btn link-reg" href="ConsultaUsuario.html?usuario=${usuario.nick}">
+	    <i class='bx bxs-user'></i> Mi Perfil
+	  </a>
       <a class="btn" href="CierreSesion.html"><i class='bx bxs-log-out'></i> Cerrar sesión</a>
     `;
 
