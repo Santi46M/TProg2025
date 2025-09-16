@@ -11,26 +11,18 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <!-- Botón hamburguesa -->
       <button class="hamburguesa" onclick="toggleMenu()">☰</button>
-
-      <!-- Sidebar mobile -->
       <aside id="sidebar" class="sidebar-mobile">
         <h3><i class='bx bx-list-ul'></i> Menú</h3>
         <ul id="menuList"><!-- Aquí JS inyecta el menú según rol --></ul>
       </aside>
-	  
       <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
-
       <nav class="main-nav">
-        <!-- Izquierda: buscador -->
         <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
           <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones" />
           <button class="btn" type="submit">Buscar</button>
         </form>
       </nav>
-
-      <!-- 🔹 Zona dinámica de usuario -->
       <nav class="user-nav" id="userNav">
         <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
         <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
@@ -40,35 +32,20 @@
 
   <main class="container">
     <section class="layout">
-      <!-- 👉 Sidebar fijo -->
       <aside class="sidebar">
         <nav class="side-group">
-          <h3>Mi Perfil</h3>
-          <a href="ModificarUsuario.html">Mi perfil</a>
-          <a href="AltaEvento.html">Alta Evento</a>
-          <a href="AltaEdicionEvento.html">Alta Edición</a>
-          <a href="AltaInstitucion.html">Alta Institución</a>
-        </nav>
-
-        <nav class="side-group">
           <h3>Categorías</h3>
-          <a href="index.html#cat/tecnologia">Tecnología</a>
-          <a href="index.html#cat/innovacion">Innovación</a>
-          <a href="index.html#cat/literatura">Literatura</a>
-          <a href="index.html#cat/cultura">Cultura</a>
-          <a href="index.html#cat/musica">Música</a>
-          <a href="index.html#cat/deporte">Deporte</a>
-          <a href="index.html#cat/salud">Salud</a>
-          <a href="index.html#cat/entretenimiento">Entretenimiento</a>
-          <a href="index.html#cat/negocios">Negocios</a>
+          <a href="index.html?cat=tecnologia">Tecnología</a>
+          <a href="index.html?cat=innovacion">Innovación</a>
+          <a href="index.html?cat=deporte">Deporte</a>
+          <a href="index.html?cat=salud">Salud</a>
+          <a href="index.html?cat=negocios">Negocios</a>
         </nav>
       </aside>
 
-      <!-- 👉 Contenido principal -->
       <article class="content">
         <h1>Consulta de Edición de Evento</h1>
 
-        <!-- Selectores -->
         <section class="card">
           <div class="row">
             <div>
@@ -86,7 +63,6 @@
           </div>
         </section>
 
-        <!-- Detalle -->
         <section id="boxDetalle" class="card hide">
           <div class="edicion-head">
             <div class="edicion-text">
@@ -113,178 +89,117 @@
     </section>
   </main>
 
+  <!-- 1) Datos primero -->
+  <script src="../js/CargaUsers.js"></script>
+
+  <!-- 2) Lógica de la página -->
   <script>
-  // ============================
-  // DATA (ahora con tipos de registro con id + nombre)
-  // ============================
-  const DATA = [
-    {
-      id: "ev1", nombre: "JSConf",
-      ediciones: [
-        {
-          id:"ed1", nombre:"JSConf 2025", estado:"Aprobada",
-          ciudad:"Montevideo", pais:"Uruguay", organizador:"Ana Pérez",
-          tiposRegistros:[
-            {id:"gen", nombre:"General"},
-            {id:"vip", nombre:"VIP"}
-          ],
-          patrocinios:["Platino — ACME", "Oro — DevCorp"],
-          imagen:"https://picsum.photos/seed/jsconf/640/360"
-        },
-        {
-          id:"ed2", nombre:"JSConf 2026", estado:"Ingresada",
-          ciudad:"Colonia", pais:"Uruguay", organizador:"Ana Pérez",
-          tiposRegistros:[{id:"gen", nombre:"General"}],
-          patrocinios:[]
-        }
-      ]
-    },
-    {
-      id: "ev2", nombre: "UX Day",
-      ediciones: [
-        {
-          id:"ed3", nombre:"UX Day 2025", estado:"Aprobada",
-          ciudad:"Buenos Aires", pais:"Argentina", organizador:"Beto García",
-          tiposRegistros:[
-            {id:"gen", nombre:"General"},
-            {id:"est", nombre:"Estudiante"}
-          ],
-          patrocinios:["Plata — Pixel SA"],
-          imagen:"https://picsum.photos/seed/uxday/640/360"
-        }
-      ]
-    },
-    {
-      id: "ev3", nombre: "Data Summit",
-      ediciones: [
-        {
-          id:"ed4", nombre:"Data Summit 2024", estado:"Aprobada",
-          ciudad:"Madrid", pais:"España", organizador:"Carla López",
-          tiposRegistros:[
-            {id:"gen", nombre:"General"},
-            {id:"prem", nombre:"Premium"}
-          ],
-          patrocinios:["Oro — BigData Corp", "Plata — CloudX"],
-          imagen:"https://picsum.photos/seed/datasummit/640/360"
-        }
-      ]
-    },
-    {
-      id: "ev4", nombre: "Maratón de Montevideo",
-      ediciones: [
-        {
-          id:"ed5", nombre:"Maratón 2025", estado:"Aprobada",
-          ciudad:"Montevideo", pais:"Uruguay", organizador:"IMM",
-          tiposRegistros:[
-            {id:"k10", nombre:"10 KM"},
-            {id:"k20", nombre:"20 KM"}
-          ],
-          patrocinios:["Platino — Salus", "Oro — Casmu"],
-          imagen:"../img/maratonmontevideo.jpg"
-        }
-      ]
-    }
-  ];
+  (function(){
+    const $ = s => document.querySelector(s);
+    const el = (t, attrs={}, txt) => { const n=document.createElement(t); Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v)); if (txt!=null) n.textContent=txt; return n; };
 
-  const $ = s => document.querySelector(s);
-  const el = (t, attrs={}, txt) => {
-    const n = document.createElement(t);
-    Object.entries(attrs).forEach(([k,v]) => n.setAttribute(k,v));
-    if (txt!=null) n.textContent = txt;
-    return n;
-  };
+    const EVENTOS = JSON.parse(localStorage.getItem("eventos") || "[]");
 
-  const selEvento   = document.getElementById('selEvento');
-  const selEdicion  = document.getElementById('selEdicion');
-  const boxDetalle  = document.getElementById('boxDetalle');
-  const edNombre    = document.getElementById('edNombre');
-  const edUbicacion = document.getElementById('edUbicacion');
-  const edEstado    = document.getElementById('edEstado');
-  const edOrganizador = document.getElementById('edOrganizador');
-  const edImgWrap   = document.getElementById('edImgWrap');
-  const listRegistros   = document.getElementById('listRegistros');
-  const listPatrocinios = document.getElementById('listPatrocinios');
+    const selEvento   = document.getElementById('selEvento');
+    const selEdicion  = document.getElementById('selEdicion');
+    const boxDetalle  = document.getElementById('boxDetalle');
+    const edNombre    = document.getElementById('edNombre');
+    const edUbicacion = document.getElementById('edUbicacion');
+    const edEstado    = document.getElementById('edEstado');
+    const edOrganizador = document.getElementById('edOrganizador');
+    const edImgWrap   = document.getElementById('edImgWrap');
+    const listRegistros   = document.getElementById('listRegistros');
+    const listPatrocinios = document.getElementById('listPatrocinios');
 
-  function findEditionById(editionId){
-    for (const ev of DATA){
-      const ed = ev.ediciones.find(e => e.id === editionId);
-      if (ed) return { ev, ed };
-    }
-    return null;
-  }
-
-  function cargarEventos() {
-    DATA.forEach(ev => selEvento.appendChild(el('option', {value: ev.id}, ev.nombre)));
-  }
-
-  selEvento.addEventListener('change', () => {
-    selEdicion.innerHTML = '<option value="">-- Seleccionar edición --</option>';
-    boxDetalle.classList.add('hide');
-
-    const ev = DATA.find(x => x.id === selEvento.value);
-    if (!ev) { selEdicion.disabled = true; return; }
-
-    ev.ediciones
-      .filter(e => e.estado === 'Aprobada')
-      .forEach(e => selEdicion.appendChild(el('option', {value: e.id}, e.nombre)));
-
-    selEdicion.disabled = false;
-  });
-
-  selEdicion.addEventListener('change', () => {
-    const ev = DATA.find(x => x.id === selEvento.value);
-    if (!ev) return;
-
-    const ed = ev.ediciones.find(x => x.id === selEdicion.value);
-    if (!ed) { boxDetalle.classList.add('hide'); return; }
-
-    edNombre.textContent = ed.nombre;
-    edUbicacion.textContent = `${ed.ciudad}, ${ed.pais}`;
-    edEstado.textContent = `Estado: ${ed.estado}`;
-    edOrganizador.textContent = ed.organizador;
-
-    edImgWrap.innerHTML = '';
-    if (ed.imagen) {
-      const img = el('img', {src: ed.imagen, alt: ed.nombre});
-      edImgWrap.appendChild(img);
+    function findEditionById(editionId){
+      for (const ev of EVENTOS){
+        const ed = (ev.ediciones||[]).find(e => e.id === editionId);
+        if (ed) return { ev, ed };
+      }
+      return null;
     }
 
-    listRegistros.innerHTML = '';
-    (ed.tiposRegistros || []).forEach(r => {
-      const li = el('li');
-      const a  = el('a', {
-        href: `ConsultaTipoRegistro.html?ed=${ed.id}&reg=${r.id}`,
-        class: 'link-reg'
-      }, r.nombre);
-      li.appendChild(a);
-      listRegistros.appendChild(li);
+    function cargarEventos() {
+      EVENTOS.forEach(ev => selEvento.appendChild(el('option', {value: ev.id}, ev.nombre)));
+    }
+
+    selEvento.addEventListener('change', () => {
+      selEdicion.innerHTML = '<option value="">-- Seleccionar edición --</option>';
+      boxDetalle.classList.add('hide');
+
+      const ev = EVENTOS.find(x => x.id === selEvento.value);
+      if (!ev) { selEdicion.disabled = true; return; }
+
+      (ev.ediciones||[])
+        .filter(e => e.estado === 'Aceptada')
+        .forEach(e => selEdicion.appendChild(el('option', {value: e.id}, e.nombre)));
+
+      selEdicion.disabled = false;
     });
 
-    listPatrocinios.innerHTML = '';
-    (ed.patrocinios || []).forEach(p => listPatrocinios.appendChild(el('li', {}, p)));
+    selEdicion.addEventListener('change', () => {
+      const ev = EVENTOS.find(x => x.id === selEvento.value);
+      if (!ev) return;
 
-    boxDetalle.classList.remove('hide');
-  });
+      const ed = (ev.ediciones||[]).find(x => x.id === selEdicion.value);
+      if (!ed) { boxDetalle.classList.add('hide'); return; }
 
-  function preselectFromURL(){
-    const params = new URLSearchParams(location.search);
-    let edParam = params.get('ed') || params.get('id');
-    if (!edParam) return;
+      edNombre.textContent = ed.nombre || '—';
+      edUbicacion.textContent = `${ed.ciudad||''}, ${ed.pais||''}`;
+      edEstado.textContent = `Estado: ${ed.estado||''}`;
+      edOrganizador.textContent = ed.organizador || '—';
 
-    const found = findEditionById(edParam);
-    if (!found) return;
+      edImgWrap.innerHTML = '';
+      if (ed.imagen) {
+        const img = el('img', {src: ed.imagen, alt: ed.nombre});
+        edImgWrap.appendChild(img);
+      }
 
-    selEvento.value = found.ev.id;
-    selEvento.dispatchEvent(new Event('change'));
+      listRegistros.innerHTML = '';
+      (ed.tiposRegistros || []).forEach(r => {
+        const li = el('li');
+        const a  = el('a', { href: `ConsultaTipoRegistro.html?ed=${ed.id}&reg=${r.id}`, class: 'link-reg' }, r.nombre);
+        li.appendChild(a);
+        listRegistros.appendChild(li);
+      });
 
-    selEdicion.value = found.ed.id;
-    selEdicion.dispatchEvent(new Event('change'));
-  }
+      listPatrocinios.innerHTML = '';
+      (ed.patrocinios || []).forEach(p => {
+        let txt = '';
+        if (typeof p === 'string') txt = p;
+        else {
+          const parts = [];
+          if (p.nivel) parts.push(p.nivel);
+          if (p.institucion) parts.push('— ' + p.institucion);
+          if (p.tipo) parts.push(`(${p.tipo})`);
+          txt = parts.join(' ');
+        }
+        listPatrocinios.appendChild(el('li', {}, txt));
+      });
 
-  cargarEventos();
-  preselectFromURL();
+      boxDetalle.classList.remove('hide');
+    });
+
+    function preselectFromURL(){
+      const params = new URLSearchParams(location.search);
+      const edParam = params.get('ed') || params.get('id');
+      if (!edParam) return;
+      const found = findEditionById(edParam);
+      if (!found) return;
+
+      selEvento.value = found.ev.id;
+      selEvento.dispatchEvent(new Event('change'));
+
+      selEdicion.value = found.ed.id;
+      selEdicion.dispatchEvent(new Event('change'));
+    }
+
+    cargarEventos();
+    preselectFromURL();
+  })();
   </script>
 
+  <!-- 3) Resto -->
   <script src="../js/Hamburgesa.js"></script>
   <script src="../js/Login.js"></script>
 </body>

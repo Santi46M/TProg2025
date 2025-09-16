@@ -1,85 +1,210 @@
 // ============================
+// TProg - Datos de Prueba T2 Parte 1 (front-end)
+// Formato compatible con tu CargaUsers.js
+// ============================
+
+// ============================
 // Usuarios de ejemplo
 // ============================
 const defaultUsers = [
   {
-    nick: "JuanPerez",
-    email: "JPerez@eventos.uy",
-    pass: "1234",
+    // US01 (Asistente)
+    nick: "atorres",
+    email: "atorres@gmail.com",
+    pass: "123.torres",
     rol: "asistente",
-    nombre: "Juan",
-    apellido: "Pérez",
-    nac: "1990-01-01",
-    instId: "inst1"
+    nombre: "Ana",
+    apellido: "Torres",
+    nac: "1990-05-12",      // 12/05/1990 -> ISO
+    instId: "INS01",
+    img: "../img/IMG-US01.jpg"  // ✅ del zip
   },
   {
-    nick: "INCO",
-    email: "inco@eventos.uy",
-    pass: "abcd",
+    // US04 (Organizador)
+    nick: "miseventos",
+    email: "contacto@miseventos.com",
+    pass: "22miseventos",
     rol: "organizador",
-    nombre: "Instituto de Computacion",
-    desc: "Instituto mas duro de la Fing",
-    web: "https://organizador1.com"
+    nombre: "MisEventos",
+    desc: "Empresa de organización de eventos.",
+    web: "https://miseventos.com",
+    img: "../img/IMG-US04.jpeg" // ✅ del zip
   }
 ];
 
 // ============================
-// Eventos y ediciones de ejemplo
+// Catálogo de categorías
+// ============================
+const defaultCategorias = [
+  { id: "CA01", key: "tecnologia", nombre: "Tecnología" },
+  { id: "CA02", key: "innovacion", nombre: "Innovación" },
+  { id: "CA06", key: "deporte",    nombre: "Deporte" },
+  { id: "CA07", key: "salud",      nombre: "Salud" }
+];
+
+window.CAT_LABEL = {
+  tecnologia: "Tecnología",
+  innovacion: "Innovación",
+  deporte:    "Deporte",
+  salud:      "Salud"
+};
+
+// ============================
+// Instituciones
+// ============================
+const defaultInstituciones = [
+  {
+    id: "INS01",
+    nombre: "Facultad de Ingeniería",
+    descripcion: "Facultad de Ingeniería de la Universidad de la República",
+    web: "https://www.fing.edu.uy"
+  }
+];
+
+// ============================
+// Eventos + Ediciones
 // ============================
 const defaultEventos = [
   {
-    id: "ev1", nombre: "JSConf",
+    id: "EV01",
+    nombre: "Conferencia de Tecnología",
+    descripcion: "Evento sobre innovación tecnológica",
+    sigla: "CONFTEC",
+    alta: "2025-01-10",
+    categorias: ["tecnologia", "innovacion"],
+    imagen: null, // ❓ no había imagen en la letra (agregar si corresponde)
     ediciones: [
       {
-        id:"ed1", nombre:"JSConf 2025", estado:"Aprobada",
-        ciudad:"Montevideo", pais:"Uruguay", organizador:"Ana Pérez",
-        tiposRegistros:["General","VIP"],
-        patrocinios:["Platino — ACME", "Oro — DevCorp"],
-        imagen:"https://picsum.photos/seed/jsconf/640/360"
+        id: "EDEV08",
+        nombre: "Tecnología Punta del Este 2026",
+        sigla: "CONFTECH26",
+        estado: "Aceptada",
+        ciudad: "Punta del Este",
+        pais: "Uruguay",
+        inicio: "2026-04-06",
+        fin:    "2026-04-10",
+        alta:   "2025-08-01",
+        organizador: "US10",
+        tiposRegistros: [
+          { id: "TR19", nombre: "Estudiante", descripcion: "Acceso para estudiantes", costo: 1000, cupo: 50 }
+        ],
+        patrocinios: [
+          { id:"PAT1", institucion:"INS01", nivel:"Oro", tipo:"TR19", aporte:20000, fecha:"2025-08-21", cantidad:4, codigo:"TECHUDELAR" }
+        ],
+        imagen: null // ❓ no hay en el zip para esta edición
       },
       {
-        id:"ed2", nombre:"JSConf 2026", estado:"Ingresada",
-        ciudad:"Colonia", pais:"Uruguay", organizador:"Ana Pérez",
-        tiposRegistros:["General"], patrocinios:[]
+        id: "EDEV09",
+        nombre: "Mobile World Congress 2025",
+        sigla: "MWC",
+        estado: "Ingresada",
+        ciudad: "Barcelona",
+        pais: "España",
+        inicio: "2025-12-12",
+        fin:    "2025-12-15",
+        alta:   "2025-08-21",
+        organizador: "US05",
+        tiposRegistros: [
+          { id: "TR20", nombre: "Full", descripcion: "Acceso ilimitado + Cena de gala", costo: 750, cupo: 550 }
+        ],
+        imagen: "../img/IMG-EDEV09.png" // ✅ del zip
+      },
+      {
+        id: "EDEV10",
+        nombre: "Web Summit 2026",
+        sigla: "WS26",
+        estado: "Aceptada",
+        ciudad: "Lisboa",
+        pais: "Portugal",
+        inicio: "2026-01-13",
+        fin:    "2026-02-01",
+        alta:   "2025-06-04",
+        organizador: "US05",
+        tiposRegistros: [
+          { id: "TR25", nombre: "Estudiante", descripcion: "Acceso para estudiantes", costo: 300, cupo: 1 }
+        ],
+        imagen: null // ❓ no hay en el zip
       }
     ]
   },
   {
-    id: "ev2", nombre: "UX Day",
+    id: "EV04",
+    nombre: "Maratón de Montevideo",
+    descripcion: "Competencia deportiva anual en la capital",
+    sigla: "MARATON",
+    alta: "2022-01-01",
+    categorias: ["deporte", "salud"],
+    imagen: "img/IMG-EV04.png", // ✅ del zip
     ediciones: [
       {
-        id:"ed3", nombre:"UX Day 2025", estado:"Aprobada",
-        ciudad:"Buenos Aires", pais:"Argentina", organizador:"Beto García",
-        tiposRegistros:["General","Estudiante"],
-        patrocinios:["Plata — Pixel SA"],
-        imagen:"https://picsum.photos/seed/uxday/640/360"
-      }
-    ]
-  },
-  {
-    id: "ev3", nombre: "Data Summit",
-    ediciones: [
+        id: "EDEV03",
+        nombre: "Maratón de Montevideo 2024",
+        sigla: "MARATON24",
+        estado: "Aceptada",
+        ciudad: "Montevideo",
+        pais: "Uruguay",
+        inicio: "2024-09-14",
+        fin:    "2024-09-14",
+        alta:   "2024-04-21",
+        organizador: "US06",
+        tiposRegistros: [
+          { id: "TR07", nombre: "Corredor 21K", descripcion: "Inscripción a la media maratón", costo: 500, cupo: 500 }
+        ],
+        imagen: "../img/IMG-EDEV03.jpeg" // ✅ del zip
+      },
       {
-        id:"ed4", nombre:"Data Summit 2024", estado:"Aprobada",
-        ciudad:"Madrid", pais:"España", organizador:"Carla López",
-        tiposRegistros:["General","Premium"],
-        patrocinios:["Oro — BigData Corp", "Plata — CloudX"],
-        imagen:"https://picsum.photos/seed/datasummit/640/360"
+        id: "EDEV04",
+        nombre: "Maratón de Montevideo 2022",
+        sigla: "MARATON22",
+        estado: "Rechazada",
+        ciudad: "Montevideo",
+        pais: "Uruguay",
+        inicio: "2022-09-14",
+        fin:    "2022-09-14",
+        alta:   "2022-05-21",
+        organizador: "US06",
+        tiposRegistros: [],
+        imagen: "../img/IMG-EDEV04.jpeg" // ✅ del zip
       }
     ]
   }
+];
+
+// ============================
+// Registros
+// ============================
+const defaultRegistros = [
+  { id:"RE02", usuario:"US01", edicion:"EDEV03", tipo:"TR07", fecha:"2024-07-30", costo:500 },
+  { id:"RE03", usuario:"US01", edicion:"EDEV10", tipo:"TR25", fecha:"2025-08-21", costo:300 }
 ];
 
 // ============================
 // Guardar en localStorage solo si no existe
 // ============================
-
-// Usuarios
 if(!localStorage.getItem("usuarios")){
   localStorage.setItem("usuarios", JSON.stringify(defaultUsers));
 }
-
-// Eventos
 if(!localStorage.getItem("eventos")){
   localStorage.setItem("eventos", JSON.stringify(defaultEventos));
 }
+if(!localStorage.getItem("categorias")){
+  localStorage.setItem("categorias", JSON.stringify(defaultCategorias));
+}
+if(!localStorage.getItem("instituciones")){
+  localStorage.setItem("instituciones", JSON.stringify(defaultInstituciones));
+}
+if(!localStorage.getItem("registros")){
+  localStorage.setItem("registros", JSON.stringify(defaultRegistros));
+}
+
+
+
+// ============================
+// Compatibilidad para navbar por categorías
+// ============================
+window.EVENTS = defaultEventos.map(ev => ({
+  id: ev.id,
+  nombre: ev.nombre,
+  categorias: ev.categorias || [],
+  cover: ev.imagen || (ev.ediciones?.find(e => !!e.imagen)?.imagen || "")
+}));

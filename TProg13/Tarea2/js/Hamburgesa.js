@@ -14,6 +14,7 @@ function toggleMenu() {
 	      <li><a href="ConsultaEvento.html"><i class='bx bx-search'></i> Consultar Evento</a></li>
 	      <li><a href="ConsultaEdicionEvento.html"><i class='bx bx-calendar'></i> Consultar Edición</a></li>
 	      <li><a href="ConsultaTipoRegistro.html"><i class='bx bx-list-ul'></i> Tipos de Registro</a></li>
+		  <li><a href="ConsultaUsuario.html"><i class='bx bx-list-ul'></i> Consultar Usuario</a></li>
 	    `;
 	  } else if (usuario.rol === "organizador") {
 	    // 🔹 Menú para ORGANIZADOR
@@ -24,6 +25,7 @@ function toggleMenu() {
 	      <li><a href="ConsultaEvento.html"><i class='bx bx-search'></i> Consultar Evento</a></li>
 	      <li><a href="ConsultaEdicionEvento.html"><i class='bx bx-calendar'></i> Consultar Edición</a></li>
 	      <li><a href="ConsultaTipoRegistro.html"><i class='bx bx-list-ul'></i> Tipos de Registro</a></li>
+		  <li><a href="ConsultaUsuario.html"><i class='bx bx-list-ul'></i> Consultar Usuario</a></li>
 	    `;
 	  } else if (usuario.rol === "asistente") {
 	    // 🔹 Menú para ASISTENTE
@@ -33,6 +35,7 @@ function toggleMenu() {
 	      <li><a href="ConsultaRegistro.html"><i class='bx bx-user-check'></i> Mis Registros</a></li>
 	      <li><a href="ConsultaTipoRegistro.html"><i class='bx bx-list-ul'></i> Tipos de Registro</a></li>
 		  <li><a href="RegistroEdicionEvento.html"><i class='bx bx-list-ul'></i> Registrarse a Edicion</a></li>
+		  <li><a href="ConsultaUsuario.html"><i class='bx bx-list-ul'></i> Consultar Usuario</a></li>
 	    `;
 	  }
 	});

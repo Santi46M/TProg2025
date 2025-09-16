@@ -5,39 +5,23 @@
   <title>Consulta de Evento — Eventos.uy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../css/style.css">
-  <style>
-    /* pequeño ajuste visual del selector */
-    .bar-select { margin: .75rem 0 1rem; }
-    .bar-select label { font-weight: 600; margin-right: .5rem; }
-    .bar-select select {
-      padding: .5rem .7rem; border:1px solid #cbd5e1; border-radius:.45rem; min-width: 260px;
-    }
-  </style>
 </head>
 <body>
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <!-- Botón hamburguesa -->
       <button class="hamburguesa" onclick="toggleMenu()">☰</button>
-
-      <!-- Sidebar -->
       <aside id="sidebar" class="sidebar-mobile">
         <h3><i class='bx bx-list-ul'></i> Menú</h3>
-        <ul id="menuList"><!-- Aquí JS inyecta el menú según rol --></ul>
+        <ul id="menuList"><!-- JS inyecta el menú según rol --></ul>
       </aside>
-
       <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
-
       <nav class="main-nav">
-        <!-- Buscador -->
         <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
           <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
           <button class="btn" type="submit">Buscar</button>
         </form>
       </nav>
-
-      <!-- Zona dinámica de usuario -->
       <nav class="user-nav" id="userNav">
         <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
         <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
@@ -46,194 +30,120 @@
   </header>
 
   <main class="container">
-    <!-- Barra para seleccionar evento -->
     <div class="bar-select">
       <label for="selEventoCE">Evento:</label>
-      <select id="selEventoCE">
-        <!-- JS completa -->
-      </select>
+      <select id="selEventoCE"></select>
     </div>
 
-    <!-- Layout: sidebar izquierda / contenido / ediciones derecha -->
     <section class="layout">
-      <!-- Sidebar izquierda -->
       <aside class="sidebar">
         <nav class="side-group">
-          <h3>Mi Perfil</h3>
-          <a href="ModificarUsuario.html">Mi perfil</a>
-          <a href="AltaEvento.html">Alta Evento</a>
-          <a href="AltaEdicionEvento.html">Alta Edición</a>
-          <a href="AltaInstitucion.html">Alta Institución</a>
-        </nav>
-
-        <nav class="side-group">
           <h3>Categorías</h3>
-          <a href="index.html#cat/tecnologia">Tecnología</a>
-          <a href="index.html#cat/innovacion">Innovación</a>
-          <a href="index.html#cat/literatura">Literatura</a>
-          <a href="index.html#cat/cultura">Cultura</a>
-          <a href="index.html#cat/musica">Música</a>
-          <a href="index.html#cat/deporte">Deporte</a>
-          <a href="index.html#cat/salud">Salud</a>
-          <a href="index.html#cat/entretenimiento">Entretenimiento</a>
-          <a href="index.html#cat/negocios">Negocios</a>
+          <a href="index.html?cat=tecnologia">Tecnología</a>
+          <a href="index.html?cat=innovacion">Innovación</a>
+          <a href="index.html?cat=deporte">Deporte</a>
+          <a href="index.html?cat=salud">Salud</a>
+          <a href="index.html?cat=negocios">Negocios</a>
         </nav>
       </aside>
 
-      <!-- Contenido principal: datos del evento (dinámico) -->
       <article class="event-card">
         <header class="event-header">
-          <img id="evCover" class="event-cover" src="../img/maratonmontevideo.jpg" alt="">
+          <img id="evCover" class="event-cover" alt="">
           <div>
             <h1 id="evTitle" class="event-title">—</h1>
             <div class="event-meta">
               <span><strong>Sigla:</strong> <span id="evSigla">—</span></span>
               <span><strong>Fecha alta:</strong> <span id="evFecha">—</span></span>
             </div>
-            <div id="evCats" class="chips"><!-- chips --></div>
+            <div id="evCats" class="chips"></div>
           </div>
         </header>
-
         <section class="event-body">
           <h3>Descripción</h3>
           <p id="evDesc">—</p>
         </section>
       </article>
 
-      <!-- Columna derecha: ediciones (del evento seleccionado) -->
       <aside class="editions">
         <h3>Ediciones</h3>
-        <div id="edList"><!-- JS renderiza --></div>
+        <div id="edList"></div>
       </aside>
     </section>
 
     <p><a href="index.html">← Volver al inicio</a></p>
   </main>
 
+  <!-- 1) Datos primero -->
+  <script src="../js/CargaUsers.js"></script>
+
+  <!-- 2) Lógica de la página -->
   <script>
-  // ============================
-  // DATA (alineado con ConsultaEdicionEvento.html)
-  // ============================
-  const DATA = [
-    {
-      id:"ev1",
-      nombre:"JSConf",
-      sigla:"JSCONF",
-      fechaAlta:"01/08/2024",
-      categorias:["Tecnología"],
-      descripcion:"Conferencia de JavaScript.",
-      cover:"https://picsum.photos/seed/jsconf/640/360",
-      ediciones:[
-        { id:"ed1", nombre:"JSConf 2025", estado:"Aprobada", ciudad:"Montevideo",  pais:"Uruguay", img:"https://picsum.photos/seed/jsconf/160/100" }
-      ]
-    },
-    {
-      id:"ev2",
-      nombre:"UX Day",
-      sigla:"UXDAY",
-      fechaAlta:"15/09/2024",
-      categorias:["Innovación","Cultura"],
-      descripcion:"Encuentro de UX e innovación.",
-      cover:"https://picsum.photos/seed/uxday/640/360",
-      ediciones:[
-        { id:"ed3", nombre:"UX Day 2025", estado:"Aprobada", ciudad:"Buenos Aires", pais:"Argentina", img:"https://picsum.photos/seed/uxday/160/100" }
-      ]
-    },
-    {
-      id:"ev3",
-      nombre:"Data Summit",
-      sigla:"DATASUMMIT",
-      fechaAlta:"10/06/2024",
-      categorias:["Tecnología","Negocios"],
-      descripcion:"Cumbre de data y analytics.",
-      cover:"https://picsum.photos/seed/datasummit/640/360",
-      ediciones:[
-        { id:"ed4", nombre:"Data Summit 2024", estado:"Aprobada", ciudad:"Madrid", pais:"España", img:"https://picsum.photos/seed/datasummit/160/100" }
-      ]
-    },
-    {
-      id:"ev4",
-      nombre:"Maratón de Montevideo",
-      sigla:"MARATON",
-      fechaAlta:"01/01/2022",
-      categorias:["Deporte","Salud"],
-      descripcion:"Competencia deportiva anual en la capital.",
-      cover:"../img/maratonmontevideo.jpg",
-      ediciones:[
-        { id:"ed5", nombre:"Maratón 2025", estado:"Aprobada", ciudad:"Montevideo", pais:"Uruguay", img:"../img/maratonmontevideo.jpg" }
-      ]
+  (function(){
+    const $ = s => document.querySelector(s);
+    const option = (v,t)=>{const o=document.createElement('option');o.value=v;o.textContent=t;return o;}
+    const chip = (txt)=>{const s=document.createElement('span');s.className='chip';s.textContent=txt;return s;}
+
+    const CAT_LABEL = window.CAT_LABEL || {};
+    const EVENTOS = JSON.parse(localStorage.getItem("eventos") || "[]");
+
+    const sel = $('#selEventoCE');
+    const elCover = $('#evCover'), elTitle = $('#evTitle'), elSigla = $('#evSigla'),
+          elFecha = $('#evFecha'), elDesc = $('#evDesc'), elCats = $('#evCats'),
+          edList = $('#edList');
+
+    function eventCover(ev){
+      if (ev.imagen) return ev.imagen;
+      const ed = (ev.ediciones||[]).find(e => !!e.imagen);
+      return ed ? ed.imagen : '';
     }
-  ];
+    function renderEvento(ev){
+      elTitle.textContent = ev.nombre || '—';
+      elSigla.textContent = ev.sigla || '—';
+      elFecha.textContent = ev.alta || '—';
+      elDesc.textContent  = ev.descripcion || '—';
+      elCover.src = eventCover(ev) || '';
+      elCover.alt = ev.nombre || '';
+      elCats.innerHTML = '';
+      (ev.categorias||[]).forEach(k => elCats.appendChild(chip(CAT_LABEL[k] || k)));
+    }
+    function renderEdiciones(ev){
+      edList.innerHTML = '';
+      (ev.ediciones||[]).filter(e => e.estado === 'Aceptada').forEach(ed=>{
+        const a = document.createElement('a');
+        a.className='edition-item';
+        a.href = `ConsultaEdicionEvento.html?ed=${encodeURIComponent(ed.id)}`;
+        const img = document.createElement('img');
+        img.src = ed.imagen || eventCover(ev) || '';
+        const info = document.createElement('div');
+        const t = document.createElement('div'); t.className='edition-title'; t.textContent = ed.nombre;
+        const small = document.createElement('small'); small.textContent = `${ed.ciudad||''} — ${ed.estado||''}`;
+        info.appendChild(t); info.appendChild(small);
+        a.appendChild(img); a.appendChild(info);
+        edList.appendChild(a);
+      });
+    }
+    function selectEvento(evId){
+      const ev = EVENTOS.find(e => e.id === evId) || EVENTOS[0];
+      if (!ev) return;
+      renderEvento(ev);
+      renderEdiciones(ev);
+    }
 
-  // ============================
-  // Helpers
-  // ============================
-  const $ = s => document.querySelector(s);
-  const sel = $('#selEventoCE');
-
-  function option(value, text){ const o=document.createElement('option'); o.value=value; o.textContent=text; return o; }
-  function chip(txt){ const s=document.createElement('span'); s.className='chip'; s.textContent=txt; return s; }
-
-  function renderEvento(ev){
-    $('#evTitle').textContent = ev.nombre;
-    $('#evSigla').textContent = ev.sigla || '—';
-    $('#evFecha').textContent = ev.fechaAlta || '—';
-    $('#evDesc').textContent  = ev.descripcion || '—';
-    const cover = $('#evCover');
-    cover.src = ev.cover || '';
-    cover.alt = ev.nombre || '';
-
-    const cats = $('#evCats'); cats.innerHTML='';
-    (ev.categorias || []).forEach(c => cats.appendChild(chip(c)));
-  }
-
-  function renderEdiciones(ev){
-    const cont = $('#edList'); cont.innerHTML='';
-    (ev.ediciones || []).filter(e => e.estado === 'Aprobada').forEach(ed => {
-      const a = document.createElement('a');
-      a.className = 'edition-item';
-      a.href = `ConsultaEdicionEvento.html?ed=${ed.id}`;
-      a.title = ed.nombre;
-
-      const img = document.createElement('img');
-      img.src = ed.img || ev.cover || '';
-      img.alt = '';
-      a.appendChild(img);
-
-      const info = document.createElement('div');
-      const t = document.createElement('div');
-      t.className = 'edition-title';
-      t.textContent = ed.nombre;
-      const small = document.createElement('small');
-      small.textContent = `${ed.ciudad} — ${ed.estado}`;
-      info.appendChild(t); info.appendChild(small);
-      a.appendChild(info);
-
-      cont.appendChild(a);
-    });
-  }
-
-  function selectEvento(evId){
-    const ev = DATA.find(e => e.id === evId) || DATA[0];
-    renderEvento(ev);
-    renderEdiciones(ev);
-  }
-
-  // ============================
-  // Init
-  // ============================
-  // llenar selector
-  DATA.forEach(e => sel.appendChild(option(e.id, e.nombre)));
-
-  // preselección desde URL (?ev=ev4) o por defecto ev4 (Maratón)
-  const params = new URLSearchParams(location.search);
-  const evParam = params.get('ev') || 'ev4';
-  sel.value = DATA.some(e => e.id===evParam) ? evParam : DATA[0].id;
-  selectEvento(sel.value);
-
-  sel.addEventListener('change', () => selectEvento(sel.value));
+    // Init
+    if (!EVENTOS.length){
+      sel.innerHTML = '<option value="">(sin eventos)</option>';
+      return;
+    }
+    EVENTOS.forEach(e => sel.appendChild(option(e.id, e.nombre)));
+    const q = new URLSearchParams(location.search).get('ev');
+    sel.value = q && EVENTOS.some(e=>e.id===q) ? q : EVENTOS[0].id;
+    selectEvento(sel.value);
+    sel.addEventListener('change', () => selectEvento(sel.value));
+  })();
   </script>
 
+  <!-- 3) Resto -->
   <script src="../js/Hamburgesa.js"></script>
   <script src="../js/Login.js"></script>
 </body>
