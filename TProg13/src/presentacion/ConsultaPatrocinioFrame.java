@@ -1,9 +1,7 @@
 package presentacion;
 
 import javax.swing.*;
-
 import logica.Interfaces.*;
-
 import java.awt.*;
 
 public class ConsultaPatrocinioFrame extends JInternalFrame {

@@ -3,7 +3,6 @@ package presentacion;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-
 import logica.Clases.Ediciones;
 import logica.Clases.Patrocinio;
 import logica.Clases.TipoRegistro;

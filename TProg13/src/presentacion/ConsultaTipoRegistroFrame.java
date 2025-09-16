@@ -27,7 +27,7 @@ public class ConsultaTipoRegistroFrame extends JInternalFrame {
      */
     public ConsultaTipoRegistroFrame(IControladorUsuario iCU, IControladorEvento iCE) {
         super("Consulta de Tipo de Registro", true, true, true, true);
-        setBounds(150, 150, 700, 350); // Agrandado horizontalmente
+        setBounds(150, 150, 700, 350);
         getContentPane().setLayout(new BorderLayout());
 
         JPanel panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -130,7 +130,6 @@ public class ConsultaTipoRegistroFrame extends JInternalFrame {
     public ConsultaTipoRegistroFrame(IControladorUsuario iCU, IControladorEvento iCE, String nombreEvento, String nombreEdicion, String nombreTipo) {
         this(iCU, iCE);
         cargarEventos();
-        // Selecciona el evento, edición y tipo en los combos
         if (nombreEvento != null && nombreEdicion != null && nombreTipo != null) {
             for (int i = 0; i < comboEventos.getItemCount(); i++) {
                 if (comboEventos.getItemAt(i).equals(nombreEvento)) {

@@ -1,11 +1,5 @@
 package logica;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-
-import excepciones.UsuarioTipoIncorrectoException;
 import logica.Interfaces.*;
 import logica.Controladores.*;
 /**

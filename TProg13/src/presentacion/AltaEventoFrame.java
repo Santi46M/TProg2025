@@ -2,9 +2,6 @@ package presentacion;
 
 import javax.swing.*;
 import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.Date;
 import excepciones.EventoYaExisteException;
 import logica.Controladores.ControladorEvento;
 import logica.Interfaces.*;
@@ -33,7 +30,7 @@ public class AltaEventoFrame extends JInternalFrame {
         }
     }
     
-    public AltaEventoFrame(IControladorUsuario iCU, IControladorEvento iCE) {//, ConsultaEventoFrame[] consultaEventoFrameRef) {
+    public AltaEventoFrame(IControladorUsuario iCU, IControladorEvento iCE) {
         super("Alta de Evento", true, true, true, true);
         setBounds(new Rectangle(50, 50, 450, 300));
         setVisible(true);

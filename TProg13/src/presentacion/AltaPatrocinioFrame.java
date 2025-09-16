@@ -14,7 +14,6 @@ import java.util.HashSet;
 public class AltaPatrocinioFrame extends JInternalFrame {
     private JComboBox<String> comboEventos;
     private JComboBox<String> comboEdiciones;
-    private JComboBox<String> comboTipos;
     private JComboBox<String> comboInstituciones;
     private JComboBox<String> comboTipoGratuito;
     private JComboBox<String> comboNivel;
