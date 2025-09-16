@@ -102,15 +102,12 @@
       h2.textContent = ev.nombre;
       card.appendChild(h2);
 
-      // Lugar y estado
+      // Lugar 
       if (ed){
         const p1 = document.createElement('p');
         p1.innerHTML = `<strong>Ciudad:</strong> ${ed.ciudad||'—'} (${ed.pais||'—'})`;
         card.appendChild(p1);
 
-        const p2 = document.createElement('p');
-        p2.innerHTML = `<strong>Estado:</strong> ${ed.estado||'—'}`;
-        card.appendChild(p2);
       }
 
       // Acción
