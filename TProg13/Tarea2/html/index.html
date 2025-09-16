@@ -4,41 +4,38 @@
   <meta charset="UTF-8">
   <title>Eventos.uy</title>
   <link rel="stylesheet" href="../css/style.css">
-  
-
 </head>
 
 <body>
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-     
-	<!-- Botón hamburguesa -->
-	<button class="hamburguesa" onclick="toggleMenu()">
-	  ☰
-	</button>
-	
-	<!-- Sidebar -->
-	<aside id="sidebar" class="sidebar-mobile">
-	  <h3><i class='bx bx-list-ul'></i> Menú</h3>
-	  <ul id="menuList">
-	    <!-- Aquí JS inyecta el menú según rol -->
-	  </ul>
+      <!-- Botón hamburguesa -->
+      <button class="hamburguesa" onclick="toggleMenu()">☰</button>
 
-	</aside>
-     <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <!-- Sidebar -->
+      <aside id="sidebar" class="sidebar-mobile">
+        <h3><i class='bx bx-list-ul'></i> Menú</h3>
+        <ul id="menuList">
+          <!-- Aquí JS inyecta el menú según rol -->
+        </ul>
+      </aside>
+
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
       <nav class="main-nav">
-        	    <!-- Izquierda: buscador -->
-	    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-	      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-	      <button class="btn" type="submit">Buscar</button>
-	    </form>
+        <!-- Buscador -->
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
       </nav>
-          <!-- 🔹 Zona dinámica de usuario -->
-    <nav class="user-nav" id="userNav">
-      <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-      <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
-    </nav>
+
+      <!-- 🔹 Zona dinámica de usuario -->
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
     </div>
   </header>
 
@@ -49,65 +46,90 @@
       <h3><i class='bx bx-list-ul'></i> Menú</h3>
       <h4>Categorías</h4>
       <ul>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Innovación</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Literatura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Cultura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Música</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Deporte</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Agro</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Moda</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Investigación</a></li>
-      </ul>
-      <h4>Usuarios</h4>
-      <ul>
-        <li><a href="#"><i class='bx bx-user'></i> Lista de usuarios</a></li>
+        <li><a href="index.html?cat=tecnologia"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
+        <li><a href="index.html?cat=innovacion"><i class='bx bx-wifi-0'></i> Innovación</a></li>
+        <li><a href="index.html?cat=literatura"><i class='bx bx-wifi-0'></i> Literatura</a></li>
+        <li><a href="index.html?cat=cultura"><i class='bx bx-wifi-0'></i> Cultura</a></li>
+        <li><a href="index.html?cat=musica"><i class='bx bx-wifi-0'></i> Música</a></li>
+        <li><a href="index.html?cat=deporte"><i class='bx bx-wifi-0'></i> Deporte</a></li>
+        <li><a href="index.html?cat=salud"><i class='bx bx-wifi-0'></i> Salud</a></li>
+        <li><a href="index.html?cat=entretenimiento"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
+        <li><a href="index.html?cat=negocios"><i class='bx bx-wifi-0'></i> Negocios</a></li>
       </ul>
     </aside>
 
     <!-- Main -->
     <main>
       <h1>Próximos eventos</h1>
-      <div class="row">
-        <!-- Evento 1 -->
-        <div class="card">
-          <h2>Conferencia de Tecnología</h2>
-          <p><strong>Fecha:</strong> 1 de Octubre de 2025</p>
-          <p><strong>Lugar:</strong> Montevideo</p>
-          <p>Evento sobre innovación tecnológica.</p>
-          <div class="actions">
-            <a href="#" class="btn">Ver más</a>
-          </div>
-        </div>
-
-        <!-- Evento 2 -->
-        <div class="card">
-          <h2>Feria del Libro</h2>
-          <p><strong>Fecha:</strong> 2 de Enero de 2025</p>
-          <p><strong>Lugar:</strong> Punta del Este</p>
-          <p>Encuentro anual de literatura.</p>
-          <div class="actions">
-            <a href="#" class="btn">Ver más</a>
-          </div>
-        </div>
-
-        <!-- Evento 3 -->
-        <div class="card">
-          <h2>Montevideo Fashion Week</h2>
-          <p><strong>Fecha:</strong> 20 de Julio 2025</p>
-          <p><strong>Lugar:</strong> Montevideo</p>
-          <p>Pasarela de moda uruguaya e internacional.</p>
-          <div class="actions">
-            <a href="#" class="btn">Ver más</a>
-          </div>
-        </div>
-      </div>
+      <div id="eventList" class="row"><!-- JS inyecta los eventos --></div>
     </main>
   </div>
- <script src="../js/Hamburgesa.js"></script>
-<script src="../js/Login.js"></script>
+
+  <!-- Scripts -->
+  <script src="../js/CargaUsers.js"></script>
+  <script>
+  (function(){
+    const $ = s => document.querySelector(s);
+
+    // Corrige rutas de imágenes relativas
+    function resolveImg(src){
+      if(!src) return '';
+      if (/^https?:|^data:|^\//.test(src)) return src;
+      if (src.startsWith('../')) return src;
+      return '../' + src.replace(/^\.?\//,'');
+    }
+
+    const EVENTOS = JSON.parse(localStorage.getItem("eventos") || "[]");
+    const list = $('#eventList');
+
+    EVENTOS.forEach(ev => {
+      const ed = (ev.ediciones||[]).find(e => e.estado === "Aprobada") || (ev.ediciones||[])[0];
+
+      const card = document.createElement('div');
+      card.className = 'card';
+
+      // Imagen
+      if (ed && ed.imagen){
+        const img = document.createElement('img');
+        img.src = resolveImg(ed.imagen);
+        img.alt = ev.nombre;
+        img.style.width = "100%";
+        card.appendChild(img);
+      }
+
+      // Título
+      const h2 = document.createElement('h2');
+      h2.textContent = ev.nombre;
+      card.appendChild(h2);
+
+      // Lugar y estado
+      if (ed){
+        const p1 = document.createElement('p');
+        p1.innerHTML = `<strong>Ciudad:</strong> ${ed.ciudad||'—'} (${ed.pais||'—'})`;
+        card.appendChild(p1);
+
+        const p2 = document.createElement('p');
+        p2.innerHTML = `<strong>Estado:</strong> ${ed.estado||'—'}`;
+        card.appendChild(p2);
+      }
+
+      // Acción
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const a = document.createElement('a');
+      a.href = `ConsultaEvento.html?ev=${ev.id}`;
+      a.className = 'btn';
+      a.textContent = 'Ver más';
+      actions.appendChild(a);
+      card.appendChild(actions);
+
+      list.appendChild(card);
+    });
+  })();
+  </script>
+
+  <script src="../js/Hamburgesa.js"></script>
+  <script src="../js/Login.js"></script>
 </body>
 </html>
+

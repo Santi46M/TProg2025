@@ -448,4 +448,31 @@ legend{ padding:0 .4rem; font-weight:700; color:#374151; }
   left: 0; /* aparece en pantalla */
 }
 
+/* Radios "Asistente / Organizador" alineados */
+.role-group{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  flex-wrap:wrap;
+  border:0;
+  padding:0;
+  margin:0 0 1rem;
+}
+.role-group > legend{
+  margin-right:.75rem;
+  font-weight:600;
+}
+.role-option{
+  display:inline-flex;
+  align-items:center;
+  gap:.45rem;
+  line-height:1;       /* evita saltos raros */
+  margin:0;
+}
+.role-option input[type="radio"]{
+  margin:0;            /* quita margen por defecto que desnívela */
+  vertical-align:middle;
+}
+
+
 /* ===== FIN Consulta de Tipo de Registro ===== */

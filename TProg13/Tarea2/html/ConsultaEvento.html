@@ -1,10 +1,19 @@
 <!doctype html>
 <html lang="es">
 <head>
+	
   <meta charset="utf-8">
   <title>Consulta de Evento — Eventos.uy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../css/style.css">
+  <style>
+      /* pequeño ajuste visual del selector */
+      .bar-select { margin: .75rem 0 1rem; }
+      .bar-select label { font-weight: 600; margin-right: .5rem; }
+      .bar-select select {
+        padding: .5rem .7rem; border:1px solid #cbd5e1; border-radius:.45rem; min-width: 260px;
+      }
+    </style>
 </head>
 <body>
   <!-- Header -->
@@ -75,14 +84,19 @@
   </main>
 
   <!-- 1) Datos primero -->
-  <script src="../js/CargaUsers.js"></script>
-
-  <!-- 2) Lógica de la página -->
+    <script src="../js/CargaUsers.js"></script>
   <script>
   (function(){
     const $ = s => document.querySelector(s);
     const option = (v,t)=>{const o=document.createElement('option');o.value=v;o.textContent=t;return o;}
-    const chip = (txt)=>{const s=document.createElement('span');s.className='chip';s.textContent=txt;return s;}
+
+    // Arregla rutas relativas de imágenes según dónde esté el HTML
+    function resolveImg(src){
+      if(!src) return '';
+      if (/^https?:|^data:|^\//.test(src)) return src;     // absolutas
+      if (src.startsWith('../')) return src;               // ya bien desde /html
+      return '../' + src.replace(/^\.?\//,'');             // convierte "img/..." -> "../img/..."
+    }
 
     const CAT_LABEL = window.CAT_LABEL || {};
     const EVENTOS = JSON.parse(localStorage.getItem("eventos") || "[]");
@@ -97,32 +111,46 @@
       const ed = (ev.ediciones||[]).find(e => !!e.imagen);
       return ed ? ed.imagen : '';
     }
+
     function renderEvento(ev){
       elTitle.textContent = ev.nombre || '—';
       elSigla.textContent = ev.sigla || '—';
-      elFecha.textContent = ev.alta || '—';
+      elFecha.textContent = ev.alta  || '—';          // ← tu data usa "alta"
       elDesc.textContent  = ev.descripcion || '—';
-      elCover.src = eventCover(ev) || '';
+      const cover = resolveImg(eventCover(ev));
+      elCover.src = cover || '';
       elCover.alt = ev.nombre || '';
       elCats.innerHTML = '';
-      (ev.categorias||[]).forEach(k => elCats.appendChild(chip(CAT_LABEL[k] || k)));
+      (ev.categorias||[]).forEach(k=>{
+        const s=document.createElement('span');
+        s.className='chip';
+        s.textContent = (CAT_LABEL[k] || k);
+        elCats.appendChild(s);
+      });
     }
+
     function renderEdiciones(ev){
       edList.innerHTML = '';
       (ev.ediciones||[]).filter(e => e.estado === 'Aceptada').forEach(ed=>{
         const a = document.createElement('a');
         a.className='edition-item';
         a.href = `ConsultaEdicionEvento.html?ed=${encodeURIComponent(ed.id)}`;
+
         const img = document.createElement('img');
-        img.src = ed.imagen || eventCover(ev) || '';
+        img.src = resolveImg(ed.imagen || eventCover(ev) || '');
+        img.alt = ed.nombre || '';
+        a.appendChild(img);
+
         const info = document.createElement('div');
         const t = document.createElement('div'); t.className='edition-title'; t.textContent = ed.nombre;
         const small = document.createElement('small'); small.textContent = `${ed.ciudad||''} — ${ed.estado||''}`;
         info.appendChild(t); info.appendChild(small);
-        a.appendChild(img); a.appendChild(info);
+        a.appendChild(info);
+
         edList.appendChild(a);
       });
     }
+
     function selectEvento(evId){
       const ev = EVENTOS.find(e => e.id === evId) || EVENTOS[0];
       if (!ev) return;
@@ -142,9 +170,8 @@
     sel.addEventListener('change', () => selectEvento(sel.value));
   })();
   </script>
-
-  <!-- 3) Resto -->
   <script src="../js/Hamburgesa.js"></script>
   <script src="../js/Login.js"></script>
+
 </body>
 </html>

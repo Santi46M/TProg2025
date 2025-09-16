@@ -1,8 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <title>Registrarse — Eventos.uy</title>
+  <meta charset="UTF-8">
+  <title>Crear cuenta — Eventos.uy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../css/style.css">
 </head>
@@ -10,222 +10,254 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-     
-	<!-- Botón hamburguesa -->
-	<button class="hamburguesa" onclick="toggleMenu()">
-	  ☰
-	</button>
-	
-	<!-- Sidebar -->
-	<aside id="sidebar" class="sidebar-mobile">
-	  <h3><i class='bx bx-list-ul'></i> Menú</h3>
-	  <ul id="menuList">
-	    <!-- Aquí JS inyecta el menú según rol -->
-	  </ul>
-
-	</aside>
-     <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <button class="hamburguesa" onclick="toggleMenu()">☰</button>
+      <aside id="sidebar" class="sidebar-mobile">
+        <h3><i class='bx bx-list-ul'></i> Menú</h3>
+        <ul id="menuList"><!-- JS inyecta el menú según rol --></ul>
+      </aside>
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
       <nav class="main-nav">
-        	    <!-- Izquierda: buscador -->
-	    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-	      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-	      <button class="btn" type="submit">Buscar</button>
-	    </form>
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
       </nav>
-          <!-- 🔹 Zona dinámica de usuario -->
-    <nav class="user-nav" id="userNav">
-      <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-      <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
-    </nav>
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
     </div>
   </header>
-  
+
   <main class="container narrow">
-    <h1>Registrarse</h1>
-    <p>Elegí tu rol y completá los datos.</p>
+    <h1>Crear cuenta</h1>
 
-    <!-- Un solo formulario (JS activa/desactiva campos según rol) -->
-    <form id="altaForm" class="card form" action="#" method="post" enctype="multipart/form-data">
+    <form id="altaForm" class="card form" novalidate>
+      <!-- Rol -->
+	  <fieldset class="role-group">
+	    <legend>Tipo de cuenta</legend>
+
+	    <label class="role-option">
+	      <input type="radio" name="rol" value="asistente" checked>
+	      <span>Asistente</span>
+	    </label>
+
+	    <label class="role-option">
+	      <input type="radio" name="rol" value="organizador">
+	      <span>Organizador</span>
+	    </label>
+	  </fieldset>
+
       <!-- Datos comunes -->
-      <fieldset>
-        <legend>Datos de cuenta</legend>
+      <div class="row">
+        <div>
+          <label for="nick">Nick*</label>
+          <input id="nick" name="nick" required placeholder="Tu alias">
+        </div>
+        <div>
+          <label for="email">Correo*</label>
+          <input id="email" name="email" type="email" required placeholder="tucorreo@ejemplo.com">
+        </div>
+      </div>
 
+      <div class="row">
+        <div>
+          <label for="pass">Contraseña*</label>
+          <input id="pass" name="pass" type="password" required minlength="4">
+        </div>
+        <div>
+          <label for="pass2">Repetir contraseña*</label>
+          <input id="pass2" name="pass2" type="password" required minlength="4">
+        </div>
+      </div>
+
+      <!-- Grupo ASISTENTE -->
+      <section id="grupoAsistente" data-role="asistente">
+        <h3>Datos de asistente</h3>
         <div class="row">
           <div>
-            <label for="nick">Nickname</label>
-            <input id="nick" name="nick" type="text" required data-required="true">
+            <label for="nombreA">Nombre*</label>
+            <input id="nombreA" name="nombreA" placeholder="Nombre">
           </div>
           <div>
-            <label for="email">Correo electrónico</label>
-            <input id="email" name="email" type="email" required data-required="true">
+            <label for="apellidoA">Apellido*</label>
+            <input id="apellidoA" name="apellidoA" placeholder="Apellido">
           </div>
         </div>
-
         <div class="row">
           <div>
-            <label for="pass">Contraseña</label>
-            <input id="pass" name="pass" type="password" required data-required="true">
+            <label for="nacA">Fecha de nacimiento*</label>
+            <input id="nacA" name="nacA" type="date">
           </div>
           <div>
-            <label for="pass2">Confirmación de contraseña</label>
-            <input id="pass2" name="pass2" type="password" required data-required="true">
+            <label for="instIdA">Institución (opcional)</label>
+            <input id="instIdA" name="instIdA" placeholder="ID institución">
           </div>
         </div>
+      </section>
 
+      <!-- Grupo ORGANIZADOR -->
+      <section id="grupoOrganizador" data-role="organizador" style="display:none;">
+        <h3>Datos de organizador</h3>
         <div class="row">
           <div>
-            <label for="nombre">Nombre</label>
-            <input id="nombre" name="nombre" type="text" required data-required="true">
+            <label for="nombreO">Nombre de la organización*</label>
+            <input id="nombreO" name="nombreO" placeholder="Ej.: Instituto de Computación">
           </div>
           <div>
-            <label for="img">Imagen (opcional)</label>
-            <input id="img" name="img" type="file" accept="image/*">
+            <label for="webO">Sitio web (opcional)</label>
+            <input id="webO" name="webO" type="url" placeholder="https://...">
           </div>
         </div>
-      </fieldset>
-
-      <!-- Tabs de rol -->
-      <section class="tabs">
-        <input type="radio" name="rolTab" id="rol-asistente" checked>
-        <input type="radio" name="rolTab" id="rol-organizador">
-
-        <div class="tablist" role="tablist" aria-label="Elegir rol">
-          <label class="tab" for="rol-asistente" role="tab" aria-controls="panel-asistente">Asistente</label>
-          <label class="tab" for="rol-organizador" role="tab" aria-controls="panel-organizador">Organizador</label>
+        <div class="row">
+          <div style="width:100%;">
+            <label for="descO">Descripción*</label>
+            <textarea id="descO" name="descO" rows="3" placeholder="Breve descripción de la organización"></textarea>
+          </div>
         </div>
-
-        <!-- Asistente -->
-        <section id="panel-asistente" class="panel" role="tabpanel" aria-labelledby="rol-asistente">
-          <fieldset data-rol="asistente">
-            <legend>Perfil de Asistente</legend>
-
-            <div class="row">
-              <div>
-                <label for="apellido">Apellido</label>
-                <input id="apellido" name="apellido" type="text" data-required="true">
-              </div>
-              <div>
-                <label for="nac">Fecha de nacimiento</label>
-                <input id="nac" name="nac" type="date" data-required="true">
-              </div>
-            </div>
-
-            <!-- Institución (opcional): combo + espacio de imagen -->
-            <div class="inst-row">
-              <div>
-                <label for="instId">Institución (opcional)</label>
-                <select id="instId" name="instId">
-                  <option value="">Ninguna</option>
-                  <option value="inst1">Insti 1</option>
-                  <option value="inst2">Insti 2</option>
-                  <option value="inst3">Insti 3</option>
-                </select>
-              </div>
-            </div>
-          </fieldset>
-        </section>
-
-        <!-- Organizador -->
-        <section id="panel-organizador" class="panel" role="tabpanel" aria-labelledby="rol-organizador">
-          <fieldset data-rol="organizador">
-            <legend>Perfil de Organizador</legend>
-
-            <div class="row">
-              <div>
-                <label for="web">Sitio web (opcional)</label>
-                <input id="web" name="web" type="url" placeholder="https://...">
-              </div>
-              <div></div>
-            </div>
-
-            <div>
-              <label for="desc">Descripción general</label>
-              <textarea id="desc" name="desc" rows="4" data-required="true"></textarea>
-            </div>
-          </fieldset>
-        </section>
       </section>
 
       <div class="actions">
         <button type="submit" class="btn">Crear cuenta</button>
         <a class="btn ghost" href="index.html">Cancelar</a>
       </div>
-    </form>
 
-    <p><a href="index.html">← Volver al inicio</a></p>
+      <p id="msg" style="display:none;"></p>
+    </form>
   </main>
 
-  <!-- JS mínimo -->
+  <!-- Cargar datos base primero -->
+  <script src="../js/CargaUsers.js"></script>
+
+  <!-- Lógica de alta con rol exclusivo -->
   <script>
-  (() => {
-    const form = document.getElementById('altaForm');
-    const rAsis = document.getElementById('rol-asistente');
-    const rOrg  = document.getElementById('rol-organizador');
+  (function(){
+    const $ = s => document.querySelector(s);
+    const form = $('#altaForm');
+    const msg  = $('#msg');
 
-    // Pestaña por hash (#organizador / #asistente)
-    const hash = location.hash.replace('#','');
-    if (hash === 'organizador') rOrg.checked = true;
-    if (hash === 'asistente')   rAsis.checked = true;
+    const grupoA = $('#grupoAsistente');
+    const grupoO = $('#grupoOrganizador');
 
-    // Activa/desactiva required según rol
-    function applyRole() {
-      const rol = rOrg.checked ? 'organizador' : 'asistente';
-      form.querySelectorAll('[data-rol="asistente"], [data-rol="organizador"]').forEach(block => {
-        const active = block.getAttribute('data-rol') === rol;
-        block.querySelectorAll('[data-required="true"]').forEach(el => {
-          el.toggleAttribute('required', active);
-          if (!active) el.setCustomValidity('');
-        });
-      });
-      history.replaceState(null, '', '#' + rol);
+    const rolRadios = form.querySelectorAll('input[name="rol"]');
+
+    function setDisabled(groupEl, disabled){
+      groupEl.querySelectorAll('input,select,textarea').forEach(el => el.disabled = disabled);
+    }
+    function setRequired(el, req){ if (el) el.required = req; }
+
+    // Cambia rol → muestra/oculta y habilita/deshabilita campos
+    function applyRoleUI(role){
+      const isAsis = role === 'asistente';
+
+      // Mostrar/ocultar
+      grupoA.style.display = isAsis ? '' : 'none';
+      grupoO.style.display = isAsis ? 'none' : '';
+
+      // Habilitar/deshabilitar
+      setDisabled(grupoA, !isAsis);
+      setDisabled(grupoO,  isAsis);
+
+      // Requeridos correctos
+      setRequired($('#nombreA'), isAsis);
+      setRequired($('#apellidoA'), isAsis);
+      setRequired($('#nacA'), isAsis);
+
+      setRequired($('#nombreO'), !isAsis);
+      setRequired($('#descO'),   !isAsis);
+      // webO opcional
     }
 
-    // Contraseña = confirmación
-    const pass  = form.querySelector('#pass');
-    const pass2 = form.querySelector('#pass2');
-    function checkPasswords() {
-      pass2.setCustomValidity(
-        pass2.value && pass.value !== pass2.value ? 'Las contraseñas no coinciden' : ''
+    // Init UI
+    applyRoleUI('asistente');
+    rolRadios.forEach(r => r.addEventListener('change', e => applyRoleUI(e.target.value)));
+
+    function showMsg(text, ok=false){
+      msg.textContent = text;
+      msg.style.display = 'block';
+      msg.style.color = ok ? 'green' : 'red';
+    }
+
+    // Validaciones comunes
+    function validateCommon(){
+      const nick = form.nick.value.trim();
+      const email = form.email.value.trim().toLowerCase();
+      const pass = form.pass.value;
+      const pass2 = form.pass2.value;
+
+      if (!nick || !email || !pass || !pass2) return {ok:false, err:'Completá los campos obligatorios.'};
+      if (pass.length < 4) return {ok:false, err:'La contraseña debe tener al menos 4 caracteres.'};
+      if (pass !== pass2) return {ok:false, err:'Las contraseñas no coinciden.'};
+
+      const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+      const exists = usuarios.some(u =>
+        u.nick?.toLowerCase() === nick.toLowerCase() ||
+        u.email?.toLowerCase() === email
       );
-    }
-    pass.addEventListener('input', checkPasswords);
-    pass2.addEventListener('input', checkPasswords);
+      if (exists) return {ok:false, err:'El nick o el correo ya están registrados.'};
 
-    // Preview de institución (placeholder ahora; agregá rutas cuando tengas imágenes)
-    const instSelect  = document.getElementById('instId');
-    const instPreview = document.getElementById('instPreview');
-    const instImg     = document.getElementById('instImg');
-    const instImages = {
-      inst1: '', // '../img/inst1.png'
-      inst2: '', // '../img/inst2.png'
-      inst3: ''  // '../img/inst3.png'
-    };
-    function updateInstPreview(){
-      const key = instSelect.value;
-      const src = instImages[key];
-      if (src) {
-        instImg.src = src;
-        instPreview.classList.add('has-image');
+      return {ok:true, nick, email, pass};
+    }
+
+    function buildUser(role, common){
+      if (role === 'asistente'){
+        return {
+          rol: 'asistente',
+          nick: common.nick,
+          email: common.email,
+          pass: common.pass,
+          nombre: form.nombreA.value.trim(),
+          apellido: form.apellidoA.value.trim(),
+          nac: form.nacA.value,
+          instId: form.instIdA.value.trim() || undefined
+        };
       } else {
-        instImg.removeAttribute('src');
-        instPreview.classList.remove('has-image');
+        return {
+          rol: 'organizador',
+          nick: common.nick,
+          email: common.email,
+          pass: common.pass,
+          nombre: form.nombreO.value.trim(), // nombre de organización
+          desc: form.descO.value.trim(),
+          web: form.webO.value.trim() || undefined
+        };
       }
     }
-    instSelect.addEventListener('change', updateInstPreview);
-
-    rAsis.addEventListener('change', applyRole);
-    rOrg .addEventListener('change', applyRole);
-
-    applyRole();
-    updateInstPreview();
 
     form.addEventListener('submit', (e) => {
-      checkPasswords();
-      if (!form.reportValidity()) e.preventDefault();
+      e.preventDefault();
+      msg.style.display = 'none';
+
+      const role = form.querySelector('input[name="rol"]:checked')?.value || 'asistente';
+      const common = validateCommon();
+      if (!common.ok){ showMsg(common.err); return; }
+
+      // Validación específica por rol
+      if (role === 'asistente'){
+        if (!form.nombreA.value.trim() || !form.apellidoA.value.trim() || !form.nacA.value){
+          showMsg('Completá Nombre, Apellido y Fecha de nacimiento.'); return;
+        }
+      } else {
+        if (!form.nombreO.value.trim() || !form.descO.value.trim()){
+          showMsg('Completá Nombre de la organización y Descripción.'); return;
+        }
+      }
+
+      const nuevo = buildUser(role, common);
+      const usuarios = JSON.parse(localStorage.getItem('usuarios') || '[]');
+      usuarios.push(nuevo);
+      localStorage.setItem('usuarios', JSON.stringify(usuarios));
+
+      // Iniciar sesión automáticamente
+      sessionStorage.setItem('usuarioActivo', JSON.stringify(nuevo));
+
+      showMsg('Cuenta creada con éxito. Redirigiendo…', true);
+      window.location.href = 'index.html';
     });
   })();
   </script>
+
   <script src="../js/Hamburgesa.js"></script>
-<script src="../js/Login.js"></script>
+  <script src="../js/Login.js"></script>
 </body>
 </html>
