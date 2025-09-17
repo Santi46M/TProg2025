@@ -1,17 +1,27 @@
 document.addEventListener("DOMContentLoaded", () => {
   const userNav = document.getElementById("userNav");
-  const usuario = JSON.parse(sessionStorage.getItem("usuarioActivo"));
+  const usuario = JSON.parse(sessionStorage.getItem("usuarioActivo") || "null");
 
   if (usuario) {
-    // Reemplaza contenido por info del usuario logueado
     let html = `
       <span>Hola, ${usuario.nombre}</span>
-	  <a class="btn link-reg" href="ConsultaUsuario.html?usuario=${usuario.nick}">
-	    <i class='bx bxs-user'></i> Mi Perfil
-	  </a>
-      <a class="btn" href="CierreSesion.html"><i class='bx bxs-log-out'></i> Cerrar sesión</a>
+      <div class="dropdown">
+        <button class="dropbtn">
+          Mi Perfil <i class='bx bxs-down-arrow'></i>
+        </button>
+        <div class="dropdown-content">
+          <a href="ConsultaUsuario.html?usuario=${usuario.nick}">
+            <i class='bx bxs-id-card'></i> Ver Datos
+          </a>
+          <a href="ModificarUsuario.html?usuario=${usuario.nick}">
+            <i class='bx bxs-edit'></i> Modificar Datos
+          </a>
+          <a href="CierreSesion.html">
+            <i class='bx bxs-log-out'></i> Cerrar sesión
+          </a>
+        </div>
+      </div>
     `;
-
     userNav.innerHTML = html;
   }
 });

@@ -33,7 +33,7 @@
 	      <button class="btn" type="submit">Buscar</button>
 	    </form>
       </nav>
-          <!-- 🔹 Zona dinámica de usuario -->
+          <!-- Zona dinámica de usuario -->
     <nav class="user-nav" id="userNav">
       <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
       <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
@@ -43,7 +43,7 @@
   
   <main class="container">
     <section class="layout">
-      <!-- 👉 Sidebar fijo -->
+      <!-- Sidebar fijo -->
       <aside class="sidebar">
 
         <nav class="side-group">
@@ -60,7 +60,7 @@
         </nav>
       </aside>
 
-      <!-- 👉 Contenido principal -->
+      <!--  Contenido principal -->
       <article class="content">
         <h1>Consulta de Registro</h1>
 
@@ -91,27 +91,7 @@
   </main>
 
   <script>
-  // ================================
-  // Datos de ejemplo hardcodeados
-  // ================================
-  const SESION = { rol: "asistente", nick: "Juan" }; 
-  // cambiar a {rol:"asistente", nick:"Juan"} para probar
 
-  const DATA = [
-    {
-      id:"ed1", nombre:"JSConf 2025", organizador:"Ana",
-      registros:[
-        {usuario:"Juan", fecha:"2025-01-10", tipo:"General", patrocinio:"Platino"},
-        {usuario:"Sofi", fecha:"2025-01-12", tipo:"VIP", patrocinio:"—"}
-      ]
-    },
-    {
-      id:"ed2", nombre:"UX Day 2025", organizador:"Beto",
-      registros:[
-        {usuario:"Juan", fecha:"2025-02-01", tipo:"Estudiante", patrocinio:"Plata"}
-      ]
-    }
-  ];
 
   // utilidades
   const $ = s => document.querySelector(s);
