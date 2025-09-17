@@ -45,7 +45,7 @@
       <h2>Alta de Tipo de Registro</h2>
       <form>
         <div class="form-group-altaTipoRegistro">
-          <label for="edicion">Edición del evento*</label>
+          <label for="edicion">Edición del evento<span style="color:red">*</span></label>
           <select id="edicion" name="edicion" required>
             <option value="">-- Seleccione una edición --</option>
             <option value="edicion1">Edición 1</option>
@@ -55,35 +55,47 @@
         </div>
 
         <div class="form-group-altaTipoRegistro">
-          <label for="nombre">Nombre*</label>
+          <label for="nombre">Nombre<span style="color:red">*</span></label>
           <input type="text" id="nombre" name="nombre" required>
         </div>
 
         <div class="form-group-altaTipoRegistro">
-          <label for="descripcion">Descripción*</label>
+          <label for="descripcion">Descripción<span style="color:red">*</span></label>
           <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
         </div>
 
         <div class="form-group-altaTipoRegistro">
-          <label for="costo">Costo*</label>
-          <input type="number" id="costo" name="costo" step="0.01" min="0" required>
+          <label for="costo">Costo<span style="color:red">*</span></label>
+          <input type="number" id="costo" name="costo" min="0" required>
         </div>
 
         <div class="form-group-altaTipoRegistro">
-          <label for="cupo">Cupo*</label>
+          <label for="cupo">Cupo<span style="color:red">*</span></label>
           <input type="number" id="cupo" name="cupo" min="1" required>
         </div>
 
         <p class="form-hint-altaTipoRegistro">Los campos marcados con * son obligatorios.</p>
 
-        <div class="form-actions-altaTipoRegistro">
-          <button type="submit" class="btn-guardar-altaTipoRegistro">Guardar</button>
-          <button type="reset" class="btn-cancelar-altaTipoRegistro">Cancelar</button>
+        <div class="form-actions-altaEvento">
+          <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
+          <button type="reset" class="btn-cancelar-altaEvento">Cancelar</button>
         </div>
       </form>
     </section>
   </main>
-   <script src="../js/Hamburgesa.js"></script>
-   <script src="../js/Login.js"></script>
+  <script src="../js/Hamburgesa.js"></script>
+  <script src="../js/Login.js"></script>
+  <script src="../js/Dialogos.js"></script>
+  <script>
+    document.querySelector('.btn-cancelar-altaEvento').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = 'index.html';
+    });
+
+    document.querySelector('.form-card-altaTipoRegistro form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      mostrarDialogoExito('Tipo de registro creado con éxito.');
+    });
+  </script>
 </body>
 </html>

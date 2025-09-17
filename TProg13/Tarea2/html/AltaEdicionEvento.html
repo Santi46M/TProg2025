@@ -37,10 +37,9 @@
     <h1>Alta de Edición de Evento</h1>
 
     <form id="form-edicion" class="card">
-      <label>Evento existente
+      <label>Evento existente<span style="color:red">*</span>
         <select id="evento" required>
           <option value="">-- Seleccionar evento --</option>
-          <!-- Hardcodeados según lo que venimos usando -->
           <option value="ev1">JSConf</option>
           <option value="ev2">UX Day</option>
           <option value="ev3">Data Summit</option>
@@ -48,22 +47,22 @@
         </select>
       </label>
 
-      <label>Nombre único de la edición
+      <label>Nombre único de la edición<span style="color:red">*</span>
         <input id="nombre" type="text" required>
       </label>
 
-      <label>Sigla
+      <label>Sigla<span style="color:red">*</span>
         <input id="sigla" type="text" required>
       </label>
 
       <div class="row">
         <div>
-          <label>Ciudad
+          <label>Ciudad<span style="color:red">*</span>
             <input id="ciudad" type="text" required>
           </label>
         </div>
         <div>
-          <label>País
+          <label>País<span style="color:red">*</span>
             <input id="pais" type="text" required>
           </label>
         </div>
@@ -71,12 +70,12 @@
 
       <div class="row">
         <div>
-          <label>Fecha de inicio
+          <label>Fecha de inicio<span style="color:red">*</span>
             <input id="inicio" type="date" required>
           </label>
         </div>
         <div>
-          <label>Fecha de fin
+          <label>Fecha de fin<span style="color:red">*</span>
             <input id="fin" type="date" required>
           </label>
         </div>
@@ -85,10 +84,12 @@
       <label>Imagen (opcional)
         <input id="img" type="file" accept="image/*">
       </label>
-
-      <div class="actions">
-        <button type="submit" class="btn">Crear edición</button>
-        <a class="btn ghost" href="index.html">Cancelar</a>
+		
+	  <p class="form-hint-altaEvento">Los campos marcados con * son obligatorios.</p>
+	  
+      <div class="form-actions-altaEvento">
+        <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
+        <button type="reset" class="btn-cancelar-altaEvento">Cancelar</button>
       </div>
     </form>
   </main>
@@ -110,9 +111,9 @@
       }
 
       const nueva = {
-        evento,                    // ev1 | ev2 | ev3 | ev4
-        nombre,                    // p.ej. "JSConf 2026"
-        sigla,                     // p.ej. "JSC26"
+        evento,
+        nombre,
+        sigla,
         ciudad: document.getElementById("ciudad").value,
         pais:   document.getElementById("pais").value,
         inicio: document.getElementById("inicio").value,
@@ -123,13 +124,13 @@
 
       ediciones.push(nueva);
       localStorage.setItem("ediciones", JSON.stringify(ediciones));
-      alert("Edición creada con éxito ✅");
-      window.location.href = "index.html";
+      mostrarDialogoExito('Edición creada con éxito.');
     });
   </script>
 
   <script src="../js/Hamburgesa.js"></script>
   <script src="../js/Login.js"></script>
+  <script src="../js/Dialogos.js"></script>
 
   <script>
   // Header logueado (igual que lo venías usando)

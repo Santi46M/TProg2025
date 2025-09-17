@@ -39,3 +39,23 @@ function toggleMenu() {
 	    `;
 	  }
 	});
+
+function toggleMenu() {
+  const dropdown = document.getElementById("dropdownMenu");
+  if (dropdown.style.display === "none" || dropdown.style.display === "") {
+    dropdown.style.display = "block";
+    document.addEventListener('click', closeDropdownOnClickOutside);
+  } else {
+    dropdown.style.display = "none";
+    document.removeEventListener('click', closeDropdownOnClickOutside);
+  }
+}
+
+function closeDropdownOnClickOutside(e) {
+  const dropdown = document.getElementById("dropdownMenu");
+  const button = document.querySelector(".hamburguesa");
+  if (!dropdown.contains(e.target) && !button.contains(e.target)) {
+    dropdown.style.display = "none";
+    document.removeEventListener('click', closeDropdownOnClickOutside);
+  }
+}

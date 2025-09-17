@@ -184,7 +184,7 @@ public class AltaEdicionEvento extends JInternalFrame {
 		gbc_btnAceptar.gridy = 9;
 		gbc_btnAceptar.insets = new Insets(10, 5, 5, 5);
 		gbc_btnAceptar.anchor = GridBagConstraints.WEST;
-		getContentPane().add(btnAceptar, gbc_btnAceptar);
+		
 
 		JButton btnCancelar = new JButton("Cancelar");
 		GridBagConstraints gbc_btnCancelar = new GridBagConstraints();
@@ -192,7 +192,7 @@ public class AltaEdicionEvento extends JInternalFrame {
 		gbc_btnCancelar.gridy = 9;
 		gbc_btnCancelar.insets = new Insets(10, 5, 5, 0);
 		gbc_btnCancelar.anchor = GridBagConstraints.EAST;
-		getContentPane().add(btnCancelar, gbc_btnCancelar);
+		
 
 		btnAceptar.addActionListener(ev -> {
 			String eventoNombre = (String) comboEvento.getSelectedItem();
@@ -238,6 +238,17 @@ public class AltaEdicionEvento extends JInternalFrame {
 		});
 
         btnCancelar.addActionListener(ev -> this.dispose());
+        
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panelBotones.add(btnAceptar);
+        panelBotones.add(btnCancelar);
+        GridBagConstraints gbc_panelBotones = new GridBagConstraints();
+        gbc_panelBotones.gridx = 1;
+        gbc_panelBotones.gridy = 9;
+        gbc_panelBotones.gridwidth = 2;
+        gbc_panelBotones.insets = new Insets(10, 5, 5, 5);
+        gbc_panelBotones.anchor = GridBagConstraints.EAST;
+        getContentPane().add(panelBotones, gbc_panelBotones);
     }
 
 	public void cargarEventos() {
