@@ -240,6 +240,26 @@ legend{ padding:0 .4rem; font-weight:700; color:#374151; }
   text-align: right;
 }
 
+.checkbox-grid-ev {
+  display: grid;
+  grid-template-columns: 1fr auto; /* texto ocupa todo, checkbox queda alineado */
+  row-gap: 0.5rem;
+  max-width: 300px; /* opcional, para que no se estire mucho */
+}
+
+.checkbox-grid-ev label {
+  display: contents; /* permite que el span y el input usen las columnas del grid */
+}
+
+.checkbox-grid-ev span {
+  text-align: left;
+}
+
+.checkbox-grid-ev input[type="checkbox"] {
+  justify-self: center; /* centra los checkbox en su columna */
+}
+
+
 
 
 /* ===== FIN Alta de Evento ===== */
