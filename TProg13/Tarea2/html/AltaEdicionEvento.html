@@ -85,7 +85,7 @@
         <input id="img" type="file" accept="image/*">
       </label>
 		
-	  <p class="form-hint-altaEvento">Los campos marcados con * son obligatorios.</p>
+	    <p class="form-hint-altaEvento">Los campos marcados con * son obligatorios.</p>
 	  
       <div class="form-actions-altaEvento">
         <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
@@ -95,6 +95,29 @@
   </main>
 
   <script>
+    // UX: mantener coherentes los límites de fechas
+    const inicioEl = document.getElementById("inicio");
+    const finEl    = document.getElementById("fin");
+
+    inicioEl.addEventListener("change", () => {
+      if (inicioEl.value) {
+        finEl.min = inicioEl.value; // fin no puede ser menor a inicio
+        // Si ya había un fin inválido, lo limpiamos para que el usuario elija de nuevo
+        if (finEl.value && finEl.value < inicioEl.value) finEl.value = "";
+      } else {
+        finEl.removeAttribute("min");
+      }
+    });
+
+    finEl.addEventListener("change", () => {
+      if (finEl.value) {
+        inicioEl.max = finEl.value; // inicio no puede ser mayor a fin
+        if (inicioEl.value && inicioEl.value > finEl.value) inicioEl.value = "";
+      } else {
+        inicioEl.removeAttribute("max");
+      }
+    });
+
     document.getElementById("form-edicion").addEventListener("submit", e => {
       e.preventDefault();
       const ediciones = JSON.parse(localStorage.getItem("ediciones") || "[]");
@@ -110,14 +133,30 @@
         return;
       }
 
+      // ✅ Validación pedida: inicio ≤ fin
+      const inicio = document.getElementById("inicio").value;
+      const fin    = document.getElementById("fin").value;
+
+      if (!inicio || !fin) { 
+        // Los inputs ya tienen required, esto es por seguridad
+        alert("Completá las fechas de inicio y fin.");
+        return;
+      }
+      if (inicio > fin) {
+        alert("La fecha de inicio debe ser menor o igual a la fecha de fin.");
+        // Llevar el foco a la primera inválida
+        document.getElementById("inicio").focus();
+        return;
+      }
+
       const nueva = {
         evento,
         nombre,
         sigla,
         ciudad: document.getElementById("ciudad").value,
         pais:   document.getElementById("pais").value,
-        inicio: document.getElementById("inicio").value,
-        fin:    document.getElementById("fin").value,
+        inicio,
+        fin,
         estado: "Ingresada",
         fechaAlta: new Date().toISOString().split("T")[0]
       };

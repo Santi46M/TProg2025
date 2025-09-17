@@ -522,3 +522,10 @@ legend{ padding:0 .4rem; font-weight:700; color:#374151; }
   background: var(--bg-soft);
   color: var(--brand);
 }
+
+/* Para cualquier botón del modal de diálogo */
+button, 
+input[type="button"], 
+input[type="submit"] {
+  cursor: pointer;
+}

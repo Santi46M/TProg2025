@@ -87,15 +87,86 @@
   <script src="../js/Login.js"></script>
   <script src="../js/Dialogos.js"></script>
   <script>
+    // Cancelar -> inicio
     document.querySelector('.btn-cancelar-altaEvento').addEventListener('click', function(e) {
       e.preventDefault();
       window.location.href = 'index.html';
     });
 
+    // Normaliza para comparar nombres sin tildes/espacios extra/mayúsculas
+    function normalize(s){
+      return (s || '')
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    }
+
     document.querySelector('.form-card-altaTipoRegistro form').addEventListener('submit', function(e) {
       e.preventDefault();
-      mostrarDialogoExito('Tipo de registro creado con éxito.');
+
+      const edicion = document.getElementById("edicion").value;
+      const nombre  = document.getElementById("nombre").value;
+
+      if (!edicion) { 
+        alert("Seleccioná una edición.");
+        return;
+      }
+
+      const tipos = JSON.parse(localStorage.getItem("tiposRegistro") || "[]");
+      const dup = tipos.some(t => t.edicion === edicion && normalize(t.nombre) === normalize(nombre));
+
+      if (dup) {
+        // Mensaje según el caso de uso: informar y permitir corregir o cancelar
+        if (typeof mostrarDialogoError === 'function') {
+          mostrarDialogoError("Ya existe un tipo de registro con ese nombre para esta edición. Podés elegir otro nombre o cancelar.");
+        } else {
+          alert("Ya existe un tipo de registro con ese nombre para esta edición. Podés elegir otro nombre o cancelar.");
+        }
+        // Enfocar el campo para que el organizador corrija
+        document.getElementById("nombre").focus();
+        return;
+      }
+
+      // Si no hay duplicado, crear el tipo de registro
+      const nueva = {
+        edicion,
+        nombre: nombre.trim(),
+        descripcion: document.getElementById("descripcion").value.trim(),
+        costo: Number(document.getElementById("costo").value),
+        cupo:  Number(document.getElementById("cupo").value),
+        fechaAlta: new Date().toISOString().split("T")[0]
+      };
+
+      tipos.push(nueva);
+      localStorage.setItem("tiposRegistro", JSON.stringify(tipos));
+
+      // Éxito: mostrar modal (redirigir solo si vos querés)
+      if (typeof mostrarDialogoExito === 'function') {
+        // si tu modal devuelve Promesa, podrías redirigir al cerrar:
+        // mostrarDialogoExito('Tipo de registro creado con éxito.').finally(() => location.href='index.html');
+        mostrarDialogoExito('Tipo de registro creado con éxito.');
+      } else {
+        alert('Tipo de registro creado con éxito.');
+      }
     });
+  </script>
+
+  <script>
+  // Header logueado (igual que lo venías usando)
+  document.addEventListener("DOMContentLoaded", () => {
+    const userNav = document.getElementById("userNav");
+    const usuario = JSON.parse(sessionStorage.getItem("usuarioActivo"));
+
+    if (usuario) {
+      userNav.innerHTML = `
+        <span>Hola, ${usuario.nombre}</span>
+        <a class="btn" href="ModificarUsuario.html"><i class='bx bxs-user'></i> Mi Perfil</a>
+        <a class="btn" href="CierreSesion.html"><i class='bx bxs-log-out'></i> Cerrar sesión</a>
+      `;
+    }
+  });
   </script>
 </body>
 </html>
