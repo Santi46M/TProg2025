@@ -11,30 +11,44 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <!-- Botón hamburguesa con dropdown -->
-      <div style="position:relative;display:inline-block;">
-        <button class="hamburguesa" onclick="toggleMenu()">☰</button>
-        <div id="dropdownMenu" class="dropdown-menu" style="display:none;position:absolute;top:100%;left:0;z-index:100;min-width:180px;">
-          <ul id="menuList"><!-- JS inyecta el menú según rol --></ul>
-        </div>
-      </div>
-
-      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
-
+      <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
       <nav class="main-nav">
         <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
           <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
           <button class="btn" type="submit">Buscar</button>
         </form>
       </nav>
-
       <nav class="user-nav" id="userNav">
-        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+        <!-- Contenido dinámico según usuario -->
       </nav>
     </div>
   </header>
 
+<div class="container row" style="margin-top:1rem;">
+    <!-- Sidebar -->
+    <aside class="card">
+      <h3><i class='bx bx-list-ul'></i> Menú</h3>
+
+      <h4>Acciones</h4>
+      <ul>
+        <li><a href="RegistroEdicionEvento.html"><i class='bx bx-edit'></i> Registrarse a edición de evento</a></li>
+      </ul>
+
+      <h4>Categorías</h4>
+      <ul>
+        <li><span><i class='bx bx-wifi-0'></i> Tecnología</span></li>
+        <li><span><i class='bx bx-wifi-0'></i> Innovación</span></li>
+        <li><span><i class='bx bx-wifi-0'></i> Literatura</span></li>
+        <li><span><i class='bx bx-wifi-0'></i> Cultura</span></li>
+        <li><span><i class='bx bx-wifi-0'></i> Música</span></li>
+        <li><span><i class='bx bx-wifi-0'></i> Deporte</span></li>
+        <li><span><i class='bx bx-wifi-0'></i> Salud</span></li>
+        <li><span><i class='bx bx-wifi-0'></i> Entretenimiento</span></li>
+        <li><span><i class='bx bx-wifi-0'></i> Negocios</span></li>
+      </ul>
+	<h4><a href="ConsultaUsuario-asistente.html">Listar Usuarios</a></h4>
+    </aside>
+    
   <main class="container narrow">
     <h1>Registro a Edición de Evento</h1>
 
@@ -71,14 +85,38 @@
       <p id="msgResultado"></p>
     </section>
   </main>
-
+</div>
   <!-- Carga de datos base -->
   <script src="../js/CargaDatos.js"></script>
-  <!-- Navbar y login -->
   <script src="../js/Hamburgesa.js"></script>
   <script src="../js/Login.js"></script>
-
   <script>
+    // Header dinámico siempre con Ana Torres
+    function renderUserHeaderAnaTorres() {
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+      const usuario = usuarios.find(u => u.nick === 'atorres');
+      const userNav = document.getElementById("userNav");
+      function ajustarRutaImg(img) {
+        if (!img) return '../../img/default-user.png';
+        if (img.startsWith('../img/')) return '../../img/' + img.split('../img/')[1];
+        if (img.startsWith('img/')) return '../../' + img;
+        return img;
+      }
+      if (!usuario || !userNav) return;
+      userNav.innerHTML = `
+        <span style="display:flex;align-items:center;gap:0.5rem;">
+          <img src="${ajustarRutaImg(usuario.img)}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+          <span>${usuario.nombre} ${usuario.apellido || ''}</span>
+        </span>
+        <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
+      `;
+    }
+    renderUserHeaderAnaTorres();
+    function cerrarSesion() {
+      sessionStorage.removeItem('usuarioActivo');
+      window.location.href = '../visitante/index.html';
+    }
+
   // Utilidades
   const $ = s => document.querySelector(s);
   const el = (t, attrs={}, txt) => {

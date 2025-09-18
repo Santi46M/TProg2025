@@ -9,7 +9,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
       <nav class="main-nav">
         <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
           <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
@@ -99,7 +99,7 @@
     // Simulación de cierre de sesión
     function cerrarSesion() {
       sessionStorage.removeItem('usuarioActivo');
-      window.location.href = 'index.html';
+      window.location.href = '../visitante/index.html';
     }
     function ajustarRutaImg(img) {
       if (!img) return '../../img/default-user.png';
