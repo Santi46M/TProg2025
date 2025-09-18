@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Tipo Registro - Full</title>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
+      <nav class="main-nav">
+        <!-- Buscador -->
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+      </nav>
+
+      <!--  Zona de usuario -->
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <div class="container row" style="margin-top:1rem;">
+	<!-- Sidebar -->
+	<aside class="card">
+	  <h3><i class='bx bx-list-ul'></i> Menú</h3>
+
+	  <h4>Categorías</h4>
+	  <ul>
+	    <li><span><i class='bx bx-wifi-0'></i> Tecnología</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Innovación</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Literatura</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Cultura</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Música</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Deporte</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Salud</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Entretenimiento</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Negocios</span></li>
+	  </ul>
+
+	  <h4>Usuarios</h4>
+	  <ul>
+	    <li><a href="#"><i class='bx bx-user'></i> Listar usuarios</a></li>
+	  </ul>
+	</aside>
+
+    <!-- Main -->
+	<main class="container consulta-layout">
+      <section class="event-card">
+        <h1 class="event-title">Full</h1>
+        <div class="event-info">
+          <h3>Descripción</h3>
+          <p>Acceso ilimitado + Cena de gala</p>
+          <div class="event-meta"><strong>Costo:</strong> 750</div>
+          <div class="event-meta"><strong>Cupo:</strong> 550</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../js/Login.js"></script>
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    if(sidebar) sidebar.style.display = 'none';
+  </script>
+</body>
+</html>

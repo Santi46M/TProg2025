@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Evento — Maratón de Montevideo</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/ConsultaEventoBase.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
+      <nav class="main-nav">
+        <!-- Buscador -->
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+      </nav>
+
+      <!--  Zona de usuario -->
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <div class="container row" style="margin-top:1rem;">
+	<!-- Sidebar -->
+	<aside class="card">
+	  <h3><i class='bx bx-list-ul'></i> Menú</h3>
+
+	  <h4>Categorías</h4>
+	  <ul>
+	    <li><span><i class='bx bx-wifi-0'></i> Tecnología</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Innovación</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Literatura</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Cultura</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Música</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Deporte</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Salud</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Entretenimiento</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Negocios</span></li>
+	  </ul>
+
+	  <h4>Usuarios</h4>
+	  <ul>
+	    <li><a href="#"><i class='bx bx-user'></i> Listar usuarios</a></li>
+	  </ul>
+	</aside>
+
+    <!-- Main -->
+	<main class="container consulta-layout">
+	  <section class="event-card">
+	    <div class="event-header">
+	      <img src="../../img/Img-ev04.png" alt="Maratón de Montevideo" class="event-cover">
+	      <h1 class="event-title">Maratón de Montevideo</h1>
+	    </div>
+	    <div class="event-info">
+	      <h3>Descripción</h3>
+	      <p>Competencia deportiva anual en la capital</p>
+	      <div class="event-meta"><strong>Sigla:</strong> MARATON</div>
+	      <div class="chips"><span class="categorias-label">Categorías:</span><span class="chip">Deporte</span><span class="chip">Salud</span></div>
+	      <div class="event-meta"><strong>Fecha alta:</strong> 01/01/2022</div>
+	    </div>
+	  </section>
+	  <aside class="editions">
+	    <h3>Ediciones</h3>
+	    <div class="edition-item">
+	      <img src="../../img/Img-edev03.jpeg" alt="Maratón 2024" style="background:#fff;display:block;">
+	      <div>
+	        <div class="edition-title"><a href="ConsultaEdicionVisitanteMaratóndeMontevideo.html" style="text-decoration:none;color:inherit;">Maratón 2024</a></div>
+	      </div>
+	    </div>
+	  </aside>
+	</main>
+  </div>
+
+  <script src="../js/Login.js"></script>
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    if(sidebar) sidebar.style.display = 'none';
+  </script>
+</body>
+</html>
