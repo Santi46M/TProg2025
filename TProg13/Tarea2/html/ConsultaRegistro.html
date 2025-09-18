@@ -33,7 +33,7 @@
 	      <button class="btn" type="submit">Buscar</button>
 	    </form>
       </nav>
-          <!-- Zona dinámica de usuario -->
+          <!-- 🔹 Zona dinámica de usuario -->
     <nav class="user-nav" id="userNav">
       <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
       <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
@@ -43,7 +43,7 @@
   
   <main class="container">
     <section class="layout">
-      <!-- Sidebar fijo -->
+      <!-- 👉 Sidebar fijo -->
       <aside class="sidebar">
 
         <nav class="side-group">
@@ -60,7 +60,7 @@
         </nav>
       </aside>
 
-      <!--  Contenido principal -->
+      <!-- 👉 Contenido principal -->
       <article class="content">
         <h1>Consulta de Registro</h1>
 
@@ -91,73 +91,127 @@
   </main>
 
   <script>
+// ================================
+// Cargar datos reales desde localStorage
+// ================================
+const usuarioActivo = JSON.parse(sessionStorage.getItem("usuarioActivo"));
+if (!usuarioActivo) {
+  alert("Debe iniciar sesión para consultar registros.");
+  window.location.href = "InicioSesion.html";
+}
 
+const eventos = JSON.parse(localStorage.getItem("eventos") || "[]");
+const registros = JSON.parse(localStorage.getItem("registros") || "[]");
+const tiposRegistro = JSON.parse(localStorage.getItem("tiposRegistro") || "[]");
 
-  // utilidades
-  const $ = s => document.querySelector(s);
-  const el = (t, attrs={}, txt) => {
-    const n=document.createElement(t);
-    Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));
-    if(txt!=null) n.textContent=txt;
-    return n;
-  };
+const $ = s => document.querySelector(s);
+const el = (t, attrs = {}, txt) => {
+  const n = document.createElement(t);
+  Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+  if (txt != null) n.textContent = txt;
+  return n;
+};
 
-  const selEdicion = $('#selEdicion');
-  const boxUsuarios = $('#boxUsuarios');
-  const listaUsuarios = $('#listaUsuarios');
-  const boxDetalle = $('#boxDetalle');
+const selEdicion = $('#selEdicion');
+const boxUsuarios = $('#boxUsuarios');
+const listaUsuarios = $('#listaUsuarios');
+const boxDetalle = $('#boxDetalle');
+const regUsuario = $('#regUsuario');
+const regFecha = $('#regFecha');
+const regTipo = $('#regTipo');
+const regPatrocinio = $('#regPatrocinio');
 
-  const regUsuario = $('#regUsuario');
-  const regFecha = $('#regFecha');
-  const regTipo = $('#regTipo');
-  const regPatrocinio = $('#regPatrocinio');
-
-  // cargar ediciones según rol
-  function cargarEdiciones() {
-    selEdicion.innerHTML = '<option value="">-- Seleccionar edición --</option>';
-    let ediciones;
-    if (SESION.rol === "organizador") {
-      ediciones = DATA.filter(e => e.organizador === SESION.nick);
-    } else {
-      ediciones = DATA.filter(e => e.registros.some(r => r.usuario === SESION.nick));
-    }
-    ediciones.forEach(e => selEdicion.appendChild(el('option',{value:e.id},e.nombre)));
-  }
-
-  // al elegir edición
-  selEdicion.addEventListener('change', () => {
-    boxDetalle.classList.add('hide');
-    listaUsuarios.innerHTML = "";
-    const ed = DATA.find(e => e.id === selEdicion.value);
-    if (!ed) return;
-
-    if (SESION.rol === "organizador") {
-      // listar usuarios registrados
-      ed.registros.forEach(r => {
-        const li = el('li', {}, r.usuario);
-        li.addEventListener('click', ()=>mostrarDetalle(r));
-        listaUsuarios.appendChild(li);
-      });
-      boxUsuarios.classList.remove('hide');
-    } else {
-      // asistente → ver su propio registro
-      const reg = ed.registros.find(r => r.usuario === SESION.nick);
-      if (reg) mostrarDetalle(reg);
-      boxUsuarios.classList.add('hide');
-    }
+// Construir lista de ediciones con registros según rol
+function obtenerEdicionesConRegistros() {
+  let ediciones = [];
+  eventos.forEach(ev => {
+    (ev.ediciones || []).forEach(ed => {
+      // Buscar registros de esta edición
+      const regs = registros.filter(r => r.edicion === ed.id);
+      if (usuarioActivo.rol === "organizador" && ed.organizador === usuarioActivo.nick) {
+        if (regs.length > 0) {
+          ediciones.push({
+            id: ed.id,
+            nombre: ed.nombre,
+            registros: regs.map(r => ({
+              usuario: r.usuario,
+              fecha: r.fecha,
+              tipo: (tiposRegistro.find(tr => tr.id === r.tipo)?.nombre) || r.tipo,
+              patrocinio: obtenerPatrocinio(ed, r)
+            }))
+          });
+        }
+      } else if (usuarioActivo.rol === "asistente") {
+        // Solo ediciones donde el usuario tiene registro
+        const reg = regs.find(r => r.usuario === usuarioActivo.nick);
+        if (reg) {
+          ediciones.push({
+            id: ed.id,
+            nombre: ed.nombre,
+            registros: [{
+              usuario: reg.usuario,
+              fecha: reg.fecha,
+              tipo: (tiposRegistro.find(tr => tr.id === reg.tipo)?.nombre) || reg.tipo,
+              patrocinio: obtenerPatrocinio(ed, reg)
+            }]
+          });
+        }
+      }
+    });
   });
+  return ediciones;
+}
 
-  // mostrar detalle
-  function mostrarDetalle(r) {
-    regUsuario.textContent = r.usuario;
-    regFecha.textContent = r.fecha;
-    regTipo.textContent = r.tipo;
-    regPatrocinio.textContent = r.patrocinio;
-    boxDetalle.classList.remove('hide');
+// Buscar patrocinio usado (si corresponde)
+function obtenerPatrocinio(edicion, registro) {
+  if (!edicion.patrocinios) return "—";
+  const pat = (edicion.patrocinios || []).find(p => p.tipo === registro.tipo && p.codigo && registro.usuario === registro.usuario);
+  return pat ? pat.nivel : "—";
+}
+
+// cargar ediciones según rol
+function cargarEdiciones() {
+  selEdicion.innerHTML = '<option value="">-- Seleccionar edición --</option>';
+  const ediciones = obtenerEdicionesConRegistros();
+  ediciones.forEach(e => selEdicion.appendChild(el('option', { value: e.id }, e.nombre)));
+  selEdicion.dataset.ediciones = JSON.stringify(ediciones);
+}
+
+// al elegir edición
+selEdicion.addEventListener('change', () => {
+  boxDetalle.classList.add('hide');
+  listaUsuarios.innerHTML = "";
+  const ediciones = JSON.parse(selEdicion.dataset.ediciones || "[]");
+  const ed = ediciones.find(e => e.id === selEdicion.value);
+  if (!ed) return;
+
+  if (usuarioActivo.rol === "organizador") {
+    // listar usuarios registrados
+    ed.registros.forEach(r => {
+      const li = el('li', {}, r.usuario);
+      li.addEventListener('click', () => mostrarDetalle(r));
+      listaUsuarios.appendChild(li);
+    });
+    boxUsuarios.classList.remove('hide');
+  } else {
+    // asistente → ver su propio registro
+    const reg = ed.registros.find(r => r.usuario === usuarioActivo.nick);
+    if (reg) mostrarDetalle(reg);
+    boxUsuarios.classList.add('hide');
   }
+});
 
-  // init
-  cargarEdiciones();
+// mostrar detalle
+function mostrarDetalle(r) {
+  regUsuario.textContent = r.usuario;
+  regFecha.textContent = r.fecha;
+  regTipo.textContent = r.tipo;
+  regPatrocinio.textContent = r.patrocinio;
+  boxDetalle.classList.remove('hide');
+}
+
+// init
+cargarEdiciones();
   </script>
    <script src="../js/Hamburgesa.js"></script>
 <script src="../js/Login.js"></script>

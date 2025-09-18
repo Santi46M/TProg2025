@@ -9,19 +9,25 @@
 </head>
 <body>
   <!-- Header -->
+ <!-- Header -->
   <header class="site-header">
     <div class="container">
       <!-- Botón hamburguesa -->
-      <button class="hamburguesa" onclick="toggleMenu()">☰</button>
-
-      <!-- Sidebar -->
-      <aside id="sidebar" class="sidebar-mobile">
-        <h3><i class='bx bx-list-ul'></i> Menú</h3>
-        <ul id="menuList"><!-- Aquí JS inyecta el menú según rol --></ul>
-      </aside>
+      <div style="position:relative;display:inline-block;">
+        <button class="hamburguesa" onclick="toggleMenu()">☰</button>
+        <!-- Dropdown Menu -->
+        <div id="dropdownMenu" class="dropdown-menu" style="display:none;position:absolute;top:100%;left:0;z-index:100;min-width:180px;">
+          <ul id="menuList">
+            <!-- Aquí JS inyecta el menú según rol -->
+          </ul>
+        </div>
+      </div>
+      <!-- Fin hamburguesa -->
 
       <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
       <nav class="main-nav">
+        <!-- Buscador -->
         <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
           <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
           <button class="btn" type="submit">Buscar</button>
