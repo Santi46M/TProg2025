@@ -575,3 +575,31 @@ input[type="submit"] {
 .dropdown:hover .dropdown-content {
   display: block;
 }
+
+/* ==== Ajustes menú lateral más compacto ==== */
+aside.card,
+.sidebar,
+.side-group {
+  max-width: 180px;     /* ancho fijo más angosto */
+  font-size: 0.85rem;   /* letras un poco más chicas */
+  padding: 0.6rem;      /* menos padding */
+}
+
+aside.card h3,
+aside.card h4,
+.side-group h3 {
+  font-size: 0.95rem;   /* títulos más compactos */
+  margin-bottom: 0.3rem;
+}
+
+aside.card ul,
+.side-group ul {
+  margin: 0 0 0.8rem;
+  padding-left: 0.8rem;
+}
+
+aside.card ul li,
+.side-group a {
+  margin: 0.25rem 0;
+  font-size: 0.85rem;
+}
