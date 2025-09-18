@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Usuario</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/ConsultaUsuario.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <div style="position:relative;display:inline-block;">
+        <button class="hamburguesa" onclick="toggleMenu()">☰</button>
+        <!-- Dropdown Menu -->
+        <div id="dropdownMenu" class="dropdown-menu" style="display:none;position:absolute;top:100%;left:0;z-index:100;min-width:180px;">
+          <ul id="menuList">
+            <!-- Aquí JS inyecta el menú según rol -->
+          </ul>
+        </div>
+      </div>
+
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <nav class="main-nav">
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+      </nav>
+
+      <!-- 🔹 Zona dinámica de usuario -->
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1>Consulta de Usuario</h1>
+
+    <!-- Selector de usuario -->
+    <section class="card">
+      <label for="selUsuario">Seleccionar usuario</label>
+      <select id="selUsuario">
+        <option value="">-- Seleccionar usuario --</option>
+      </select>
+    </section>
+
+    <!-- Detalle de usuario -->
+    <section id="boxDetalle" class="card hide">
+      <div class="user-head" style="display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;">
+        <div>
+          <h2 id="uNombre">—</h2>
+          <p id="uDescripcion" class="muted">—</p>
+          <p><strong id="uFechaLabel">Fecha de Nacimiento:</strong> <span id="uFecha">—</span></p>
+          <p><strong>Rol:</strong> <span id="uRol">—</span></p>
+        </div>
+        <div id="uImgWrap"></div>
+      </div>
+
+      <div id="boxExtra" class="mt"></div>
+    </section>
+  </main>
+
+  <!-- Cargar datos base (por si no existe localStorage) -->
+  <script src="../js/CargaUsers.js"></script>
+
+  <script>
+
+  // ============================
+  // Utilidades
+  // ============================
+  const $ = s => document.querySelector(s);
+  const el = (t,attrs={},txt) => { const n=document.createElement(t); Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v)); if(txt!=null) n.textContent=txt; return n; };
+
+  // Arregla rutas de imagen relativas desde /html/
+  function resolveImg(src){
+    if(!src) return '';
+    if (/^https?:|^data:|^\//.test(src)) return src;
+    if (src.startsWith('../')) return src;
+    return '../' + src.replace(/^\.?\//,''); // "img/..." -> "../img/..."
+  }
+
+  // Avatar por iniciales (fallback si faltara imagen)
+  function renderAvatar(container, user){
+    const initials = (user.nombre ? user.nombre[0] : (user.nick||'?')[0]) +
+                     (user.apellido ? user.apellido[0] : '');
+    const avatar = document.createElement('div');
+    avatar.textContent = initials.toUpperCase();
+    avatar.setAttribute('aria-label','avatar');
+    avatar.style.width = '96px';
+    avatar.style.height = '96px';
+    avatar.style.borderRadius = '50%';
+    avatar.style.display = 'flex';
+    avatar.style.alignItems = 'center';
+    avatar.style.justifyContent = 'center';
+    avatar.style.fontWeight = '700';
+    avatar.style.fontSize = '32px';
+    avatar.style.background = '#e5e7eb';
+    avatar.style.color = '#374151';
+    container.appendChild(avatar);
+  }
+
+  // ============================
+  // Refs UI
+  // ============================
+  const selUsuario=$('#selUsuario');
+  const boxDetalle=$('#boxDetalle');
+  const uNombre=$('#uNombre'), uDescripcion=$('#uDescripcion'),
+        uFecha=$('#uFecha'), uRol=$('#uRol'), uImgWrap=$('#uImgWrap');
+  const uFechaLabel = $('#uFechaLabel');
+  const boxExtra=$('#boxExtra');
+
+  // Sesión (si la hay)
+  const SESION = JSON.parse(sessionStorage.getItem('usuarioActivo') || 'null') || {};
+
+  // Cargar usuarios desde localStorage (no usar defaultUsers para que aparezcan los nuevos)
+  const USERS = JSON.parse(localStorage.getItem('usuarios') || '[]');
+
+  // ============================
+  // Mapeo explícito de imágenes por nick
+  // ⚠️ Ajustá las rutas a tus archivos reales:
+  //    "US1" y "US4" según tu carpeta /img/US/
+  // ============================
+  const PROFILE_IMAGES_BY_NICK = {
+    // asistente:
+    "atorres": "../img/IMG-US01.jpg",    // <- poné aquí la ruta correcta a la #1 de "US"
+    // organizador:
+    "miseventos": "../img/IMG-US04.jpeg"  // <- poné aquí la ruta correcta a la #4 de "US"
+  };
+
+  // ============================
+  // Carga selector (solo NICK)
+  // ============================
+  USERS.forEach(u=>{
+    selUsuario.appendChild(el('option',{value:u.nick}, u.nick));
+  });
+
+  selUsuario.addEventListener('change', ()=>{
+    const u = USERS.find(x=>x.nick===selUsuario.value);
+    if(!u){ boxDetalle.classList.add('hide'); return; }
+    mostrarUsuario(u);
+  });
+  
+  
+	//============================
+	//Leer usuario de la URL
+	//============================
+	const params = new URLSearchParams(window.location.search);
+	const usuarioParam = params.get("usuario");
+
+	if (usuarioParam) {
+	const u = USERS.find(x => x.nick === usuarioParam);
+	if (u) {
+ 		selUsuario.value = u.nick; // opcional: marcarlo en el selector
+ 		mostrarUsuario(u);
+		}
+	}
+
+  
+
+  // ============================
+  // Render detalle
+  // ============================
+  function mostrarUsuario(u){
+    // Nombre principal
+    const nombrePrincipal = u.rol === 'organizador'
+      ? (u.nombre || u.nick)
+      : ((u.nombre||'') + ' ' + (u.apellido||'')).trim() || u.nick;
+
+    uNombre.textContent = nombrePrincipal;
+    uRol.textContent = u.rol || '—';
+
+    // Descripción: organizador -> desc ; asistente -> email (no tocar)
+    uDescripcion.textContent = (u.rol === 'organizador' ? (u.desc || '—') : (u.email || '—'));
+
+    // Etiqueta + valor:
+    if (u.rol === 'asistente'){
+      uFechaLabel.textContent = 'Fecha de Nacimiento:';
+      uFecha.textContent = u.nac || '—';
+    } else {
+      uFechaLabel.textContent = 'Web:';
+      uFecha.textContent = u.web || '—';
+    }
+
+    // Imagen (prioridad: mapeo explícito > u.imagen/u.foto > avatar)
+    uImgWrap.innerHTML = '';
+    const mapped = PROFILE_IMAGES_BY_NICK[u.nick] || '';
+    const chosen = mapped || u.imagen || u.foto || '';
+    const src = resolveImg(chosen);
+    if (src){
+      const img = el('img', {src, alt: nombrePrincipal});
+      img.style.maxWidth = '140px';
+      img.style.borderRadius = '8px';
+      img.style.display = 'block';
+      uImgWrap.appendChild(img);
+    } else {
+      renderAvatar(uImgWrap, u);
+    }
+
+    // Contenido extra según rol (opcional)
+    boxExtra.innerHTML = '';
+    if(u.rol==="organizador"){
+      const {aceptadas=[], ingresadas=[], rechazadas=[]} = u.ediciones || {};
+      const div=el('div');
+      div.innerHTML="<h3>Ediciones</h3>";
+      if(aceptadas.length) div.appendChild(el('p',{}, "Aceptadas: "+aceptadas.join(", ")));
+      if(SESION?.nick && u.nick===SESION.nick){
+        if(ingresadas.length) div.appendChild(el('p',{},"Ingresadas: "+ingresadas.join(", ")));
+        if(rechazadas.length) div.appendChild(el('p',{},"Rechazadas: "+rechazadas.join(", ")));
+      }
+      if (div.children.length>1) boxExtra.appendChild(div);
+    } else if(u.rol==="asistente"){
+      const regs = u.registros || [];
+      if(regs.length){
+        const div=el('div');
+        div.innerHTML="<h3>Registros</h3>";
+        const ul=el('ul');
+        regs.forEach(r=>ul.appendChild(el('li',{},r)));
+        div.appendChild(ul);
+        boxExtra.appendChild(div);
+      }
+    }
+
+    boxDetalle.classList.remove('hide');
+  }
+  </script>
+
+  <script src="../js/Hamburgesa.js"></script>
+  <script src="../js/Login.js"></script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Modificar Datos de Usuario — Eventos.uy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="../css/style.css" />
+  <link rel="stylesheet" href="../css/ModificarUsuario.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <div style="position:relative;display:inline-block;">
+        <button class="hamburguesa" onclick="toggleMenu()">☰</button>
+        <!-- Dropdown Menu -->
+        <div id="dropdownMenu" class="dropdown-menu" style="display:none;position:absolute;top:100%;left:0;z-index:100;min-width:180px;">
+          <ul id="menuList">
+            <!-- Aquí JS inyecta el menú según rol -->
+          </ul>
+        </div>
+      </div>
+
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
+      <nav class="main-nav">
+        <form class="search" action="Buscar.html" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones" />
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+      </nav>
+
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1>Modificar Datos de Usuario</h1>
+    <p>Todos los campos son <strong>opcionales</strong>. Dejá vacío lo que no quieras cambiar.</p>
+
+    <form id="editForm" class="card form" enctype="multipart/form-data">
+      <!-- Datos básicos -->
+      <fieldset>
+        <legend>Datos básicos</legend>
+
+        <div class="row">
+          <div>
+            <label for="nombre">Nombre</label>
+            <input id="nombre" name="nombre" type="text" />
+          </div>
+          <div>
+            <label for="apellido">Apellido</label>
+            <input id="apellido" name="apellido" type="text" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="nac">Fecha de nacimiento</label>
+            <input id="nac" name="nac" type="date" />
+          </div>
+          <div>
+            <label for="web">Link a sitio web</label>
+            <input id="web" name="web" type="url" placeholder="https://..." />
+          </div>
+        </div>
+
+        <div>
+          <label for="desc">Descripción</label>
+          <textarea id="desc" name="desc" rows="3"></textarea>
+        </div>
+      </fieldset>
+
+      <!-- Imagen -->
+      <fieldset>
+        <legend>Imagen de perfil</legend>
+        <div class="img-row">
+          <div id="fotoWrap"><span>Sin imagen</span></div>
+          <div class="img-actions">
+            <label for="img">Subir nueva imagen</label>
+            <input id="img" name="img" type="file" accept="image/*" />
+            <label class="chk">
+              <input type="checkbox" id="elimImg" name="elimImg" />
+              Quitar imagen actual
+            </label>
+          </div>
+        </div>
+      </fieldset>
+
+      <!-- Contraseña -->
+      <fieldset>
+        <legend>Cambiar contraseña</legend>
+        <p class="muted">Dejalo vacío si no querés cambiarla.</p>
+        <label for="passNueva">Nueva contraseña</label>
+        <input id="passNueva" name="passNueva" type="password" />
+      </fieldset>
+
+      <div class="actions">
+        <button type="submit" class="btn">Guardar cambios</button>
+        <a class="btn ghost" href="index.html">Cancelar</a>
+      </div>
+    </form>
+
+    <p><a href="index.html">← Volver al inicio</a></p>
+  </main>
+
+  <script src="../js/Hamburgesa.js"></script>
+  <script src="../js/Login.js"></script>
+
+  <script>
+    // ---------- Utilidades ----------
+    const LS_USUARIOS = 'usuarios';
+
+    function getQS(name) {
+      const p = new URLSearchParams(location.search);
+      return p.get(name);
+    }
+
+    function leerUsuarios() {
+      try { return JSON.parse(localStorage.getItem(LS_USUARIOS) || '[]'); }
+      catch { return []; }
+    }
+
+    function escribirUsuarios(arr) {
+      localStorage.setItem(LS_USUARIOS, JSON.stringify(arr));
+    }
+
+    function leerUsuarioActivo() {
+      try { return JSON.parse(sessionStorage.getItem('usuarioActivo') || 'null'); }
+      catch { return null; }
+    }
+
+    // ---------- Vista previa de imagen ----------
+    const inputImg = document.getElementById('img');
+    const fotoWrap = document.getElementById('fotoWrap');
+    inputImg.addEventListener('change', () => {
+      const file = inputImg.files && inputImg.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        fotoWrap.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = ev.target.result;
+        img.alt = 'Vista previa';
+        img.style.width = '100%';
+        img.style.height = '100%';
+        img.style.objectFit = 'cover';
+        fotoWrap.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // ---------- Guardar cambios ----------
+    const form = document.getElementById('editForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nickQS = getQS('usuario');
+      let usuarios = leerUsuarios();
+      let usuario = usuarios.find(u => u.nick === nickQS);
+
+      if (!usuario) {
+        usuario = leerUsuarioActivo();
+      }
+      if (!usuario) {
+        alert('No se encontró usuario para modificar.');
+        return;
+      }
+
+      const fd = new FormData(form);
+      const trim = v => (typeof v === 'string' ? v.trim() : v);
+
+      const patch = {};
+      ['nombre','apellido','nac','web','desc'].forEach(k => {
+        const v = trim(fd.get(k));
+        if (v) patch[k] = v;
+      });
+
+      const passNueva = trim(fd.get('passNueva'));
+      if (passNueva) patch.pass = passNueva;
+
+      const quitar = fd.get('elimImg');
+      const file = fd.get('img');
+      if (quitar) {
+        patch.img = null;
+      } else if (file && file.size > 0) {
+        patch.img = await new Promise(res => {
+          const reader = new FileReader();
+          reader.onload = e2 => res(e2.target.result);
+          reader.readAsDataURL(file);
+        });
+      }
+
+      // Actualizar usuario
+      Object.assign(usuario, patch);
+
+      // Persistir en sessionStorage
+      const activo = leerUsuarioActivo();
+      if (activo && activo.nick === usuario.nick) {
+        sessionStorage.setItem('usuarioActivo', JSON.stringify(usuario));
+      }
+
+      // Persistir en la colección
+      const idx = usuarios.findIndex(u => u.nick === usuario.nick);
+      if (idx >= 0) {
+        usuarios[idx] = { ...usuarios[idx], ...usuario };
+      } else {
+        usuarios.push(usuario);
+      }
+      escribirUsuarios(usuarios);
+
+      alert('Datos guardados ');
+      location.href = `ConsultaUsuario.html?usuario=${encodeURIComponent(usuario.nick)}`;
+    });
+  </script>
+</body>
+</html>

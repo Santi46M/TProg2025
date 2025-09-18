@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro a Edición de Evento</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/RegistroEdicionEvento.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <!-- Botón hamburguesa con dropdown -->
+      <div style="position:relative;display:inline-block;">
+        <button class="hamburguesa" onclick="toggleMenu()">☰</button>
+        <div id="dropdownMenu" class="dropdown-menu" style="display:none;position:absolute;top:100%;left:0;z-index:100;min-width:180px;">
+          <ul id="menuList"><!-- JS inyecta el menú según rol --></ul>
+        </div>
+      </div>
+
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
+      <nav class="main-nav">
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+      </nav>
+
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container narrow">
+    <h1>Registro a Edición de Evento</h1>
+
+    <section class="card">
+      <label>Seleccionar evento
+        <select id="selEvento">
+          <option value="">-- Seleccionar evento --</option>
+        </select>
+      </label>
+      <label>Seleccionar edición
+        <select id="selEdicion" disabled>
+          <option value="">-- Seleccionar edición --</option>
+        </select>
+      </label>
+    </section>
+
+    <section id="boxRegistro" class="card hide">
+      <h2>Tipos de registro</h2>
+      <label>
+        <select id="tipoRegistro">
+          <option value="">-- Seleccionar tipo de registro --</option>
+        </select>
+      </label>
+
+      <label>Código de patrocinio (opcional)
+        <input type="text" id="codigoPatrocinio">
+      </label>
+
+      <button class="btn" id="btnRegistrar">Confirmar registro</button>
+    </section>
+
+    <section id="boxResultado" class="card hide">
+      <h2>Resultado del registro</h2>
+      <p id="msgResultado"></p>
+    </section>
+  </main>
+
+  <!-- Carga de datos base -->
+  <script src="../js/CargaDatos.js"></script>
+  <!-- Navbar y login -->
+  <script src="../js/Hamburgesa.js"></script>
+  <script src="../js/Login.js"></script>
+
+  <script>
+  // Utilidades
+  const $ = s => document.querySelector(s);
+  const el = (t, attrs={}, txt) => {
+    const n=document.createElement(t);
+    Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));
+    if(txt!=null) n.textContent=txt;
+    return n;
+  };
+  const read = (k, def) => {
+    try { const v = JSON.parse(localStorage.getItem(k)); return v ?? def; } catch { return def; }
+  };
+
+  // Sesión actual
+  const SESION = (() => {
+    try { return JSON.parse(sessionStorage.getItem('usuarioActivo') || 'null') || {}; }
+    catch { return {}; }
+  })();
+
+  // Datos desde localStorage
+  const EVENTOS = read('eventos', []);
+  const TIPOS   = read('tiposRegistro', []);
+
+  // Referencias UI
+  const selEvento     = $('#selEvento');
+  const selEdicion    = $('#selEdicion');
+  const tipoRegistro  = $('#tipoRegistro');
+  const inputCodigo   = $('#codigoPatrocinio');
+  const boxRegistro   = $('#boxRegistro');
+  const boxResultado  = $('#boxResultado');
+  const msgResultado  = $('#msgResultado');
+  const btnRegistrar  = $('#btnRegistrar');
+
+  // Cargar lista de eventos
+  EVENTOS.forEach(ev => {
+    selEvento.appendChild(el('option', { value: ev.id }, ev.nombre));
+  });
+
+  // Obtener ediciones de un evento
+  function getEdiciones(evId) {
+    const ev = EVENTOS.find(e => e.id === evId);
+    return ev?.ediciones || [];
+  }
+
+  // Obtener tipos de una edición
+  function getTiposEdicion(edId) {
+    let lista = TIPOS.filter(t => t.edicion === edId).map(t => ({
+      id: t.id, nombre: t.nombre, costo: Number(t.costo) || 0
+    }));
+    if (!lista.length) {
+      const ed = EVENTOS.flatMap(e => e.ediciones || []).find(e => e.id === edId);
+      if (ed?.tiposRegistros?.length) {
+        lista = ed.tiposRegistros.map(tr => ({
+          id: tr.id || tr.nombre, nombre: tr.nombre, costo: Number(tr.costo) || 0
+        }));
+      }
+    }
+    return lista;
+  }
+
+  // Buscar edición seleccionada
+  function findSelectedEd() {
+    const ev = EVENTOS.find(e => e.id === selEvento.value);
+    return ev ? (ev.ediciones || []).find(ed => ed.id === selEdicion.value) : null;
+  }
+
+  // Al elegir evento
+  selEvento.addEventListener('change', () => {
+    selEdicion.innerHTML = '<option value="">-- Seleccionar edición --</option>';
+    boxRegistro.classList.add('hide');
+    boxResultado.classList.add('hide');
+
+    const eds = getEdiciones(selEvento.value);
+    if (!eds.length) { selEdicion.disabled = true; return; }
+
+    eds.forEach(ed => selEdicion.appendChild(el('option', { value: ed.id }, ed.nombre)));
+    selEdicion.disabled = false;
+  });
+
+  // Al elegir edición
+  selEdicion.addEventListener('change', () => {
+    tipoRegistro.innerHTML = '<option value="">-- Seleccionar tipo de registro --</option>';
+    boxResultado.classList.add('hide');
+
+    const tipos = getTiposEdicion(selEdicion.value);
+    if (!tipos.length) { boxRegistro.classList.add('hide'); return; }
+
+    tipos.forEach(t => tipoRegistro.appendChild(
+      el('option', { value: t.id, 'data-costo': t.costo }, t.nombre)
+    ));
+    boxRegistro.classList.remove('hide');
+  });
+
+  // Confirmar registro (simulado, sin persistencia)
+  btnRegistrar.addEventListener('click', () => {
+    const ed = findSelectedEd();
+    if (!ed) { alert('Seleccioná evento y edición.'); return; }
+
+    const tipoId = tipoRegistro.value;
+    if (!tipoId) { alert('Seleccioná un tipo de registro.'); return; }
+
+    const tipoOpt = tipoRegistro.options[tipoRegistro.selectedIndex];
+    const costoBase = Number(tipoOpt.getAttribute('data-costo') || 0);
+
+    const cod = (inputCodigo.value || '').trim();
+    let costoFinal = costoBase;
+    let ok = true;
+    let msg = '';
+
+    if (cod) {
+      const codes = Array.isArray(ed.patrocinios) ? ed.patrocinios : [];
+      const match = codes.find(c => (c.codigo || '').toString().trim() === cod);
+
+      if (!match) {
+        ok = false; msg = 'El código no existe para esta edición.';
+      } else if (match.tipo && match.tipo !== tipoId) {
+        ok = false; msg = 'El código no aplica a este tipo de registro.';
+      } else if (SESION?.instId && match.institucion && match.institucion !== SESION.instId) {
+        ok = false; msg = 'El código no corresponde a tu institución.';
+      } else {
+        costoFinal = 0;
+        msg = 'Registro exitoso con código de patrocinio.';
+      }
+    } else {
+      msg = 'Registro exitoso.';
+    }
+
+    boxResultado.classList.remove('hide');
+    msgResultado.textContent = ok
+      ? `${msg} Costo = ${costoFinal}`
+      : msg;
+  });
+  </script>
+</body>
+</html>

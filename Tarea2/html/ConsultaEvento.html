@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="es">
+<head>
+	
+  <meta charset="utf-8">
+  <title>Consulta de Evento — Eventos.uy</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+      /* pequeño ajuste visual del selector */
+      .bar-select { margin: .75rem 0 1rem; }
+      .bar-select label { font-weight: 600; margin-right: .5rem; }
+      .bar-select select {
+        padding: .5rem .7rem; border:1px solid #cbd5e1; border-radius:.45rem; min-width: 260px;
+      }
+    </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <div style="position:relative;display:inline-block;">
+        <button class="hamburguesa" onclick="toggleMenu()">☰</button>
+        <!-- Dropdown Menu -->
+        <div id="dropdownMenu" class="dropdown-menu" style="display:none;position:absolute;top:100%;left:0;z-index:100;min-width:180px;">
+          <ul id="menuList">
+            <!-- Aquí JS inyecta el menú según rol -->
+          </ul>
+        </div>
+      </div>
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <nav class="main-nav">
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+      </nav>
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="bar-select">
+      <label for="selEventoCE">Evento:</label>
+      <select id="selEventoCE"></select>
+    </div>
+
+    <section class="layout">
+      <aside class="sidebar">
+        <nav class="side-group">
+          <h3>Categorías</h3>
+          <a href="index.html?cat=tecnologia">Tecnología</a>
+          <a href="index.html?cat=innovacion">Innovación</a>
+          <a href="index.html?cat=deporte">Deporte</a>
+          <a href="index.html?cat=salud">Salud</a>
+          <a href="index.html?cat=negocios">Negocios</a>
+        </nav>
+      </aside>
+
+      <article class="event-card">
+        <header class="event-header">
+          <img id="evCover" class="event-cover" alt="">
+          <div>
+            <h1 id="evTitle" class="event-title">—</h1>
+            <div class="event-meta">
+              <span><strong>Sigla:</strong> <span id="evSigla">—</span></span>
+              <span><strong>Fecha alta:</strong> <span id="evFecha">—</span></span>
+            </div>
+            <div id="evCats" class="chips"></div>
+          </div>
+        </header>
+        <section class="event-body">
+          <h3>Descripción</h3>
+          <p id="evDesc">—</p>
+        </section>
+      </article>
+
+      <aside class="editions">
+        <h3>Ediciones</h3>
+        <div id="edList"></div>
+      </aside>
+    </section>
+
+  </main>
+
+  <!-- 1) Datos primero -->
+    <script src="../js/CargaUsers.js"></script>
+  <script>
+  (function(){
+    const $ = s => document.querySelector(s);
+    const option = (v,t)=>{const o=document.createElement('option');o.value=v;o.textContent=t;return o;}
+
+    // Arregla rutas relativas de imágenes según dónde esté el HTML
+    function resolveImg(src){
+      if(!src) return '';
+      if (/^https?:|^data:|^\//.test(src)) return src;     // absolutas
+      if (src.startsWith('../')) return src;               // ya bien desde /html
+      return '../' + src.replace(/^\.?\//,'');             // convierte "img/..." -> "../img/..."
+    }
+
+    const CAT_LABEL = window.CAT_LABEL || {};
+    const EVENTOS = JSON.parse(localStorage.getItem("eventos") || "[]");
+
+    const sel = $('#selEventoCE');
+    const elCover = $('#evCover'), elTitle = $('#evTitle'), elSigla = $('#evSigla'),
+          elFecha = $('#evFecha'), elDesc = $('#evDesc'), elCats = $('#evCats'),
+          edList = $('#edList');
+
+    function eventCover(ev){
+      if (ev.imagen) return ev.imagen;
+      const ed = (ev.ediciones||[]).find(e => !!e.imagen);
+      return ed ? ed.imagen : '';
+    }
+
+    function renderEvento(ev){
+      elTitle.textContent = ev.nombre || '—';
+      elSigla.textContent = ev.sigla || '—';
+      elFecha.textContent = ev.alta  || '—';          // ← tu data usa "alta"
+      elDesc.textContent  = ev.descripcion || '—';
+      const cover = resolveImg(eventCover(ev));
+      elCover.src = cover || '';
+      elCover.alt = ev.nombre || '';
+      elCats.innerHTML = '';
+      (ev.categorias||[]).forEach(k=>{
+        const s=document.createElement('span');
+        s.className='chip';
+        s.textContent = (CAT_LABEL[k] || k);
+        elCats.appendChild(s);
+      });
+    }
+
+    function renderEdiciones(ev){
+      edList.innerHTML = '';
+      (ev.ediciones||[]).filter(e => e.estado === 'Aceptada').forEach(ed=>{
+        const a = document.createElement('a');
+        a.className='edition-item';
+        a.href = `ConsultaEdicionEvento.html?ed=${encodeURIComponent(ed.id)}`;
+
+        const img = document.createElement('img');
+        img.src = resolveImg(ed.imagen || eventCover(ev) || '');
+        img.alt = ed.nombre || '';
+        a.appendChild(img);
+
+        const info = document.createElement('div');
+        const t = document.createElement('div'); t.className='edition-title'; t.textContent = ed.nombre;
+        const small = document.createElement('small'); small.textContent = `${ed.ciudad||''} — ${ed.estado||''}`;
+        info.appendChild(t); info.appendChild(small);
+        a.appendChild(info);
+
+        edList.appendChild(a);
+      });
+    }
+
+    function selectEvento(evId){
+      const ev = EVENTOS.find(e => e.id === evId) || EVENTOS[0];
+      if (!ev) return;
+      renderEvento(ev);
+      renderEdiciones(ev);
+    }
+
+    // Init
+    if (!EVENTOS.length){
+      sel.innerHTML = '<option value="">(sin eventos)</option>';
+      return;
+    }
+    EVENTOS.forEach(e => sel.appendChild(option(e.id, e.nombre)));
+    const q = new URLSearchParams(location.search).get('ev');
+    sel.value = q && EVENTOS.some(e=>e.id===q) ? q : EVENTOS[0].id;
+    selectEvento(sel.value);
+    sel.addEventListener('change', () => selectEvento(sel.value));
+  })();
+  </script>
+  <script src="../js/Hamburgesa.js"></script>
+  <script src="../js/Login.js"></script>
+
+</body>
+</html>
