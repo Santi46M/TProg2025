@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Perfil de Usuario - Asistente</title>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <nav class="main-nav">
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+      </nav>
+      <nav class="user-nav" id="userNav">
+        <!-- Contenido dinámico según usuario -->
+      </nav>
+    </div>
+  </header>
+  <div class="container row" style="margin-top:1rem;">
+    <!-- Sidebar -->
+    <aside class="card">
+      <h3><i class='bx bx-list-ul'></i> Menú</h3>
+      <h4>Categorías</h4>
+      <ul>
+        <li><a href="index.html?cat=tecnologia"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
+        <li><a href="index.html?cat=innovacion"><i class='bx bx-wifi-0'></i> Innovación</a></li>
+        <li><a href="index.html?cat=literatura"><i class='bx bx-wifi-0'></i> Literatura</a></li>
+        <li><a href="index.html?cat=cultura"><i class='bx bx-wifi-0'></i> Cultura</a></li>
+        <li><a href="index.html?cat=musica"><i class='bx bx-wifi-0'></i> Música</a></li>
+        <li><a href="index.html?cat=deporte"><i class='bx bx-wifi-0'></i> Deporte</a></li>
+        <li><a href="index.html?cat=salud"><i class='bx bx-wifi-0'></i> Salud</a></li>
+        <li><a href="index.html?cat=entretenimiento"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
+        <li><a href="index.html?cat=negocios"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+      </ul>
+      <h4><a href="ConsultaUsuario-asistente.html">Listar Usuarios</a></h4>
+      <div id="menuPorRol"></div>
+    </aside>
+    <!-- Main -->
+    <main>
+      <h1>Perfil de Usuario</h1>
+      <div id="perfilUsuario" class="card" style="max-width:500px;margin:auto;"></div>
+    </main>
+  </div>
+  <script src="../js/CargaUsers.js"></script>
+  <script>
+    // Obtener nick de la URL
+    function getNickFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('nick') || 'atorres'; // por defecto atorres
+    }
+    // Mostrar datos de un usuario
+    function mostrarPerfilUsuario(nick) {
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+      const usuario = usuarios.find(u => u.nick === nick);
+      const perfil = document.getElementById("perfilUsuario");
+      if (!usuario) {
+        perfil.innerHTML = '<p>Usuario no encontrado.</p>';
+        return;
+      }
+      perfil.innerHTML = `
+        <div style="text-align:center;">
+          <img src="${ajustarRutaImg(usuario.img)}" alt="Foto de perfil" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:1rem;">
+        </div>
+        <h2 style="text-align:center;">${usuario.nombre} ${usuario.apellido || ''}</h2>
+        <p><strong>Nickname:</strong> ${usuario.nick}</p>
+        <p><strong>Email:</strong> ${usuario.email}</p>
+        ${usuario.rol === 'asistente' ? `<p><strong>Rol:</strong> Asistente</p>
+        <p><strong>Fecha de nacimiento:</strong> ${usuario.nac}</p>
+        <p><strong>Institución:</strong> ${usuario.instId || '-'}</p>` : ''}
+        ${usuario.rol === 'organizador' ? `<p><strong>Rol:</strong> Organizador</p>
+        <p><strong>Descripción:</strong> ${usuario.desc || '-'}</p>
+        <p><strong>Sitio web:</strong> <a href="${usuario.web}" target="_blank">${usuario.web}</a></p>` : ''}
+      `;
+    }
+    // Cargar perfil según nick de la URL (o por defecto atorres)
+    const nick = getNickFromUrl();
+    mostrarPerfilUsuario(nick);
+
+    // Header dinámico siempre con Ana Torres
+    function renderUserHeaderAnaTorres() {
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+      const usuario = usuarios.find(u => u.nick === 'atorres');
+      const userNav = document.getElementById("userNav");
+      if (!usuario || !userNav) return;
+      userNav.innerHTML = `
+        <span style="display:flex;align-items:center;gap:0.5rem;">
+          <img src="${ajustarRutaImg(usuario.img)}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+          <span>${usuario.nombre} ${usuario.apellido || ''}</span>
+        </span>
+        <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
+      `;
+    }
+    renderUserHeaderAnaTorres();
+    // Simulación de cierre de sesión
+    function cerrarSesion() {
+      sessionStorage.removeItem('usuarioActivo');
+      window.location.href = 'index.html';
+    }
+    function ajustarRutaImg(img) {
+      if (!img) return '../../img/default-user.png';
+      if (img.startsWith('../img/')) return '../../img/' + img.split('../img/')[1];
+      if (img.startsWith('img/')) return '../../' + img;
+      return img;
+    }
+  </script>
+  <script src="../js/Hamburgesa.js"></script>
+  <script src="../js/Login.js"></script>
+</body>
+</html>

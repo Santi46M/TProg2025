@@ -10,7 +10,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <a class="brand" href="index-organizador.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
       <nav class="main-nav">
         <!-- Buscador -->
@@ -22,8 +22,7 @@
 
       <!-- Usuario logueado (hardcodeado: miseventos) -->
       <nav class="user-nav" id="userNav">
-        <span class="user-name">Hola, <strong>Ana</strong></span>
-        <a class="btn" href="ConsultaUsuario.html"><i class='bx bxs-user'></i> Ver Perfil</a>
+        <!-- Contenido dinámico según usuario -->
       </nav>
     </div>
   </header>
@@ -51,11 +50,7 @@
         <li><span><i class='bx bx-wifi-0'></i> Entretenimiento</span></li>
         <li><span><i class='bx bx-wifi-0'></i> Negocios</span></li>
       </ul>
-
-      <h4>Usuarios</h4>
-      <ul>
-        <li><a href="#"><i class='bx bx-user'></i> Listar usuarios</a></li>
-      </ul>
+	<h4><a href="ConsultaUsuario-asistente.html">Listar Usuarios</a></h4>
     </aside>
 
     <!-- Main -->
@@ -84,5 +79,31 @@
       </div>
     </main>
   </div>
+
+  <script src="../js/CargaUsers.js"></script>
+  <script>
+  // Header dinámico para asistente (Ana Torres)
+  (function(){
+    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+    const usuario = usuarios.find(u => u.nick === "atorres");
+    const userNav = document.getElementById("userNav");
+    if (usuario && userNav) {
+      let imgSrc = usuario.img || '../../img/default-user.png';
+      if (imgSrc.startsWith('../img/')) imgSrc = '../../img/' + imgSrc.split('../img/')[1];
+      if (imgSrc.startsWith('img/')) imgSrc = '../../' + imgSrc;
+      userNav.innerHTML = `
+        <span style="display:flex;align-items:center;gap:0.5rem;">
+          <img src="${imgSrc}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+          <span>${usuario.nombre} ${usuario.apellido || ''}</span>
+        </span>
+        <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
+      `;
+    }
+    window.cerrarSesion = function() {
+      sessionStorage.removeItem('usuarioActivo');
+      window.location.href = 'index.html';
+    }
+  })();
+  </script>
 </body>
 </html>
