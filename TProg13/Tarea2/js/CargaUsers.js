@@ -91,7 +91,7 @@ const defaultEventos = [
         patrocinios: [
           { id:"PAT1", institucion:"INS01", nivel:"Oro", tipo:"TR19", aporte:20000, fecha:"2025-08-21", cantidad:4, codigo:"TECHUDELAR" }
         ],
-        imagen: null // ❓ no hay en el zip
+        imagen: null //  no hay en el zip
       },
       {
         id: "EDEV09",
@@ -123,7 +123,7 @@ const defaultEventos = [
         tiposRegistros: [
           { id: "TR25", nombre: "Estudiante", descripcion: "Acceso para estudiantes", costo: 300, cupo: 1 }
         ],
-        imagen: null // ❓ no hay en el zip
+        imagen: null //  no hay en el zip
       }
     ]
   },
