@@ -10,12 +10,15 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <button class="hamburguesa" onclick="toggleMenu()">☰</button>
-
-      <aside id="sidebar" class="sidebar-mobile">
-        <h3><i class='bx bx-list-ul'></i> Menú</h3>
-        <ul id="menuList"></ul>
-      </aside>
+      <div style="position:relative;display:inline-block;">
+        <button class="hamburguesa" onclick="toggleMenu()">☰</button>
+        <!-- Dropdown Menu -->
+        <div id="dropdownMenu" class="dropdown-menu" style="display:none;position:absolute;top:100%;left:0;z-index:100;min-width:180px;">
+          <ul id="menuList">
+            <!-- Aquí JS inyecta el menú según rol -->
+          </ul>
+        </div>
+      </div>
 
       <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
