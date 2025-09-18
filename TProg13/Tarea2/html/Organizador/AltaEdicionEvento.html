@@ -11,34 +11,50 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <div style="position:relative;display:inline-block;">
-        <button class="hamburguesa" onclick="toggleMenu()">☰</button>
-        <!-- Dropdown Menu -->
-        <div id="dropdownMenu" class="dropdown-menu" style="display:none;position:absolute;top:100%;left:0;z-index:100;min-width:180px;">
-          <ul id="menuList">
-            <!-- Aquí JS inyecta el menú según rol -->
-          </ul>
-        </div>
-      </div>
-
-      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
-
+      <a class="brand" href="index-organizador.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
       <nav class="main-nav">
         <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
           <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
           <button class="btn" type="submit">Buscar</button>
         </form>
       </nav>
-
-      <!-- Header con dropdown igual al otro -->
       <nav class="user-nav" id="userNav">
-        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+        <!-- Contenido dinámico según usuario -->
       </nav>
     </div>
   </header>
+  <!-- Layout -->
+  <div class="container row" style="margin-top:1rem;">
+    <!-- Sidebar -->
+    <aside class="card">
+      <h3><i class='bx bx-list-ul'></i> Menú</h3>
+	  
+	  <h4>Acciones</h4>
+	        <ul>
+	          <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
+			  <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edicion Evento</a></li>
+			  <li><a href="index-organizador.html"><i class='bx bx-edit'></i> Alta Patrocinio</a></li>
+	        </ul>
+
+      <h4>Categorías</h4>
+	  <ul>
+	    <li><span><i class='bx bx-wifi-0'></i> Tecnología</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Innovación</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Literatura</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Cultura</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Música</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Deporte</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Salud</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Entretenimiento</span></li>
+	    <li><span><i class='bx bx-wifi-0'></i> Negocios</span></li>
+	  </ul>
+
+      <h4><a href="ConsultaUsuario-organizador.html">Listar Usuarios</a></h4>
+    </aside>
+
 
   <main class="container narrow">
+  
     <h1>Alta de Edición de Evento</h1>
 
     <form id="form-edicion" class="card">
@@ -94,32 +110,38 @@
       </div>
     </form>
   </main>
-
+</div>
   <!-- Orden: datos -> base -> página -->
   <script src="../js/CargaDatos.js"></script>
   <script src="../js/Hamburgesa.js"></script>
   <script src="../js/Dialogos.js"></script>
   <script src="../js/Login.js"></script>
-
   <script>
-  // Header igual al otro (dropdown "Mi Perfil")
-  document.addEventListener("DOMContentLoaded", () => {
+  // Header dinámico para organizador (miseventos)
+  (function(){
+    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+    const usuario = usuarios.find(u => u.nick === "miseventos");
     const userNav = document.getElementById("userNav");
-    const u = JSON.parse(sessionStorage.getItem("usuarioActivo") || "null");
-    if (u) {
+    function ajustarRutaImg(img) {
+      if (!img) return '../../img/default-user.png';
+      if (img.startsWith('../img/')) return '../../img/' + img.split('../img/')[1];
+      if (img.startsWith('img/')) return '../../' + img;
+      return img;
+    }
+    if (usuario && userNav) {
       userNav.innerHTML = `
-        <span>Hola, ${u.nombre || u.nick}</span>
-        <div class="dropdown">
-          <button class="dropbtn">Mi Perfil <i class='bx bxs-down-arrow'></i></button>
-          <div class="dropdown-content">
-            <a href="ConsultaUsuario.html?usuario=${u.nick}"><i class='bx bxs-id-card'></i> Ver Datos</a>
-            <a href="ModificarUsuario.html?usuario=${u.nick}"><i class='bx bxs-edit'></i> Modificar Datos</a>
-            <a href="CierreSesion.html"><i class='bx bxs-log-out'></i> Cerrar sesión</a>
-          </div>
-        </div>
+        <span style="display:flex;align-items:center;gap:0.5rem;">
+          <img src="${ajustarRutaImg(usuario.img)}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+          <span>${usuario.nombre}</span>
+        </span>
+        <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
       `;
     }
-  });
+    window.cerrarSesion = function() {
+      sessionStorage.removeItem('usuarioActivo');
+      window.location.href = 'index.html';
+    }
+  })();
 
   // Poblar select de eventos (desde localStorage.eventos). Si es organizador: solo los suyos.
   document.addEventListener("DOMContentLoaded", () => {
