@@ -189,28 +189,14 @@ const defaultRegistros = [
 ];
 
 // ============================
-// Guardar en localStorage solo si no existe
+// Guardar SIEMPRE en localStorage (sobrescribe datos viejos)
 // ============================
-if(!localStorage.getItem("usuarios")){
-  localStorage.setItem("usuarios", JSON.stringify(defaultUsers));
-}
-if(!localStorage.getItem("eventos")){
-  localStorage.setItem("eventos", JSON.stringify(defaultEventos));
-}
-if(!localStorage.getItem("categorias")){
-  localStorage.setItem("categorias", JSON.stringify(defaultCategorias));
-}
-if(!localStorage.getItem("instituciones")){
-  localStorage.setItem("instituciones", JSON.stringify(defaultInstituciones));
-}
-if(!localStorage.getItem("registros")){
-  localStorage.setItem("registros", JSON.stringify(defaultRegistros));
-}
-if(!localStorage.getItem("tiposRegistro")){
-  localStorage.setItem("tiposRegistro", JSON.stringify(defaultTiposRegistro));
-}
-
-
+localStorage.setItem("usuarios", JSON.stringify(defaultUsers));
+localStorage.setItem("eventos", JSON.stringify(defaultEventos));
+localStorage.setItem("categorias", JSON.stringify(defaultCategorias));
+localStorage.setItem("instituciones", JSON.stringify(defaultInstituciones));
+localStorage.setItem("registros", JSON.stringify(defaultRegistros));
+localStorage.setItem("tiposRegistro", JSON.stringify(defaultTiposRegistro));
 
 // ============================
 // Compatibilidad para navbar por categorías

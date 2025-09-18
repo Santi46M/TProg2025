@@ -155,23 +155,70 @@
         edImgWrap.appendChild(img);
       }
 
-      // Obtener usuario activo
-      const usuarioActivo = JSON.parse(sessionStorage.getItem('usuarioActivo') || 'null');
-
-      // Mostrar tipos de registro solo si el usuario es el organizador
+      // Mostrar tipos de registro siempre
       listRegistros.innerHTML = '';
-      if (usuarioActivo && usuarioActivo.nick === ed.organizador) {
-        (ed.tiposRegistros || []).forEach(r => {
+      if (ed.tiposRegistros && ed.tiposRegistros.length > 0) {
+        listRegistros.parentElement.querySelector('h3').style.display = '';
+        ed.tiposRegistros.forEach(r => {
           const li = el('li');
           const a  = el('a', { href: `ConsultaTipoRegistro.html?ed=${ed.id}&reg=${r.id}`, class: 'link-reg' }, r.nombre);
           li.appendChild(a);
           listRegistros.appendChild(li);
         });
-        listRegistros.parentElement.querySelector('h3').style.display = '';
         listRegistros.style.display = '';
       } else {
         listRegistros.parentElement.querySelector('h3').style.display = 'none';
         listRegistros.style.display = 'none';
+      }
+
+      // Mostrar registros o detalles de registro según usuario
+      const usuarioActivo = JSON.parse(sessionStorage.getItem('usuarioActivo') || 'null');
+      const registros = JSON.parse(localStorage.getItem('registros') || '[]');
+      const boxRegistros = document.getElementById('boxRegistros') || document.createElement('div');
+      boxRegistros.id = 'boxRegistros';
+      boxRegistros.innerHTML = '';
+      boxRegistros.className = 'card';
+      let mostrarBox = false;
+
+      if (usuarioActivo && usuarioActivo.rol === 'organizador' && usuarioActivo.nick === ed.organizador) {
+        // Mostrar lista de registros de la edición
+        const registrosEdicion = registros.filter(r => r.edicion === ed.id);
+        if (registrosEdicion.length > 0) {
+          const h3 = el('h3', {}, 'Registros de asistentes');
+          const ul = el('ul', {class: 'clean'});
+          registrosEdicion.forEach(r => {
+            const li = el('li');
+            li.textContent = `Usuario: ${r.usuario} | Tipo: ${r.tipo} | Fecha: ${r.fecha} | Costo: $${r.costo}`;
+            ul.appendChild(li);
+          });
+          boxRegistros.appendChild(h3);
+          boxRegistros.appendChild(ul);
+          mostrarBox = true;
+        }
+      } else if (usuarioActivo && usuarioActivo.rol === 'asistente') {
+        // Mostrar detalles del registro si el usuario está registrado en la edición
+        const miRegistro = registros.find(r => r.edicion === ed.id && r.usuario === usuarioActivo.nick);
+        if (miRegistro) {
+          const h3 = el('h3', {}, 'Tu registro');
+          const ul = el('ul', {class: 'clean'});
+          const li = el('li');
+          li.textContent = `Tipo: ${miRegistro.tipo} | Fecha: ${miRegistro.fecha} | Costo: $${miRegistro.costo}`;
+          ul.appendChild(li);
+          boxRegistros.appendChild(h3);
+          boxRegistros.appendChild(ul);
+          mostrarBox = true;
+        }
+      }
+      // Insertar o quitar el boxRegistros
+      if (mostrarBox) {
+        if (!boxRegistros.parentElement) {
+          boxDetalle.appendChild(boxRegistros);
+        }
+        boxRegistros.style.display = '';
+      } else {
+        if (boxRegistros.parentElement) {
+          boxRegistros.parentElement.removeChild(boxRegistros);
+        }
       }
 
       listPatrocinios.innerHTML = '';

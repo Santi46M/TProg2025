@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const usuario = JSON.parse(sessionStorage.getItem("usuarioActivo"));
 
   if (usuario) {
+
     // Reemplaza contenido por info del usuario logueado
     let html = `
       <span>Hola, ${usuario.nombre}</span>
