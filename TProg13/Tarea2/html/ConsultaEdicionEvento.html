@@ -155,13 +155,24 @@
         edImgWrap.appendChild(img);
       }
 
+      // Obtener usuario activo
+      const usuarioActivo = JSON.parse(sessionStorage.getItem('usuarioActivo') || 'null');
+
+      // Mostrar tipos de registro solo si el usuario es el organizador
       listRegistros.innerHTML = '';
-      (ed.tiposRegistros || []).forEach(r => {
-        const li = el('li');
-        const a  = el('a', { href: `ConsultaTipoRegistro.html?ed=${ed.id}&reg=${r.id}`, class: 'link-reg' }, r.nombre);
-        li.appendChild(a);
-        listRegistros.appendChild(li);
-      });
+      if (usuarioActivo && usuarioActivo.nick === ed.organizador) {
+        (ed.tiposRegistros || []).forEach(r => {
+          const li = el('li');
+          const a  = el('a', { href: `ConsultaTipoRegistro.html?ed=${ed.id}&reg=${r.id}`, class: 'link-reg' }, r.nombre);
+          li.appendChild(a);
+          listRegistros.appendChild(li);
+        });
+        listRegistros.parentElement.querySelector('h3').style.display = '';
+        listRegistros.style.display = '';
+      } else {
+        listRegistros.parentElement.querySelector('h3').style.display = 'none';
+        listRegistros.style.display = 'none';
+      }
 
       listPatrocinios.innerHTML = '';
       (ed.patrocinios || []).forEach(p => {

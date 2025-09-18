@@ -17,7 +17,7 @@ const defaultUsers = [
     apellido: "Torres",
     nac: "1990-05-12",      // 12/05/1990 -> ISO
     instId: "INS01",
-    img: "../img/IMG-US01.jpg"  // ✅ del zip
+    img: "../img/IMG-US01.jpg" 
   },
   {
     // US04 (Organizador)
@@ -28,7 +28,7 @@ const defaultUsers = [
     nombre: "MisEventos",
     desc: "Empresa de organización de eventos.",
     web: "https://miseventos.com",
-    img: "../img/IMG-US04.jpeg" // ✅ del zip
+    img: "../img/IMG-US04.jpeg"
   }
 ];
 
@@ -72,7 +72,7 @@ const defaultEventos = [
     sigla: "CONFTEC",
     alta: "2025-01-10",
     categorias: ["tecnologia", "innovacion"],
-    imagen: null, // ❓ no había imagen en la letra (agregar si corresponde)
+    imagen: null,
     ediciones: [
       {
         id: "EDEV08",
@@ -84,14 +84,14 @@ const defaultEventos = [
         inicio: "2026-04-06",
         fin:    "2026-04-10",
         alta:   "2025-08-01",
-        organizador: "US10",
+        organizador: "udelar",
         tiposRegistros: [
           { id: "TR19", nombre: "Estudiante", descripcion: "Acceso para estudiantes", costo: 1000, cupo: 50 }
         ],
         patrocinios: [
           { id:"PAT1", institucion:"INS01", nivel:"Oro", tipo:"TR19", aporte:20000, fecha:"2025-08-21", cantidad:4, codigo:"TECHUDELAR" }
         ],
-        imagen: null // ❓ no hay en el zip para esta edición
+        imagen: null // ❓ no hay en el zip
       },
       {
         id: "EDEV09",
@@ -103,11 +103,11 @@ const defaultEventos = [
         inicio: "2025-12-12",
         fin:    "2025-12-15",
         alta:   "2025-08-21",
-        organizador: "US05",
+        organizador: "techcorp",
         tiposRegistros: [
           { id: "TR20", nombre: "Full", descripcion: "Acceso ilimitado + Cena de gala", costo: 750, cupo: 550 }
         ],
-        imagen: "../img/IMG-EDEV09.png" // ✅ del zip
+        imagen: "../img/IMG-EDEV09.png" 
       },
       {
         id: "EDEV10",
@@ -119,7 +119,7 @@ const defaultEventos = [
         inicio: "2026-01-13",
         fin:    "2026-02-01",
         alta:   "2025-06-04",
-        organizador: "US05",
+        organizador: "techcorp",
         tiposRegistros: [
           { id: "TR25", nombre: "Estudiante", descripcion: "Acceso para estudiantes", costo: 300, cupo: 1 }
         ],
@@ -134,7 +134,7 @@ const defaultEventos = [
     sigla: "MARATON",
     alta: "2022-01-01",
     categorias: ["deporte", "salud"],
-    imagen: "img/IMG-EV04.png", // ✅ del zip
+    imagen: "img/IMG-EV04.png", 
     ediciones: [
       {
         id: "EDEV03",
@@ -146,11 +146,11 @@ const defaultEventos = [
         inicio: "2024-09-14",
         fin:    "2024-09-14",
         alta:   "2024-04-21",
-        organizador: "US06",
+        organizador: "miseventos",
         tiposRegistros: [
           { id: "TR07", nombre: "Corredor 21K", descripcion: "Inscripción a la media maratón", costo: 500, cupo: 500 }
         ],
-        imagen: "../img/IMG-EDEV03.jpeg" // ✅ del zip
+        imagen: "../img/IMG-EDEV03.jpeg" 
       },
       {
         id: "EDEV04",
@@ -162,20 +162,30 @@ const defaultEventos = [
         inicio: "2022-09-14",
         fin:    "2022-09-14",
         alta:   "2022-05-21",
-        organizador: "US06",
+        organizador: "imm",
         tiposRegistros: [],
-        imagen: "../img/IMG-EDEV04.jpeg" // ✅ del zip
+        imagen: "../img/IMG-EDEV04.jpeg" 
       }
     ]
   }
 ];
 
 // ============================
-// Registros
+// Tipos de Registro (agregado según tabla del usuario)
+// ============================
+const defaultTiposRegistro = [
+  { id: "TR07", edicion: "EDEV03", nombre: "Corredor 21K", descripcion: "Inscripción a la media maratón", costo: 500, cupo: 500 },
+  { id: "TR19", edicion: "EDEV08", nombre: "Estudiante", descripcion: "Acceso para estudiantes", costo: 1000, cupo: 50 },
+  { id: "TR20", edicion: "EDEV09", nombre: "Full", descripcion: "Acceso ilimitado + Cena de gala", costo: 750, cupo: 550 },
+  { id: "TR25", edicion: "EDEV10", nombre: "Estudiante", descripcion: "Acceso para estudiantes", costo: 300, cupo: 1 }
+];
+
+// ============================
+// Registros (agregado según tabla del usuario)
 // ============================
 const defaultRegistros = [
-  { id:"RE02", usuario:"US01", edicion:"EDEV03", tipo:"TR07", fecha:"2024-07-30", costo:500 },
-  { id:"RE03", usuario:"US01", edicion:"EDEV10", tipo:"TR25", fecha:"2025-08-21", costo:300 }
+  { id: "RE02", usuario: "atorres", edicion: "EDEV03", tipo: "TR07", fecha: "2024-07-30", costo: 500 },
+  { id: "RE03", usuario: "atorres", edicion: "EDEV10", tipo: "TR25", fecha: "2025-08-21", costo: 300 }
 ];
 
 // ============================
@@ -195,6 +205,9 @@ if(!localStorage.getItem("instituciones")){
 }
 if(!localStorage.getItem("registros")){
   localStorage.setItem("registros", JSON.stringify(defaultRegistros));
+}
+if(!localStorage.getItem("tiposRegistro")){
+  localStorage.setItem("tiposRegistro", JSON.stringify(defaultTiposRegistro));
 }
 
 
