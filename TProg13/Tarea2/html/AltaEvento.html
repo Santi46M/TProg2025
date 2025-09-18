@@ -9,26 +9,18 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <!-- Botón hamburguesa -->
       <button class="hamburguesa" onclick="toggleMenu()">☰</button>
-
-      <!-- Sidebar -->
       <aside id="sidebar" class="sidebar-mobile">
         <h3><i class='bx bx-list-ul'></i> Menú</h3>
-        <ul id="menuList"><!-- Aquí JS inyecta el menú según rol --></ul>
+        <ul id="menuList"></ul>
       </aside>
-
       <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
-
       <nav class="main-nav">
-        <!-- Buscador -->
-        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+        <form class="search" action="/buscar" method="get" role="search">
           <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
           <button class="btn" type="submit">Buscar</button>
         </form>
       </nav>
-
-      <!-- 🔹 Zona dinámica de usuario -->
       <nav class="user-nav" id="userNav">
         <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
         <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
@@ -44,6 +36,10 @@
         <div class="form-group-altaEvento">
           <label for="nombre">Nombre del evento<span style="color:red">*</span></label>
           <input type="text" id="nombre" name="nombre" required>
+          <!-- Error duplicado -->
+          <small id="error-nombre" class="error" style="display:none;color:#c00;" aria-live="polite">
+            Ya existe un evento con ese nombre.
+          </small>
         </div>
 
         <div class="form-group-altaEvento">
@@ -57,49 +53,19 @@
         </div>
 
         <!-- Categorías como checklist -->
-        <fieldset class="form-group-altaEvento">
+        <fieldset class="form-group-altaEvento" id="fs-categorias">
           <legend>Categorías<span style="color:red">*</span></legend>
-
           <div class="checkbox-grid-ev">
-            <label>
-            	<span>Tecnología</span>
-            	<input type="checkbox" name="categorias" value="Tecnología">
-            </label>
-            <label>
-            	<span>Innovación</span>
-            	<input type="checkbox" name="categorias" value="Innovación">
-            </label>
-            <label>
-            	<span>Literatura</span>
-            	<input type="checkbox" name="categorias" value="Literatura">
-            </label>
-            <label>
-            	<span>Cultura</span>
-            	<input type="checkbox" name="categorias" value="Cultura">
-            </label>
-            <label>
-            	<span>Música</span>
-            	<input type="checkbox" name="categorias" value="Música">
-            </label> 
-            <label>
-            	<span>Deporte</span>
-            	<input type="checkbox" name="categorias" value="Deporte">
-            </label>
-            <label>
-            	<span>Salud</span>
-            	<input type="checkbox" name="categorias" value="Salud">
-            </label> 
-            <label>
-            	<span>Entretenimiento</span>
-            	<input type="checkbox" name="categorias" value="Entretenimiento">
-            </label>
-            <label>
-            	<span>Negocios</span>
-            	<input type="checkbox" name="categorias" value="Negocios">
-            </label>              
+            <label><span>Tecnología</span><input type="checkbox" name="categorias" value="Tecnología"></label>
+            <label><span>Innovación</span><input type="checkbox" name="categorias" value="Innovación"></label>
+            <label><span>Literatura</span><input type="checkbox" name="categorias" value="Literatura"></label>
+            <label><span>Cultura</span><input type="checkbox" name="categorias" value="Cultura"></label>
+            <label><span>Música</span><input type="checkbox" name="categorias" value="Música"></label>
+            <label><span>Deporte</span><input type="checkbox" name="categorias" value="Deporte"></label>
+            <label><span>Salud</span><input type="checkbox" name="categorias" value="Salud"></label>
+            <label><span>Entretenimiento</span><input type="checkbox" name="categorias" value="Entretenimiento"></label>
+            <label><span>Negocios</span><input type="checkbox" name="categorias" value="Negocios"></label>
           </div>
-
-          <!-- Preview de seleccionadas (usa tus estilos .chips/.chip si existen) -->
           <div id="preview-categorias" class="chips" aria-live="polite"></div>
           <small>Marcá una o más categorías.</small>
         </fieldset>
@@ -124,38 +90,92 @@
   <script src="../js/Dialogos.js"></script>
 
   <script>
-  //  Preview de categorías seleccionadas + validación simple
   (function(){
     const form = document.getElementById('form-alta-evento');
     const checks = [...document.querySelectorAll('input[name="categorias"]')];
     const preview = document.getElementById('preview-categorias');
 
+    const nombreInput = document.getElementById('nombre');
+    const errorNombre = document.getElementById('error-nombre');
+    const fsCategorias = document.getElementById('fs-categorias');
+
+    // utils duplicado
+    function normalizeName(s){ return (s||'').trim().toLowerCase(); }
+    function getNombres(){ return JSON.parse(localStorage.getItem('eventosNombres') || '[]'); }
+    function setNombres(arr){ localStorage.setItem('eventosNombres', JSON.stringify(arr)); }
+    function existeNombre(n){ return getNombres().includes(n); }
+    function mostrarErrorNombre(v){ errorNombre.style.display = v ? 'inline' : 'none'; }
+
+    // preview categorías
     function renderPreview(){
       const seleccionadas = checks.filter(c => c.checked).map(c => c.value);
       preview.innerHTML = '';
       seleccionadas.forEach(txt => {
         const chip = document.createElement('span');
-        chip.className = 'chip';         
+        chip.className = 'chip';
         chip.textContent = txt;
         preview.appendChild(chip);
       });
     }
-
     checks.forEach(c => c.addEventListener('change', renderPreview));
     renderPreview();
 
-    form.addEventListener('submit', (e) => {
-      const alguna = checks.some(c => c.checked);
-      if (!alguna) {
-        e.preventDefault();
-        alert('Seleccioná al menos una categoría.');
-        return;
-      }
-      e.preventDefault();
-      mostrarDialogoExito('Evento registrado con éxito.');
+    // validación en vivo opcional (sin scrollear todavía)
+    nombreInput.addEventListener('input', () => {
+      const val = normalizeName(nombreInput.value);
+      if (!val){ mostrarErrorNombre(false); return; }
+      mostrarErrorNombre(existeNombre(val));
     });
 
-    form.addEventListener('reset', (e) => {
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      // categorías obligatorias
+      if (!checks.some(c => c.checked)) {
+        // desplazá al fieldset para que se vea por qué no avanza
+        fsCategorias.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      // duplicado por nombre (con scroll + focus arriba)
+      const nombreNorm = normalizeName(nombreInput.value);
+      if (!nombreNorm || existeNombre(nombreNorm)) {
+        mostrarErrorNombre(true);
+        errorNombre.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        nombreInput.focus({ preventScroll: true });
+        return;
+      }
+      mostrarErrorNombre(false);
+
+      // registrar nombre para próximas validaciones
+      const arr = getNombres(); arr.push(nombreNorm); setNombres(arr);
+
+      // mostrar modal de éxito y redirigir SOLO al aceptar
+      if (typeof mostrarDialogoExito === 'function') {
+        const ret = mostrarDialogoExito('Evento registrado con éxito.');
+        const irAlInicio = () => window.location.href = 'index.html';
+
+        if (ret && typeof ret.then === 'function') {
+          ret.finally(irAlInicio);
+        } else {
+          // enganchar al botón "Aceptar" del modal (robusto)
+          const observer = new MutationObserver(() => {
+            const botones = document.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"]');
+            for (const b of botones) {
+              const t = (b.innerText || b.value || '').trim().toLowerCase();
+              if (t === 'aceptar') {
+                b.addEventListener('click', irAlInicio, { once: true });
+                observer.disconnect();
+                break;
+              }
+            }
+          });
+          observer.observe(document.body, { childList: true, subtree: true });
+        }
+      }
+    });
+
+    form.addEventListener('reset', () => {
       window.location.href = 'index.html';
     });
   })();

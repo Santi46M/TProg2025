@@ -522,3 +522,56 @@ legend{ padding:0 .4rem; font-weight:700; color:#374151; }
   background: var(--bg-soft);
   color: var(--brand);
 }
+
+/* Para cualquier botón del modal de diálogo */
+button, 
+input[type="button"], 
+input[type="submit"] {
+  cursor: pointer;
+}
+
+
+/* Dropdown */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.dropbtn {
+  background-color: #0a66c2;
+  color: white;
+  padding: 6px 12px;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Contenido del menú */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  background-color: #fff;
+  min-width: 180px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  border-radius: 6px;
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 10px 14px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f1f1;
+}
+
+/* Mostrar al pasar mouse */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
