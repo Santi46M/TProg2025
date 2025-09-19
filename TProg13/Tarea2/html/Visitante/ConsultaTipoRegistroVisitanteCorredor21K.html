@@ -7,51 +7,40 @@
 </head>
 
 <body>
-  <!-- Header -->
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+<!-- Header -->
+<header class="site-header">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <!-- Marca -->
+    <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
-      <nav class="main-nav">
-        <!-- Buscador -->
-        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-          <button class="btn" type="submit">Buscar</button>
-        </form>
-      </nav>
-
-      <!--  Zona de usuario -->
-      <nav class="user-nav" id="userNav">
-        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
-      </nav>
-    </div>
-  </header>
+    <!-- Buscador -->
+    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
+      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+  </div>
+</header>
 
   <!-- Layout -->
   <div class="container row" style="margin-top:1rem;">
-	<!-- Sidebar -->
-	<aside class="card">
-	  <h3><i class='bx bx-list-ul'></i> Menú</h3>
+    <!-- Sidebar -->
+    <aside class="card">
+      <h3><i class='bx bx-list-ul'></i> Menú</h3>
 
-	  <h4>Categorías</h4>
-	  <ul>
-	    <li><span><i class='bx bx-wifi-0'></i> Tecnología</span></li>
-	    <li><span><i class='bx bx-wifi-0'></i> Innovación</span></li>
-	    <li><span><i class='bx bx-wifi-0'></i> Literatura</span></li>
-	    <li><span><i class='bx bx-wifi-0'></i> Cultura</span></li>
-	    <li><span><i class='bx bx-wifi-0'></i> Música</span></li>
-	    <li><span><i class='bx bx-wifi-0'></i> Deporte</span></li>
-	    <li><span><i class='bx bx-wifi-0'></i> Salud</span></li>
-	    <li><span><i class='bx bx-wifi-0'></i> Entretenimiento</span></li>
-	    <li><span><i class='bx bx-wifi-0'></i> Negocios</span></li>
-	  </ul>
-
-	  <h4>Usuarios</h4>
-	  <ul>
-	    <li><a href="#"><i class='bx bx-user'></i> Listar usuarios</a></li>
-	  </ul>
-	</aside>
+      <h4>Categorías</h4>
+      <ul>
+        <li><a href="#">Tecnología</a></li>
+        <li><a href="#">Innovación</a></li>
+        <li><a href="#">Literatura</a></li>
+        <li><a href="#">Cultura</a></li>
+        <li><a href="#">Música</a></li>
+        <li><a href="#">Deporte</a></li>
+        <li><a href="#">Salud</a></li>
+        <li><a href="#">Entretenimiento</a></li>
+        <li><a href="#">Negocios</a></li>
+      </ul>
+      <h4><a href="ConsultaUsuariohtml">Listar Usuarios</a></h4>
+    </aside>
 
     <!-- Main -->
 	<main class="container consulta-layout">
