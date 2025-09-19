@@ -8,243 +8,96 @@
   <link rel="stylesheet" href="../../css/RegistroEdicionEvento.css">
 </head>
 <body>
- <!-- Header -->
-<header class="site-header">
-  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
-    <!-- Marca -->
-    <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+      <a class="brand" href="index-asistente.html">Eventos.uy</a>
+      <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
+        <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+        <button class="btn" type="submit">Buscar</button>
+      </form>
+    </div>
+  </header>
 
-    <!-- Buscador -->
-    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
-      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-      <button class="btn" type="submit">Buscar</button>
-    </form>
-  </div>
-</header>
   <!-- Layout -->
   <div class="container row" style="margin-top:1rem;">
     <!-- Sidebar -->
     <aside class="card">
-      <h3><i class='bx bx-list-ul'></i> Menú</h3>
-     	<h4>Acciones</h4>
+      <h3>Menú</h3>
+      <h4>Acciones</h4>
       <ul>
-        <li><a href="RegistroEdicionEvento.html"><i class='bx bx-edit'></i> Registrarse a edición de evento</a></li>
+        <li><a href="RegistroEdicionEvento.html">Registrarse a edición de evento</a></li>
       </ul>
       <h4>Categorías</h4>
       <ul>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Innovación</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Literatura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Cultura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Música</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Deporte</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+        <li><a href="#">Tecnología</a></li>
+        <li><a href="#">Deporte</a></li>
+        <li><a href="#">Salud</a></li>
+        <li><a href="#">Cultura</a></li>
+        <li><a href="#">Entretenimiento</a></li>
+        <li><a href="#">Negocios</a></li>
       </ul>
       <h4><a href="ConsultaUsuario-Asistente.html">Listar Usuarios</a></h4>
-      <ul>
-        <!-- Puedes agregar más opciones aquí si lo necesitas -->
-      </ul>
-    </aside>="container narrow">
-    <h1>Registro a Edición de Evento</h1>
+    </aside>
 
-    <section class="card">
-      <label>Seleccionar evento
-        <select id="selEvento">
-          <option value="">-- Seleccionar evento --</option>
-        </select>
-      </label>
-      <label>Seleccionar edición
-        <select id="selEdicion" disabled>
-          <option value="">-- Seleccionar edición --</option>
-        </select>
-      </label>
-    </section>
+    <!-- Main -->
+    <main class="container narrow">
+      <h1>Registro a Edición de Evento</h1>
 
-    <section id="boxRegistro" class="card hide">
-      <h2>Tipos de registro</h2>
-      <label>
-        <select id="tipoRegistro">
-          <option value="">-- Seleccionar tipo de registro --</option>
-        </select>
-      </label>
+      <section class="card">
+        <!-- Evento -->
+        <label>Seleccionar evento
+          <select>
+            <option value="">-- Seleccionar evento --</option>
+            <option value="EV01">Conferencia de Tecnología</option>
+            <option value="EV04">Maratón de Montevideo</option>
+          </select>
+        </label>
 
-      <label>Código de patrocinio (opcional)
-        <input type="text" id="codigoPatrocinio">
-      </label>
+        <!-- Edición (todas, agrupadas) -->
+        <label>Seleccionar edición
+          <select>
+            <option value="">-- Seleccionar edición --</option>
+            <optgroup label="Conferencia de Tecnología">
+              <option value="EDEV08">Tecnología Punta del Este 2026</option>
+              <option value="EDEV09">Mobile World Congress 2025</option>
+              <option value="EDEV10">Web Summit 2026</option>
+            </optgroup>
+            <optgroup label="Maratón de Montevideo">
+              <option value="EDEV03">Maratón de Montevideo 2024</option>
+              <option value="EDEV04">Maratón de Montevideo 2022</option>
+            </optgroup>
+          </select>
+        </label>
 
-      <button class="btn" id="btnRegistrar">Confirmar registro</button>
-    </section>
+        <!-- Tipos de registro (listado completo) -->
+        <label>Tipo de registro
+          <select>
+            <option value="">-- Seleccionar tipo de registro --</option>
+            <!-- EDEV03 -->
+            <option value="TR07">Corredor 21K (EDEV03)</option>
+            <!-- EDEV08 -->
+            <option value="TR19">Estudiante (EDEV08)</option>
+            <!-- EDEV09 -->
+            <option value="TR20">Full (EDEV09)</option>
+            <!-- EDEV10 -->
+            <option value="TR25">Estudiante (EDEV10)</option>
+          </select>
+        </label>
 
-    <section id="boxResultado" class="card hide">
-      <h2>Resultado del registro</h2>
-      <p id="msgResultado"></p>
-    </section>
-  </main>
-</div>
-  <!-- Carga de datos base -->
-  <script src="../js/CargaDatos.js"></script>
-  <script src="../js/Hamburgesa.js"></script>
-  <script src="../js/Login.js"></script>
-  <script>
-    // Header dinámico siempre con Ana Torres
-    function renderUserHeaderAnaTorres() {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-      const usuario = usuarios.find(u => u.nick === 'atorres');
-      const userNav = document.getElementById("userNav");
-      function ajustarRutaImg(img) {
-        if (!img) return '../../img/default-user.png';
-        if (img.startsWith('../img/')) return '../../img/' + img.split('../img/')[1];
-        if (img.startsWith('img/')) return '../../' + img;
-        return img;
-      }
-      if (!usuario || !userNav) return;
-      userNav.innerHTML = `
-        <span style="display:flex;align-items:center;gap:0.5rem;">
-          <img src="${ajustarRutaImg(usuario.img)}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-          <span>${usuario.nombre} ${usuario.apellido || ''}</span>
-        </span>
-        <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
-      `;
-    }
-    renderUserHeaderAnaTorres();
-    function cerrarSesion() {
-      sessionStorage.removeItem('usuarioActivo');
-      window.location.href = '../visitante/index.html';
-    }
+        <!-- Código -->
+        <label>Código de patrocinio (opcional)
+          <input type="text">
+        </label>
 
-  // Utilidades
-  const $ = s => document.querySelector(s);
-  const el = (t, attrs={}, txt) => {
-    const n=document.createElement(t);
-    Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));
-    if(txt!=null) n.textContent=txt;
-    return n;
-  };
-  const read = (k, def) => {
-    try { const v = JSON.parse(localStorage.getItem(k)); return v ?? def; } catch { return def; }
-  };
+        <!-- Acciones (sin JS) -->
+        <div class="form-actions-altaEvento">
+          <a class="btn-guardar-altaEvento" href="index-asistente.html">Guardar</a>
+          <a class="btn-cancelar-altaEvento" href="index-asistente.html">Cancelar</a>
+        </div>
 
-  // Sesión actual
-  const SESION = (() => {
-    try { return JSON.parse(sessionStorage.getItem('usuarioActivo') || 'null') || {}; }
-    catch { return {}; }
-  })();
-
-  // Datos desde localStorage
-  const EVENTOS = read('eventos', []);
-  const TIPOS   = read('tiposRegistro', []);
-
-  // Referencias UI
-  const selEvento     = $('#selEvento');
-  const selEdicion    = $('#selEdicion');
-  const tipoRegistro  = $('#tipoRegistro');
-  const inputCodigo   = $('#codigoPatrocinio');
-  const boxRegistro   = $('#boxRegistro');
-  const boxResultado  = $('#boxResultado');
-  const msgResultado  = $('#msgResultado');
-  const btnRegistrar  = $('#btnRegistrar');
-
-  // Cargar lista de eventos
-  EVENTOS.forEach(ev => {
-    selEvento.appendChild(el('option', { value: ev.id }, ev.nombre));
-  });
-
-  // Obtener ediciones de un evento
-  function getEdiciones(evId) {
-    const ev = EVENTOS.find(e => e.id === evId);
-    return ev?.ediciones || [];
-  }
-
-  // Obtener tipos de una edición
-  function getTiposEdicion(edId) {
-    let lista = TIPOS.filter(t => t.edicion === edId).map(t => ({
-      id: t.id, nombre: t.nombre, costo: Number(t.costo) || 0
-    }));
-    if (!lista.length) {
-      const ed = EVENTOS.flatMap(e => e.ediciones || []).find(e => e.id === edId);
-      if (ed?.tiposRegistros?.length) {
-        lista = ed.tiposRegistros.map(tr => ({
-          id: tr.id || tr.nombre, nombre: tr.nombre, costo: Number(tr.costo) || 0
-        }));
-      }
-    }
-    return lista;
-  }
-
-  // Buscar edición seleccionada
-  function findSelectedEd() {
-    const ev = EVENTOS.find(e => e.id === selEvento.value);
-    return ev ? (ev.ediciones || []).find(ed => ed.id === selEdicion.value) : null;
-  }
-
-  // Al elegir evento
-  selEvento.addEventListener('change', () => {
-    selEdicion.innerHTML = '<option value="">-- Seleccionar edición --</option>';
-    boxRegistro.classList.add('hide');
-    boxResultado.classList.add('hide');
-
-    const eds = getEdiciones(selEvento.value);
-    if (!eds.length) { selEdicion.disabled = true; return; }
-
-    eds.forEach(ed => selEdicion.appendChild(el('option', { value: ed.id }, ed.nombre)));
-    selEdicion.disabled = false;
-  });
-
-  // Al elegir edición
-  selEdicion.addEventListener('change', () => {
-    tipoRegistro.innerHTML = '<option value="">-- Seleccionar tipo de registro --</option>';
-    boxResultado.classList.add('hide');
-
-    const tipos = getTiposEdicion(selEdicion.value);
-    if (!tipos.length) { boxRegistro.classList.add('hide'); return; }
-
-    tipos.forEach(t => tipoRegistro.appendChild(
-      el('option', { value: t.id, 'data-costo': t.costo }, t.nombre)
-    ));
-    boxRegistro.classList.remove('hide');
-  });
-
-  // Confirmar registro (simulado, sin persistencia)
-  btnRegistrar.addEventListener('click', () => {
-    const ed = findSelectedEd();
-    if (!ed) { alert('Seleccioná evento y edición.'); return; }
-
-    const tipoId = tipoRegistro.value;
-    if (!tipoId) { alert('Seleccioná un tipo de registro.'); return; }
-
-    const tipoOpt = tipoRegistro.options[tipoRegistro.selectedIndex];
-    const costoBase = Number(tipoOpt.getAttribute('data-costo') || 0);
-
-    const cod = (inputCodigo.value || '').trim();
-    let costoFinal = costoBase;
-    let ok = true;
-    let msg = '';
-
-    if (cod) {
-      const codes = Array.isArray(ed.patrocinios) ? ed.patrocinios : [];
-      const match = codes.find(c => (c.codigo || '').toString().trim() === cod);
-
-      if (!match) {
-        ok = false; msg = 'El código no existe para esta edición.';
-      } else if (match.tipo && match.tipo !== tipoId) {
-        ok = false; msg = 'El código no aplica a este tipo de registro.';
-      } else if (SESION?.instId && match.institucion && match.institucion !== SESION.instId) {
-        ok = false; msg = 'El código no corresponde a tu institución.';
-      } else {
-        costoFinal = 0;
-        msg = 'Registro exitoso con código de patrocinio.';
-      }
-    } else {
-      msg = 'Registro exitoso.';
-    }
-
-    boxResultado.classList.remove('hide');
-    msgResultado.textContent = ok
-      ? `${msg} Costo = ${costoFinal}`
-      : msg;
-  });
-  </script>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
