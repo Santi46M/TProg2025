@@ -6,45 +6,43 @@
   <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index-organizador.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
-      <nav class="main-nav">
-        <form class="search" action="/buscar" method="get" role="search">
-          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-          <button class="btn" type="submit">Buscar</button>
-        </form>
-      </nav>
-      <nav class="user-nav" id="userNav">
-        <!-- Contenido dinámico según usuario -->
-      </nav>
-    </div>
-  </header>
+<!-- Header -->
+<header class="site-header">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <!-- Marca -->
+    <a class="brand" href="index-organizador.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
+    <!-- Buscador -->
+    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
+      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+  </div>
+</header>
   <div class="container row" style="margin-top:1rem;">
+   
     <!-- Sidebar -->
     <aside class="card">
       <h3><i class='bx bx-list-ul'></i> Menú</h3>
-      	  <h4>Acciones</h4>
-	        <ul>
-	          <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
-			  <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edicion Evento</a></li>
-			  <li><a href="index-organizador.html"><i class='bx bx-edit'></i> Alta Patrocinio</a></li>
-	        </ul>
+      <h4>Acciones</h4>
+      <ul>
+        <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
+        <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edicion Evento</a></li>
+        <li><a href="AltaTipoRegistro.html"><i class='bx bx-edit'></i> Alta Tipo Registro</a></li>
+      </ul>
       <h4>Categorías</h4>
       <ul>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Innovación</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Literatura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Cultura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Música</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Deporte</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+        <li><a href="#">Tecnología</a></li>
+        <li><a href="#">Innovación</a></li>
+        <li><a href="#">Literatura</a></li>
+        <li><a href="#">Cultura</a></li>
+        <li><a href="#">Música</a></li>
+        <li><a href="#">Deporte</a></li>
+        <li><a href="#">Salud</a></li>
+        <li><a href="#">Entretenimiento</a></li>
+        <li><a href="#">Negocios</a></li>
       </ul>
       <h4><a href="ConsultaUsuario-organizador.html">Listar Usuarios</a></h4>
-      <div id="menuPorRol"></div>
     </aside>
   <main class="container">
     <section class="form-card-altaEvento">
@@ -103,7 +101,7 @@
     </section>
   </main>
 </div>
-  <script>
+ <!-- <script>
   (function(){
     const form = document.getElementById('form-alta-evento');
     const checks = [...document.querySelectorAll('input[name="categorias"]')];
@@ -200,6 +198,6 @@
       sessionStorage.removeItem('usuarioActivo');
       window.location.href = 'index.html';
     }
-  </script>
+  </script>-->
 </body>
 </html>

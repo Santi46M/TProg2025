@@ -4,114 +4,113 @@
   <meta charset="UTF-8">
   <title>Perfil de Usuario - Organizador</title>
   <link rel="stylesheet" href="../../css/style.css">
+  <style>
+    .grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; }
+    @media (max-width:900px){ .grid{ grid-template-columns:1fr; } }
+    .section-title{ margin:1.25rem 0 .5rem; font-size:1.2rem; font-weight:800; }
+    .empty{ padding:.8rem 1rem; border:1px dashed #cbd5e1; border-radius:.6rem; color:#555; background:#f8fafc; }
+    .mini-meta{ color:#555; font-size:.92rem; margin:.35rem 0; display:flex; gap:1rem; flex-wrap:wrap; }
+    .event-thumb{ width:100%; height:160px; object-fit:cover; border-radius:.5rem; background:#f3f4f6; border:1px solid #e5e7eb; }
+    .tag { display:inline-block; padding:.18rem .5rem; border:1px solid #cbd5e1; border-radius:999px; font-size:.82rem; color:#444; background:#fff; }
+  </style>
 </head>
 <body>
-  <!-- Header -->
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index-organizador.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
-      <nav class="main-nav">
-        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-          <button class="btn" type="submit">Buscar</button>
-        </form>
-      </nav>
-      <nav class="user-nav" id="userNav">
-        <!-- Contenido dinámico según usuario -->
-      </nav>
-    </div>
-  </header>
+<!-- Header -->
+<header class="site-header">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <!-- Marca -->
+    <a class="brand" href="index-organizador.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
+    <!-- Buscador -->
+    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
+      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+  </div>
+</header>
+
   <div class="container row" style="margin-top:1rem;">
     <!-- Sidebar -->
     <aside class="card">
       <h3><i class='bx bx-list-ul'></i> Menú</h3>
-      	  <h4>Acciones</h4>
-	        <ul>
-	          <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
-			  <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edicion Evento</a></li>
-			  <li><a href="index-organizador.html"><i class='bx bx-edit'></i> Alta Patrocinio</a></li>
-	        </ul>
+      <h4>Acciones</h4>
+      <ul>
+        <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
+        <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edicion Evento</a></li>
+        <li><a href="AltaTipoRegistro.html"><i class='bx bx-edit'></i> Alta Tipo Registro</a></li>
+      </ul>
       <h4>Categorías</h4>
       <ul>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Innovación</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Literatura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Cultura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Música</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Deporte</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+        <li><a href="#">Tecnología</a></li>
+        <li><a href="#">Innovación</a></li>
+        <li><a href="#">Literatura</a></li>
+        <li><a href="#">Cultura</a></li>
+        <li><a href="#">Música</a></li>
+        <li><a href="#">Deporte</a></li>
+        <li><a href="#">Salud</a></li>
+        <li><a href="#">Entretenimiento</a></li>
+        <li><a href="#">Negocios</a></li>
       </ul>
       <h4><a href="ConsultaUsuario-organizador.html">Listar Usuarios</a></h4>
-      <div id="menuPorRol"></div>
     </aside>
+
     <!-- Main -->
     <main>
       <h1>Perfil de Usuario</h1>
-      <div id="perfilUsuario" class="card" style="max-width:500px;margin:auto;"></div>
+
+      <!-- Datos del organizador (hardcodeado) -->
+      <section class="card" style="max-width:560px;">
+        <div style="text-align:center;">
+          <img src="../../img/IMG-US04.jpeg" alt="Foto de perfil de MisEventos"
+               style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:1rem;">
+        </div>
+        <h2 style="text-align:center;margin:.25rem 0 1rem;">MisEventos</h2>
+        <p><strong>Nickname:</strong> miseventos</p>
+        <p><strong>Email:</strong> contacto@miseventos.com</p>
+        <p><strong>Rol:</strong> Organizador</p>
+        <p><strong>Descripción:</strong> Empresa de organización de eventos.</p>
+        <p><strong>Sitio web:</strong> <a href="https://miseventos.com" target="_blank">https://miseventos.com</a></p>
+      </section>
+
+      <!-- Ediciones del organizador (propias) -->
+      <section style="margin-top:1.25rem;">
+        <h2 class="section-title">Ediciones Aceptadas</h2>
+        <div class="grid">
+          <!-- EDEV03 — propia de miseventos -->
+          <article class="card">
+            <img class="event-thumb" src="../../img/IMG-EDEV03.jpeg" alt="Maratón de Montevideo 2024">
+            <h3 class="event-title" style="margin:.6rem 0 .2rem;">Maratón de Montevideo 2024</h3>
+            <div class="mini-meta">
+              <span><strong>Sigla:</strong> MARATON24</span>
+              <span><strong>Ciudad:</strong> Montevideo</span>
+              <span><strong>País:</strong> Uruguay</span>
+            </div>
+            <div class="mini-meta">
+              <span><strong>Inicio:</strong> 2024-09-14</span>
+              <span><strong>Fin:</strong> 2024-09-14</span>
+              <span class="tag">Aceptada</span>
+            </div>
+            <div class="actions" style="margin-top:.5rem;">
+              <a class="btn" href="ConsultaEdicionOrganizadorMaratóndeMontevideo.html">Ver edición</a>
+            </div>
+          </article>
+        </div>
+
+        <h2 class="section-title">Ediciones Ingresadas</h2>
+        <!-- No hay ediciones propias en estado Ingresada -->
+        <div class="empty">No tenés ediciones en este estado.</div>
+
+        <h2 class="section-title">Ediciones Rechazadas</h2>
+        <!-- No hay ediciones propias en estado Rechazada -->
+        <div class="empty">No tenés ediciones en este estado.</div>
+      </section>
     </main>
   </div>
-  <script src="../js/CargaUsers.js"></script>
-  <script>
-    // Obtener nick de la URL
-    function getNickFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      return params.get('nick') || 'miseventos'; // por defecto miseventos
-    }
-    // Mostrar datos de un usuario
-    function mostrarPerfilUsuario(nick) {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-      const usuario = usuarios.find(u => u.nick === nick);
-      const perfil = document.getElementById("perfilUsuario");
-      if (!usuario) {
-        perfil.innerHTML = '<p>Usuario no encontrado.</p>';
-        return;
-      }
-      perfil.innerHTML = `
-        <div style="text-align:center;">
-          <img src="${ajustarRutaImg(usuario.img)}" alt="Foto de perfil" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:1rem;">
-        </div>
-        <h2 style="text-align:center;">${usuario.nombre}</h2>
-        <p><strong>Nickname:</strong> ${usuario.nick}</p>
-        <p><strong>Email:</strong> ${usuario.email}</p>
-        <p><strong>Rol:</strong> Organizador</p>
-        <p><strong>Descripción:</strong> ${usuario.desc || '-'}</p>
-        <p><strong>Sitio web:</strong> <a href="${usuario.web}" target="_blank">${usuario.web}</a></p>
-      `;
-    }
-    // Cargar perfil según nick de la URL (o por defecto miseventos)
-    const nick = getNickFromUrl();
-    mostrarPerfilUsuario(nick);
 
-    // Header dinámico siempre con miseventos
-    function renderUserHeaderMiseventos() {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-      const usuario = usuarios.find(u => u.nick === 'miseventos');
-      const userNav = document.getElementById("userNav");
-      if (!usuario || !userNav) return;
-      userNav.innerHTML = `
-        <span style="display:flex;align-items:center;gap:0.5rem;">
-          <img src="${ajustarRutaImg(usuario.img)}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-          <span>${usuario.nombre}</span>
-        </span>
-        <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
-      `;
-    }
-    renderUserHeaderMiseventos();
-    // Simulación de cierre de sesión
-    function cerrarSesion() {
-      sessionStorage.removeItem('usuarioActivo');
-      window.location.href = '../visitante/index.html';
-    }
-    function ajustarRutaImg(img) {
-      if (!img) return '../../img/default-user.png';
-      if (img.startsWith('../img/')) return '../../img/' + img.split('../img/')[1];
-      if (img.startsWith('img/')) return '../../' + img;
-      return img;
-    }
-  </script>
+  <!-- JS dinámico original REMOVIDO / NO USADO (estático). Si lo necesitás, volvé a activarlo:
+  <script src="../js/CargaUsers.js"></script>
   <script src="../js/Hamburgesa.js"></script>
   <script src="../js/Login.js"></script>
+  -->
 </body>
 </html>
