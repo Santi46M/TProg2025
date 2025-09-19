@@ -54,6 +54,8 @@
       <label>Seleccionar evento
         <select id="selEvento">
           <option value="">-- Seleccionar evento --</option>
+          <option value="tecnologia">Conferencia de Tecnología</option>
+          <option value="maraton">Maratón de Montevideo</option>
         </select>
       </label>
       <label>Seleccionar edición
@@ -70,12 +72,14 @@
           <option value="">-- Seleccionar tipo de registro --</option>
         </select>
       </label>
-
+      <div id="costoRegistro" style="margin:1rem 0;font-weight:bold;"></div>
       <label>Código de patrocinio (opcional)
         <input type="text" id="codigoPatrocinio">
       </label>
-
-      <button class="btn" id="btnRegistrar">Confirmar registro</button>
+      <div style="display:flex;gap:1rem;justify-content:center;margin-top:1rem;">
+        <button class="btn" id="btnRegistrar">Confirmar registro</button>
+        <button class="btn" id="btnCancelar" type="button">Cancelar</button>
+      </div>
     </section>
 
     <section id="boxResultado" class="card hide">
@@ -115,137 +119,65 @@
       window.location.href = '../visitante/index.html';
     }
 
-  // Utilidades
-  const $ = s => document.querySelector(s);
-  const el = (t, attrs={}, txt) => {
-    const n=document.createElement(t);
-    Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));
-    if(txt!=null) n.textContent=txt;
-    return n;
-  };
-  const read = (k, def) => {
-    try { const v = JSON.parse(localStorage.getItem(k)); return v ?? def; } catch { return def; }
-  };
-
-  // Sesión actual
-  const SESION = (() => {
-    try { return JSON.parse(sessionStorage.getItem('usuarioActivo') || 'null') || {}; }
-    catch { return {}; }
-  })();
-
-  // Datos desde localStorage
-  const EVENTOS = read('eventos', []);
-  const TIPOS   = read('tiposRegistro', []);
-
-  // Referencias UI
-  const selEvento     = $('#selEvento');
-  const selEdicion    = $('#selEdicion');
-  const tipoRegistro  = $('#tipoRegistro');
-  const inputCodigo   = $('#codigoPatrocinio');
-  const boxRegistro   = $('#boxRegistro');
-  const boxResultado  = $('#boxResultado');
-  const msgResultado  = $('#msgResultado');
-  const btnRegistrar  = $('#btnRegistrar');
-
-  // Cargar lista de eventos
-  EVENTOS.forEach(ev => {
-    selEvento.appendChild(el('option', { value: ev.id }, ev.nombre));
-  });
-
-  // Obtener ediciones de un evento
-  function getEdiciones(evId) {
-    const ev = EVENTOS.find(e => e.id === evId);
-    return ev?.ediciones || [];
-  }
-
-  // Obtener tipos de una edición
-  function getTiposEdicion(edId) {
-    let lista = TIPOS.filter(t => t.edicion === edId).map(t => ({
-      id: t.id, nombre: t.nombre, costo: Number(t.costo) || 0
-    }));
-    if (!lista.length) {
-      const ed = EVENTOS.flatMap(e => e.ediciones || []).find(e => e.id === edId);
-      if (ed?.tiposRegistros?.length) {
-        lista = ed.tiposRegistros.map(tr => ({
-          id: tr.id || tr.nombre, nombre: tr.nombre, costo: Number(tr.costo) || 0
-        }));
+    // Hardcodear eventos y ediciones
+    const selEvento = document.getElementById('selEvento');
+    const selEdicion = document.getElementById('selEdicion');
+    const tipoRegistro = document.getElementById('tipoRegistro');
+    selEvento.addEventListener('change', function() {
+      selEdicion.innerHTML = '<option value="">-- Seleccionar edición --</option>';
+      selEdicion.disabled = true;
+      tipoRegistro.innerHTML = '<option value="">-- Seleccionar tipo de registro --</option>';
+      tipoRegistro.disabled = true;
+      if (this.value === 'tecnologia') {
+        selEdicion.innerHTML += '<option value="punta2026">Tecnología Punta del Este 2026</option>';
+        selEdicion.innerHTML += '<option value="websummit2026">Web Summit 2026</option>';
+        selEdicion.disabled = false;
+      } else if (this.value === 'maraton') {
+        selEdicion.innerHTML += '<option value="maraton2024">Maratón de Montevideo 2024</option>';
+        selEdicion.disabled = false;
       }
-    }
-    return lista;
-  }
+    });
 
-  // Buscar edición seleccionada
-  function findSelectedEd() {
-    const ev = EVENTOS.find(e => e.id === selEvento.value);
-    return ev ? (ev.ediciones || []).find(ed => ed.id === selEdicion.value) : null;
-  }
-
-  // Al elegir evento
-  selEvento.addEventListener('change', () => {
-    selEdicion.innerHTML = '<option value="">-- Seleccionar edición --</option>';
-    boxRegistro.classList.add('hide');
-    boxResultado.classList.add('hide');
-
-    const eds = getEdiciones(selEvento.value);
-    if (!eds.length) { selEdicion.disabled = true; return; }
-
-    eds.forEach(ed => selEdicion.appendChild(el('option', { value: ed.id }, ed.nombre)));
-    selEdicion.disabled = false;
-  });
-
-  // Al elegir edición
-  selEdicion.addEventListener('change', () => {
-    tipoRegistro.innerHTML = '<option value="">-- Seleccionar tipo de registro --</option>';
-    boxResultado.classList.add('hide');
-
-    const tipos = getTiposEdicion(selEdicion.value);
-    if (!tipos.length) { boxRegistro.classList.add('hide'); return; }
-
-    tipos.forEach(t => tipoRegistro.appendChild(
-      el('option', { value: t.id, 'data-costo': t.costo }, t.nombre)
-    ));
-    boxRegistro.classList.remove('hide');
-  });
-
-  // Confirmar registro (simulado, sin persistencia)
-  btnRegistrar.addEventListener('click', () => {
-    const ed = findSelectedEd();
-    if (!ed) { alert('Seleccioná evento y edición.'); return; }
-
-    const tipoId = tipoRegistro.value;
-    if (!tipoId) { alert('Seleccioná un tipo de registro.'); return; }
-
-    const tipoOpt = tipoRegistro.options[tipoRegistro.selectedIndex];
-    const costoBase = Number(tipoOpt.getAttribute('data-costo') || 0);
-
-    const cod = (inputCodigo.value || '').trim();
-    let costoFinal = costoBase;
-    let ok = true;
-    let msg = '';
-
-    if (cod) {
-      const codes = Array.isArray(ed.patrocinios) ? ed.patrocinios : [];
-      const match = codes.find(c => (c.codigo || '').toString().trim() === cod);
-
-      if (!match) {
-        ok = false; msg = 'El código no existe para esta edición.';
-      } else if (match.tipo && match.tipo !== tipoId) {
-        ok = false; msg = 'El código no aplica a este tipo de registro.';
-      } else if (SESION?.instId && match.institucion && match.institucion !== SESION.instId) {
-        ok = false; msg = 'El código no corresponde a tu institución.';
-      } else {
-        costoFinal = 0;
-        msg = 'Registro exitoso con código de patrocinio.';
+    // Mostrar tipos de registro según edición seleccionada
+    selEdicion.addEventListener('change', function() {
+      tipoRegistro.innerHTML = '<option value="">-- Seleccionar tipo de registro --</option>';
+      tipoRegistro.disabled = true;
+      var boxRegistro = document.getElementById('boxRegistro');
+      boxRegistro.classList.add('hide');
+      document.getElementById('costoRegistro').textContent = '';
+      if (this.value === 'maraton2024') {
+        tipoRegistro.innerHTML += '<option value="corredor21k">Corredor 21K</option>';
+        tipoRegistro.disabled = false;
+        boxRegistro.classList.remove('hide');
+      } else if (this.value === 'websummit2026' || this.value === 'punta2026') {
+        tipoRegistro.innerHTML += '<option value="estudiante">Estudiante</option>';
+        tipoRegistro.disabled = false;
+        boxRegistro.classList.remove('hide');
       }
-    } else {
-      msg = 'Registro exitoso.';
-    }
+    });
 
-    boxResultado.classList.remove('hide');
-    msgResultado.textContent = ok
-      ? `${msg} Costo = ${costoFinal}`
-      : msg;
-  });
-  </script>
+    // Mostrar costo al elegir tipo de registro
+    tipoRegistro.addEventListener('change', function() {
+      var ed = selEdicion.value;
+      var tipo = tipoRegistro.value;
+      var costo = '';
+      if (ed === 'maraton2024' && tipo === 'corredor21k') costo = 'Costo: $500';
+      else if (ed === 'punta2026' && tipo === 'estudiante') costo = 'Costo: $1000';
+      else if (ed === 'websummit2026' && tipo === 'estudiante') costo = 'Costo: $300';
+      document.getElementById('costoRegistro').textContent = costo;
+    });
+
+    // Confirmar registro: validar y redirigir
+    document.getElementById('btnRegistrar').onclick = function() {
+      if (!selEvento.value) return alert('Seleccioná un evento.');
+      if (!selEdicion.value) return alert('Seleccioná una edición.');
+      if (!tipoRegistro.value) return alert('Seleccioná un tipo de registro.');
+      window.location.href = 'index-asistente.html';
+    };
+    // Cancelar: redirigir siempre
+    document.getElementById('btnCancelar').onclick = function() {
+      window.location.href = 'index-asistente.html';
+    };
+    </script>
 </body>
 </html>
