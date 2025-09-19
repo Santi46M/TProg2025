@@ -6,49 +6,44 @@
   <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
-   <!-- Header -->
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+<!-- Header -->
+<header class="site-header">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <!-- Marca -->
+    <a class="brand" href="index-organizador.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
-      <nav class="main-nav">
-        <!-- Buscador -->
-        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-          <button class="btn" type="submit">Buscar</button>
-        </form>
-      </nav>
+    <!-- Buscador -->
+    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
+      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+  </div>
+</header>
 
-      <!-- Usuario logueado (hardcodeado: miseventos) -->
-      <nav class="user-nav" id="userNav">
-        <span class="user-name">Hola, <strong>Ana</strong></span>
-        <a class="btn" href="ConsultaUsuario.html"><i class='bx bxs-user'></i> Ver Perfil</a>
-      </nav>
-    </div>
-  </header>
-
+  <!-- Layout -->
   <div class="container row" style="margin-top:1rem;">
     <!-- Sidebar -->
     <aside class="card">
       <h3><i class='bx bx-list-ul'></i> Menú</h3>
-            <h4>Acciones</h4>
+      <h4>Acciones</h4>
       <ul>
-        <li><a href="RegistroEdicionEvento.html"><i class='bx bx-edit'></i> Registrarse a edición de evento</a></li>
+        <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
+        <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edicion Evento</a></li>
+        <li><a href="AltaTipoRegistro.html"><i class='bx bx-edit'></i> Alta Tipo Registro</a></li>
       </ul>
       <h4>Categorías</h4>
       <ul>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Innovación</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Literatura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Cultura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Música</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Deporte</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+        <li><a href="#">Tecnología</a></li>
+        <li><a href="#">Innovación</a></li>
+        <li><a href="#">Literatura</a></li>
+        <li><a href="#">Cultura</a></li>
+        <li><a href="#">Música</a></li>
+        <li><a href="#">Deporte</a></li>
+        <li><a href="#">Salud</a></li>
+        <li><a href="#">Entretenimiento</a></li>
+        <li><a href="#">Negocios</a></li>
       </ul>
-      <h4><a href="ConsultaUsuario-asistente.html">Listar Usuarios</a></h4>
-      <div id="menuPorRol"></div>
+      <h4><a href="ConsultaUsuario-organizador.html">Listar Usuarios</a></h4>
     </aside>
     <!-- Main -->
     <main>
@@ -62,8 +57,7 @@
       			<p><strong>Nickname:</strong> atorres</p>
       			<p><strong>Rol:</strong> Asistente</p>
       			<div class="actions">
-        			<a href="#" class="btn">Ver más</a>
-
+        			<a href="PerfilDeAsistenteEnOrganizador.html" class="btn">Ver más</a>
       			</div>
     		</div>
 
@@ -74,13 +68,81 @@
       			<p><strong>Nickname:</strong> miseventos</p>
       			<p><strong>Rol:</strong> Organizador</p>
       			<div class="actions">
-        			<a href="ConsultaUsuarioDetalles-Organizador.html" class="btn">Ver más</a>
-
+        			<a href="Perfil-Organizador.html" class="btn">Ver más</a>
       			</div>
     		</div>
 
   </div>
-</main>
-</div>
+      <!-- <div id="usuariosList" class="row">JS inyecta los usuarios</div>
+       -->
+    </main>
+  </div>
+<!--   <script src="../js/CargaUsers.js"></script> -->
+ <!--  <script>
+  // Header dinámico para asistente (Ana Torres)
+  (function(){
+    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+    const usuario = usuarios.find(u => u.nick === "atorres");
+    const userNav = document.getElementById("userNav");
+    if (usuario && userNav) {
+      // Corrige la ruta de la imagen según la nueva estructura
+      let imgSrc = usuario.img || '../../img/default-user.png';
+      if (imgSrc.startsWith('../img/')) imgSrc = '../../img/' + imgSrc.split('../img/')[1];
+      if (imgSrc.startsWith('img/')) imgSrc = '../../' + imgSrc;
+      userNav.innerHTML = `
+        <span style="display:flex;align-items:center;gap:0.5rem;">
+          <img src="${imgSrc}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+          <span>${usuario.nombre} ${usuario.apellido || ''}</span>
+        </span>
+        <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
+      `;
+    }
+    window.cerrarSesion = function() {
+      sessionStorage.removeItem('usuarioActivo');
+      window.location.href = '../visitante/index.html';
+    }
+  })();
+  // Mostrar usuarios (igual que visitante)
+  (function(){
+    const $ = s => document.querySelector(s);
+    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+    const list = $('#usuariosList');
+    usuarios.forEach(u => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      // Corrige la ruta de la imagen para cada usuario
+      let imgSrc = u.img || '../../img/default-user.png';
+      if (imgSrc.startsWith('../img/')) imgSrc = '../../img/' + imgSrc.split('../img/')[1];
+      if (imgSrc.startsWith('img/')) imgSrc = '../../' + imgSrc;
+      if (u.img){
+        const img = document.createElement('img');
+        img.src = imgSrc;
+        img.alt = u.nombre;
+        img.style.width = "100%";
+        card.appendChild(img);
+      }
+      const h2 = document.createElement('h2');
+      h2.textContent = u.nombre + (u.apellido ? ' ' + u.apellido : '');
+      card.appendChild(h2);
+      const p1 = document.createElement('p');
+      p1.innerHTML = `<strong>Nickname:</strong> ${u.nick}`;
+      card.appendChild(p1);
+      const p2 = document.createElement('p');
+      p2.innerHTML = `<strong>Rol:</strong> ${u.rol.charAt(0).toUpperCase() + u.rol.slice(1)}`;
+      card.appendChild(p2);
+      const actions = document.createElement('div');
+      actions.className = 'actions';
+      const a = document.createElement('a');
+      a.href = `Perfil-Asistente.html?nick=${u.nick}`;
+      a.className = 'btn';
+      a.textContent = 'Ver más';
+      actions.appendChild(a);
+      card.appendChild(actions);
+      list.appendChild(card);
+    });
+  })();
+  </script>
+  <script src="../js/Hamburgesa.js"></script>
+  <script src="../js/Login.js"></script> -->
 </body>
 </html>

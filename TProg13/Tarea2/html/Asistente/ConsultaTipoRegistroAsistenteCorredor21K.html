@@ -60,29 +60,6 @@
     </main>
   </div>
 
-    <script src="../js/CargaUsers.js"></script>
-    <script>
-    (function(){
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-      const usuario = usuarios.find(u => u.nick === "atorres");
-      const userNav = document.getElementById("userNav");
-      if (usuario && userNav) {
-        let imgSrc = usuario.img || '../../img/default-user.png';
-        if (imgSrc.startsWith('../img/')) imgSrc = '../../img/' + imgSrc.split('../img/')[1];
-        if (imgSrc.startsWith('img/')) imgSrc = '../../' + imgSrc;
-        userNav.innerHTML = `
-          <span style="display:flex;align-items:center;gap:0.5rem;">
-            <img src="${imgSrc}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-            <span>${usuario.nombre} ${usuario.apellido || ''}</span>
-          </span>
-          <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
-        `;
-      }
-      window.cerrarSesion = function() {
-        sessionStorage.removeItem('usuarioActivo');
-        window.location.href = '../visitante/index.html';
-      }
-    })();
-    </script>
+
   </body>
   </html>

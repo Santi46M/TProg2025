@@ -8,176 +8,92 @@
   <link rel="stylesheet" href="../../css/RegistroEdicionEvento.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
-      <nav class="main-nav">
-        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-          <button class="btn" type="submit">Buscar</button>
-        </form>
-      </nav>
-      <nav class="user-nav" id="userNav">
-        <!-- Contenido dinámico según usuario -->
-      </nav>
-    </div>
-  </header>
+<!-- Header -->
+<header class="site-header">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <!-- Marca -->
+    <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
+    <!-- Buscador -->
+    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
+      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+  </div>
+</header>
+
+  <!-- Layout -->
   <div class="container row" style="margin-top:1rem;">
     <!-- Sidebar -->
     <aside class="card">
-      <h3><i class='bx bx-list-ul'></i> Menú</h3>
-            <h4>Acciones</h4>
+      <h3>Menú</h3>
+      <h4>Acciones</h4>
       <ul>
-        <li><a href="RegistroEdicionEvento.html"><i class='bx bx-edit'></i> Registrarse a edición de evento</a></li>
+        <li><a href="RegistroEdicionEvento.html">Registrarse a edición de evento</a></li>
       </ul>
       <h4>Categorías</h4>
       <ul>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Innovación</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Literatura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Cultura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Música</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Deporte</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+        <li><a href="#">Tecnología</a></li>
+        <li><a href="#">Deporte</a></li>
+        <li><a href="#">Salud</a></li>
+        <li><a href="#">Cultura</a></li>
+        <li><a href="#">Entretenimiento</a></li>
+        <li><a href="#">Negocios</a></li>
       </ul>
-      <h4><a href="ConsultaUsuario-asistente.html">Listar Usuarios</a></h4>
-      <div id="menuPorRol"></div>
+      <h4><a href="ConsultaUsuario-Asistente.html">Listar Usuarios</a></h4>
     </aside>
-  <main class="container narrow">
-    <h1>Registro a Edición de Evento</h1>
 
-    <section class="card">
-      <label>Seleccionar evento
-        <select id="selEvento">
-          <option value="">-- Seleccionar evento --</option>
-          <option value="tecnologia">Conferencia de Tecnología</option>
-          <option value="maraton">Maratón de Montevideo</option>
-        </select>
-      </label>
-      <label>Seleccionar edición
-        <select id="selEdicion" disabled>
-          <option value="">-- Seleccionar edición --</option>
-        </select>
-      </label>
-    </section>
+    <!-- Main -->
+    <main class="container narrow">
+      <h1>Registro a Edición de Evento</h1>
 
-    <section id="boxRegistro" class="card hide">
-      <h2>Tipos de registro</h2>
-      <label>
-        <select id="tipoRegistro">
-          <option value="">-- Seleccionar tipo de registro --</option>
-        </select>
-      </label>
-      <div id="costoRegistro" style="margin:1rem 0;font-weight:bold;"></div>
-      <label>Código de patrocinio (opcional)
-        <input type="text" id="codigoPatrocinio">
-      </label>
-      <div style="display:flex;gap:1rem;justify-content:center;margin-top:1rem;">
-        <button class="btn" id="btnRegistrar">Confirmar registro</button>
-        <button class="btn" id="btnCancelar" type="button">Cancelar</button>
-      </div>
-    </section>
+      <section class="card">
 
-    <section id="boxResultado" class="card hide">
-      <h2>Resultado del registro</h2>
-      <p id="msgResultado"></p>
-    </section>
-  </main>
-</div>
-  <!-- Carga de datos base -->
-  <script src="../js/CargaDatos.js"></script>
-  <script src="../js/Hamburgesa.js"></script>
-  <script src="../js/Login.js"></script>
-  <script>
-    // Header dinámico siempre con Ana Torres
-    function renderUserHeaderAnaTorres() {
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-      const usuario = usuarios.find(u => u.nick === 'atorres');
-      const userNav = document.getElementById("userNav");
-      function ajustarRutaImg(img) {
-        if (!img) return '../../img/default-user.png';
-        if (img.startsWith('../img/')) return '../../img/' + img.split('../img/')[1];
-        if (img.startsWith('img/')) return '../../' + img;
-        return img;
-      }
-      if (!usuario || !userNav) return;
-      userNav.innerHTML = `
-        <span style="display:flex;align-items:center;gap:0.5rem;">
-          <img src="${ajustarRutaImg(usuario.img)}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-          <span>${usuario.nombre} ${usuario.apellido || ''}</span>
-        </span>
-        <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
-      `;
-    }
-    renderUserHeaderAnaTorres();
-    function cerrarSesion() {
-      sessionStorage.removeItem('usuarioActivo');
-      window.location.href = '../visitante/index.html';
-    }
 
-    // Hardcodear eventos y ediciones
-    const selEvento = document.getElementById('selEvento');
-    const selEdicion = document.getElementById('selEdicion');
-    const tipoRegistro = document.getElementById('tipoRegistro');
-    selEvento.addEventListener('change', function() {
-      selEdicion.innerHTML = '<option value="">-- Seleccionar edición --</option>';
-      selEdicion.disabled = true;
-      tipoRegistro.innerHTML = '<option value="">-- Seleccionar tipo de registro --</option>';
-      tipoRegistro.disabled = true;
-      if (this.value === 'tecnologia') {
-        selEdicion.innerHTML += '<option value="punta2026">Tecnología Punta del Este 2026</option>';
-        selEdicion.innerHTML += '<option value="websummit2026">Web Summit 2026</option>';
-        selEdicion.disabled = false;
-      } else if (this.value === 'maraton') {
-        selEdicion.innerHTML += '<option value="maraton2024">Maratón de Montevideo 2024</option>';
-        selEdicion.disabled = false;
-      }
-    });
+        <!-- Edición (todas, agrupadas) -->
+        <label>Seleccionar edición
+          <select>
+            <option value="">-- Seleccionar edición --</option>
+            <optgroup label="Conferencia de Tecnología">
+              <option value="EDEV08">Tecnología Punta del Este 2026</option>
+              <option value="EDEV09">Mobile World Congress 2025</option>
+              <option value="EDEV10">Web Summit 2026</option>
+            </optgroup>
+            <optgroup label="Maratón de Montevideo">
+              <option value="EDEV03">Maratón de Montevideo 2024</option>
+              <option value="EDEV04">Maratón de Montevideo 2022</option>
+            </optgroup>
+          </select>
+        </label>
 
-    // Mostrar tipos de registro según edición seleccionada
-    selEdicion.addEventListener('change', function() {
-      tipoRegistro.innerHTML = '<option value="">-- Seleccionar tipo de registro --</option>';
-      tipoRegistro.disabled = true;
-      var boxRegistro = document.getElementById('boxRegistro');
-      boxRegistro.classList.add('hide');
-      document.getElementById('costoRegistro').textContent = '';
-      if (this.value === 'maraton2024') {
-        tipoRegistro.innerHTML += '<option value="corredor21k">Corredor 21K</option>';
-        tipoRegistro.disabled = false;
-        boxRegistro.classList.remove('hide');
-      } else if (this.value === 'websummit2026' || this.value === 'punta2026') {
-        tipoRegistro.innerHTML += '<option value="estudiante">Estudiante</option>';
-        tipoRegistro.disabled = false;
-        boxRegistro.classList.remove('hide');
-      }
-    });
+        <!-- Tipos de registro (listado completo) -->
+        <label>Tipo de registro
+          <select>
+            <option value="">-- Seleccionar tipo de registro --</option>
+            <!-- EDEV03 -->
+            <option value="TR07">Corredor 21K (EDEV03)</option>
+            <!-- EDEV08 -->
+            <option value="TR19">Estudiante (EDEV08)</option>
+            <!-- EDEV09 -->
+            <option value="TR20">Full (EDEV09)</option>
+            <!-- EDEV10 -->
+            <option value="TR25">Estudiante (EDEV10)</option>
+          </select>
+        </label>
 
-    // Mostrar costo al elegir tipo de registro
-    tipoRegistro.addEventListener('change', function() {
-      var ed = selEdicion.value;
-      var tipo = tipoRegistro.value;
-      var costo = '';
-      if (ed === 'maraton2024' && tipo === 'corredor21k') costo = 'Costo: $500';
-      else if (ed === 'punta2026' && tipo === 'estudiante') costo = 'Costo: $1000';
-      else if (ed === 'websummit2026' && tipo === 'estudiante') costo = 'Costo: $300';
-      document.getElementById('costoRegistro').textContent = costo;
-    });
+        <!-- Código -->
+        <label>Código de patrocinio (opcional)
+          <input type="text">
+        </label>
 
-    // Confirmar registro: validar y redirigir
-    document.getElementById('btnRegistrar').onclick = function() {
-      if (!selEvento.value) return alert('Seleccioná un evento.');
-      if (!selEdicion.value) return alert('Seleccioná una edición.');
-      if (!tipoRegistro.value) return alert('Seleccioná un tipo de registro.');
-      window.location.href = 'index-asistente.html';
-    };
-    // Cancelar: redirigir siempre
-    document.getElementById('btnCancelar').onclick = function() {
-      window.location.href = 'index-asistente.html';
-    };
-    </script>
+        <!-- Acciones (sin JS) -->
+        <div class="form-actions-altaEvento">
+          <a class="btn-guardar-altaEvento" href="index-asistente.html">Guardar</a>
+          <a class="btn-cancelar-altaEvento" href="index-asistente.html">Cancelar</a>
+        </div>
+
+      </section>
+    </main>
+  </div>
 </body>
 </html>
