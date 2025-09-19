@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Eventos.uy — Organizador</title>
+  <title>Eventos.uy — Asistente</title>
   <link rel="stylesheet" href="../../css/style.css">
 </head>
 
@@ -10,7 +10,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
       <nav class="main-nav">
         <!-- Buscador -->
@@ -21,9 +21,10 @@
       </nav>
 
       <!-- Usuario logueado (hardcodeado: miseventos) -->
-      <nav class="user-nav" id="userNav">
-        <!-- Contenido dinámico según usuario -->
-      </nav>
+	  <nav class="user-nav" id="userNav">
+	    <span class="user-name">Hola, <strong>Ana</strong></span>
+	    <a class="btn" href="ConsultaUsuario.html"><i class='bx bxs-user'></i> Ver Perfil</a>
+	  </nav>
     </div>
   </header>
 
@@ -57,21 +58,18 @@
       <div class="row">
         <!-- Evento 1 -->
         <div class="card">
-          <img src="../../img/IMG-EDEV03.jpeg" alt="Maratón de Montevideo 2024" style="width:100%">
-          <h2>Maratón de Montevideo</h2>
-          <p><strong>Ciudad:</strong> Montevideo (Uruguay)</p>
+          <img src="../../img/IMG-EV04.png" alt="Maratón de Montevideo 2024" style="width:100%">
           <div class="actions">
-            <a href="ConsultaEvento.html?ev=EV04" class="btn">Ver más</a>
+            <a href="ConsultaEventoAsistenteMaraton.html" class="btn">Ver más</a>
           </div>
         </div>
 
         <!-- Evento 2 -->
         <div class="card">
-          <img src="../../img/IMG-EDEV09.png" alt="Mobile World Congress 2025" style="width:100%">
+          <img src="placeholder.png" alt="Conferencia de Tecnología" style="width:100%">
           <h2>Conferencia de Tecnología</h2>
-          <p><strong>Ciudad:</strong> Barcelona (España)</p>
           <div class="actions">
-            <a href="ConsultaEvento.html?ev=EV01" class="btn">Ver más</a>
+            <a href="ConsultaEventoAsistenteConferencia.html" class="btn">Ver más</a>
           </div>
         </div>
       </div>
@@ -80,7 +78,6 @@
 
   <script src="../js/CargaUsers.js"></script>
   <script>
-  // Header dinámico para asistente (Ana Torres)
   (function(){
     const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
     const usuario = usuarios.find(u => u.nick === "atorres");
