@@ -17,6 +17,9 @@
         </form>
       </nav>
       <nav class="user-nav" id="userNav">
+      	<img src="../../img/IMG-US01.jpg" alt="Ana Torres" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+      	<span class="user-name">Hola, <strong>Ana</strong></span>
+        <a class="btn" href="ConsultaUsuario.html"><i class='bx bxs-user'></i> Ver Perfil</a>
         <!-- Contenido dinámico según usuario -->
       </nav>
     </div>
@@ -47,10 +50,26 @@
     <!-- Main -->
     <main>
       <h1>Perfil de Usuario</h1>
-      <div id="perfilUsuario" class="card" style="max-width:500px;margin:auto;"></div>
+  <!--     <div id="perfilUsuario" class="card" style="max-width:500px;margin:auto;"></div> -->
+      <div class="card" style="max-width:500px;margin:auto;text-align:center;">
+        <img src="../../img/IMG-US01.jpg" alt="Ana Torres" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:1rem;">
+        <h2>Ana Torres</h2>
+        <p><strong>Nickname:</strong> atorres</p>
+        <p><strong>Email:</strong> atorres@gmail.com</p>
+        <p><strong>Rol:</strong> Asistente</p>
+        <p><strong>Fecha de nacimiento:</strong> 1990-05-12</p>
+        <p><strong>Institución:</strong> Facultad de Ingeniería</p>
+      </div>
+      <div class="card" style="max-width:500px;margin:2rem auto;padding:1rem;">
+    	<h2>Registros</h2>
+    	<ul>
+      		<li><a href="RegistroAsistenteMaratón.html">Maratón de Montevideo 2024</a></li>
+      		<li><a href="RegistroAsistenteWeb.html">Web Summit 2026</a></li>
+    	</ul>
+  		</div>
     </main>
   </div>
-  <script src="../js/CargaUsers.js"></script>
+  <!-- <script src="../js/CargaUsers.js"></script>
   <script>
     // Obtener nick de la URL
     function getNickFromUrl() {
@@ -113,6 +132,6 @@
     }
   </script>
   <script src="../js/Hamburgesa.js"></script>
-  <script src="../js/Login.js"></script>
+  <script src="../js/Login.js"></script> -->
 </body>
 </html>

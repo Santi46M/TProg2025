@@ -53,11 +53,37 @@
     <!-- Main -->
     <main>
       <h1>Usuarios</h1>
-      <div id="usuariosList" class="row"><!-- JS inyecta los usuarios --></div>
+        <div id="usuariosList" class="row">
+
+    		<!-- Usuario Asistente -->
+    		<div class="card">
+      			<img src="../../img/IMG-US01.jpg" alt="Ana Torres" style="width:100%">
+      			<h2>Ana Torres</h2>
+      			<p><strong>Nickname:</strong> atorres</p>
+      			<p><strong>Rol:</strong> Asistente</p>
+      			<div class="actions">
+        			<a href="Perfil-Asistente.html?nick=atorres" class="btn">Ver más</a>
+      			</div>
+    		</div>
+
+    		<!-- Usuario Organizador -->
+    		<div class="card">
+      			<img src="../../img/IMG-US04.jpeg" alt="MisEventos" style="width:100%">
+      			<h2>MisEventos</h2>
+      			<p><strong>Nickname:</strong> miseventos</p>
+      			<p><strong>Rol:</strong> Organizador</p>
+      			<div class="actions">
+        			<a href="Perfil-Organizador.html?nick=jperez" class="btn">Ver más</a>
+      			</div>
+    		</div>
+
+  </div>
+      <!-- <div id="usuariosList" class="row">JS inyecta los usuarios</div>
+       -->
     </main>
   </div>
-  <script src="../js/CargaUsers.js"></script>
-  <script>
+<!--   <script src="../js/CargaUsers.js"></script> -->
+ <!--  <script>
   // Header dinámico para asistente (Ana Torres)
   (function(){
     const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
@@ -122,6 +148,6 @@
   })();
   </script>
   <script src="../js/Hamburgesa.js"></script>
-  <script src="../js/Login.js"></script>
+  <script src="../js/Login.js"></script> -->
 </body>
 </html>
