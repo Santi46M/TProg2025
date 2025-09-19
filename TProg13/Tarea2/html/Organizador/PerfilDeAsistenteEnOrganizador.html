@@ -2,10 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Consulta de Tipo Registro - Estudiante2</title>
+  <title>Perfil de Usuario (Asistente) — Visto por Organizador</title>
   <link rel="stylesheet" href="../../css/style.css">
 </head>
-
 <body>
 <!-- Header -->
 <header class="site-header">
@@ -21,7 +20,6 @@
   </div>
 </header>
 
-  <!-- Layout -->
   <div class="container row" style="margin-top:1rem;">
     <!-- Sidebar -->
     <aside class="card">
@@ -48,42 +46,51 @@
     </aside>
 
     <!-- Main -->
-	<main class="container consulta-layout">
-      <section class="event-card">
-        <h1 class="event-title">Full</h1>
-        <div class="event-info">
-          <h3>Descripción:</h3>
-          <p>Acceso para estudiantes</p>
-          <div class="event-meta"><strong>Costo:</strong> $300</div>
-          <div class="event-meta"><strong>Cupo:</strong> 1</div>
+    <main>
+      <h1>Perfil de Usuario (Asistente)</h1>
+
+      <!-- Datos del asistente -->
+      <section class="card perfil-card">
+        <div class="perfil-img">
+          <img src="../../img/IMG-US01.jpg" alt="Foto de perfil de Ana Torres">
+        </div>
+        <h2 class="perfil-nombre">Ana Torres</h2>
+        <p><strong>Nickname:</strong> atorres</p>
+        <p><strong>Email:</strong> atorres@gmail.com</p>
+        <p><strong>Rol:</strong> Asistente</p>
+        <p><strong>Nombre completo:</strong> Ana Torres</p>
+        <p><strong>Fecha de nacimiento:</strong> 1990-05-12</p>
+        <p><strong>Institución:</strong> INS01</p>
+      </section>
+
+      <!-- Registros del asistente -->
+      <section class="registros">
+        <h2>Registros a Ediciones</h2>
+        <div class="grid">
+          <!-- Registro 1 -->
+          <article class="card">
+            <h3>Maratón de Montevideo 2024</h3>
+            <p><strong>Tipo:</strong> Corredor 21K</p>
+            <p><strong>Fecha de registro:</strong> 2024-07-30</p>
+            <p><strong>Costo:</strong> 500</p>
+            <div class="actions">
+              <a class="btn" href="ConsultaTipoRegistroOrganizadorCorredor21K.html">Ver registro</a>
+            </div>
+          </article>
+
+          <!-- Registro 2 -->
+          <article class="card">
+            <h3>Web Summit 2026</h3>
+            <p><strong>Tipo:</strong> Estudiante</p>
+            <p><strong>Fecha de registro:</strong> 2025-08-21</p>
+            <p><strong>Costo:</strong> 300</p>
+            <div class="actions">
+              <a class="btn" href="ConsultaTipoRegistroOrganizadorEstudiante2.html">Ver registro</a>
+            </div>
+          </article>
         </div>
       </section>
     </main>
   </div>
-
- <!--    <script src="../js/CargaUsers.js"></script>
-    <script>
-    (function(){
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-      const usuario = usuarios.find(u => u.nick === "atorres");
-      const userNav = document.getElementById("userNav");
-      if (usuario && userNav) {
-        let imgSrc = usuario.img || '../../img/default-user.png';
-        if (imgSrc.startsWith('../img/')) imgSrc = '../../img/' + imgSrc.split('../img/')[1];
-        if (imgSrc.startsWith('img/')) imgSrc = '../../' + imgSrc;
-        userNav.innerHTML = `
-          <span style="display:flex;align-items:center;gap:0.5rem;">
-            <img src="${imgSrc}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-            <span>${usuario.nombre} ${usuario.apellido || ''}</span>
-          </span>
-          <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
-        `;
-      }
-      window.cerrarSesion = function() {
-        sessionStorage.removeItem('usuarioActivo');
-        window.location.href = '../visitante/index.html';
-      }
-    })();
-    </script>-->
-  </body>
-  </html>
+</body>
+</html>

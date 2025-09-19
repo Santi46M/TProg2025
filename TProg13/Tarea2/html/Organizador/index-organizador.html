@@ -24,7 +24,8 @@
 	<nav class="user-nav" id="userNav">
 		<img src="../../img/IMG-US04.jpeg" alt="MisEventos" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
 		<span class="user-name">Hola, <strong>miseventos</strong></span>
-		<a class="btn" href="../ConsultaUsuario.html"><i class='bx bxs-user'></i> Ver Perfil</a>
+		<a class="btn" href="Perfil-Organizador.html"><i class='bx bxs-user'></i> Ver Perfil</a>
+    <a class="btn" href="../Visitante/index.html"><i class='bx bxs-user'></i> Cerrar sesión</a>
       </nav>
     </div>
   </header>
@@ -32,25 +33,25 @@
     <!-- Sidebar -->
     <aside class="card">
       <h3><i class='bx bx-list-ul'></i> Menú</h3>
-		<h4><a href="Perfil-Organizador.html"><i class='bx bxs-user'></i> Mi Perfil</a></h4>	        <ul>
-	          <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
-			  <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edicion Evento</a></li>
-			  <li><a href="AltaTipoRegistro.html"><i class='bx bx-edit'></i> Alta de Tipo Registro</a></li>
-	        </ul>
+      <h4>Acciones</h4>
+      <ul>
+        <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
+        <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edicion Evento</a></li>
+        <li><a href="AltaTipoRegistro.html"><i class='bx bx-edit'></i> Alta Tipo Registro</a></li>
+      </ul>
       <h4>Categorías</h4>
       <ul>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Innovación</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Literatura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Cultura</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Música</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Deporte</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
-        <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+        <li><a href="#">Tecnología</a></li>
+        <li><a href="#">Innovación</a></li>
+        <li><a href="#">Literatura</a></li>
+        <li><a href="#">Cultura</a></li>
+        <li><a href="#">Música</a></li>
+        <li><a href="#">Deporte</a></li>
+        <li><a href="#">Salud</a></li>
+        <li><a href="#">Entretenimiento</a></li>
+        <li><a href="#">Negocios</a></li>
       </ul>
       <h4><a href="ConsultaUsuario-organizador.html">Listar Usuarios</a></h4>
-      <div id="menuPorRol"></div>
     </aside>
     <!-- Main -->
 	<main>
@@ -80,30 +81,5 @@
 	</main>
   </div>
 
-  <script src="../js/CargaUsers.js"></script>
-  <script>
-  // Header dinámico para organizador (miseventos)
-  (function(){
-    const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-    const usuario = usuarios.find(u => u.nick === "miseventos");
-    const userNav = document.getElementById("userNav");
-    if (usuario && userNav) {
-      let imgSrc = usuario.img || '../../img/default-user.png';
-      if (imgSrc.startsWith('../img/')) imgSrc = '../../img/' + imgSrc.split('../img/')[1];
-      if (imgSrc.startsWith('img/')) imgSrc = '../../' + imgSrc;
-      userNav.innerHTML = `
-        <span style="display:flex;align-items:center;gap:0.5rem;">
-          <img src="${imgSrc}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-          <span>${usuario.nombre}</span>
-        </span>
-        <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
-      `;
-    }
-    window.cerrarSesion = function() {
-      sessionStorage.removeItem('usuarioActivo');
-      window.location.href = '../visitante/index.html';
-    }
-  })();
-  </script>
 </body>
 </html>

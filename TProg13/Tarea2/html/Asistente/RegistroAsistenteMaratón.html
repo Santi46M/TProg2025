@@ -6,29 +6,25 @@
   <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
-  <!-- Header -->
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
-      <nav class="main-nav">
-        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-          <button class="btn" type="submit">Buscar</button>
-        </form>
-      </nav>
-      <nav class="user-nav" id="userNav">
-      	<img src="../../img/IMG-US01.jpg" alt="Ana Torres" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-      	<span class="user-name">Hola, <strong>Ana</strong></span>
-        <a class="btn" href="ConsultaUsuario.html"><i class='bx bxs-user'></i> Ver Perfil</a>
-        <!-- Contenido dinámico según usuario -->
-      </nav>
-    </div>
-  </header>
+<!-- Header -->
+<header class="site-header">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <!-- Marca -->
+    <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
+    <!-- Buscador -->
+    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
+      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+  </div>
+</header>
+  <!-- Layout -->
   <div class="container row" style="margin-top:1rem;">
     <!-- Sidebar -->
     <aside class="card">
       <h3><i class='bx bx-list-ul'></i> Menú</h3>
-            <h4>Acciones</h4>
+     	<h4>Acciones</h4>
       <ul>
         <li><a href="RegistroEdicionEvento.html"><i class='bx bx-edit'></i> Registrarse a edición de evento</a></li>
       </ul>
@@ -43,9 +39,12 @@
         <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
         <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
         <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+        
       </ul>
-      <h4><a href="ConsultaUsuario-asistente.html">Listar Usuarios</a></h4>
-      <div id="menuPorRol"></div>
+      <h4><a href="ConsultaUsuario-Asistente.html">Listar Usuarios</a></h4>
+      <ul>
+        <!-- Puedes agregar más opciones aquí si lo necesitas -->
+      </ul>
     </aside>
     <!-- Main -->
    <main>

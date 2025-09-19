@@ -5,149 +5,110 @@
   <title>Alta de Tipo de Registro — Eventos.uy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../../css/style.css">
+  <style>
+    /* Ajuste de ancho del formulario */
+    .form-card-altaTipoRegistro {
+      max-width: 960px;
+      margin: 2rem auto;
+    }
+  </style>
 </head>
 <body>
   <!-- Header -->
-  <header class="site-header">
-    <div class="container">
-      <div style="position:relative;display:inline-block;">
-        <button class="hamburguesa" onclick="toggleMenu()">☰</button>
-        <!-- Dropdown Menu -->
-        <div id="dropdownMenu" class="dropdown-menu" style="display:none;position:absolute;top:100%;left:0;z-index:100;min-width:180px;">
-          <ul id="menuList">
-            <!-- Aquí JS inyecta el menú según rol -->
-          </ul>
-        </div>
-      </div>
+<!-- Header -->
+<header class="site-header">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <!-- Marca -->
+    <a class="brand" href="index-organizador.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
-      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+    <!-- Buscador -->
+    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
+      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+  </div>
+</header>
 
-      <nav class="main-nav">
-        <form class="search" action="/buscar" method="get" role="search">
-          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-          <button class="btn" type="submit">Buscar</button>
+  <!-- Layout con sidebar -->
+  <div class="container row" style="margin-top:1rem;">
+    <!-- Sidebar -->
+    <aside class="card">
+      <h3><i class='bx bx-list-ul'></i> Menú</h3>
+      <h4>Acciones</h4>
+      <ul>
+        <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
+        <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edicion Evento</a></li>
+        <li><a href="AltaTipoRegistro.html"><i class='bx bx-edit'></i> Alta Tipo Registro</a></li>
+      </ul>
+      <h4>Categorías</h4>
+      <ul>
+        <li><a href="#">Tecnología</a></li>
+        <li><a href="#">Innovación</a></li>
+        <li><a href="#">Literatura</a></li>
+        <li><a href="#">Cultura</a></li>
+        <li><a href="#">Música</a></li>
+        <li><a href="#">Deporte</a></li>
+        <li><a href="#">Salud</a></li>
+        <li><a href="#">Entretenimiento</a></li>
+        <li><a href="#">Negocios</a></li>
+      </ul>
+      <h4><a href="ConsultaUsuario-organizador.html">Listar Usuarios</a></h4>
+    </aside>
+
+    <!-- Contenido principal -->
+    <main class="container">
+      <section class="form-card-altaTipoRegistro">
+        <h2>Alta de Tipo de Registro</h2>
+
+        <form>
+          <div class="form-group-altaTipoRegistro">
+            <label>Edición del evento <span style="color:red">*</span></label>
+            <select required>
+              <option value="">-- Seleccione una edición --</option>
+              <option value="EDEV08">Tecnología Punta del Este 2026</option>
+              <option value="EDEV09">Mobile World Congress 2025</option>
+              <option value="EDEV10">Web Summit 2026</option>
+              <option value="EDEV03">Maratón de Montevideo 2024</option>
+              <option value="EDEV04">Maratón de Montevideo 2022</option>
+            </select>
+          </div>
+
+          <div class="form-group-altaTipoRegistro">
+            <label>Nombre <span style="color:red">*</span></label>
+            <input required>
+          </div>
+
+          <div class="form-group-altaTipoRegistro">
+            <label>Descripción <span style="color:red">*</span></label>
+            <textarea rows="4" required></textarea>
+          </div>
+
+          <div class="form-group-altaTipoRegistro">
+            <label>Costo <span style="color:red">*</span></label>
+            <input type="number" min="0" step="0.01" required>
+          </div>
+
+          <div class="form-group-altaTipoRegistro">
+            <label>Cupo <span style="color:red">*</span></label>
+            <input type="number" min="1" required>
+          </div>
+
+          <div class="form-actions-altaEvento">
+            <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
+            <a href="index-organizador.html" class="btn-cancelar-altaEvento">Cancelar</a>
+          </div>
         </form>
-      </nav>
+      </section>
+    </main>
+  </div>
 
-      <!-- Header con dropdown 'Mi Perfil' (igual al otro) -->
-      <nav class="user-nav" id="userNav">
-        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container">
-    <section class="form-card-altaTipoRegistro">
-      <h2>Alta de Tipo de Registro</h2>
-
-      <form id="formTipoRegistro">
-        <div class="form-group-altaTipoRegistro">
-          <label for="edicion">Edición del evento <span style="color:red">*</span></label>
-          <select id="edicion" required>
-            <option value="">-- Seleccione una edición --</option>
-          </select>
-        </div>
-
-        <div class="form-group-altaTipoRegistro">
-          <label for="nombre">Nombre <span style="color:red">*</span></label>
-          <input id="nombre" required>
-        </div>
-
-        <div class="form-group-altaTipoRegistro">
-          <label for="descripcion">Descripción <span style="color:red">*</span></label>
-          <textarea id="descripcion" rows="4" required></textarea>
-        </div>
-
-        <div class="form-group-altaTipoRegistro">
-          <label for="costo">Costo <span style="color:red">*</span></label>
-          <input id="costo" type="number" min="0" step="0.01" required>
-        </div>
-
-        <div class="form-group-altaTipoRegistro">
-          <label for="cupo">Cupo <span style="color:red">*</span></label>
-          <input id="cupo" type="number" min="1" required>
-        </div>
-
-        <div class="form-actions-altaEvento">
-          <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
-          <button type="button" class="btn-cancelar-altaEvento">Cancelar</button>
-        </div>
-      </form>
-    </section>
-  </main>
-
-  <!-- Scripts (orden: datos -> base -> esta página) -->
+  <!-- ======= JS ORIGINAL COMENTADO ======= -->
+  <!--
   <script src="../js/CargaDatos.js"></script>
   <script src="../js/Hamburgesa.js"></script>
-
   <script>
-  // Header "Mi Perfil" igual al otro
-  document.addEventListener("DOMContentLoaded", () => {
-    const userNav = document.getElementById("userNav");
-    const u = JSON.parse(sessionStorage.getItem("usuarioActivo") || "null");
-
-    if (u) {
-      userNav.innerHTML = `
-        <span>Hola, ${u.nombre || u.nick}</span>
-        <div class="dropdown">
-          <button class="dropbtn">Mi Perfil <i class='bx bxs-down-arrow'></i></button>
-          <div class="dropdown-content">
-            <a href="ConsultaUsuario.html?usuario=${u.nick}"><i class='bx bxs-id-card'></i> Ver Datos</a>
-            <a href="ModificarUsuario.html?usuario=${u.nick}"><i class='bx bxs-edit'></i> Modificar Datos</a>
-            <a href="CierreSesion.html"><i class='bx bxs-log-out'></i> Cerrar sesión</a>
-          </div>
-        </div>
-      `;
-    }
-  });
-
-  // Poblar ediciones (hardcodeado)
-  document.addEventListener("DOMContentLoaded", () => {
-    const sel = document.getElementById("edicion");
-    const edicionesHardcode = [
-      "Maratón de Montevideo 2024",
-      "Maratón de Montevideo 2022",
-      "Tecnología Punta del Este 2026",
-      "Mobile World Congress 2025",
-      "Web Summit 2026"
-    ];
-    // limpiar y cargar
-    for (let i = sel.options.length - 1; i >= 1; i--) sel.remove(i);
-    edicionesHardcode.forEach(e => {
-      const o = document.createElement("option");
-      o.value = e;
-      o.textContent = e;
-      sel.appendChild(o);
-    });
-  });
-
-  // Guardar tipo de registro (solo validación, sin guardar nada)
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("formTipoRegistro");
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const edicion = document.getElementById("edicion").value;
-      const nombre  = document.getElementById("nombre").value;
-      const descripcion = document.getElementById("descripcion").value;
-      const costo = Number(document.getElementById("costo").value);
-      const cupo  = Number(document.getElementById("cupo").value);
-
-      if (!edicion) return alert("Seleccioná una edición.");
-      if (!nombre.trim()) return alert("Ingresá un nombre.");
-      if (!descripcion.trim()) return alert("Ingresá una descripción.");
-      if (isNaN(costo) || costo < 0) return alert("Ingresá un costo válido.");
-      if (isNaN(cupo) || cupo < 1) return alert("Ingresá un cupo válido (mayor a 0).");
-
-      // Si todo está OK, redirigir
-      window.location.href = "index-organizador.html";
-    });
-  });
-
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelector(".btn-cancelar-altaEvento")
-      .addEventListener("click", () => location.href = "index-organizador.html");
-  });
+    // Aquí iba el header dinámico y la carga de ediciones
   </script>
+  -->
 </body>
 </html>
