@@ -24,9 +24,9 @@
 
     <!-- Usuario logueado (hardcodeado: miseventos) -->
     <nav class="user-nav" id="userNav">
-  <span class="user-name">Hola, <strong>miseventos</strong></span>
-  <a class="btn" href="Perfil-Organizador.html"><i class='bx bxs-user'></i> Ver Perfil</a>
-  <a class="btn" href="../Visitante/index.html"><i class='bx bxs-user'></i> Cerrar sesión</a>
+      <span class="user-name">Hola, <strong>miseventos</strong></span>
+      <a class="btn" href="Perfil-Organizador.html"><i class='bx bxs-user'></i> Ver Perfil</a>
+      <a class="btn" href="../Visitante/index.html"><i class='bx bxs-user'></i> Cerrar sesión</a>
     </nav>
   </div>
 </header>
@@ -73,27 +73,13 @@
 	      <!-- Lista de registros debajo de la info de la edición -->
 	      <section class="registros-list" style="margin-top:2rem;">
 	        <h2>Registros</h2>
-	        <table style="width:100%;border-collapse:collapse;">
-	          <thead>
-	            <tr style="background:#f2f2f2;">
-	              <th style="padding:8px;border:1px solid #ddd;">Usuario</th>
-	              <th style="padding:8px;border:1px solid #ddd;">Tipo de registro</th>
-	              <th style="padding:8px;border:1px solid #ddd;">Fecha registro</th>
-	              <th style="padding:8px;border:1px solid #ddd;">Costo</th>
-	            </tr>
-	          </thead>
-	          <tbody>
-	            <tr>
-	              <td style="padding:8px;border:1px solid #ddd;">atorres</td>
-	              <td style="padding:8px;border:1px solid #ddd;">Corredor 21K</td>
-	              <td style="padding:8px;border:1px solid #ddd;">30/07/2024</td>
-	              <td style="padding:8px;border:1px solid #ddd;">$500</td>
-	            </tr>
-	          </tbody>
-	        </table>
+	        <!-- Botón directo al detalle del registro -->
+	        <a class="btn" href="../Organizador/ConsultaTipoRegistroOrganizadorCorredor21K.html">
+	          Usuario: atorres (Corredor 21K)
+	        </a>
 	      </section>
 	    </div>
-<div style="clear:both;"></div>
+
 	    <div class="edicion-header" style="flex:0 0 320px;">
 	      <div class="organizador">
 	        <span class="tipo-title">Organizador:</span><br>
@@ -113,30 +99,5 @@
 	  </section>
 	</main>
   </div>
-
-    <!--<script src="../js/CargaUsers.js"></script>
-    <script>
-    (function(){
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-      const usuario = usuarios.find(u => u.nick === "atorres");
-      const userNav = document.getElementById("userNav");
-      if (usuario && userNav) {
-        let imgSrc = usuario.img || '../../img/default-user.png';
-        if (imgSrc.startsWith('../img/')) imgSrc = '../../img/' + imgSrc.split('../img/')[1];
-        if (imgSrc.startsWith('img/')) imgSrc = '../../' + imgSrc;
-        userNav.innerHTML = `
-          <span style="display:flex;align-items:center;gap:0.5rem;">
-            <img src="${imgSrc}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
-            <span>${usuario.nombre} ${usuario.apellido || ''}</span>
-          </span>
-          <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
-        `;
-      }
-      window.cerrarSesion = function() {
-        sessionStorage.removeItem('usuarioActivo');
-        window.location.href = '../visitante/index.html';
-      }
-    })();
-    </script>-->
-  </body>
-  </html>
+</body>
+</html>
