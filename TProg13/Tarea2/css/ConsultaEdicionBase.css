@@ -1,6 +1,6 @@
 /* ConsultaEdicion base CSS */
 body, .edicion-card, .edicion-title, .edicion-header, .edicion-info, .edicion-info h3, .edicion-meta, .chips, .chip, .categorias-label, .evento, .evento-title, .patrocinios, .patrocinio-title, .tipos-registro, .tipo-title {
-  font-family: Arial, Helvetica, sans-serif !important;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif !important;
   font-size: 1rem !important;
   font-weight: normal;
 }
