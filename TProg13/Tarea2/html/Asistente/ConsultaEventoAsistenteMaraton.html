@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Evento — Maratón de Montevideo</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/ConsultaEventoBase.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
+      <nav class="main-nav">
+        <!-- Buscador -->
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+      </nav>
+
+      <!-- Usuario logueado (hardcodeado: miseventos) -->
+      <nav class="user-nav" id="userNav">
+        <!-- Contenido dinámico según usuario -->
+      </nav>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <div class="container row" style="margin-top:1rem;">
+    <!-- Sidebar -->
+    <aside class="card">
+      <h3><i class='bx bx-list-ul'></i> Menú</h3>
+            <h4>Acciones</h4>
+      <ul>
+        <li><a href="RegistroEdicionEvento.html"><i class='bx bx-edit'></i> Registrarse a edición de evento</a></li>
+      </ul>
+      <h4>Categorías</h4>
+      <ul>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Innovación</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Literatura</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Cultura</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Música</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Deporte</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+      </ul>
+      <h4><a href="ConsultaUsuario-asistente.html">Listar Usuarios</a></h4>
+      <div id="menuPorRol"></div>
+    </aside>
+
+    <!-- Main -->
+	<main class="container consulta-layout">
+	  <section class="event-card">
+	    <div class="event-header">
+	      <img src="../../img/Img-ev04.png" alt="Maratón de Montevideo" class="event-cover">
+	      <h1 class="event-title">Maratón de Montevideo</h1>
+	    </div>
+	    <div class="event-info">
+	      <h3>Descripción</h3>
+	      <p>Competencia deportiva anual en la capital</p>
+	      <div class="event-meta"><strong>Sigla:</strong> MARATON</div>
+	      <div class="chips"><span class="categorias-label">Categorías:</span><span class="chip">Deporte</span><span class="chip">Salud</span></div>
+	      <div class="event-meta"><strong>Fecha alta:</strong> 01/01/2022</div>
+	    </div>
+	  </section>
+	  <aside class="editions">
+	    <h3>Ediciones</h3>
+	    <div class="edition-item">
+	      <img src="../../img/Img-edev03.jpeg" alt="Maratón 2024" style="background:#fff;display:block;">
+	      <div>
+	        <div class="edition-title"><a href="../Asistente/ConsultaEdicionAsistenteMaratóndeMontevideo.html" style="text-decoration:none;color:inherit;">Maratón 2024</a></div>
+	      </div>
+	    </div>
+	  </aside>
+	</main>
+  </div>
+
+    <script src="../js/CargaUsers.js"></script>
+    <script>
+    (function(){
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+      const usuario = usuarios.find(u => u.nick === "atorres");
+      const userNav = document.getElementById("userNav");
+      if (usuario && userNav) {
+        let imgSrc = usuario.img || '../../img/default-user.png';
+        if (imgSrc.startsWith('../img/')) imgSrc = '../../img/' + imgSrc.split('../img/')[1];
+        if (imgSrc.startsWith('img/')) imgSrc = '../../' + imgSrc;
+        userNav.innerHTML = `
+          <span style="display:flex;align-items:center;gap:0.5rem;">
+            <img src="${imgSrc}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+            <span>${usuario.nombre} ${usuario.apellido || ''}</span>
+          </span>
+          <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
+        `;
+      }
+      window.cerrarSesion = function() {
+        sessionStorage.removeItem('usuarioActivo');
+        window.location.href = '../visitante/index.html';
+      }
+    })();
+    </script>
+  </body>
+  </html>

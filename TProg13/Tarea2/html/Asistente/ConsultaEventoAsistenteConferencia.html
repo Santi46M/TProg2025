@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Evento — Conferencia de Tecnología</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/ConsultaEventoBase.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
+      <nav class="main-nav">
+        <!-- Buscador -->
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+      </nav>
+
+      <!-- Usuario logueado (hardcodeado: miseventos) -->
+      <nav class="user-nav" id="userNav">
+        <!-- Contenido dinámico según usuario -->
+      </nav>
+    </div>
+  </header>
+
+  <!-- Layout -->
+  <div class="container row" style="margin-top:1rem;">
+    <!-- Sidebar -->
+    <aside class="card">
+      <h3><i class='bx bx-list-ul'></i> Menú</h3>
+            <h4>Acciones</h4>
+      <ul>
+        <li><a href="RegistroEdicionEvento.html"><i class='bx bx-edit'></i> Registrarse a edición de evento</a></li>
+      </ul>
+      <h4>Categorías</h4>
+      <ul>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Innovación</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Literatura</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Cultura</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Música</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Deporte</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
+        <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+      </ul>
+      <h4><a href="ConsultaUsuario-asistente.html">Listar Usuarios</a></h4>
+      <div id="menuPorRol"></div>
+    </aside>
+
+    <!-- Main -->
+	<main class="container consulta-layout">
+	  <section class="event-card">
+	    <div class="event-header">
+	      <img src="placeholder.png" alt="Conferencia de Tecnología" class="event-cover">
+	      <h1 class="event-title">Conferencia de Tecnología</h1>
+	    </div>
+	    <div class="event-info">
+	      <h3>Descripción</h3>
+	      <p>Evento sobre innovación tecnológica</p>
+	      <div class="event-meta"><strong>Sigla:</strong> CONFTEC</div>
+	      <div class="chips"><span class="categorias-label">Categorías:</span><span class="chip">Tecnología</span><span class="chip">Innovación</span></div>
+	      <div class="event-meta"><strong>Fecha alta:</strong> 10/01/2025</div>
+	    </div>
+	  </section>
+	  <aside class="editions">
+	    <h3>Ediciones</h3>
+	    <div class="edition-item">
+	      <img src="placeholder.png" alt="Tecnología Punta del Este 2026" class="event-cover">
+	      <div>
+	        <div class="edition-title"><a href="ConsultaEdicionAsistenteTecnologiaPuntaDelEste2026.html" style="text-decoration:none;color:inherit;">Tecnología Punta del Este 2026</a></div>
+	      </div>
+	    </div>
+	    <div class="edition-item">
+	      <img src="placeholder.png" alt="Web Summit 2026" class="event-cover">
+	      <div>
+	        <div class="edition-title"><a href="ConsultaEdicionAsistenteWebSummit2026.html" style="text-decoration:none;color:inherit;">Web Summit 2026</a></div>
+	      </div>
+	    </div>
+	  </aside>
+	</main>
+  </div>
+
+    <script src="../js/CargaUsers.js"></script>
+    <script>
+    (function(){
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+      const usuario = usuarios.find(u => u.nick === "atorres");
+      const userNav = document.getElementById("userNav");
+      if (usuario && userNav) {
+        let imgSrc = usuario.img || '../../img/default-user.png';
+        if (imgSrc.startsWith('../img/')) imgSrc = '../../img/' + imgSrc.split('../img/')[1];
+        if (imgSrc.startsWith('img/')) imgSrc = '../../' + imgSrc;
+        userNav.innerHTML = `
+          <span style="display:flex;align-items:center;gap:0.5rem;">
+            <img src="${imgSrc}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+            <span>${usuario.nombre} ${usuario.apellido || ''}</span>
+          </span>
+          <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
+        `;
+      }
+      window.cerrarSesion = function() {
+        sessionStorage.removeItem('usuarioActivo');
+        window.location.href = '../visitante/index.html';
+      }
+    })();
+    </script>
+  </body>
+  </html>
