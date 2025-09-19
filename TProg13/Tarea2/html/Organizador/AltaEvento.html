@@ -141,12 +141,17 @@
       mostrarErrorNombre(existeNombre(val));
     });
 
+	// Cancelar
+	document.addEventListener("DOMContentLoaded", () => {
+	  document.querySelector(".btn-cancelar-altaEvento")
+	    .addEventListener("click", () => location.href = "index-organizador.html");
+	});
+	
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
       // categorías obligatorias
       if (!checks.some(c => c.checked)) {
-        // desplazá al fieldset para que se vea por qué no avanza
         fsCategorias.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
       }
@@ -161,36 +166,12 @@
       }
       mostrarErrorNombre(false);
 
-      // registrar nombre para próximas validaciones
-      const arr = getNombres(); arr.push(nombreNorm); setNombres(arr);
-
-      // mostrar modal de éxito y redirigir SOLO al aceptar
-      if (typeof mostrarDialogoExito === 'function') {
-        const ret = mostrarDialogoExito('Evento registrado con éxito.');
-        const irAlInicio = () => window.location.href = 'index.html';
-
-        if (ret && typeof ret.then === 'function') {
-          ret.finally(irAlInicio);
-        } else {
-          // enganchar al botón "Aceptar" del modal (robusto)
-          const observer = new MutationObserver(() => {
-            const botones = document.querySelectorAll('button, [role="button"], input[type="button"], input[type="submit"]');
-            for (const b of botones) {
-              const t = (b.innerText || b.value || '').trim().toLowerCase();
-              if (t === 'aceptar') {
-                b.addEventListener('click', irAlInicio, { once: true });
-                observer.disconnect();
-                break;
-              }
-            }
-          });
-          observer.observe(document.body, { childList: true, subtree: true });
-        }
-      }
+      // No guardar datos de prueba, solo redirigir si todo está OK
+      window.location.href = 'index-organizador.html';
     });
 
     form.addEventListener('reset', () => {
-      window.location.href = '../visitante/index.html';
+      window.location.href = 'index-organizador.html';
     });
   })();
 

@@ -61,25 +61,30 @@
     </form>
   </main>
 
-  <!-- primero cargamos los datos de prueba -->
-  <script src="../js/CargaUsers.js"></script>
 
-  <!-- después el código de login -->
   <script>
     const form = document.getElementById('loginForm');
     const error = document.getElementById('error');
 
     form.addEventListener('submit', e => {
       e.preventDefault();
-      const emailOrNick = form.email.value.trim(); // puede ser correo o nick
+      const emailOrNick = form.email.value.trim();
       const pass  = form.pass.value;
 
-      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+      // Hardcodeo de credenciales
+      if (emailOrNick === "atorres" && pass === "123.torres") {
+        window.location.href = "../Asistente/index-asistente.html";
+        return;
+      }
+      if (emailOrNick === "miseventos" && pass === "22miseventos") {
+        window.location.href = "../Organizador/index-organizador.html";
+        return;
+      }
 
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
       const user = usuarios.find(u => 
         (u.email === emailOrNick || u.nick === emailOrNick) && u.pass === pass
       );
-
       if (user) {
         sessionStorage.setItem("usuarioActivo", JSON.stringify(user));
         window.location.href = "index.html";
@@ -89,7 +94,5 @@
     });
   </script>
 
-  <!-- al final el resto de scripts -->
-  <script src="../js/Hamburgesa.js"></script>
 </body>
 </html>

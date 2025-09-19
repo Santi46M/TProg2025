@@ -102,44 +102,29 @@
     }
   });
 
-  // Poblar ediciones (simple, estático, desde localStorage.eventos)
+  // Poblar ediciones (hardcodeado)
   document.addEventListener("DOMContentLoaded", () => {
     const sel = document.getElementById("edicion");
-    const eventos = JSON.parse(localStorage.getItem("eventos") || "[]");
-    const eds = eventos.flatMap(ev => ev.ediciones || []);
-    const u = JSON.parse(sessionStorage.getItem("usuarioActivo") || "null");
-    const rol = (u?.rol || "").toLowerCase();
-    const nick = (u?.nick || "").toLowerCase();
-
-    // si es organizador, mostrar solo sus ediciones
-    const lista = (rol === "organizador")
-      ? eds.filter(e => (e.organizador || "").toLowerCase() === nick)
-      : eds;
-
+    const edicionesHardcode = [
+      "Maratón de Montevideo 2024",
+      "Maratón de Montevideo 2022",
+      "Tecnología Punta del Este 2026",
+      "Mobile World Congress 2025",
+      "Web Summit 2026"
+    ];
     // limpiar y cargar
     for (let i = sel.options.length - 1; i >= 1; i--) sel.remove(i);
-    if (!lista.length) {
-      const opt = document.createElement("option");
-      opt.disabled = true; opt.textContent = "No hay ediciones disponibles";
-      sel.appendChild(opt);
-    } else {
-      lista.forEach(e => {
-        const o = document.createElement("option");
-        o.value = e.id || e.sigla || e.nombre;
-        o.textContent = e.nombre || e.sigla || o.value;
-        sel.appendChild(o);
-      });
-    }
+    edicionesHardcode.forEach(e => {
+      const o = document.createElement("option");
+      o.value = e;
+      o.textContent = e;
+      sel.appendChild(o);
+    });
   });
 
-  // Guardar tipo de registro (estático a localStorage)
+  // Guardar tipo de registro (solo validación, sin guardar nada)
   document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("formTipoRegistro");
-    const norm = s => (s||"").trim().toLowerCase();
-
-    document.querySelector(".btn-cancelar-altaEvento")
-      .addEventListener("click", () => location.href = "index.html");
-
     form.addEventListener("submit", (e) => {
       e.preventDefault();
       const edicion = document.getElementById("edicion").value;
@@ -149,17 +134,19 @@
       const cupo  = Number(document.getElementById("cupo").value);
 
       if (!edicion) return alert("Seleccioná una edición.");
+      if (!nombre.trim()) return alert("Ingresá un nombre.");
+      if (!descripcion.trim()) return alert("Ingresá una descripción.");
+      if (isNaN(costo) || costo < 0) return alert("Ingresá un costo válido.");
+      if (isNaN(cupo) || cupo < 1) return alert("Ingresá un cupo válido (mayor a 0).");
 
-      const tipos = JSON.parse(localStorage.getItem("tiposRegistro") || "[]");
-      const dup = tipos.some(t => t.edicion === edicion && norm(t.nombre) === norm(nombre));
-      if (dup) return alert("Ya existe un tipo con ese nombre en esta edición.");
-
-      tipos.push({ edicion, nombre: nombre.trim(), descripcion: descripcion.trim(), costo, cupo,
-                   fechaAlta: new Date().toISOString().slice(0,10) });
-      localStorage.setItem("tiposRegistro", JSON.stringify(tipos));
-      alert("Tipo de registro creado con éxito.");
-      form.reset();
+      // Si todo está OK, redirigir
+      window.location.href = "index-organizador.html";
     });
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelector(".btn-cancelar-altaEvento")
+      .addEventListener("click", () => location.href = "index-organizador.html");
   });
   </script>
 </body>
