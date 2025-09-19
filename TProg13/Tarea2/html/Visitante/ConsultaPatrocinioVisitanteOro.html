@@ -7,20 +7,26 @@
 </head>
 
 <body>
-<!-- Header -->
-<header class="site-header">
-  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
-    <!-- Marca -->
-    <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
-    <!-- Buscador -->
-    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
-      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-      <button class="btn" type="submit">Buscar</button>
-    </form>
-  </div>
-</header>
+      <nav class="main-nav">
+        <!-- Buscador -->
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+      </nav>
 
+      <!--  Zona de usuario -->
+      <nav class="user-nav" id="userNav">
+        <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
+      </nav>
+    </div>
+  </header>
   <!-- Layout -->
   <div class="container row" style="margin-top:1rem;">
     <!-- Sidebar -->

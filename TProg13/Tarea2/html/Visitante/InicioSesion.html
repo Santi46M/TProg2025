@@ -10,27 +10,17 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <div style="position:relative;display:inline-block;">
-        <button class="hamburguesa" onclick="toggleMenu()">☰</button>
-        <!-- Dropdown Menu -->
-        <div id="dropdownMenu" class="dropdown-menu" style="display:none;position:absolute;top:100%;left:0;z-index:100;min-width:180px;">
-          <ul id="menuList">
-            <!-- Aquí JS inyecta el menú según rol -->
-          </ul>
-        </div>
-      </div>
-
       <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
       <nav class="main-nav">
-        <!-- Izquierda: buscador -->
+        <!-- Buscador -->
         <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
           <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
           <button class="btn" type="submit">Buscar</button>
         </form>
       </nav>
 
-      <!--  Zona dinámica de usuario -->
+      <!--  Zona de usuario -->
       <nav class="user-nav" id="userNav">
         <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
         <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
