@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Consulta de Evento — Conferencia de Tecnología</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/ConsultaEventoBase.css">
+</head>
+
+<body>
+<!-- Header -->
+<header class="site-header">
+	<div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+	  <!-- Marca -->
+	  <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+  
+	  <!-- Buscador -->
+	  <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
+		<input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+		<button class="btn" type="submit">Buscar</button>
+	  </form>
+	</div>
+  </header>
+  
+	<!-- Layout -->
+	<div class="container row" style="margin-top:1rem;">
+	  <!-- Sidebar -->
+	  <aside class="card">
+		<h3><i class='bx bx-list-ul'></i> Menú</h3>
+  
+		<h4>Categorías</h4>
+		<ul>
+		  <li><a href="#">Tecnología</a></li>
+		  <li><a href="#">Innovación</a></li>
+		  <li><a href="#">Literatura</a></li>
+		  <li><a href="#">Cultura</a></li>
+		  <li><a href="#">Música</a></li>
+		  <li><a href="#">Deporte</a></li>
+		  <li><a href="#">Salud</a></li>
+		  <li><a href="#">Entretenimiento</a></li>
+		  <li><a href="#">Negocios</a></li>
+		</ul>
+		<h4><a href="ConsultaUsuario.html">Listar Usuarios</a></h4>
+	  </aside>
+
+    <!-- Main -->
+	<main class="container consulta-layout">
+	  <section class="event-card">
+	    <div class="event-header">
+	      <img src="../../img/Img-ev05.png" alt="Conferencia de Tecnología" class="event-cover">
+	      <h1 class="event-title">Conferencia de Tecnología</h1>
+	    </div>
+	    <div class="event-info">
+	      <h3>Descripción</h3>
+	      <p>Evento sobre innovación tecnológica</p>
+	      <div class="event-meta"><strong>Sigla:</strong> CONFTEC</div>
+	      <div class="chips"><span class="categorias-label">Categorías:</span><span class="chip">Tecnología</span><span class="chip">Innovación</span></div>
+	      <div class="event-meta"><strong>Fecha alta:</strong> 10/01/2025</div>
+	    </div>
+	  </section>
+	  <aside class="editions">
+	    <h3>Ediciones</h3>
+	    <div class="edition-item">
+	      <img src="../../img/Img-ev06.png" alt="Tecnología Punta del Este 2026" class="event-cover">
+	      <div>
+	        <div class="edition-title"><a href="ConsultaEdicionVisitanteTecnologiaPuntaDelEste2026.html" style="text-decoration:none;color:inherit;">Tecnología Punta del Este 2026</a></div>
+	      </div>
+	    </div>
+	    <div class="edition-item">
+	      <img src="../../img/Img-ev07.png" alt="Web Summit 2026" class="event-cover">
+	      <div>
+	        <div class="edition-title"><a href="ConsultaEdicionVisitanteWebSummit2026.html" style="text-decoration:none;color:inherit;">Web Summit 2026</a></div>
+	      </div>
+	    </div>
+	  </aside>
+	</main>
+  </div>
+
+  <script src="../js/Login.js"></script>
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    if(sidebar) sidebar.style.display = 'none';
+  </script>
+</body>
+</html>

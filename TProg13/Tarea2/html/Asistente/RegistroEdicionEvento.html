@@ -5,7 +5,6 @@
   <title>Registro a Edición de Evento</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="../../css/style.css">
-  <link rel="stylesheet" href="../../css/RegistroEdicionEvento.css">
 </head>
 <body>
   <!-- Header -->
@@ -33,23 +32,30 @@
   <!-- Layout -->
   <div class="container row" style="margin-top:1rem;">
     <!-- Sidebar -->
-    <aside class="card">
-      <h3>Menú</h3>
-      <h4>Acciones</h4>
-      <ul>
-        <li><a href="RegistroEdicionEvento.html">Registrarse a edición de evento</a></li>
-      </ul>
-      <h4>Categorías</h4>
-      <ul>
-        <li><a href="#">Tecnología</a></li>
-        <li><a href="#">Deporte</a></li>
-        <li><a href="#">Salud</a></li>
-        <li><a href="#">Cultura</a></li>
-        <li><a href="#">Entretenimiento</a></li>
-        <li><a href="#">Negocios</a></li>
-      </ul>
-      <h4><a href="ConsultaUsuario-Asistente.html">Listar Usuarios</a></h4>
-    </aside>
+	<aside class="card">
+	  <h3><i class='bx bx-list-ul'></i> Menú</h3>
+	 	<h4>Acciones</h4>
+	  <ul>
+	    <li><a href="RegistroEdicionEvento.html"><i class='bx bx-edit'></i> Registrarse a edición de evento</a></li>
+	  </ul>
+	  <h4>Categorías</h4>
+	  <ul>
+	    <li><a href="#"><i class='bx bx-wifi-0'></i> Tecnología</a></li>
+	    <li><a href="#"><i class='bx bx-wifi-0'></i> Innovación</a></li>
+	    <li><a href="#"><i class='bx bx-wifi-0'></i> Literatura</a></li>
+	    <li><a href="#"><i class='bx bx-wifi-0'></i> Cultura</a></li>
+	    <li><a href="#"><i class='bx bx-wifi-0'></i> Música</a></li>
+	    <li><a href="#"><i class='bx bx-wifi-0'></i> Deporte</a></li>
+	    <li><a href="#"><i class='bx bx-wifi-0'></i> Salud</a></li>
+	    <li><a href="#"><i class='bx bx-wifi-0'></i> Entretenimiento</a></li>
+	    <li><a href="#"><i class='bx bx-wifi-0'></i> Negocios</a></li>
+	    
+	  </ul>
+	  <h4><a href="ConsultaUsuario-Asistente.html">Listar Usuarios</a></h4>
+	  <ul>
+	    <!-- Puedes agregar más opciones aquí si lo necesitas -->
+	  </ul>
+	</aside>
 
     <!-- Main -->
     <main class="container narrow">
@@ -58,36 +64,46 @@
       <section class="card">
 
 
-        <!-- Edición (todas, agrupadas) -->
-        <label>Seleccionar edición
-          <select>
-            <option value="">-- Seleccionar edición --</option>
-            <optgroup label="Conferencia de Tecnología">
-              <option value="EDEV08">Tecnología Punta del Este 2026</option>
-              <option value="EDEV09">Mobile World Congress 2025</option>
-              <option value="EDEV10">Web Summit 2026</option>
-            </optgroup>
-            <optgroup label="Maratón de Montevideo">
-              <option value="EDEV03">Maratón de Montevideo 2024</option>
-              <option value="EDEV04">Maratón de Montevideo 2022</option>
-            </optgroup>
-          </select>
-        </label>
 
-        <!-- Tipos de registro (listado completo) -->
-        <label>Tipo de registro
-          <select>
-            <option value="">-- Seleccionar tipo de registro --</option>
-            <!-- EDEV03 -->
-            <option value="TR07">Corredor 21K (EDEV03)</option>
-            <!-- EDEV08 -->
-            <option value="TR19">Estudiante (EDEV08)</option>
-            <!-- EDEV09 -->
-            <option value="TR20">Full (EDEV09)</option>
-            <!-- EDEV10 -->
-            <option value="TR25">Estudiante (EDEV10)</option>
-          </select>
-        </label>
+		<label>Seleccionar evento:
+		  <select id="eventoSelect">
+		    <option value="">-- Seleccionar evento --</option>
+		    <option value="EV01">Conferencia de Tecnología</option>
+		    <option value="EV04">Maratón de Montevideo</option>
+		  </select>
+		</label>
+
+<br>
+
+		<label>Seleccionar edición:
+		  <select id="edicionSelect" disabled>
+		    <option value="">-- Seleccionar edición --</option>
+		    <!-- Conferencia de Tecnología -->
+		    <option data-evento="EV01" value="EDEV08">Tecnología Punta del Este 2026</option>
+		    <option data-evento="EV01" value="EDEV09">Mobile World Congress 2025</option>
+		    <option data-evento="EV01" value="EDEV10">Web Summit 2026</option>
+
+		    <!-- Maratón de Montevideo -->
+		    <option data-evento="EV04" value="EDEV03">Maratón de Montevideo 2024</option>
+		    <option data-evento="EV04" value="EDEV04">Maratón de Montevideo 2022</option>
+		  </select>
+		</label>
+
+
+<br>
+		<label>Tipo de registro:
+		  <select id="tipoRegistroSelect" disabled>
+		    <option value="">-- Seleccionar tipo de registro --</option>
+		    <!-- TR07 - EDEV03 -->
+		    <option data-edicion="EDEV03" value="TR07">Corredor 21K (EDEV03)</option>
+		    <!-- TR19 - EDEV08 -->
+		    <option data-edicion="EDEV08" value="TR19">Estudiante (EDEV08)</option>
+		    <!-- TR20 - EDEV09 -->
+		    <option data-edicion="EDEV09" value="TR20">Full (EDEV09)</option>
+		    <!-- TR25 - EDEV10 -->
+		    <option data-edicion="EDEV10" value="TR25">Estudiante (EDEV10)</option>
+		  </select>
+		</label>
 
         <!-- Código -->
         <label>Código de patrocinio (opcional)
@@ -103,5 +119,43 @@
       </section>
     </main>
   </div>
+  <script>
+    const eventoSelect = document.getElementById("eventoSelect");
+    const edicionSelect = document.getElementById("edicionSelect");
+    const tipoRegistroSelect = document.getElementById("tipoRegistroSelect");
+
+    eventoSelect.addEventListener("change", function () {
+      const eventoSeleccionado = this.value;
+
+      edicionSelect.disabled = !eventoSeleccionado;
+      tipoRegistroSelect.disabled = true;
+      edicionSelect.value = "";
+      tipoRegistroSelect.value = "";
+
+      Array.from(edicionSelect.options).forEach(opt => {
+        if (!opt.value) return; // dejar el primer "-- Seleccionar edición --"
+        opt.hidden = opt.getAttribute("data-evento") !== eventoSeleccionado;
+      });
+
+      // Ocultar tipos de registro hasta que se seleccione edición
+      Array.from(tipoRegistroSelect.options).forEach(opt => {
+        if (!opt.value) return;
+        opt.hidden = true;
+      });
+    });
+
+    edicionSelect.addEventListener("change", function () {
+      const edicionSeleccionada = this.value;
+
+      tipoRegistroSelect.disabled = !edicionSeleccionada;
+      tipoRegistroSelect.value = "";
+
+      Array.from(tipoRegistroSelect.options).forEach(opt => {
+        if (!opt.value) return;
+        opt.hidden = opt.getAttribute("data-edicion") !== edicionSeleccionada;
+      });
+    });
+  </script>
 </body>
+
 </html>

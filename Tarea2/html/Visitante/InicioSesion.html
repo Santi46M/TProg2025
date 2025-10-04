@@ -10,16 +10,27 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
+      <div style="position:relative;display:inline-block;">
+        <button class="hamburguesa" onclick="toggleMenu()">☰</button>
+        <!-- Dropdown Menu -->
+        <div id="dropdownMenu" class="dropdown-menu" style="display:none;position:absolute;top:100%;left:0;z-index:100;min-width:180px;">
+          <ul id="menuList">
+            <!-- Aquí JS inyecta el menú según rol -->
+          </ul>
+        </div>
+      </div>
+
       <a class="brand" href="index.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
       <nav class="main-nav">
+        <!-- Izquierda: buscador -->
         <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
           <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
           <button class="btn" type="submit">Buscar</button>
         </form>
       </nav>
 
-      <!-- Zona de usuario -->
+      <!--  Zona dinámica de usuario -->
       <nav class="user-nav" id="userNav">
         <a class="btn ghost" href="InicioSesion.html"><i class='bx bxs-user'></i> Iniciar Sesión</a>
         <a class="btn" href="AltaUsuario.html"><i class='bx bxs-user-plus'></i> Registrarse</a>
@@ -27,33 +38,29 @@
     </div>
   </header>
 
-  <!-- Main con clase específica para iniciar sesión -->
-  <main class="wrapper-iniciar-sesion">
-    <h1 class="titulo-iniciar-sesion">Iniciar sesión</h1>
-
-    <form id="loginForm" class="card form-iniciar-sesion">
-      <div class="row-iniciar-sesion">
-        <div class="campo-iniciar-sesion">
+  <main class="container narrow">
+    <h1>Iniciar sesión</h1>
+    <form id="loginForm" class="card form">
+      <div class="row">
+        <div>
           <label for="email">Correo electrónico o Nickname</label>
           <input id="email" name="email" type="text" required placeholder="Correo o Nick">
         </div>
       </div>
-
-      <div class="row-iniciar-sesion">
-        <div class="campo-iniciar-sesion">
+      <div class="row">
+        <div>
           <label for="pass">Contraseña</label>
           <input id="pass" name="pass" type="password" required>
         </div>
       </div>
-
-      <div class="acciones-iniciar-sesion">
-        <button type="submit" class="btn btn-iniciar-sesion">Ingresar</button>
-        <a class="btn ghost btn-cancelar-iniciar-sesion" href="index.html">Cancelar</a>
+      <div class="actions">
+        <button type="submit" class="btn">Ingresar</button>
+        <a class="btn ghost" href="index.html">Cancelar</a>
       </div>
-
-      <p id="error" class="error-iniciar-sesion">Credenciales incorrectas</p>
+      <p id="error" style="color:red;display:none;">Credenciales incorrectas</p>
     </form>
   </main>
+
 
   <script>
     const form = document.getElementById('loginForm');
@@ -64,6 +71,7 @@
       const emailOrNick = form.email.value.trim();
       const pass  = form.pass.value;
 
+      // Hardcodeo de credenciales
       if (emailOrNick === "atorres" && pass === "123.torres") {
         window.location.href = "../Asistente/index-asistente.html";
         return;
@@ -77,7 +85,6 @@
       const user = usuarios.find(u => 
         (u.email === emailOrNick || u.nick === emailOrNick) && u.pass === pass
       );
-
       if (user) {
         sessionStorage.setItem("usuarioActivo", JSON.stringify(user));
         window.location.href = "index.html";
@@ -86,5 +93,6 @@
       }
     });
   </script>
+
 </body>
 </html>

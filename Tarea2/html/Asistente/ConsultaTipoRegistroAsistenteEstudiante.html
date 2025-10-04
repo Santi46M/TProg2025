@@ -7,27 +7,19 @@
 </head>
 
 <body>
-  <!-- Header -->
-  <header class="site-header">
-    <div class="container">
-      <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+<!-- Header -->
+<header class="site-header">
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+    <!-- Marca -->
+    <a class="brand" href="index-asistente.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
 
-      <nav class="main-nav">
-        <!-- Buscador -->
-        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
-          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-          <button class="btn" type="submit">Buscar</button>
-        </form>
-      </nav>
-
-      <!-- Usuario logueado (hardcodeado: miseventos) -->
-	  <nav class="user-nav" id="userNav">
-	    <span class="user-name">Hola, <strong>Ana</strong></span>
-	    <a class="btn" href="Perfil-Asistente.html"><i class='bx bxs-user'></i> Ver Perfil</a>
-      <a class="btn" href="../Visitante/index.html"><i class='bx bxs-user'></i>Cerrar sesión</a>
-	  </nav>
-    </div>
-  </header>
+    <!-- Buscador -->
+    <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar" style="display:flex;gap:.5rem;">
+      <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+      <button class="btn" type="submit">Buscar</button>
+    </form>
+  </div>
+</header>
   <!-- Layout -->
   <div class="container row" style="margin-top:1rem;">
     <!-- Sidebar -->
@@ -71,6 +63,27 @@
 
     <script src="../js/CargaUsers.js"></script>
     <script>
-
+    (function(){
+      const usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+      const usuario = usuarios.find(u => u.nick === "atorres");
+      const userNav = document.getElementById("userNav");
+      if (usuario && userNav) {
+        let imgSrc = usuario.img || '../../img/default-user.png';
+        if (imgSrc.startsWith('../img/')) imgSrc = '../../img/' + imgSrc.split('../img/')[1];
+        if (imgSrc.startsWith('img/')) imgSrc = '../../' + imgSrc;
+        userNav.innerHTML = `
+          <span style="display:flex;align-items:center;gap:0.5rem;">
+            <img src="${imgSrc}" alt="Foto de perfil" style="width:32px;height:32px;border-radius:50%;object-fit:cover;">
+            <span>${usuario.nombre} ${usuario.apellido || ''}</span>
+          </span>
+          <a class="btn" href="#" onclick="cerrarSesion()"><i class='bx bx-log-out'></i> Cerrar Sesión</a>
+        `;
+      }
+      window.cerrarSesion = function() {
+        sessionStorage.removeItem('usuarioActivo');
+        window.location.href = '../visitante/index.html';
+      }
+    })();
+    </script>
   </body>
   </html>

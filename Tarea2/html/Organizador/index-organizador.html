@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Eventos.uy — Organizador</title>
+  <link rel="stylesheet" href="../../css/style.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container">
+      <a class="brand" href="index-organizador.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+
+      <nav class="main-nav">
+        <!-- Buscador -->
+        <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
+          <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
+          <button class="btn" type="submit">Buscar</button>
+        </form>
+      </nav>
+
+      <!-- Usuario logueado (hardcodeado: miseventos) -->
+      <nav class="user-nav" id="userNav">
+		<span class="user-name">Hola, <strong>miseventos</strong></span>
+		<a class="btn" href="Perfil-Organizador.html"><i class='bx bxs-user'></i> Ver Perfil</a>
+    <a class="btn" href="../Visitante/index.html"><i class='bx bxs-user'></i> Cerrar sesión</a>
+      </nav>
+    </div>
+  </header>
+  <div class="container row" style="margin-top:1rem;">
+    <!-- Sidebar -->
+    <aside class="card">
+      <h3><i class='bx bx-list-ul'></i> Menú</h3>
+      <h4>Acciones</h4>
+      <ul>
+        <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
+        <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edicion Evento</a></li>
+        <li><a href="AltaTipoRegistro.html"><i class='bx bx-edit'></i> Alta Tipo Registro</a></li>
+      </ul>
+      <h4>Categorías</h4>
+      <ul>
+        <li><a href="#">Tecnología</a></li>
+        <li><a href="#">Innovación</a></li>
+        <li><a href="#">Literatura</a></li>
+        <li><a href="#">Cultura</a></li>
+        <li><a href="#">Música</a></li>
+        <li><a href="#">Deporte</a></li>
+        <li><a href="#">Salud</a></li>
+        <li><a href="#">Entretenimiento</a></li>
+        <li><a href="#">Negocios</a></li>
+      </ul>
+      <h4><a href="ConsultaUsuario-organizador.html">Listar Usuarios</a></h4>
+    </aside>
+    <!-- Main -->
+	<main>
+	  <h1>Próximos eventos</h1>
+
+	  <div id="eventList" class="row">
+	    <!-- EV01: Conferencia de Tecnología -->
+	    <div class="card">
+	      <img src="placeholder.png" alt="Conferencia de Tecnología" style="width:100%;">
+	      <h2>Conferencia de Tecnología</h2>
+	      <p><strong>Ciudad:</strong> Punta del Este (Uruguay)</p>
+	      <div class="actions">
+	        <a href="ConsultaEventoOrganizadorConferencia.html" class="btn">Ver más</a>
+	      </div>
+	    </div>
+
+	    <!-- EV04: Maratón de Montevideo -->
+	    <div class="card">
+	      <img src="../../img/IMG-EV04.png" alt="Maratón de Montevideo" style="width:100%;">
+	      <h2>Maratón de Montevideo</h2>
+	      <p><strong>Ciudad:</strong> Montevideo (Uruguay)</p>
+	      <div class="actions">
+	        <a href="ConsultaEventoOrganizadorMaraton.html" class="btn">Ver más</a>
+	      </div>
+	    </div>
+	  </div>
+	</main>
+  </div>
+
+</body>
+</html>
