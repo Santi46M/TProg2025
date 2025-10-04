@@ -49,19 +49,18 @@
       <h4><a href="ConsultaUsuario.html">Listar Usuarios</a></h4>
     </aside>
 
-	<main class="main-alta-usuario">
-	  <h1 class="titulo-alta-usuario">Crear cuenta</h1>
+	<main class="form-wrapper">
+	  <h1>Crear cuenta</h1>
 
-	  <form id="altaForm" class="form-alta-usuario card" novalidate>
-	    <!-- Rol -->
-	    <fieldset class="grupo-rol">
+	  <form id="altaForm" class="card form-alta" novalidate>
+	    
+	    <!-- Tipo de cuenta -->
+	    <fieldset class="fieldset">
 	      <legend>Tipo de cuenta</legend>
-
 	      <label class="rol-opcion">
 	        <input type="radio" name="rol" value="asistente" checked>
 	        <span>Asistente</span>
 	      </label>
-
 	      <label class="rol-opcion">
 	        <input type="radio" name="rol" value="organizador">
 	        <span>Organizador</span>
@@ -69,71 +68,69 @@
 	    </fieldset>
 
 	    <!-- Datos comunes -->
-	    <div class="fila">
-	      <div>
+	    <div class="fila-espaciada">
+	      <div class="input-group">
 	        <label for="nick">Nick*</label>
 	        <input id="nick" name="nick" required placeholder="Tu alias">
 	      </div>
-	      <div>
+	      <div class="input-group">
 	        <label for="email">Correo*</label>
 	        <input id="email" name="email" type="email" required placeholder="tucorreo@ejemplo.com">
 	      </div>
 	    </div>
 
-	    <div class="fila">
-	      <div>
+	    <div class="fila-espaciada">
+	      <div class="input-group">
 	        <label for="pass">Contraseña*</label>
 	        <input id="pass" name="pass" type="password" required minlength="4">
 	      </div>
-	      <div>
+	      <div class="input-group">
 	        <label for="pass2">Repetir contraseña*</label>
 	        <input id="pass2" name="pass2" type="password" required minlength="4">
 	      </div>
 	    </div>
 
-	    <!-- Grupo ASISTENTE -->
+	    <!-- Datos asistente -->
 	    <section id="grupoAsistente" data-role="asistente">
 	      <h3>Datos de asistente</h3>
-	      <div class="fila">
-	        <div>
+	      <div class="fila-espaciada">
+	        <div class="input-group">
 	          <label for="nombreA">Nombre*</label>
 	          <input id="nombreA" name="nombreA" placeholder="Nombre">
 	        </div>
-	        <div>
+	        <div class="input-group">
 	          <label for="apellidoA">Apellido*</label>
 	          <input id="apellidoA" name="apellidoA" placeholder="Apellido">
 	        </div>
 	      </div>
-	      <div class="fila">
-	        <div>
+	      <div class="fila-espaciada">
+	        <div class="input-group">
 	          <label for="nacA">Fecha de nacimiento*</label>
 	          <input id="nacA" name="nacA" type="date">
 	        </div>
-	        <div>
+	        <div class="input-group">
 	          <label for="instIdA">Institución (opcional)</label>
 	          <input id="instIdA" name="instIdA" placeholder="ID institución">
 	        </div>
 	      </div>
 	    </section>
 
-	    <!-- Grupo ORGANIZADOR -->
+	    <!-- Datos organizador -->
 	    <section id="grupoOrganizador" data-role="organizador" style="display:none;">
 	      <h3>Datos de organizador</h3>
-	      <div class="fila">
-	        <div>
+	      <div class="fila-espaciada">
+	        <div class="input-group">
 	          <label for="nombreO">Nombre de la organización*</label>
 	          <input id="nombreO" name="nombreO" placeholder="Ej.: Instituto de Computación">
 	        </div>
-	        <div>
+	        <div class="input-group">
 	          <label for="webO">Sitio web (opcional)</label>
 	          <input id="webO" name="webO" type="url" placeholder="https://...">
 	        </div>
 	      </div>
-	      <div class="fila">
-	        <div style="width:100%;">
-	          <label for="descO">Descripción*</label>
-	          <textarea id="descO" name="descO" rows="3" placeholder="Breve descripción de la organización"></textarea>
-	        </div>
+	      <div class="input-full">
+	        <label for="descO">Descripción*</label>
+	        <textarea id="descO" name="descO" rows="3" placeholder="Breve descripción de la organización"></textarea>
 	      </div>
 	    </section>
 
@@ -145,7 +142,6 @@
 	    <p id="msg" style="display:none;"></p>
 	  </form>
 	</main>
-
   <!-- Cargar datos base primero -->
   <script src="../js/CargaUsers.js"></script>
 
