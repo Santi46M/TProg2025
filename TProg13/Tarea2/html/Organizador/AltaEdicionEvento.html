@@ -2,146 +2,137 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Alta de Edición de Evento</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Estilos -->
+  <title>Alta Edición Evento — Eventos.uy</title>
   <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/styleAltaEdicion.css">
 </head>
 <body>
+
 <!-- Header -->
 <header class="site-header">
   <div class="container">
     <a class="brand" href="index-organizador.html"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
-
     <nav class="main-nav">
-      <!-- Buscador -->
       <form class="search" action="/buscar" method="get" role="search" aria-label="Buscar">
         <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
         <button class="btn" type="submit">Buscar</button>
       </form>
     </nav>
-
-    <!-- Usuario logueado (hardcodeado: miseventos) -->
     <nav class="user-nav" id="userNav">
-  <span class="user-name">Hola, <strong>miseventos</strong></span>
-  <a class="btn" href="Perfil-Organizador.html"><i class='bx bxs-user'></i> Ver Perfil</a>
-  <a class="btn" href="../Visitante/index.html"><i class='bx bxs-user'></i> Cerrar sesión</a>
+      <span class="user-name">Hola, <strong>miseventos</strong></span>
+      <a class="btn" href="Perfil-Organizador.html"><i class='bx bxs-user'></i> Ver Perfil</a>
+      <a class="btn" href="../Visitante/index.html"><i class='bx bxs-user'></i> Cerrar sesión</a>
     </nav>
   </div>
 </header>
 
-  <!-- Layout -->
-  <div class="container row" style="margin-top:1rem;">
-    <!-- Sidebar -->
-    <aside class="card">
-      <h3><i class='bx bx-list-ul'></i> Menú</h3>
-      <h4>Acciones</h4>
-      <ul>
-        <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
-        <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edicion Evento</a></li>
-        <li><a href="AltaTipoRegistro.html"><i class='bx bx-edit'></i> Alta Tipo Registro</a></li>
-      </ul>
-      <h4>Categorías</h4>
-      <ul>
-        <li><a href="#">Tecnología</a></li>
-        <li><a href="#">Innovación</a></li>
-        <li><a href="#">Literatura</a></li>
-        <li><a href="#">Cultura</a></li>
-        <li><a href="#">Música</a></li>
-        <li><a href="#">Deporte</a></li>
-        <li><a href="#">Salud</a></li>
-        <li><a href="#">Entretenimiento</a></li>
-        <li><a href="#">Negocios</a></li>
-      </ul>
-      <h4><a href="ConsultaUsuario-organizador.html">Listar Usuarios</a></h4>
-    </aside>
+<!-- Contenido -->
+<div class="container row" style="margin-top:1rem;">
 
-    <!-- Main -->
-    <main class="container narrow">
-      <h1>Alta de Edición de Evento</h1>
+  <!-- Sidebar -->
+  <aside class="card">
+    <h3><i class='bx bx-list-ul'></i> Menú</h3>
+    <h4>Acciones</h4>
+    <ul>
+      <li><a href="AltaEvento.html"><i class='bx bx-edit'></i> Alta Evento</a></li>
+      <li><a href="AltaEdicionEvento.html"><i class='bx bx-edit'></i> Alta de Edición Evento</a></li>
+      <li><a href="AltaTipoRegistro.html"><i class='bx bx-edit'></i> Alta Tipo Registro</a></li>
+    </ul>
+    <h4>Categorías</h4>
+    <ul>
+      <li><a href="#">Tecnología</a></li>
+      <li><a href="#">Innovación</a></li>
+      <li><a href="#">Literatura</a></li>
+      <li><a href="#">Cultura</a></li>
+      <li><a href="#">Música</a></li>
+      <li><a href="#">Deporte</a></li>
+      <li><a href="#">Salud</a></li>
+      <li><a href="#">Entretenimiento</a></li>
+      <li><a href="#">Negocios</a></li>
+    </ul>
+    <h4><a href="ConsultaUsuario-organizador.html">Listar Usuarios</a></h4>
+  </aside>
 
-      <form id="form-edicion" class="card form-alta-edicion-evento">
-        <!-- Combobox de eventos (hardcodeado con tus datos reales) -->
-        <label>Evento existente <span style="color:red">*</span>
-          <select id="evento" required>
-            <option value="">-- Seleccionar evento --</option>
-            <option value="EV01">Conferencia de Tecnología</option>
-            <option value="EV04">Maratón de Montevideo</option>
-          </select>
-        </label>
+  <!-- Formulario Alta Edición -->
+  <main class="form-wrapper-alta-edicion">
+    <h2>Alta de Edición de Evento</h2>
+    <form id="form-edicion">
 
-        <label>Nombre de la edición <span style="color:red">*</span>
-          <input id="nombre" required placeholder="Ej: Tecnología Punta del Este 2026">
-        </label>
+      <!-- Evento -->
+      <label for="evento">Evento existente <span style="color:red">*</span></label>
+      <select id="evento" name="evento" required>
+        <option value="">-- Seleccionar evento --</option>
+        <option value="EV01">Conferencia de Tecnología</option>
+        <option value="EV04">Maratón de Montevideo</option>
+      </select>
 
-        <label>Sigla <span style="color:red">*</span>
-          <input id="sigla" required placeholder="Ej: CONFTECH26 / MARATON26">
-        </label>
+      <!-- Edición -->
+      <label for="edicion">Edición existente <span style="color:red">*</span></label>
+      <select id="edicion" name="edicion" required>
+        <option value="">-- Seleccionar edición --</option>
+        <option value="EDEV08" data-evento="EV01">Tecnología Punta del Este 2026 (CONFTECH26)</option>
+        <option value="EDEV09" data-evento="EV01">Mobile World Congress 2025 (MWC)</option>
+        <option value="EDEV10" data-evento="EV01">Web Summit 2026 (WS26)</option>
+        <option value="EDEV03" data-evento="EV04">Maratón de Montevideo 2024 (MARATON24)</option>
+        <option value="EDEV04" data-evento="EV04">Maratón de Montevideo 2022 (MARATON22)</option>
+      </select>
 
-        <div class="row">
-          <div>
-            <label>Ciudad <span style="color:red">*</span>
-              <input id="ciudad" required placeholder="Ej: Montevideo / Punta del Este">
-            </label>
-          </div>
-          <div>
-            <label>País <span style="color:red">*</span>
-              <input id="pais" required placeholder="Ej: Uruguay">
-            </label>
-          </div>
-        </div>
+      <!-- Ciudad -->
+      <label for="ciudad">Ciudad <span style="color:red">*</span></label>
+      <input type="text" id="ciudad" name="ciudad" required placeholder="Ej: Montevideo / Punta del Este">
 
-        <div class="row">
-          <div>
-            <label>Fecha de inicio <span style="color:red">*</span>
-              <input id="inicio" type="date" required>
-            </label>
-          </div>
-          <div>
-            <label>Fecha de fin <span style="color:red">*</span>
-              <input id="fin" type="date" required>
-            </label>
-          </div>
-        </div>
+      <!-- País -->
+      <label for="pais">País <span style="color:red">*</span></label>
+      <input type="text" id="pais" name="pais" required placeholder="Ej: Uruguay">
 
-        <label>Imagen (opcional)
-          <input id="img" type="file" accept="image/*">
-        </label>
+      <!-- Fecha inicio -->
+      <label for="inicio">Fecha de inicio <span style="color:red">*</span></label>
+      <input type="date" id="inicio" name="inicio" required>
 
-        <p class="form-hint-altaEvento">Los campos marcados con * son obligatorios.</p>
+      <!-- Fecha fin -->
+      <label for="fin">Fecha de fin <span style="color:red">*</span></label>
+      <input type="date" id="fin" name="fin" required>
 
-        <div class="form-actions-altaEvento">
-          <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
-          <!-- Cancelar como link estático (sin JS) -->
-          <a href="index-organizador.html" class="btn-cancelar-altaEvento">Cancelar</a>
-        </div>
-      </form>
-    </main>
-  </div>
+      <!-- Imagen -->
+      <label for="imagen">Imagen (opcional)</label>
+      <input type="file" id="imagen" name="imagen" accept="image/*">
 
-  <!-- Tus scripts originales, dejados comentados -->
-  <!--
-  <script src="../js/CargaDatos.js"></script>
-  <script src="../js/Hamburgesa.js"></script>
-  <script src="../js/Dialogos.js"></script>
-  <script src="../js/Login.js"></script>
-  <script>
-    // Ejemplo para poblar dinámicamente el combo (si querés reactivarlo)
-    // document.addEventListener("DOMContentLoaded", () => {
-    //   const sel = document.getElementById("evento");
-    //   const eventos = [
-    //     { id: "EV01", nombre: "Conferencia de Tecnología" },
-    //     { id: "EV04", nombre: "Maratón de Montevideo" }
-    //   ];
-    //   for (let i = sel.options.length - 1; i >= 1; i--) sel.remove(i);
-    //   eventos.forEach(e => {
-    //     const o = document.createElement("option");
-    //     o.value = e.id;
-    //     o.textContent = e.nombre;
-    //     sel.appendChild(o);
-    //   });
-    // });
-  </script>
-  -->
+      <p class="nota">Los campos marcados con * son obligatorios.</p>
+
+      <div class="form-actions">
+        <button type="submit" class="guardar">Guardar</button>
+        <button type="reset" class="cancelar">Cancelar</button>
+      </div>
+    </form>
+  </main>
+</div>
+
+<!-- Script para mostrar ediciones según evento -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const eventoSelect = document.getElementById("evento");
+    const edicionSelect = document.getElementById("edicion");
+
+    function filtrarEdiciones() {
+      const eventoSeleccionado = eventoSelect.value;
+      edicionSelect.disabled = false;
+      edicionSelect.value = "";
+
+      edicionSelect.querySelectorAll("option").forEach(opcion => {
+        const pertenece = opcion.dataset.evento === eventoSeleccionado;
+        opcion.style.display = (!opcion.value || pertenece) ? "block" : "none";
+      });
+    }
+
+    edicionSelect.querySelectorAll("option").forEach(opcion => {
+      if (opcion.value !== "") {
+        opcion.style.display = "none";
+      }
+    });
+
+    eventoSelect.addEventListener("change", filtrarEdiciones);
+  });
+</script>
+
 </body>
 </html>

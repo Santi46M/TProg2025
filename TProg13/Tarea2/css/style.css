@@ -867,3 +867,77 @@ form.form-alta-edicion-evento .row > div {
   font-weight: 500;
   padding: 0.25rem;
 }
+
+
+/* ====== Contenedor general ====== */
+.form-wrapper-alta-edicion {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  box-shadow: 0 0 0 1px #e5e7eb;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: #111827;
+}
+
+/* ====== Títulos ====== */
+.form-wrapper-alta-edicion h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ====== Campos ====== */
+.form-wrapper-alta-edicion label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.form-wrapper-alta-edicion input,
+.form-wrapper-alta-edicion select,
+.form-wrapper-alta-edicion textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  background-color: #fff;
+}
+
+.form-wrapper-alta-edicion input[type="file"] {
+  padding: 0.3rem;
+}
+
+/* ====== Botones ====== */
+.form-wrapper-alta-edicion .form-actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.form-wrapper-alta-edicion button {
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.form-wrapper-alta-edicion .guardar {
+  background-color: #0d6efd;
+  color: white;
+}
+
+.form-wrapper-alta-edicion .cancelar {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+/* ====== Texto aclaratorio ====== */
+.form-wrapper-alta-edicion .nota {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-top: 1rem;
+}
