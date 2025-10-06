@@ -33,4 +33,7 @@ public interface IControladorEvento {
     public DTEdicion obtenerEdicionSeleccionada();
     Ediciones obtenerEdicionPorSigla(String sigla);
     public String encontrarEventoPorSigla(String siglaEdicion);
+    public List<String> listarEventosConEdicionesIngresadas();
+    public List<String> listarEdicionesIngresadasDeEvento(String nombreEvento);
+    public void cambiarEstadoEdicion(String nombreEvento, String nombreEdicion, boolean aceptar);
 }

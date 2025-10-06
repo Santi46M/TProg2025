@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.HashMap;
+import logica.Enumerados.EstadoEdicion;
 
 
 public class Ediciones {
@@ -17,6 +18,7 @@ public class Ediciones {
     private Usuario organizador;
     private String ciudad;
     private String pais;
+    private EstadoEdicion estado;
     private Map<String, TipoRegistro> tiposRegistro = new HashMap<>();
     private Set<Patrocinio> patrocinios = new HashSet<>();
     private Map<String, Registro> registros = new HashMap<>();
@@ -33,6 +35,7 @@ public class Ediciones {
         this.organizador = organizador;
         this.ciudad = ciudad;
         this.pais = pais;
+        this.estado = EstadoEdicion.INGRESADA;
     }
 
     public Eventos getEvento() {
@@ -143,5 +146,17 @@ public class Ediciones {
 
     public void agregarRegistro(String id, Registro registro) {
         this.registros.put(id, registro);
+    }
+    
+    public EstadoEdicion getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoEdicion estado) {
+        this.estado = estado;
+    }
+
+    public boolean estaIngresada() {
+        return estado == EstadoEdicion.INGRESADA;
     }
 }

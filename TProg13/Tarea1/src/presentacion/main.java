@@ -30,6 +30,7 @@ public class main {
     private RegistroEdicionEventoFrame registroEdicionEventoFrame;
     private AltaEdicionEvento altaEdicionEventoFrame;
     private ModificarDatosUsuarioFrame modificarDatosUsuarioFrame;
+    private AceptarEdicionEventoFrame aceptarEdicionEventoFrame;
 
     public static void main(String[] args) {
         try {
@@ -84,6 +85,9 @@ public class main {
         registroEdicionEventoFrame.setVisible(false);
         altaEdicionEventoFrame = new AltaEdicionEvento(ICU, ICE);
         altaEdicionEventoFrame.setVisible(false);
+        aceptarEdicionEventoFrame = new AceptarEdicionEventoFrame(ICE);
+        aceptarEdicionEventoFrame.setVisible(false);
+
 
         frame.getContentPane().setLayout(null);
         desktopPane.add(creUsrInternalFrame);
@@ -99,6 +103,7 @@ public class main {
         desktopPane.add(altaInstitucionFrame);
         desktopPane.add(registroEdicionEventoFrame);
         desktopPane.add(altaEdicionEventoFrame);
+        desktopPane.add(aceptarEdicionEventoFrame);
     }
 
     private void initialize() {
@@ -433,6 +438,24 @@ public class main {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+            }
+        });
+        
+        JMenuItem itemAceptarEdicion = new JMenuItem("Aceptar/Rechazar Edición de Evento");
+        styleMenuItem(itemAceptarEdicion);
+        menuEvento.add(itemAceptarEdicion);
+
+        itemAceptarEdicion.addActionListener(e -> {
+            try {
+                if (aceptarEdicionEventoFrame == null || aceptarEdicionEventoFrame.isClosed()) {
+                    aceptarEdicionEventoFrame = new AceptarEdicionEventoFrame(ICE);
+                    desktopPane.add(aceptarEdicionEventoFrame);
+                }
+                aceptarEdicionEventoFrame.cargarEventos();
+                aceptarEdicionEventoFrame.setVisible(true);
+                aceptarEdicionEventoFrame.toFront();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         });
     }

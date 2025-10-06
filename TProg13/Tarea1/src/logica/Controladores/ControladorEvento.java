@@ -261,4 +261,40 @@ public class ControladorEvento implements IControladorEvento {
         }
         return null;
     }
+    
+    public List<String> listarEventosConEdicionesIngresadas() {
+        List<String> resultado = new ArrayList<>();
+        for (Eventos e : manejador.obtenerEventos().values()) {
+            for (Ediciones ed : e.getEdiciones().values()) {
+                if (ed.getEstado() == EstadoEdicion.INGRESADA) {
+                    resultado.add(e.getNombre());
+                    break;
+                }
+            }
+        }
+        return resultado;
+    }
+
+    public List<String> listarEdicionesIngresadasDeEvento(String nombreEvento) {
+        Eventos evento = manejador.obtenerEvento(nombreEvento);
+        List<String> resultado = new ArrayList<>();
+        if (evento != null) {
+            for (Ediciones ed : evento.getEdiciones().values()) {
+                if (ed.getEstado() == EstadoEdicion.INGRESADA) {
+                    resultado.add(ed.getNombre());
+                }
+            }
+        }
+        return resultado;
+    }
+
+    public void cambiarEstadoEdicion(String nombreEvento, String nombreEdicion, boolean aceptar) {
+        Eventos evento = manejador.obtenerEvento(nombreEvento);
+        if (evento != null) {
+            Ediciones ed = evento.obtenerEdicion(nombreEdicion);
+            if (ed != null && ed.getEstado() == EstadoEdicion.INGRESADA) {
+                ed.setEstado(aceptar ? EstadoEdicion.CONFIRMADA : EstadoEdicion.RECHAZADA);
+            }
+        }
+    }
 }
