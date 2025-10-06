@@ -29,28 +29,26 @@
       </nav>
 
       <!--  Zona de usuario -->
-      <nav class="user-nav" id="userNav">
-        <% if (nick == null) { %>
-          <!-- Usuario NO logueado -->
-          <a class="btn ghost" href="<%=request.getContextPath()%>/auth/login">
-            <i class='bx bxs-user'></i> Iniciar Sesión
-          </a>
-          <a class="btn" href="<%=ctx%>/usuario/alta">
-            <i class='bx bxs-user-plus'></i> Registrarse
-          </a>
-        <% } else { %>
-          <!-- Usuario logueado -->
-          <span class="btn ghost" style="cursor:default;">
-            <i class='bx bxs-user'></i> <%=nick%> (<%=rol==null?"":rol%>)
-          </span>
-          <a class="btn" href="<%=ctx%>/usuario/consulta?nick=<%=nick%>">
-            <i class='bx bxs-id-card'></i> Mi perfil
-          </a>
-          <a class="btn ghost" href="<%=ctx%>/auth/logout">
-            <i class='bx bx-log-out'></i> Cerrar sesión
-          </a>
-        <% } %>
-      </nav>
+     <nav class="user-nav" id="userNav">
+  <% if (nick == null) { %>
+    <!-- Usuario NO logueado -->
+    <a class="btn ghost" href="<%= ctx %>/auth/login">
+      <i class='bx bxs-user'></i> Iniciar Sesión
+    </a>
+    <a class="btn" href="<%= ctx %>/usuario/alta">
+      <i class='bx bxs-user-plus'></i> Registrarse
+    </a>
+  <% } else { %>
+    <!-- Usuario logueado -->
+    <span class="user-chip">
+      <i class='bx bxs-user-circle'></i> <%= nick %>
+    </span>
+    <a class="btn ghost" href="<%= ctx %>/auth/logout">
+      <i class='bx bx-log-out'></i> Cerrar sesión
+    </a>
+  <% } %>
+</nav>
+
     </div>
   </header>
 
