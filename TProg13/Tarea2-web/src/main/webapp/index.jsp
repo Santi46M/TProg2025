@@ -27,14 +27,14 @@
           <button class="btn" type="submit">Buscar</button>
         </form>
       </nav>
-
+//prueba
       <!--  Zona de usuario -->
      <nav class="user-nav" id="userNav">
   <% if (nick == null) { %>
     <!-- Usuario NO logueado -->
     <a class="btn ghost" href="<%= ctx %>/auth/login">
       <i class='bx bxs-user'></i> Iniciar Sesión
-    </a>
+    </a> 
     <a class="btn" href="<%= ctx %>/usuario/alta">
       <i class='bx bxs-user-plus'></i> Registrarse
     </a>
