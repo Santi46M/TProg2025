@@ -46,7 +46,7 @@ body, .edicion-card, .edicion-title, .edicion-header, .edicion-info, .edicion-in
   margin: 0.5rem 0 1.5rem 0;
   font-family: inherit;
   text-align: left;
-}
+} 
 .evento {
   display: flex;
   flex-direction: row;
@@ -83,7 +83,7 @@ body, .edicion-card, .edicion-title, .edicion-header, .edicion-info, .edicion-in
   font-weight: bold;
   font-size: 1rem;
   font-family: inherit;
-}
+} /*dfsfs*/
 @media (max-width: 900px) {
   .edicion-card {
     grid-template-columns: 1fr;
