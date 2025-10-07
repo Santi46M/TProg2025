@@ -12,7 +12,7 @@ import dtos.DTEvento;
 import excepciones.EventoRepetidoException;
 
 @WebServlet("/evento/*")
-public class EventoServlet extends HttpServlet {
+public class EventoServlets extends HttpServlet {
   private final IControladorEvento ce = Fabrica.getInstancia().getControladorEvento();
 
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
