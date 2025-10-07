@@ -99,7 +99,7 @@
 
         <div class="form-actions-altaEvento">
           <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
-          <a class="btn-cancelar-altaEvento btn" href="<%=ctx%%>/">Cancelar</a>
+          <a class="btn-cancelar-altaEvento btn" href="<%=ctx%>/">Cancelar</a>
         </div>
       </form>
     </section>
