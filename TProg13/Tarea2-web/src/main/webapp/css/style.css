@@ -575,3 +575,103 @@ input[type="submit"] {
 .dropdown:hover .dropdown-content {
   display: block;
 }
+
+
+/* === WRAPPER GENERAL DEL LOGIN === */
+.wrapper-iniciar-sesion {
+  width: 100%;
+  max-width: 500px;           /* ancho máximo controlado */
+  margin: 3rem auto;          /* centra vertical y horizontalmente */
+  padding: 2rem;
+}
+
+/* === TÍTULO === */
+.titulo-iniciar-sesion {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-align: left;
+  color: var(--text);
+}
+
+/* === FORMULARIO === */
+.form-iniciar-sesion {
+  background-color: var(--bg-soft);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* === FILAS Y CAMPOS === */
+.row-iniciar-sesion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.campo-iniciar-sesion label {
+  font-weight: 500;
+  color: var(--text);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.campo-iniciar-sesion input {
+  width: 100%;
+  padding: 0.6rem;
+  font-size: 1rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background-color: white;
+}
+
+/* === ACCIONES (BOTONES) === */
+.acciones-iniciar-sesion {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-iniciar-sesion {
+  background-color: var(--brand);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  flex: 1;
+}
+
+.btn-iniciar-sesion:hover {
+  background-color: #004999;
+}
+
+.btn-cancelar-iniciar-sesion {
+  background-color: #ccc;
+  color: #333;
+  border-radius: 4px;
+  padding: 0.6rem 1rem;
+  text-align: center;
+  flex: 1;
+}
+
+.btn-cancelar-iniciar-sesion:hover {
+  background-color: #999;
+  color: white;
+}
+
+/* === ERROR === */
+.error-iniciar-sesion {
+  color: #c00;
+  font-size: 0.9rem;
+  text-align: center;
+  display: none; /* visible solo con JS */
+  margin-top: 0.5rem;
+}
