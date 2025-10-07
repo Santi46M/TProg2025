@@ -4,22 +4,24 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.time.LocalDate;
 
-import logica.Fabrica;
-import logica.IControladorUsuario;
-import dtos.DTUsuario;
-import excepciones.UsuarioRepetidoException;
+import logica.fabrica;
+import logica.Interfaces.IControladorUsuario;
+import logica.Datatypes.DTDatosUsuario;
+import excepciones.UsuarioYaExisteException;
+import excepciones.UsuarioNoExisteException;
+import excepciones.UsuarioTipoIncorrectoException;
 
 @WebServlet("/usuario/*")
 public class UsuarioServlet extends HttpServlet {
 
-  private static final String JSP_LOGIN = "/WEB-INF/auth/login.jsp";
-  private static final String JSP_ALTA  = "/WEB-INF/usuarios/AltaUsuario.jsp";
-  // Si más adelante creás estas páginas, actualizá las rutas:
-  private static final String JSP_CONSULTA   = "/WEB-INF/usuarios/ConsultaUsuario.jsp";
-  private static final String JSP_MODIFICAR  = "/WEB-INF/usuarios/ModificarUsuario.jsp";
+  private static final String JSP_LOGIN    = "/WEB-INF/auth/login.jsp";
+  private static final String JSP_ALTA     = "/WEB-INF/usuarios/AltaUsuario.jsp";
+  private static final String JSP_CONSULTA = "/WEB-INF/usuarios/ConsultaUsuario.jsp";
+  private static final String JSP_MODIF    = "/WEB-INF/usuarios/ModificarUsuario.jsp";
 
-  private final IControladorUsuario cu = Fabrica.getInstancia().getControladorUsuario();
+  private final IControladorUsuario cu = fabrica.getInstance().getIControladorUsuario();
 
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
@@ -32,35 +34,46 @@ public class UsuarioServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    String path = req.getPathInfo(); // puede ser null, "/", "/alta", "/modificar"
+    String path = req.getPathInfo(); // null, "/", "/alta", "/modificar", "/consulta"
     if (path == null || "/".equals(path)) {
-      // Si todavía no tenés ConsultaUsuario.jsp, por ahora mandamos al index.
       resp.sendRedirect(ctx(req) + "/");
       return;
-      // Cuando tengas la consulta:
-      // String nick = req.getParameter("nick");
-      // if (nick == null || nick.isBlank()) {
-      //   nick = nickEnSesion(req);
-      //   if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
-      // }
-      // DTUsuario dto = cu.obtenerDTUsuario(nick);
-      // req.setAttribute("dto", dto);
-      // req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
-      // return;
     }
 
     switch (path) {
       case "/alta":
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-        break;
+        return;
+
+      case "/consulta": {
+        String nick = req.getParameter("nick");
+        if (nick == null || nick.isBlank()) {
+          nick = nickEnSesion(req);
+          if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
+        }
+        try {
+          DTDatosUsuario dto = cu.obtenerDatosUsuario(nick);
+          req.setAttribute("dto", dto);
+          req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
+        } catch (UsuarioNoExisteException e) {
+          req.setAttribute("error", e.getMessage());
+          req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
+        }
+        return;
+      }
 
       case "/modificar": {
         String nick = nickEnSesion(req);
         if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
-        DTUsuario dto = cu.obtenerDTUsuario(nick);
-        req.setAttribute("dto", dto);
-        req.getRequestDispatcher(JSP_MODIFICAR).forward(req, resp);
-        break;
+        try {
+          DTDatosUsuario dto = cu.obtenerDatosUsuario(nick);
+          req.setAttribute("dto", dto);
+          req.getRequestDispatcher(JSP_MODIF).forward(req, resp);
+        } catch (UsuarioNoExisteException e) {
+          req.setAttribute("error", e.getMessage());
+          req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
+        }
+        return;
       }
 
       default:
@@ -73,32 +86,83 @@ public class UsuarioServlet extends HttpServlet {
       throws ServletException, IOException {
 
     String path = req.getPathInfo();
-
     if ("/alta".equals(path)) {
-      // NOMBRES DE INPUTS según tu AltaUsuario.jsp (la que convertimos):
-      // rol = ASISTENTE|ORGANIZADOR
-      // nick, correo, pass, pass2
-      // ASISTENTE: nombre, apellido, nac
-      // ORGANIZADOR: orgNombre, orgDesc, (orgWeb opcional)
-      String rol      = req.getParameter("rol");
-      String nick     = req.getParameter("nick");
-      String correo   = req.getParameter("correo");
-      String pass     = req.getParameter("pass");
-      String pass2    = req.getParameter("pass2");
+      // Campos esperados en el form (ajustá los name= si difieren):
+      // rol: "ASISTENTE" | "ORGANIZADOR"
+      // nick, nombre, apellido, correo, descripcion, link, institucion, nac (yyyy-MM-dd)
+      String rol         = req.getParameter("rol");
+      String nick        = req.getParameter("nick");
+      String nombre      = req.getParameter("nombre");
+      String apellido    = req.getParameter("apellido");
+      String correo      = req.getParameter("correo");
+      String descripcion = req.getParameter("descripcion");
+      String link        = req.getParameter("link");
+      String institucion = req.getParameter("institucion");
+      String nacStr      = req.getParameter("nac");
 
-      if (nick==null || correo==null || pass==null || pass2==null || !pass.equals(pass2)) {
-        req.setAttribute("error", "Datos inválidos o contraseñas no coinciden");
+      if (nick==null || nombre==null || correo==null || rol==null ||
+          nick.isBlank() || nombre.isBlank() || correo.isBlank()) {
+        req.setAttribute("error", "Faltan datos obligatorios.");
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
         return;
       }
 
+      LocalDate fechaNac = null;
+      if (nacStr != null && !nacStr.isBlank()) {
+        try { fechaNac = LocalDate.parse(nacStr); } catch (Exception ignored) {}
+      }
+
+      boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rol);
+
       try {
-        if ("ASISTENTE".equals(rol)) {
-          String nombre   = req.getParameter("nombre");
-          String apellido = req.getParameter("apellido");
-          String nac      = req.getParameter("nac"); // yyyy-MM-dd
-          // TODO: si tu lógica requiere institución u otros campos, leé aquí
-          cu.altaUsuarioAsistente(nick, correo, nombre, apellido, nac, pass); // adapta a tu firma real
-        } else if ("ORGANIZADOR".equals(rol)) {
-          String orgNombre = req.getParameter("orgNombre");
-          String orgDesc   = req.getP
+        cu.AltaUsuario(
+            nick,
+            nombre,
+            correo,
+            descripcion,     // puede ser null
+            link,            // puede ser null
+            apellido,        // para asistente
+            fechaNac,        // para asistente
+            institucion,     // para asistente
+            esOrganizador
+        );
+        // Dejamos logueado al recién creado
+        HttpSession s = req.getSession(true);
+        s.setAttribute("nick", nick);
+        s.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
+        resp.sendRedirect(ctx(req) + "/");
+      } catch (UsuarioYaExisteException e) {
+        req.setAttribute("error", e.getMessage());
+        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+      }
+      return;
+    }
+
+    if ("/modificar".equals(path)) {
+      String nick = nickEnSesion(req);
+      if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
+
+      String nombre      = req.getParameter("nombre");
+      String descripcion = req.getParameter("descripcion");
+      String link        = req.getParameter("link");
+      String apellido    = req.getParameter("apellido");
+      String institucion = req.getParameter("institucion");
+      String nacStr      = req.getParameter("nac");
+      LocalDate fechaNac = null;
+      if (nacStr != null && !nacStr.isBlank()) {
+        try { fechaNac = LocalDate.parse(nacStr); } catch (Exception ignored) {}
+      }
+
+      try {
+        cu.modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaNac, institucion);
+        resp.sendRedirect(ctx(req) + "/usuario/consulta?nick=" + nick);
+      } catch (UsuarioNoExisteException | UsuarioTipoIncorrectoException e) {
+        req.setAttribute("error", e.getMessage());
+        req.getRequestDispatcher(JSP_MODIF).forward(req, resp);
+      }
+      return;
+    }
+
+    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+  }
+}

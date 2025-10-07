@@ -27,7 +27,6 @@
           <button class="btn" type="submit">Buscar</button>
         </form>
       </nav>
-//prueba
       <!--  Zona de usuario -->
      <nav class="user-nav" id="userNav">
   <% if (nick == null) { %>

@@ -4,13 +4,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import logica.Fabrica;
-import logica.IControladorUsuario;
+import java.util.Map;
+
+import logica.fabrica;
+import logica.Interfaces.IControladorUsuario;
+import logica.Clases.Usuario;
 
 @WebServlet(urlPatterns = {"/auth/login", "/auth/logout"})
 public class LoginServlet extends HttpServlet {
   private static final String JSP_LOGIN = "/WEB-INF/auth/login.jsp";
-  private final IControladorUsuario cu = Fabrica.getInstancia().getControladorUsuario();
+  private final IControladorUsuario cu = fabrica.getInstance().getIControladorUsuario();
 
   private String ctx(HttpServletRequest req){ return req.getContextPath(); }
 
@@ -44,29 +47,33 @@ public class LoginServlet extends HttpServlet {
       return;
     }
 
-    String emailOrNick = req.getParameter("email"); // name="email" en el form
-    String pass        = req.getParameter("pass");  // name="pass"  en el form
+    String nickOrEmail = req.getParameter("email"); // del form: name="email"
+    String pass        = req.getParameter("pass");  // del form: name="pass"
 
-    if (emailOrNick == null || pass == null || emailOrNick.isBlank() || pass.isBlank()) {
-      req.setAttribute("error", "Completá usuario y contraseña.");
+    if (nickOrEmail == null || nickOrEmail.isBlank()) {
+      req.setAttribute("error", "Ingresá tu usuario (nickname).");
       req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
       return;
     }
 
-    String nick = emailOrNick; // si tenés email→nick, hacelo aquí
-    boolean ok = cu.validarLogin(nick, pass); // ajustá la firma si difiere
-    if (!ok) {
-      req.setAttribute("error", "Credenciales incorrectas");
+    // TODO: si más adelante manejan email y contraseña real, validar aquí.
+    // Por ahora: login por existencia del nickname.
+    String nick = nickOrEmail.trim();
+
+    Map<String, Usuario> usuarios = cu.listarUsuarios();
+    if (usuarios == null || !usuarios.containsKey(nick)) {
+      req.setAttribute("error", "Usuario no existe.");
       req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
       return;
     }
+
+    // Rol: segun tu interfaz, existe cu.esAsistente(nick)
+    String rol = cu.esAsistente(nick) ? "ASISTENTE" : "ORGANIZADOR";
 
     HttpSession s = req.getSession(true);
     s.setAttribute("nick", nick);
-    s.setAttribute("rol", cu.obtenerRol(nick)); // "ASISTENTE" | "ORGANIZADOR"
+    s.setAttribute("rol", rol);
 
     resp.sendRedirect(ctx(req) + "/");
   }
 }
-
-//falta probarlo

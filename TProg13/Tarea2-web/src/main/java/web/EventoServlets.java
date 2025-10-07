@@ -4,16 +4,19 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
-import logica.Fabrica;
-import logica.IControladorEvento;
-import dtos.DTEvento;
-import excepciones.EventoRepetidoException;
+import logica.fabrica;
+import logica.Interfaces.IControladorEvento;
+import logica.Datatypes.DTEvento;
+import logica.Clases.Eventos;
+// import logica.Datatypes.DTCategorias; // ← si lo necesitás para alta
+import excepciones.EventoYaExisteException;
 
 @WebServlet("/evento/*")
 public class EventoServlets extends HttpServlet {
-  private final IControladorEvento ce = Fabrica.getInstancia().getControladorEvento();
+  private final IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
 
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
@@ -30,21 +33,21 @@ public class EventoServlets extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
-    String path = req.getPathInfo(); // null,"/","/listar","/alta"
+    String path = req.getPathInfo(); // null,"/","/listar","/alta","/consulta"
 
     if (path == null || "/".equals(path)) {
-      // /evento?id=EV123
-      String id = req.getParameter("id");
-      if (id == null || id.isBlank()) { resp.sendError(400, "Falta id"); return; }
-      DTEvento dto = ce.obtenerDTEvento(id);        // <-- tu lógica
-      req.setAttribute("dto", dto);
+      // Consulta por nombre (según tu interfaz)
+      String nombre = req.getParameter("nombre");
+      if (nombre == null || nombre.isBlank()) { resp.sendError(400, "Falta nombre"); return; }
+      Eventos evento = ce.consultaEvento(nombre); // objeto de dominio
+      req.setAttribute("evento", evento);
       req.getRequestDispatcher("/eventos/consulta.jsp").forward(req, resp);
       return;
     }
 
     switch (path) {
       case "/listar": {
-        List<DTEvento> lista = ce.listarEventos();  // <-- tu lógica
+        List<DTEvento> lista = ce.listarEventos();
         req.setAttribute("lista", lista);
         req.getRequestDispatcher("/eventos/listar.jsp").forward(req, resp);
         break;
@@ -66,22 +69,33 @@ public class EventoServlets extends HttpServlet {
     if ("/alta".equals(path)) {
       if (!requiereOrganizador(req, resp)) return;
 
-      // Nombres de inputs en eventos/alta.jsp:
-      // nombre, categorias (ej: "IA,Redes"), urlImagen (o file si luego haces multipart)
+      // Inputs esperados en eventos/alta.jsp:
+      // nombre, desc, sigla, categorias (p.ej: "IA,Redes")
       String nombre = req.getParameter("nombre");
-      String categorias = req.getParameter("categorias");
-      String urlImagen = req.getParameter("urlImagen");
+      String desc   = req.getParameter("desc");
+      String sigla  = req.getParameter("sigla");
+      String cats   = req.getParameter("categorias");
 
-      if (nombre == null || nombre.isBlank()) {
-        req.setAttribute("error", "Nombre requerido");
+      if (nombre == null || nombre.isBlank() || sigla == null || sigla.isBlank()) {
+        req.setAttribute("error", "Nombre y sigla son requeridos.");
         req.getRequestDispatcher("/eventos/alta.jsp").forward(req, resp);
         return;
       }
 
       try {
-        String id = ce.altaEvento(nombre, categorias, urlImagen); // <-- tu lógica (devuelve id)
-        resp.sendRedirect(ctx(req)+"/evento?id="+id);
-      } catch (EventoRepetidoException e) {
+        // TODO: construir DTCategorias según cómo lo definieron ustedes.
+        // Ejemplo (si existiera un ctor / factory):
+        // DTCategorias categorias = DTCategorias.fromCSV(cats);
+        // ce.AltaEvento(nombre, desc, LocalDate.now(), sigla, categorias);
+
+        // Por ahora, dejo sin categorías para que compile si DTCategorias no tiene ctor público:
+        // ce.AltaEvento(nombre, desc, LocalDate.now(), sigla, null);
+
+        // Si sí tienen el DTO, descomentá la línea correcta de arriba y borrá esta:
+        ce.AltaEvento(nombre, desc, LocalDate.now(), sigla, /*categorias*/ null);
+
+        resp.sendRedirect(ctx(req)+"/evento?nombre="+nombre);
+      } catch (EventoYaExisteException e) {
         req.setAttribute("error", e.getMessage());
         req.getRequestDispatcher("/eventos/alta.jsp").forward(req, resp);
       }
