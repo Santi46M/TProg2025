@@ -675,3 +675,40 @@ input[type="submit"] {
   display: none; /* visible solo con JS */
   margin-top: 0.5rem;
 }
+/*  alta usuario */
+.form-wrapper {
+  max-width: 720px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.fieldset {
+  border: none;
+  padding: 0;
+  margin-bottom: 1rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rol-opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+
+
+
+/* === Ajuste de espaciado para formulario Alta Usuario === */
+.input-group {
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.input-full {
+  margin-top: 1.5rem;
+}
+

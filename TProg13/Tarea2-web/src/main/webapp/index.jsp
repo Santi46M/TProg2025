@@ -29,20 +29,26 @@
       </nav>
       <!--  Zona de usuario -->
      <nav class="user-nav" id="userNav">
-  <% if (nick == null) { %>
-    <!-- Usuario NO logueado -->
+
+
+<% Boolean precargado = (Boolean) application.getAttribute("datosPrecargados"); %>
+
+<% if (nick == null) { %>
     <a class="btn ghost" href="<%= ctx %>/auth/login">
       <i class='bx bxs-user'></i> Iniciar Sesión
     </a> 
     <a class="btn" href="<%= ctx %>/usuario/AltaUsuario">
       <i class='bx bxs-user-plus'></i> Registrarse
     </a>
-    <form action="<%= ctx %>/precargar" method="post">
-  		<button type="submit">Precargar datos</button>
-	</form>	
 
-<p>${mensaje}</p>
-    
+    <% if (precargado == null || !precargado) { %>
+      <form action="<%= ctx %>/precargar" method="post">
+        <button type="submit">Precargar datos</button>
+      </form>
+    <% } else { %>
+      <p>✅ Datos precargados correctamente</p>
+    <% } %>
+
   <% } else { %>
     <!-- Usuario logueado -->
     <span class="user-chip">
