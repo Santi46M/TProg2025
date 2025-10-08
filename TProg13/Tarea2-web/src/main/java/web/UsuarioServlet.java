@@ -36,7 +36,7 @@ public class UsuarioServlet extends HttpServlet {
 
 //    String path = req.getPathInfo();
 	  String path = req.getServletPath();
-    System.out.println("el path es " + path);// null, "/", "/alta", "/modificar", "/consulta"
+    
     if (path == null || "/".equals(path)) {
       resp.sendRedirect(ctx(req) + "/");
       return;
@@ -45,7 +45,7 @@ public class UsuarioServlet extends HttpServlet {
     switch (path) {
       case "/usuario/AltaUsuario":
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-        System.out.println("entra a alta usuario");
+        
 
         return;
 
@@ -90,16 +90,19 @@ public class UsuarioServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    String path = req.getPathInfo();
-    if ("/AltaUsuario".equals(path)) {
+	  String path = req.getServletPath();  // ← cambio clave
+	  System.out.println("path post: " + path);
+
+    if ("/usuario/AltaUsuario".equals(path)) {
+    	
       // Campos esperados en el form (ajustá los name= si difieren):
       // rol: "ASISTENTE" | "ORGANIZADOR"
       // nick, nombre, apellido, correo, descripcion, link, institucion, nac (yyyy-MM-dd)
       String rol         = req.getParameter("rol");
       String nick        = req.getParameter("nick");
-      String nombre      = req.getParameter("nombre");
-      String apellido    = req.getParameter("apellido");
-      String correo      = req.getParameter("correo");
+      String nombre      = req.getParameter("nombreA");
+      String apellido    = req.getParameter("apellidoA");
+      String correo      = req.getParameter("email");
       String descripcion = req.getParameter("descripcion");
       String link        = req.getParameter("link");
       String institucion = req.getParameter("institucion");
@@ -109,6 +112,7 @@ public class UsuarioServlet extends HttpServlet {
           nick.isBlank() || nombre.isBlank() || correo.isBlank()) {
         req.setAttribute("error", "Faltan datos obligatorios.");
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+
         return;
       }
 
@@ -131,14 +135,17 @@ public class UsuarioServlet extends HttpServlet {
             institucion,     // para asistente
             esOrganizador
         );
+        
         // Dejamos logueado al recién creado
         HttpSession s = req.getSession(true);
         s.setAttribute("nick", nick);
         s.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
         resp.sendRedirect(ctx(req) + "/");
+        
       } catch (UsuarioYaExisteException e) {
         req.setAttribute("error", e.getMessage());
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+        
       }
       return;
     }

@@ -60,7 +60,7 @@
       <h1>Crear cuenta</h1>
 
       <!-- IMPORTANTE: enviar al servlet -->
-      <form id="altaForm" class="card form-alta" method="post" action="<%=ctx%>/usuario/alta" novalidate>
+      <form id="altaForm" class="card form-alta" method="post" action="<%=ctx%>/usuario/AltaUsuario" novalidate>
 
         <!-- Tipo de cuenta -->
         <fieldset class="fieldset">
@@ -151,5 +151,104 @@
       </form>
     </main>
   </div>
+    <script>
+(function(){
+  const $ = s => document.querySelector(s);
+  const form = $('#altaForm');
+  if (!form) return; // si no está el formulario, no hace nada
+
+  const msg  = $('#msg');
+  const grupoA = $('#grupoAsistente');
+  const grupoO = $('#grupoOrganizador');
+  const rolRadios = form.querySelectorAll('input[name="rol"]');
+
+  function setDisabled(groupEl, disabled){
+    groupEl.querySelectorAll('input,select,textarea').forEach(el => el.disabled = disabled);
+  }
+  function setRequired(el, req){ if (el) el.required = req; }
+
+  // Cambia rol → muestra/oculta y habilita/deshabilita campos
+  function applyRoleUI(role){
+    const isAsis = role === 'asistente';
+
+    // Mostrar/ocultar grupos
+    grupoA.style.display = isAsis ? '' : 'none';
+    grupoO.style.display = isAsis ? 'none' : '';
+
+    // Habilitar/deshabilitar inputs
+    setDisabled(grupoA, !isAsis);
+    setDisabled(grupoO,  isAsis);
+
+    // Requeridos correctos
+    setRequired($('#nombreA'), isAsis);
+    setRequired($('#apellidoA'), isAsis);
+    setRequired($('#nacA'), isAsis);
+
+    setRequired($('#nombreO'), !isAsis);
+    setRequired($('#descO'),   !isAsis);
+  }
+
+  // Inicializar con asistente por defecto
+  applyRoleUI('asistente');
+  rolRadios.forEach(r => r.addEventListener('change', e => applyRoleUI(e.target.value)));
+
+  function showMsg(text, ok=false){
+    if (!msg) return;
+    msg.textContent = text;
+    msg.style.display = 'block';
+    msg.style.color = ok ? 'green' : 'red';
+  }
+
+  // Validaciones comunes antes de enviar
+  function validateCommon(){
+    const nick = form.nick.value.trim();
+    const email = form.email.value.trim();
+    const pass = form.pass.value;
+    const pass2 = form.pass2.value;
+
+    if (!nick || !email || !pass || !pass2) {
+      showMsg("Completá los campos obligatorios.");
+      return false;
+    }
+    if (pass.length < 4) {
+      showMsg("La contraseña debe tener al menos 4 caracteres.");
+      return false;
+    }
+    if (pass !== pass2) {
+      showMsg("Las contraseñas no coinciden.");
+      return false;
+    }
+    return true;
+  }
+
+  // Validaciones específicas por rol
+  function validateByRole(role){
+    if (role === 'asistente'){
+      if (!form.nombreA.value.trim() || !form.apellidoA.value.trim() || !form.nacA.value){
+        showMsg("Completá Nombre, Apellido y Fecha de nacimiento.");
+        return false;
+      }
+    } else {
+      if (!form.nombreO.value.trim() || !form.descO.value.trim()){
+        showMsg("Completá Nombre de la organización y Descripción.");
+        return false;
+      }
+    }
+    return true;
+  }
+
+  // Manejador de envío
+  form.addEventListener('submit', (e) => {
+    const role = form.querySelector('input[name="rol"]:checked')?.value || 'asistente';
+    msg.style.display = 'none';
+
+    if (!validateCommon() || !validateByRole(role)){
+      e.preventDefault(); // si falla validación, no se envía al servidor
+    }
+    // Si pasa las validaciones, el form se envía al servlet normalmente
+  });
+})();
+</script>
+
 </body>
 </html>
