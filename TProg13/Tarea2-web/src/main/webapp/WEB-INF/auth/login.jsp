@@ -29,7 +29,7 @@
       <!-- Zona de usuario (visitante) -->
       <nav class="user-nav" id="userNav">
         <a class="btn ghost" href="<%=ctx%>/auth/login"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-        <a class="btn" href="<%=ctx%>/usuario/alta"><i class='bx bxs-user-plus'></i> Registrarse</a>
+        <a class="btn" href="<%=ctx%>/usuario/AltaUsuario"><i class='bx bxs-user-plus'></i> Registrarse</a>
       </nav>
     </div>
   </header>

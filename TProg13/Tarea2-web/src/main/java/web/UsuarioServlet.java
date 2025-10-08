@@ -13,13 +13,13 @@ import excepciones.UsuarioYaExisteException;
 import excepciones.UsuarioNoExisteException;
 import excepciones.UsuarioTipoIncorrectoException;
 
-@WebServlet("/usuario/*")
+@WebServlet(urlPatterns = {"/usuario/AltaUsuario", "/usuario/ConsultaUsuario", "/usuario/modificar"})
 public class UsuarioServlet extends HttpServlet {
 
   private static final String JSP_LOGIN    = "/WEB-INF/auth/login.jsp";
-  private static final String JSP_ALTA     = "/WEB-INF/usuarios/AltaUsuario.jsp";
-  private static final String JSP_CONSULTA = "/WEB-INF/usuarios/ConsultaUsuario.jsp";
-  private static final String JSP_MODIF    = "/WEB-INF/usuarios/ModificarUsuario.jsp";
+  private static final String JSP_ALTA     = "/WEB-INF/usuario/AltaUsuario.jsp";
+  private static final String JSP_CONSULTA = "/WEB-INF/usuario/ConsultaUsuario.jsp";
+  private static final String JSP_MODIF    = "/WEB-INF/usuario/ModificarUsuario.jsp";
 
   private final IControladorUsuario cu = fabrica.getInstance().getIControladorUsuario();
 
@@ -34,18 +34,22 @@ public class UsuarioServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    String path = req.getPathInfo(); // null, "/", "/alta", "/modificar", "/consulta"
+//    String path = req.getPathInfo();
+	  String path = req.getServletPath();
+    System.out.println("el path es " + path);// null, "/", "/alta", "/modificar", "/consulta"
     if (path == null || "/".equals(path)) {
       resp.sendRedirect(ctx(req) + "/");
       return;
     }
 
     switch (path) {
-      case "/alta":
+      case "/usuario/AltaUsuario":
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+        System.out.println("entra a alta usuario");
+
         return;
 
-      case "/consulta": {
+      case "/usuario/ConsultaUsuario": {
         String nick = req.getParameter("nick");
         if (nick == null || nick.isBlank()) {
           nick = nickEnSesion(req);
@@ -78,6 +82,7 @@ public class UsuarioServlet extends HttpServlet {
 
       default:
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+        return;
     }
   }
 
@@ -86,7 +91,7 @@ public class UsuarioServlet extends HttpServlet {
       throws ServletException, IOException {
 
     String path = req.getPathInfo();
-    if ("/alta".equals(path)) {
+    if ("/AltaUsuario".equals(path)) {
       // Campos esperados en el form (ajustá los name= si difieren):
       // rol: "ASISTENTE" | "ORGANIZADOR"
       // nick, nombre, apellido, correo, descripcion, link, institucion, nac (yyyy-MM-dd)

@@ -34,7 +34,7 @@
     <a class="btn ghost" href="<%= ctx %>/auth/login">
       <i class='bx bxs-user'></i> Iniciar Sesión
     </a> 
-    <a class="btn" href="<%= ctx %>/usuario/alta">
+    <a class="btn" href="<%= ctx %>/usuario/AltaUsuario">
       <i class='bx bxs-user-plus'></i> Registrarse
     </a>
   <% } else { %>
