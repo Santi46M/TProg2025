@@ -37,6 +37,12 @@
     <a class="btn" href="<%= ctx %>/usuario/AltaUsuario">
       <i class='bx bxs-user-plus'></i> Registrarse
     </a>
+    <form action="<%= ctx %>/precargar" method="post">
+  		<button type="submit">Precargar datos</button>
+	</form>	
+
+<p>${mensaje}</p>
+    
   <% } else { %>
     <!-- Usuario logueado -->
     <span class="user-chip">

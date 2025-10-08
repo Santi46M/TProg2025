@@ -15,7 +15,9 @@ public class LoginServlet extends HttpServlet {
   private static final String JSP_LOGIN = "/WEB-INF/auth/login.jsp";
   private final IControladorUsuario cu = fabrica.getInstance().getIControladorUsuario();
 
-  private String ctx(HttpServletRequest req){ return req.getContextPath(); }
+  private String ctx(HttpServletRequest req){ 
+    return req.getContextPath(); 
+  }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -24,7 +26,9 @@ public class LoginServlet extends HttpServlet {
     String path = req.getServletPath(); // /auth/login o /auth/logout
 
     if ("/auth/login".equals(path)) {
-      req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
+    	
+    	req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
+    	
       return;
     }
 
@@ -42,8 +46,10 @@ public class LoginServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    if (!"/auth/login".equals(req.getServletPath())) {
+	  
+	  if (!"/auth/login".equals(req.getServletPath())) {
       resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+      
       return;
     }
 
@@ -53,27 +59,49 @@ public class LoginServlet extends HttpServlet {
     if (nickOrEmail == null || nickOrEmail.isBlank()) {
       req.setAttribute("error", "Ingresá tu usuario (nickname).");
       req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
+
       return;
     }
 
-    // TODO: si más adelante manejan email y contraseña real, validar aquí.
-    // Por ahora: login por existencia del nickname.
     String nick = nickOrEmail.trim();
 
     Map<String, Usuario> usuarios = cu.listarUsuarios();
+
+
+
+
+
     if (usuarios == null || !usuarios.containsKey(nick)) {
+      req.setAttribute("estado_sesion", "LOGIN_INCORRECTO");
       req.setAttribute("error", "Usuario no existe.");
       req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
       return;
     }
 
-    // Rol: segun tu interfaz, existe cu.esAsistente(nick)
+    Usuario usr = usuarios.get(nick);
+
+    
+//    // ⚠️ Simulación de validación de contraseña (ajustar según tu implementación)
+//    if (pass == null || pass.isBlank() || !pass.equals(usr.getPassword())) {
+//      req.setAttribute("estado_sesion", "LOGIN_INCORRECTO");
+//      req.setAttribute("error", "Contraseña incorrecta.");
+//      req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
+//      return;
+//    }
+
+    // Rol (según tu interfaz)
     String rol = cu.esAsistente(nick) ? "ASISTENTE" : "ORGANIZADOR";
 
+    // Crear sesión y guardar datos del usuario
     HttpSession s = req.getSession(true);
+    s.setAttribute("usuario_logueado", usr);
     s.setAttribute("nick", nick);
     s.setAttribute("rol", rol);
+    s.setAttribute("estado_sesion", "LOGIN_CORRECTO");
 
-    resp.sendRedirect(ctx(req) + "/");
+    // Redirigir o hacer forward al home (siguiendo el modelo)
+    req.getRequestDispatcher("/index.jsp").forward(req, resp);
+
+
   }
 }

@@ -65,7 +65,7 @@
                 if (usuarios != null && !usuarios.isEmpty()) {
                     for (Usuario u : usuarios) {
             %>
-                        <div class="card">
+<%--                         <div class="card">
                             <img src="<%= request.getContextPath() + "/img/" + (u.getImagen() != null ? u.getImagen() : "default-user.png") %>" 
                                  alt="<%= u.getNombre() %>" style="width:100%">
                             <h2><%= u.getNombre() %> <%= (u.getApellido() != null ? u.getApellido() : "") %></h2>
@@ -74,7 +74,7 @@
                             <div class="actions">
                                 <a href="ConsultaUsuarioDetalle.jsp?nick=<%= u.getNick() %>" class="btn">Ver más</a>
                             </div>
-                        </div>
+                        </div> --%>
             <% 
                     }
                 } else { 
