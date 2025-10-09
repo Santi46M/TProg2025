@@ -4,7 +4,11 @@
   String rol = (String) session.getAttribute("rol");
   String nick = (String) session.getAttribute("nick");
   boolean precargado = Boolean.TRUE.equals(application.getAttribute("datosPrecargados"));
+
+  java.util.List<logica.Datatypes.DTEvento> eventos =
+    (java.util.List<logica.Datatypes.DTEvento>) request.getAttribute("eventos");
 %>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -12,7 +16,7 @@
   <title>Eventos.uy</title>
   <link rel="stylesheet" href="<%=ctx%>/css/style.css">
   <link rel="stylesheet" href="<%=ctx%>/css/index.css">
-  <link rel="stylesheet" href="<%=ctx%>/css/layoutAside.css"><!-- nuevo CSS -->
+  <link rel="stylesheet" href="<%=ctx%>/css/layoutAside.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 </head>
 
@@ -20,7 +24,7 @@
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <a class="brand" href="<%=ctx%>/">Eventos.uy</a>
+      <a class="brand" href="<%=ctx%>/inicio">Eventos.uy</a>
 
       <nav class="main-nav">
         <form class="search" action="<%=ctx%>/buscar" method="get" role="search" aria-label="Buscar">
@@ -88,26 +92,30 @@
       <h1>Próximos eventos</h1>
 
       <div id="eventList" class="row">
-        <div class="card">
-          <h2>Conferencia de Tecnología</h2>
-          <p><strong>Ciudad:</strong> Punta del Este (Uruguay)</p>
-          <div class="actions">
-            <a href="<%=ctx%>/evento/ConsultaEvento?nombre=Conferencia%20de%20Tecnolog%C3%ADa" class="btn">Ver más</a>
+        <%
+          if (eventos != null && !eventos.isEmpty()) {
+            for (logica.Datatypes.DTEvento e : eventos) {
+        %>
+          <div class="card">
+            <h2><%= e.getNombre() %></h2>
+            <p><strong>Descripción:</strong> <%= e.getDescripcion() %></p>
+            <p><strong>Fecha:</strong> <%= e.getFecha() %></p>
+            <div class="actions">
+              <a href="<%=ctx%>/evento/ConsultaEvento?nombre=<%= java.net.URLEncoder.encode(e.getNombre(), "UTF-8") %>" class="btn">
+                Ver más
+              </a>
+            </div>
           </div>
-        </div>
-
-        <div class="card">
-          <img src="<%=ctx%>/img/IMG-EV04.png" alt="Maratón de Montevideo" style="width:100%;">
-          <h2>Maratón de Montevideo</h2>
-          <p><strong>Ciudad:</strong> Montevideo (Uruguay)</p>
-          <div class="actions">
-            <a href="<%=ctx%>/evento/ConsultaEvento?nombre=Marat%C3%B3n%20de%20Montevideo" class="btn">Ver más</a>
-          </div>
-        </div>
+        <%
+            }
+          } else {
+        %>
+          <p>No hay eventos disponibles.</p>
+        <%
+          }
+        %>
       </div>
     </main>
   </div>
-
-  <script src="<%=ctx%>/js/Login.js"></script>
 </body>
 </html>

@@ -4,29 +4,28 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-
 import logica.CargaDatosPrueba;
 
 @WebServlet("/precargar")
 public class PrecargaServlet extends HttpServlet {
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-	        throws ServletException, IOException {
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
 
-	    try {
-	        CargaDatosPrueba cargador = new CargaDatosPrueba();
-	        cargador.cargar();
+        try {
+            // Cargar datos
+            CargaDatosPrueba.cargar();
 
-	        // Guardar a nivel de aplicación (no sesión)
-	        getServletContext().setAttribute("datosPrecargados", true);
+            // Guardar bandera a nivel de aplicación (solo una vez)
+            getServletContext().setAttribute("datosPrecargados", true);
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
+            // Redirigir al inicio dinámico
+            resp.sendRedirect(req.getContextPath() + "/inicio");
 
-	    req.getRequestDispatcher("/index.jsp").forward(req, resp);
-	}
-
-
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error al cargar datos de prueba.");
+        }
+    }
 }
