@@ -1,0 +1,58 @@
+/* ===== Estilos solo para la página de inicio ===== */
+
+/* Layout con aside angosto */
+.layout-inicio {
+  display: grid;
+  grid-template-columns: 260px 1fr; /* Sidebar fijo, main flexible */
+  gap: 1rem;
+}
+
+/* Sidebar más limpio */
+.aside-inicio {
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: .6rem;
+}
+
+.aside-inicio h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.aside-inicio h4 {
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+.menu-categorias {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.menu-categorias li {
+  margin-bottom: 0.4rem;
+}
+
+.menu-categorias a {
+  text-decoration: none;
+  color: var(--text);
+}
+
+.menu-categorias a:hover {
+  color: var(--brand);
+  text-decoration: underline;
+}
+
+/* Main específico */
+.main-inicio h1 {
+  margin-top: 0;
+  font-size: 1.6rem;
+}
+
+#eventList {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}

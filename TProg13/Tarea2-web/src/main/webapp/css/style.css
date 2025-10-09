@@ -6,7 +6,7 @@
   --line:#e5e7eb;
   --bg:#fff;
   --bg-soft:#f8fafc;
-  --max:960px;
+  --max:90%;
 }
 
 *{ box-sizing:border-box; }

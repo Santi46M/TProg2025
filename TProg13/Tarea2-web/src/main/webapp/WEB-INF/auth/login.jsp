@@ -10,14 +10,14 @@
   <title>Iniciar Sesión — Eventos.uy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="<%=ctx%>/css/style.css">
-  <!-- (opcional) iconos -->
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 </head>
 <body>
   <!-- Header -->
   <header class="site-header">
     <div class="container">
-      <a class="brand" href="<%=ctx%>/"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+      <!-- Eliminado el ícono del avión -->
+      <a class="brand" href="<%=ctx%>/">Eventos.uy</a>
 
       <nav class="main-nav">
         <form class="search" action="<%=ctx%>/buscar" method="get" role="search" aria-label="Buscar">
@@ -28,8 +28,8 @@
 
       <!-- Zona de usuario (visitante) -->
       <nav class="user-nav" id="userNav">
-        <a class="btn ghost" href="<%=ctx%>/auth/login"><i class='bx bxs-user'></i> Iniciar Sesión</a>
-        <a class="btn" href="<%=ctx%>/usuario/AltaUsuario"><i class='bx bxs-user-plus'></i> Registrarse</a>
+        <a class="btn ghost" href="<%=ctx%>/auth/login">Iniciar Sesión</a>
+        <a class="btn" href="<%=ctx%>/usuario/AltaUsuario">Registrarse</a>
       </nav>
     </div>
   </header>
