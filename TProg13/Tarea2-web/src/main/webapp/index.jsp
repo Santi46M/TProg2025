@@ -83,7 +83,6 @@
           <h2>Conferencia de Tecnología</h2>
           <p><strong>Ciudad:</strong> Punta del Este (Uruguay)</p>
           <div class="actions">
-            <!-- Por nombre (URL-encoded): Conferencia%20de%20Tecnolog%C3%ADa -->
             <a href="<%= request.getContextPath() %>/evento/ConsultaEvento?nombre=Conferencia%20de%20Tecnolog%C3%ADa" class="btn">Ver más</a>
           </div>
         </div>
@@ -93,7 +92,6 @@
           <h2>Maratón de Montevideo</h2>
           <p><strong>Ciudad:</strong> Montevideo (Uruguay)</p>
           <div class="actions">
-            <!-- Maratón de Montevideo → Marat%C3%B3n%20de%20Montevideo -->
             <a href="<%= request.getContextPath() %>/evento/ConsultaEvento?nombre=Marat%C3%B3n%20de%20Montevideo" class="btn">Ver más</a>
           </div>
         </div>
