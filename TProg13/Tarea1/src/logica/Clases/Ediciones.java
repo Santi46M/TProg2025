@@ -37,6 +37,20 @@ public class Ediciones {
         this.pais = pais;
         this.estado = EstadoEdicion.INGRESADA;
     }
+    public Ediciones(Eventos evento, String nombre, String sigla,
+            LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
+            Usuario organizador, String ciudad, String pais, EstadoEdicion estado) {
+    	this.evento = evento;
+    	this.nombre = nombre;
+    	this.sigla = sigla;
+    	this.fechaInicio = fechaInicio;
+    	this.fechaFin = fechaFin;
+    	this.fechaAlta = fechaAlta;
+    	this.organizador = organizador;
+    	this.ciudad = ciudad;
+    	this.pais = pais;
+    	this.estado = estado;
+    }
 
     public Eventos getEvento() {
         return evento;
