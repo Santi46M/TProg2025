@@ -5,7 +5,7 @@
   String ctx = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
   String rol  = (String) session.getAttribute("rol");
-  List<Usuario> usuarios = (List<Usuario>) request.getAttribute("usuarios");
+//list <Usuario> usuarios = (List<Usuario>) request.getAttribute("usuarios");
 %>
 <!DOCTYPE html>
 <html lang="es">

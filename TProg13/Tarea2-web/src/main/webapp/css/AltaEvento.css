@@ -1,0 +1,120 @@
+/* ======= LAYOUT GENERAL ======= */
+.container.row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: flex-start !important;
+  gap: 2rem !important;
+  width: 100% !important;
+}
+
+/* ----- ASIDE: ancho fijo real ----- */
+.container.row > aside.card.aside-inicio {
+  flex: 0 0 220px !important;
+  width: 220px !important;
+  min-width: 220px !important;
+  max-width: 220px !important;
+  margin: 0 !important;
+  align-self: flex-start !important;
+  background: #fff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Evita que el main se achique */
+.container.row > main.container {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 1rem 0 !important;
+}
+
+/* ======= FORMULARIO ======= */
+.form-card-altaEvento {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  background: var(--bg-soft, #f9fafb);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+
+.form-card-altaEvento h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.6rem;
+  color: var(--ink, #111);
+}
+
+.form-group-altaEvento {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.form-group-altaEvento label {
+  font-weight: 500;
+  margin-bottom: .3rem;
+}
+
+.form-group-altaEvento input,
+.form-group-altaEvento textarea,
+.form-group-altaEvento select {
+  padding: .6rem;
+  border: 1px solid #ccc;
+  border-radius: .5rem;
+  font-size: 1rem;
+}
+
+.checkbox-grid-ev {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: .5rem;
+  margin-top: .5rem;
+}
+
+.checkbox-grid-ev label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: .4rem .6rem;
+  border-radius: .4rem;
+}
+
+.form-actions-altaEvento {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+}
+
+.btn-guardar-altaEvento {
+  background-color: var(--brand, #0a66c2);
+  color: #fff;
+  border: none;
+  padding: .6rem 1.2rem;
+  border-radius: .5rem;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-cancelar-altaEvento {
+  background: #ddd;
+  color: #333;
+  padding: .6rem 1.2rem;
+  border-radius: .5rem;
+  text-decoration: none;
+}
+
+.error-msg {
+  color: #c00;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.form-hint-altaEvento {
+  font-size: .9rem;
+  color: #555;
+}
