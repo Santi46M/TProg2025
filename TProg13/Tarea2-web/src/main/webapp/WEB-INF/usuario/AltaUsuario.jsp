@@ -18,7 +18,7 @@
 <!-- Header -->
 <header class="site-header">
   <div class="container">
-    <a class="brand" href="<%=ctx%>/">Eventos.uy</a>
+      <a class="brand" href="<%=ctx%>/inicio">Eventos.uy</a>
     <nav class="main-nav">
       <form class="search" action="<%=ctx%>/buscar" method="get" role="search">
         <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">

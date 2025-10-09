@@ -13,7 +13,7 @@ import excepciones.UsuarioYaExisteException;
 import excepciones.UsuarioNoExisteException;
 import excepciones.UsuarioTipoIncorrectoException;
 
-@WebServlet(urlPatterns = {"/usuario/AltaUsuario", "/usuario/ConsultaUsuario", "/usuario/modificar"})
+@WebServlet(urlPatterns = {"/usuario/AltaUsuario", "/usuario/modificar"})
 public class UsuarioServlet extends HttpServlet {
 
   private static final String JSP_LOGIN    = "/WEB-INF/auth/login.jsp";
