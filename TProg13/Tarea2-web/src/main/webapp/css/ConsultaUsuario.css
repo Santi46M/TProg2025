@@ -1,20 +1,67 @@
-/* ===== ConsultaUsuario.css ===== */
+#usuariosList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 1rem;
+}
 
-/* Cabecera */
-.topbar {
-    position: sticky; top:0; z-index:50;
-    background:#fff; border-bottom:1px solid #e5e7eb;
-    box-shadow:0 2px 8px rgba(0,0,0,.04);
-  }
-  .topbar-wrap { max-width:1100px; margin:0 auto; padding:.8rem 1rem; display:flex; align-items:center; }
-  .topbar-brand { font-weight:800; font-size:1.05rem; color:#111827; text-decoration:none; }
-  .topbar-brand:hover { text-decoration:underline; }
-  
-  /* Contenido */
-  .card { background:#fff; border:1px solid var(--line,#e5e7eb); border-radius:.6rem; padding:1rem; margin:1rem 0; box-shadow:0 2px 6px rgba(0,0,0,.04); }
-  .hide{display:none;}
-  label{display:block;margin:.8rem 0;}
-  select{width:100%;padding:.6rem .7rem;border:1px solid var(--line,#e5e7eb);border-radius:.5rem;}
-  .user-head{display:grid;grid-template-columns:1fr 200px;gap:1rem;align-items:start;}
-  .user-head img{width:100%;border-radius:.5rem;border:1px solid var(--line,#e5e7eb);}
-  .muted{color:#6b7280;}
+.usuario-card {
+  width: 300px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.usuario-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.usuario-info {
+  padding: 1rem;
+}
+
+.usuario-info h2 {
+  font-size: 1.2rem;
+  margin: 0 0 0.5rem;
+}
+
+.usuario-info p {
+  margin: 0.3rem 0;
+}
+
+.usuario-info .actions {
+  margin-top: 1rem;
+}
+
+.usuario-info .btn {
+  display: inline-block;
+  background: #0a66c2;
+  color: #fff;
+  padding: 0.4rem 1rem;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.usuario-info .btn:hover {
+  background: #084d99;
+}
+
+/* === AJUSTE DEL ASIDE === */
+.container.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+aside.card {
+  flex: 0 0 250px;
+  min-height: 200px;
+  max-height: 600px;
+  overflow-y: auto;
+}

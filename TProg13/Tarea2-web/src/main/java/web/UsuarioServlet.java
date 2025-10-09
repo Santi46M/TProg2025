@@ -51,10 +51,14 @@ public class UsuarioServlet extends HttpServlet {
 
       case "/usuario/ConsultaUsuario": {
         String nick = req.getParameter("nick");
-        if (nick == null || nick.isBlank()) {
-          nick = nickEnSesion(req);
-          if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
-        }
+
+     // Si no vino el nick por parámetro, mostramos error amigable
+     if (nick == null || nick.isBlank()) {
+       req.setAttribute("error", "Falta el nick del usuario a consultar.");
+       req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
+       return;
+     }
+
         try {
           DTDatosUsuario dto = cu.obtenerDatosUsuario(nick);
           req.setAttribute("dto", dto);
