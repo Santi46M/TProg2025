@@ -2,7 +2,7 @@
 <%
   String ctx  = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
-  String rol  = (String) session.getAttribute("rol"); // "ASISTENTE" | "ORGANIZADOR"
+  boolean precargado = Boolean.TRUE.equals(application.getAttribute("datosPrecargados"));
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -10,12 +10,15 @@
   <meta charset="UTF-8">
   <title>Crear Evento — Eventos.uy</title>
   <link rel="stylesheet" href="<%=ctx%>/css/style.css">
+  <link rel="stylesheet" href="<%=ctx%>/css/index.css"><!-- para estilos compartidos del layout -->
+  <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 </head>
 <body>
 
+<!-- Header igual al index -->
 <header class="site-header">
   <div class="container">
-    <a class="brand" href="<%=ctx%>/"><i class='bx bxs-plane-alt'></i> Eventos.uy</a>
+    <a class="brand" href="<%=ctx%>/">Eventos.uy</a>
 
     <nav class="main-nav">
       <form class="search" action="<%=ctx%>/buscar" method="get" role="search" aria-label="Buscar">
@@ -26,27 +29,45 @@
 
     <nav class="user-nav" id="userNav">
       <% if (nick == null) { %>
-        <a class="btn" href="<%=ctx%>/auth/login"><i class='bx bxs-user'></i> Iniciar sesión</a>
+        <a class="btn ghost" href="<%=ctx%>/auth/login"><i class='bx bxs-user'></i> Iniciar Sesión</a>
+        <a class="btn" href="<%=ctx%>/usuario/alta"><i class='bx bxs-user-plus'></i> Registrarse</a>
+        <% if (!precargado) { %>
+          <form action="<%=ctx%>/precargar" method="post" style="display:inline;">
+            <button class="btn" type="submit">Precargar datos</button>
+          </form>
+        <% } else { %>
+          <span>Datos precargados correctamente</span>
+        <% } %>
       <% } else { %>
-        <span class="user-name">Hola, <strong><%= nick %></strong></span>
-        <a class="btn" href="<%=ctx%>/auth/logout"><i class='bx bxs-user'></i> Cerrar sesión</a>
+        <span class="user-chip"><i class='bx bxs-user'></i> <%= nick %></span>
+        <a class="btn ghost" href="<%=ctx%>/auth/logout"><i class='bx bx-log-out'></i> Cerrar sesión</a>
       <% } %>
     </nav>
   </div>
 </header>
 
 <div class="container row" style="margin-top:1rem;">
-  <!-- Sidebar -->
-  <aside class="card">
-    <h3><i class='bx bx-list-ul'></i> Menú</h3>
-    <h4>Acciones</h4>
-    <ul>
-      <li><a href="<%=ctx%>/evento/alta"><i class='bx bx-edit'></i> Alta Evento</a></li>
-      <li><a href="#"><i class='bx bx-edit'></i> Alta de Edición Evento</a></li>
-      <li><a href="#"><i class='bx bx-edit'></i> Alta Tipo Registro</a></li>
+  <!-- Sidebar igual al index -->
+  <aside class="card aside-inicio">
+    <h3>Menú</h3>
+
+    <h4>Categorías</h4>
+    <ul class="menu-categorias">
+      <li><a href="#">Tecnología</a></li>
+      <li><a href="#">Innovación</a></li>
+      <li><a href="#">Literatura</a></li>
+      <li><a href="#">Cultura</a></li>
+      <li><a href="#">Música</a></li>
+      <li><a href="#">Deporte</a></li>
+      <li><a href="#">Salud</a></li>
+      <li><a href="#">Entretenimiento</a></li>
+      <li><a href="#">Negocios</a></li>
     </ul>
+
+    <h4><a href="<%=ctx%>/usuario/listar">Listar Usuarios</a></h4>
   </aside>
 
+  <!-- Main -->
   <main class="container">
     <section class="form-card-altaEvento">
       <h2>Crear Evento</h2>
@@ -55,8 +76,8 @@
         <p style="color:#c00"><%= request.getAttribute("error") %></p>
       <% } %>
 
-      <!-- IMPORTANTE: el action apunta a tu servlet /evento/alta (POST) -->
-      <form id="form-alta-evento" method="post" action="<%=ctx%>/evento/alta" enctype="application/x-www-form-urlencoded">
+      <!-- el action habla con tu servlet /evento/alta (POST) -->
+      <form id="form-alta-evento" method="post" action="<%=ctx%>/evento/alta">
         <div class="form-group-altaEvento">
           <label for="nombre">Nombre del evento<span style="color:red">*</span></label>
           <input type="text" id="nombre" name="nombre" required>
@@ -72,7 +93,7 @@
           <textarea id="desc" name="desc" rows="4" required></textarea>
         </div>
 
-        <!-- Categorías: mandamos un solo parámetro CSV "categorias" (lo arma el JS) -->
+        <!-- Categorías: se envían como CSV en el hidden "categorias" -->
         <fieldset class="form-group-altaEvento" id="fs-categorias">
           <legend>Categorías<span style="color:red">*</span></legend>
           <div class="checkbox-grid-ev">
@@ -90,16 +111,11 @@
           <small>Marcá una o más categorías.</small>
         </fieldset>
 
-        <div class="form-group-altaEvento">
-          <label for="imagen">Imagen (opcional)</label>
-          <input type="file" id="imagen" name="imagen" accept="image/*">
-        </div>
-
         <p class="form-hint-altaEvento">Los campos marcados con * son obligatorios.</p>
 
         <div class="form-actions-altaEvento">
           <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
-          <a class="btn-cancelar-altaEvento btn" href="<%=ctx%>/">Cancelar</a>
+          <a class="btn btn-cancelar-altaEvento" href="<%=ctx%>/">Cancelar</a>
         </div>
       </form>
     </section>
@@ -107,14 +123,13 @@
 </div>
 
 <script>
-  // Junta las categorías seleccionadas en un CSV para el parámetro "categorias"
+  // Arma el CSV de categorías en el hidden "categorias" antes de enviar
   (function () {
     var form = document.getElementById('form-alta-evento');
     form.addEventListener('submit', function (e) {
       var checks = Array.prototype.slice.call(document.querySelectorAll('.cat'));
       var sel = checks.filter(function(c){ return c.checked; }).map(function(c){ return c.value; });
       if (sel.length === 0) {
-        // evita enviar si no hay categorías
         e.preventDefault();
         document.getElementById('fs-categorias').scrollIntoView({behavior:'smooth', block:'center'});
         return;
