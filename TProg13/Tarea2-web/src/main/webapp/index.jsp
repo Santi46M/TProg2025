@@ -74,7 +74,7 @@
         <li><a href="#">Entretenimiento</a></li>
         <li><a href="#">Negocios</a></li>
       </ul>
-      <h4><a href="<%=ctx%>/usuario/listar">Listar Usuarios</a></h4>
+      <h4><a href="<%=ctx%>/usuario/ConsultaUsuario">Listar Usuarios</a></h4>
       <div id="menuPorRol"></div>
     </aside>
 
