@@ -23,9 +23,9 @@ import logica.Clases.Usuario;
 public class EdicionServlet extends HttpServlet {
 
   // ===== JSPs =====
-  private static final String JSP_ALTA     = "/WEB-INF/edicion/AltaEdicion.jsp";           // creá este JSP si no lo tenés
-  private static final String JSP_CONSULTA = "/WEB-INF/edicion/ConsultaEdicion.jsp";// idem
-  private static final String JSP_LISTADO  = "/WEB-INF/edicion/listado.jsp";        // opcional
+  private static final String JSP_ALTA     = "/WEB-INF/ediciones/AltaEdicion.jsp";
+  private static final String JSP_CONSULTA = "/WEB-INF/ediciones/ConsultaEdicion.jsp";
+  private static final String JSP_LISTADO  = "/WEB-INF/ediciones/ListarEdiciones.jsp";
 
   // ===== Lógica =====
   private IControladorEvento ce() {  // fábrica hacia tu capa de lógica

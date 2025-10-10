@@ -56,12 +56,27 @@
       <% } %>
 
       <!-- IMPORTANTE: el action apunta a tu servlet /edicion/alta (POST) -->
-      <form id="form-alta-edicion" method="post" action="<%=ctx%>/edicion/alta" enctype="application/x-www-form-urlencoded">
+      <form id="form-alta-edicion" method="post" action="<%=ctx%>/edicion/alta" enctype="multipart/form-data">
         <div class="form-group-altaEvento">
           <label for="evento">Evento<span style="color:red">*</span></label>
           <select id="evento" name="evento" required>
             <option value="">Seleccione un evento</option>
-            <!-- Opciones de eventos deben ser generadas dinámicamente desde el backend -->
+            <%-- Opciones de eventos generadas dinámicamente --%>
+            <% 
+              java.util.List eventos = (java.util.List) request.getAttribute("listaEventos");
+              if (eventos != null) {
+                for (Object obj : eventos) {
+                  String nombre = null;
+                  try {
+                    java.lang.reflect.Method m = obj.getClass().getMethod("getNombre");
+                    Object v = m.invoke(obj);
+                    nombre = v == null ? "" : v.toString();
+                  } catch (Exception e) { nombre = obj.toString(); }
+            %>
+                  <option value="<%=nombre%>"><%=nombre%></option>
+            <%   }
+              }
+            %>
           </select>
         </div>
 
@@ -86,8 +101,12 @@
         </div>
 
         <div class="form-group-altaEvento">
-          <label for="lugar">Lugar<span style="color:red">*</span></label>
-          <input type="text" id="lugar" name="lugar" required>
+          <label for="ciudad">Ciudad<span style="color:red">*</span></label>
+          <input type="text" id="ciudad" name="ciudad" required>
+        </div>
+        <div class="form-group-altaEvento">
+          <label for="pais">País<span style="color:red">*</span></label>
+          <input type="text" id="pais" name="pais" required>
         </div>
 
         <div class="form-group-altaEvento">
