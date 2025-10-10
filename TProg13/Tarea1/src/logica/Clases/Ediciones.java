@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.HashMap;
-import logica.Enumerados.EstadoEdicion;
+import logica.Enumerados.DTEstado;
 
 
 public class Ediciones {
@@ -18,7 +18,7 @@ public class Ediciones {
     private Usuario organizador;
     private String ciudad;
     private String pais;
-    private EstadoEdicion estado;
+    private DTEstado estado;
     private Map<String, TipoRegistro> tiposRegistro = new HashMap<>();
     private Set<Patrocinio> patrocinios = new HashSet<>();
     private Map<String, Registro> registros = new HashMap<>();
@@ -36,11 +36,11 @@ public class Ediciones {
         this.organizador = organizador;
         this.ciudad = ciudad;
         this.pais = pais;
-        this.estado = EstadoEdicion.INGRESADA;
+        this.estado = EstadoEdicion.Ingresada;
     }
     public Ediciones(Eventos evento, String nombre, String sigla,
             LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
-            Usuario organizador, String ciudad, String pais, EstadoEdicion estado) {
+            Usuario organizador, String ciudad, String pais, DTEstado estadoEdicion) {
     	this.evento = evento;
     	this.nombre = nombre;
     	this.sigla = sigla;
@@ -52,6 +52,7 @@ public class Ediciones {
     	this.pais = pais;
     	this.estado = estado;
     }
+    
     public Ediciones(Eventos evento, String nombre, String sigla,
             LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
             Usuario organizador, String ciudad, String pais, String imagen) {
@@ -64,7 +65,7 @@ public class Ediciones {
         this.organizador = organizador;
         this.ciudad = ciudad;
         this.pais = pais;
-        this.estado = EstadoEdicion.INGRESADA;
+        this.estado = EstadoEdicion.Ingresada;
         this.imagen = imagen;
     }
 
@@ -195,5 +196,12 @@ public class Ediciones {
     }
     public void setImagen(String imagen) {
         this.imagen = imagen;
+    }
+
+    public DTEstado getEstadoEdicion() {
+        return estadoEdicion;
+    }
+    public void setEstadoEdicion(DTEstado estadoEdicion) {
+        this.estadoEdicion = estadoEdicion;
     }
 }

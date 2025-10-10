@@ -288,13 +288,9 @@ public class ControladorEvento implements IControladorEvento {
         return resultado;
     }
 
-    public void cambiarEstadoEdicion(String nombreEvento, String nombreEdicion, boolean aceptar) {
-        Eventos evento = manejador.obtenerEvento(nombreEvento);
-        if (evento != null) {
-            Ediciones ed = evento.obtenerEdicion(nombreEdicion);
-            if (ed != null && ed.getEstado() == EstadoEdicion.INGRESADA) {
-                ed.setEstado(aceptar ? EstadoEdicion.CONFIRMADA : EstadoEdicion.RECHAZADA);
-            }
+    public void aceptarRechazarEdicion(Ediciones edicion, boolean aceptar) {
+        if (edicion != null) {
+            edicion.setEstadoEdicion(aceptar ? DTEstado.Acetpada : DTEstado.Rechazada);
         }
     }
 }
