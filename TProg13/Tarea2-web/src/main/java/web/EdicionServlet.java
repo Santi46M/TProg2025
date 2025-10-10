@@ -34,6 +34,16 @@ public class EdicionServlet extends HttpServlet {
 
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
+  // ===== Helpers =====
+  private Usuario getUsuario(HttpServletRequest req) {
+    HttpSession s = req.getSession(false);
+    return s == null ? null : (Usuario) s.getAttribute("usuario");
+  }
+  private String getRol(HttpServletRequest req) {
+    HttpSession s = req.getSession(false);
+    return s == null ? null : (String) s.getAttribute("rol");
+  }
+
   // ===== GET =====
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -75,8 +85,11 @@ public class EdicionServlet extends HttpServlet {
     switch (path) {
       case "/alta": {
         if (!requiereOrganizador(req, resp)) return;
-        // Si tu formulario necesita lista de eventos para el <select>, cargala acá:
-        req.setAttribute("listaEventos", ce().listarEventos()); // ajustado
+        var listaEventos = ce().listarEventos();
+        req.setAttribute("listaEventos", listaEventos);
+        if (listaEventos == null || listaEventos.isEmpty()) {
+          req.setAttribute("sinEventos", true);
+        }
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
         return;
       }

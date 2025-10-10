@@ -55,11 +55,14 @@
         <p style="color:#c00"><%= request.getAttribute("error") %></p>
       <% } %>
 
+      <% if (request.getAttribute("sinEventos") != null && (Boolean)request.getAttribute("sinEventos")) { %>
+        <p style="color:#c00">No hay eventos disponibles. Debe crear un evento antes de poder crear una edición.</p>
+      <% } %>
       <!-- IMPORTANTE: el action apunta a tu servlet /edicion/alta (POST) -->
       <form id="form-alta-edicion" method="post" action="<%=ctx%>/edicion/alta" enctype="multipart/form-data">
         <div class="form-group-altaEvento">
           <label for="evento">Evento<span style="color:red">*</span></label>
-          <select id="evento" name="evento" required>
+          <select id="evento" name="evento" required <%= (request.getAttribute("sinEventos") != null && (Boolean)request.getAttribute("sinEventos")) ? "disabled" : "" %>>
             <option value="">Seleccione un evento</option>
             <%-- Opciones de eventos generadas dinámicamente --%>
             <% 
@@ -117,7 +120,7 @@
         <p class="form-hint-altaEvento">Los campos marcados con * son obligatorios.</p>
 
         <div class="form-actions-altaEvento">
-          <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
+          <button type="submit" class="btn-guardar-altaEvento" <%= (request.getAttribute("sinEventos") != null && (Boolean)request.getAttribute("sinEventos")) ? "disabled" : "" %>>Guardar</button>
           <a class="btn-cancelar-altaEvento btn" href="<%=ctx%>/">Cancelar</a>
         </div>
       </form>
