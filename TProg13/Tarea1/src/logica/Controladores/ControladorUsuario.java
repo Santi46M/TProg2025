@@ -37,7 +37,7 @@ public class ControladorUsuario implements IControladorUsuario {
     }
 
     public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link,
-                            String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador) throws UsuarioYaExisteException {
+                            String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador, String contrasena, String imagen) throws UsuarioYaExisteException {
 
         // verificar unicidad de nickname y correo
         if (manejador.findUsuario(nickname) != null) {
@@ -51,10 +51,10 @@ public class ControladorUsuario implements IControladorUsuario {
         Usuario nuevoUsuario;
 
         if (esOrganizador) {
-            nuevoUsuario = ingresarOrganizador(nickname, nombre, correo, descripcion, link);
+            nuevoUsuario = new Organizador(nickname, nombre, correo, contrasena, imagen, descripcion, link);
         } else {
             Institucion inst = manejador.findInstitucion(institucion);
-            nuevoUsuario = ingresarAsistente(nickname, nombre, correo, apellido, fechaNacimiento, inst);
+            nuevoUsuario = new Asistente(nickname, nombre, correo, contrasena, imagen, apellido, fechaNacimiento, inst);
         }
 
         manejador.addUsuario(nuevoUsuario);
@@ -258,5 +258,32 @@ public class ControladorUsuario implements IControladorUsuario {
         } else {
             throw new UsuarioTipoIncorrectoException(nickname);
         }
+    }
+    
+
+    public boolean inicioSesion(String nickOrEmail, String contrasena) {
+        Usuario usuario = manejador.findUsuario(nickOrEmail);
+        if (usuario == null) {
+            for (Usuario u : manejador.getUsuarios().values()) {
+                if (u.getEmail().equals(nickOrEmail)) {
+                    usuario = u;
+                    break;
+                }
+            }
+        }
+        if (usuario == null) {
+            return false;
+        }
+        if (usuario.getContrasena() == null || !usuario.getContrasena().equals(contrasena)) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Caso de uso: cierre de sesión. Por ahora no realiza ninguna acción.
+     */
+    public void cierreSesion() {
+        // No hace nada por ahora
     }
 }

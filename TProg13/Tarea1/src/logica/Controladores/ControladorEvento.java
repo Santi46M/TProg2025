@@ -28,7 +28,7 @@ public class ControladorEvento implements IControladorEvento {
 
     private String edicionSeleccionadaSigla = null;
 
-    public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias) throws EventoYaExisteException {
+    public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias, String imagen) throws EventoYaExisteException {
         if (categorias == null || categorias.getCategorias() == null || categorias.getCategorias().isEmpty()) {
             throw new RuntimeException("Debe asociar al menos una categoría al evento");
         }
@@ -44,7 +44,7 @@ public class ControladorEvento implements IControladorEvento {
             }
             categoriasMap.put(nombreCat, cat);
         }
-        Eventos nuevoEvento = new Eventos(nombre, sigla, desc, fechaDeAlta, categoriasMap);
+        Eventos nuevoEvento = new Eventos(nombre, sigla, desc, fechaDeAlta, categoriasMap, imagen);
         manejador.agregarEvento(nuevoEvento);
     }
 
@@ -92,14 +92,14 @@ public class ControladorEvento implements IControladorEvento {
         manejadorAux.agregarCategoria(nombre, categoria);
     }
 
-    public void AltaEdicionEvento(Eventos evento, Usuario usuario, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais) throws EdicionYaExisteException, EventoYaExisteException, FechasCruzadasException {
+    public void AltaEdicionEvento(Eventos evento, Usuario usuario, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais, String imagen) throws EdicionYaExisteException, EventoYaExisteException, FechasCruzadasException {
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
         if (fechaInicio.isAfter(fechaFin)) {
             throw new FechasCruzadasException("La fecha de inicio debe ser anterior a la fecha de fin.");
         }
         if (manejador.existeEvento(evento.getNombre())) {
             if (!manejador.existeEdicion(nombre)) {
-                Ediciones nuevaEdicion = new Ediciones(evento, nombre, sigla, fechaInicio, fechaFin, fechaAlta, usuario, ciudad, pais);
+                Ediciones nuevaEdicion = new Ediciones(evento, nombre, sigla, fechaInicio, fechaFin, fechaAlta, usuario, ciudad, pais, imagen);
                 evento.agregarEdicion(nuevaEdicion);
                 manejador.agregarEdicion(nuevaEdicion);
                 mUsuario.findOrganizador(usuario.getNickname()).agregarEdicion(nuevaEdicion);

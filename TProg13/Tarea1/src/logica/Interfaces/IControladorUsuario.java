@@ -50,4 +50,12 @@ public interface IControladorUsuario {
     public DTRegistro obtenerRegistroSeleccionado();
     public String getUsuarioSeleccionadoNickname();
 	void modificarDatosUsuario(String nickname, String nombre, String descripcion, String link, String apellido, java.time.LocalDate fechaNacimiento, String institucion) throws excepciones.UsuarioNoExisteException, excepciones.UsuarioTipoIncorrectoException;
+    // Alta de usuario con contraseña e imagen
+    public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador, String contrasena, String imagen) throws UsuarioYaExisteException;
+
+    // Inicio de sesión
+    public boolean inicioSesion(String nickOrEmail, String contrasena);
+
+    // Cierre de sesión
+    public void cierreSesion();
 }
