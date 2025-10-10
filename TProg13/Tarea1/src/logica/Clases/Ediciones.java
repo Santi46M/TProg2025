@@ -22,6 +22,7 @@ public class Ediciones {
     private Map<String, TipoRegistro> tiposRegistro = new HashMap<>();
     private Set<Patrocinio> patrocinios = new HashSet<>();
     private Map<String, Registro> registros = new HashMap<>();
+    private String imagen;
 
     public Ediciones(Eventos evento, String nombre, String sigla,
                      LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
@@ -50,6 +51,21 @@ public class Ediciones {
     	this.ciudad = ciudad;
     	this.pais = pais;
     	this.estado = estado;
+    }
+    public Ediciones(Eventos evento, String nombre, String sigla,
+            LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
+            Usuario organizador, String ciudad, String pais, String imagen) {
+        this.evento = evento;
+        this.nombre = nombre;
+        this.sigla = sigla;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.fechaAlta = fechaAlta;
+        this.organizador = organizador;
+        this.ciudad = ciudad;
+        this.pais = pais;
+        this.estado = EstadoEdicion.INGRESADA;
+        this.imagen = imagen;
     }
 
     public Eventos getEvento() {
@@ -172,5 +188,12 @@ public class Ediciones {
 
     public boolean estaIngresada() {
         return estado == EstadoEdicion.INGRESADA;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 }

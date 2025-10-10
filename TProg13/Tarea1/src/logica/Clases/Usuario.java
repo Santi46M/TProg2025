@@ -5,11 +5,22 @@ public abstract class Usuario {
     private String nickname;
     private String nombre;
     private String email;
+    private String contrasena;
+    private String imagen;
 
-    public Usuario(String nickname, String nombre, String email) {
+    public Usuario(String nickname, String nombre, String email, String contrasena, String imagen) {
         this.nickname = nickname;
         this.nombre = nombre;
         this.email = email;
+        this.contrasena = contrasena;
+        this.imagen = imagen;
+    }
+    public Usuario(String nickname, String nombre, String email, String contrasena) {
+        this.nickname = nickname;
+        this.nombre = nombre;
+        this.email = email;
+        this.contrasena = contrasena;
+        this.imagen = null;
     }
     
     public String getNickname() {
@@ -53,5 +64,18 @@ public abstract class Usuario {
 
     public Institucion getInstitucion() {
         return null;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
+    }
+    public String getImagen() {
+        return imagen;
+    }
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 }

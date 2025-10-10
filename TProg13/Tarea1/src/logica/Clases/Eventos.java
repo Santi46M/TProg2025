@@ -12,14 +12,16 @@ public class Eventos{
 	private LocalDate fecha;
 	private Map<String, Categoria> categorias;
 	private Map<String, Ediciones> ediciones;
+	private String imagen;
 
-	public Eventos(String nombre, String sigla, String descripcion, LocalDate fecha, Map<String, Categoria> categorias) {
+	public Eventos(String nombre, String sigla, String descripcion, LocalDate fecha, Map<String, Categoria> categorias, String imagen) {
 		this.nombre = nombre;
 		this.sigla = sigla;
 		this.descripcion = descripcion;
 		this.fecha = fecha;
 		this.categorias = categorias;
         this.ediciones = new HashMap<>(); 
+        this.imagen = imagen;
 	} 
 	
 	//Definimos los getters
@@ -47,6 +49,10 @@ public class Eventos{
         return this.categorias;
     }
 	
+	public String getImagen() {
+		return this.imagen;
+	}
+	
 	//Definimos los setters
 	/*public void setNombre(String nombre) {
 		this.nombre = nombre;
@@ -67,6 +73,10 @@ public class Eventos{
 	public void setCategorias(Map<String, Categoria> categorias) {
         this.categorias = categorias;
     }
+
+    public void setImagen(String imagen) {
+		this.imagen = imagen;
+	}
 
     public Map<String, Ediciones> getEdiciones() {
         return ediciones;
