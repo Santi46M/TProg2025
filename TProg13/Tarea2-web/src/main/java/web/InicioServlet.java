@@ -20,10 +20,20 @@ public class InicioServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        List<DTEvento> eventos = ce().listarEventos();
+        System.out.println("✅ Entró al InicioServlet");
+        IControladorEvento ce = ce();
+        List<DTEvento> eventos = ce.listarEventos();
+        System.out.println("Eventos listados: " + (eventos != null ? eventos.size() : "null"));
+
+        // Si no hay eventos, se considera que la precarga se perdió
+        if (eventos == null || eventos.isEmpty()) {
+            getServletContext().setAttribute("datosPrecargados", Boolean.FALSE);
+            System.out.println("⚠️ No hay eventos, datosPrecargados = FALSE");
+        }
+
         req.setAttribute("eventos", eventos);
         req.getRequestDispatcher("/index.jsp").forward(req, resp);
     }
-    
+
 
 }

@@ -22,7 +22,8 @@
 
 <body>
   <!-- Header -->
-  <header class="site-header">
+    <jsp:include page="/WEB-INF/templates/header.jsp" />
+<%--   <header class="site-header">
     <div class="container">
       <a class="brand" href="<%=ctx%>/inicio">Eventos.uy</a>
 
@@ -50,7 +51,7 @@
         <% } %>
       </nav>
     </div>
-  </header>
+  </header> --%>
 
   <div class="container row layout-inicio">
     <!-- Sidebar -->
