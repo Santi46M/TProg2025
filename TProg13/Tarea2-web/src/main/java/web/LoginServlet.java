@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 import logica.fabrica;
 import logica.Interfaces.IControladorUsuario;
@@ -21,8 +22,8 @@ public class LoginServlet extends HttpServlet {
 
     private void cargarInstituciones(HttpServletRequest req) {
         IControladorUsuario cu = fabrica.getInstance().getIControladorUsuario();
-        java.util.Set<String> instituciones = cu.getInstituciones();
-        req.getSession().setAttribute("instituciones", instituciones);
+        Collection<String> instituciones = cu.getInstituciones();
+        req.setAttribute("instituciones", instituciones);
     }
 
     @Override
