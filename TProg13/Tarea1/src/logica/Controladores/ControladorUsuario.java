@@ -165,7 +165,8 @@ public class ControladorUsuario implements IControladorUsuario {
                 e.getFechaAlta(),
                 o.getNombre(),
                 e.getCiudad(),
-                e.getPais()));
+                e.getPais(),
+                e.getEstado()));
         }
         return lista;
     }
