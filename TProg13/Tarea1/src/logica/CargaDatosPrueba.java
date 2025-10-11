@@ -11,6 +11,7 @@ import logica.Manejadores.*;
 import logica.Datatypes.*;
 import logica.Enumerados.*;
 import logica.Clases.*;
+
 public class CargaDatosPrueba {
     public static void cargar() throws Exception {
         cargarCategorias();
@@ -24,8 +25,7 @@ public class CargaDatosPrueba {
         logResumenDatos();
     }
 
-    public static void logResumenDatos() {
-    }
+    public static void logResumenDatos() { }
 
     // Variables globales para instituciones y categorías
     public static Institucion INS01, INS02, INS03, INS04, INS05;
@@ -40,7 +40,7 @@ public class CargaDatosPrueba {
     public static TipoRegistro TR02, TR07, TR25, TR03, TR20, TR05, TR04, TR14, TR11;
     public static Usuario US03, US07, US09, US12, US13, US14, US15;
 
-    // Cargar instituciones y guardar en variables globales
+    // Cargar instituciones
     public static void cargarInstitucionesEjemplo() throws InstitucionYaExisteException {
         logica.Controladores.ControladorUsuario controlador = new logica.Controladores.ControladorUsuario();
         controlador.AltaInstitucion("Facultad de Ingeniería", "Facultad de Ingeniería de la Universidad de la República", "https://www.fing.edu.uy");
@@ -52,32 +52,20 @@ public class CargaDatosPrueba {
 
     public static void cargarCategorias() {
         logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
-        //CA01
         controlador.AltaCategoria("Tecnología");
-        //CA02
         controlador.AltaCategoria("Innovación");
-        //CA03
         controlador.AltaCategoria("Literatura");
-        //CA04
         controlador.AltaCategoria("Cultura");
-        //CA05
         controlador.AltaCategoria("Música");
-        //CA06
         controlador.AltaCategoria("Deporte");
-        //CA07
         controlador.AltaCategoria("Salud");
-        //CA08
         controlador.AltaCategoria("Entretenimiento");
-        //CA09
         controlador.AltaCategoria("Agro");
-        //CA10
         controlador.AltaCategoria("Negocios");
-        //CA11
         controlador.AltaCategoria("Moda");
-        //CA12
         controlador.AltaCategoria("Investigación");
     }
-    
+
     public static void cargarEventosEjemplo() throws EventoYaExisteException {
         logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         java.util.List<String> catEv01 = java.util.Arrays.asList("Tecnología", "Innovación");
@@ -87,7 +75,8 @@ public class CargaDatosPrueba {
         java.util.List<String> catEv05 = java.util.Arrays.asList("Entretenimiento");
         java.util.List<String> catEv06 = java.util.Arrays.asList("Agro", "Negocios");
         java.util.List<String> catEv07 = java.util.Arrays.asList("Moda", "Investigación");
-     // EV01
+
+        // EV01 (sin imagen)
         controlador.AltaEvento(
             "Conferencia de Tecnología",
             "Evento sobre innovación tecnológica",
@@ -104,7 +93,7 @@ public class CargaDatosPrueba {
             java.time.LocalDate.of(2025, 2, 1),
             "FERLIB",
             new DTCategorias(catEv02),
-            "src/img/IMG-EV02.jpeg"
+            "IMG-EV02.jpeg"
         );
 
         // EV03
@@ -114,7 +103,7 @@ public class CargaDatosPrueba {
             java.time.LocalDate.of(2023, 3, 15),
             "MONROCK",
             new DTCategorias(catEv03),
-            "src/img/IMG-EV03.jpeg"
+            "IMG-EV03.jpeg"
         );
 
         // EV04
@@ -124,7 +113,7 @@ public class CargaDatosPrueba {
             java.time.LocalDate.of(2022, 1, 1),
             "MARATON",
             new DTCategorias(catEv04),
-            "src/img/IMG-EV04.png"
+            "IMG-EV04.png"
         );
 
         // EV05
@@ -134,7 +123,7 @@ public class CargaDatosPrueba {
             java.time.LocalDate.of(2024, 4, 10),
             "COMICS",
             new DTCategorias(catEv05),
-            "src/img/IMG-EV05.png"
+            "IMG-EV05.png"
         );
 
         // EV06
@@ -144,10 +133,10 @@ public class CargaDatosPrueba {
             java.time.LocalDate.of(2024, 12, 12),
             "EXPOAGRO",
             new DTCategorias(catEv06),
-            "src/img/IMG-EV06.png"
+            "IMG-EV06.png"
         );
 
-        // EV07
+        // EV07 (sin imagen)
         controlador.AltaEvento(
             "Montevideo Fashion Week",
             "Pasarela de moda uruguaya e internacional",
@@ -156,9 +145,7 @@ public class CargaDatosPrueba {
             new DTCategorias(catEv07),
             null
         );
-
     }
-    
 
     private static java.time.LocalDate parseFecha(String fecha) {
         String[] partes = fecha.split("/");
@@ -167,59 +154,58 @@ public class CargaDatosPrueba {
         int anio = Integer.parseInt(partes[2]);
         return java.time.LocalDate.of(anio, mes, dia);
     }
-    
+
     public static void cargarUsuariosEjemplo() throws UsuarioYaExisteException {
         logica.Controladores.ControladorUsuario controlador = new logica.Controladores.ControladorUsuario();
 
-        // Asistentes (descripcion y link = null)
-        controlador.AltaUsuario("atorres", "Ana", "atorres@gmail.com", null, null, "Torres", 
+        // Asistentes
+        controlador.AltaUsuario("atorres", "Ana", "atorres@gmail.com", null, null, "Torres",
             java.time.LocalDate.of(1990, 5, 12), "Facultad de Ingeniería", false, "123.torres", "IMG-US01.jpg");
 
-        controlador.AltaUsuario("msilva", "Martin", "martin.silva@fing.edu.uy", null, null, "Silva", 
+        controlador.AltaUsuario("msilva", "Martin", "martin.silva@fing.edu.uy", null, null, "Silva",
             java.time.LocalDate.of(1987, 8, 21), "Facultad de Ingeniería", false, "msilva2025", "IMG-US02.jpg");
 
-        controlador.AltaUsuario("sofirod", "Sofia", "srodriguez@outlook.com", null, null, "Rodriguez", 
+        controlador.AltaUsuario("sofirod", "Sofia", "srodriguez@outlook.com", null, null, "Rodriguez",
             java.time.LocalDate.of(1995, 2, 3), "Universidad Católica del Uruguay", false, "srod.abc1", "IMG-US03.jpeg");
 
-        controlador.AltaUsuario("vale23", "Valentina", "valentina.costa@mail.com", null, null, "Costa", 
+        controlador.AltaUsuario("vale23", "Valentina", "valentina.costa@mail.com", null, null, "Costa",
             java.time.LocalDate.of(1992, 12, 1), null, false, "valen11c", "IMG-US07.jpeg");
 
-        controlador.AltaUsuario("luciag", "Lucía", "lucia.garcia@mail.com", null, null, "García", 
+        controlador.AltaUsuario("luciag", "Lucía", "lucia.garcia@mail.com", null, null, "García",
             java.time.LocalDate.of(1993, 11, 9), null, false, "garcia.22l", "IMG-US08.jpeg");
 
-        controlador.AltaUsuario("andrearod", "Andrea", "andrea.rod@mail.com", null, null, "Rodríguez", 
+        controlador.AltaUsuario("andrearod", "Andrea", "andrea.rod@mail.com", null, null, "Rodríguez",
             java.time.LocalDate.of(2000, 6, 10), "Agencia Nacional de Investigación e Innovación (ANII)", false, "rod77and", "IMG-US09.jpeg");
 
-        controlador.AltaUsuario("AnaG", "Ana", "ana.gomez@hotmail.com", null, null, "Gómez", 
+        controlador.AltaUsuario("AnaG", "Ana", "ana.gomez@hotmail.com", null, null, "Gómez",
             java.time.LocalDate.of(1998, 3, 15), null, false, "gomez88a", "IMG-US12.png");
 
-        controlador.AltaUsuario("JaviL", "Javier", "javier.lopez@outlook.com", null, null, "López", 
+        controlador.AltaUsuario("JaviL", "Javier", "javier.lopez@outlook.com", null, null, "López",
             java.time.LocalDate.of(1995, 7, 22), null, false, "jl99lopez", "IMG-US13.jpeg");
 
-        controlador.AltaUsuario("MariR", "María", "maria.rodriguez@gmail.com", null, null, "Rodríguez", 
+        controlador.AltaUsuario("MariR", "María", "maria.rodriguez@gmail.com", null, null, "Rodríguez",
             java.time.LocalDate.of(2000, 11, 10), null, false, "maria55r", "IMG-US14.jpeg");
 
-        controlador.AltaUsuario("SofiM", "Sofía", "sofia.martinez@yahoo.com", null, null, "Martínez", 
+        controlador.AltaUsuario("SofiM", "Sofía", "sofia.martinez@yahoo.com", null, null, "Martínez",
             java.time.LocalDate.of(1997, 2, 5), null, false, "smarti99z", "IMG-US15.jpeg");
 
-
-        // Organizadores (apellido y fechaNacimiento = null)
-        controlador.AltaUsuario("miseventos", "MisEventos", "contacto@miseventos.com", 
+        // Organizadores
+        controlador.AltaUsuario("miseventos", "MisEventos", "contacto@miseventos.com",
             "Empresa de organización de eventos.", "https://miseventos.com", null, null, null, true, "22miseventos", "IMG-US04.jpeg");
 
-        controlador.AltaUsuario("techcorp", "Corporación Tecnológica", "info@techcorp.com", 
+        controlador.AltaUsuario("techcorp", "Corporación Tecnológica", "info@techcorp.com",
             "Empresa líder en tecnologías de la información.", null, null, null, null, true, "tech25corp", "IMG-US05.jpeg");
 
-        controlador.AltaUsuario("imm", "Intendencia de Montevideo", "contacto@imm.gub.uy", 
+        controlador.AltaUsuario("imm", "Intendencia de Montevideo", "contacto@imm.gub.uy",
             "Gobierno departamental de Montevideo.", "https://montevideo.gub.uy", null, null, null, true, "imm2025", "IMG-US06.png");
 
-        controlador.AltaUsuario("udelar", "Universidad de la República", "contacto@udelar.edu.uy", 
+        controlador.AltaUsuario("udelar", "Universidad de la República", "contacto@udelar.edu.uy",
             "Universidad pública de Uruguay.", "https://udelar.edu.uy", null, null, null, true, "25udelar", "IMG-US10.jpeg");
 
-        controlador.AltaUsuario("mec", "Ministerio de Educación y Cultura", "mec@mec.gub.uy", 
+        controlador.AltaUsuario("mec", "Ministerio de Educación y Cultura", "mec@mec.gub.uy",
             "Institución pública promotora de cultura.", "https://mec.gub.uy", null, null, null, true, "mec2025ok", "IMG-US11.png");
     }
-    
+
     public static void cargarEdicionesEjemplo() throws Exception {
         logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
@@ -227,7 +213,7 @@ public class CargaDatosPrueba {
 
         Eventos ev;
 
-        // EDEV01 — Montevideo Rock 2025 (tiene imagen)
+        // EDEV01 — Montevideo Rock 2025
         ev = manejadorEvento.obtenerEvento("Conferencia de Tecnología");
         if (ev == null) {
             System.err.println("Evento Conferencia de Tecnología no encontrado");
@@ -243,7 +229,7 @@ public class CargaDatosPrueba {
                 parseFecha("12/03/2025"),
                 "Montevideo",
                 "Uruguay",
-                "src/img/IMG-EDEV01.jpeg"
+                "IMG-EDEV01.jpeg"
             );
         }
 
@@ -263,7 +249,7 @@ public class CargaDatosPrueba {
                 parseFecha("05/02/2025"),
                 "Montevideo",
                 "Uruguay",
-                "src/img/IMG-EDEV02.png"
+                "IMG-EDEV02.png"
             );
             controlador.AltaEdicionEvento(
                 ev,
@@ -276,7 +262,7 @@ public class CargaDatosPrueba {
                 parseFecha("21/04/2024"),
                 "Montevideo",
                 "Uruguay",
-                "src/img/IMG-EDEV03.jpeg"
+                "IMG-EDEV03.jpeg"
             );
             controlador.AltaEdicionEvento(
                 ev,
@@ -289,11 +275,11 @@ public class CargaDatosPrueba {
                 parseFecha("21/05/2022"),
                 "Montevideo",
                 "Uruguay",
-                "src/img/IMG-EDEV04.jpeg"
+                "IMG-EDEV04.jpeg"
             );
         }
 
-        // EDEV05–EDEV06 — Montevideo Comics (ambas con imagen)
+        // EDEV05–EDEV06 — Montevideo Comics
         ev = manejadorEvento.obtenerEvento("Montevideo Comics");
         if (ev == null) {
             System.err.println("Evento Montevideo Comics no encontrado");
@@ -309,7 +295,7 @@ public class CargaDatosPrueba {
                 parseFecha("20/06/2024"),
                 "Montevideo",
                 "Uruguay",
-                "src/img/IMG-EDEV05.jpeg"
+                "IMG-EDEV05.jpeg"
             );
             controlador.AltaEdicionEvento(
                 ev,
@@ -322,11 +308,11 @@ public class CargaDatosPrueba {
                 parseFecha("04/07/2025"),
                 "Montevideo",
                 "Uruguay",
-                "src/img/IMG-EDEV06.jpeg"
+                "IMG-EDEV06.jpeg"
             );
         }
 
-        // EDEV07 — Expointer Uruguay 2025 (con imagen)
+        // EDEV07 — Expointer Uruguay 2025
         ev = manejadorEvento.obtenerEvento("Expointer Uruguay");
         if (ev == null) {
             System.err.println("Evento Expointer Uruguay no encontrado");
@@ -342,11 +328,11 @@ public class CargaDatosPrueba {
                 parseFecha("01/02/2025"),
                 "Durazno",
                 "Uruguay",
-                "src/img/IMG-EDEV07.jpeg"
+                "IMG-EDEV07.jpeg"
             );
         }
 
-        // EDEV08–EDEV10 — Ediciones de Conferencia de Tecnología
+        // EDEV08–EDEV10 — Conferencia de Tecnología
         ev = manejadorEvento.obtenerEvento("Conferencia de Tecnología");
         if (ev == null) {
             System.err.println("Evento Conferencia de Tecnología no encontrado");
@@ -362,7 +348,7 @@ public class CargaDatosPrueba {
                 parseFecha("01/08/2025"),
                 "Punta del Este",
                 "Uruguay",
-                "src/img/IMG-EDEV08.jpeg"
+                "IMG-EDEV08.jpeg"
             );
             controlador.AltaEdicionEvento(
                 ev,
@@ -393,66 +379,40 @@ public class CargaDatosPrueba {
         }
     }
 
-    
     public static void cargarTipoRegistroEjemplo() throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
         logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
-        //TR01 - General para MONROCK25
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MONROCK25"), "General", "Acceso general a Montevideo Rock (2 días)", 1500, 2000);
-        //TR02 - VIP para MONROCK25
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MONROCK25"), "VIP", "Incluye backstage + acceso preferencial", 4000, 200);
-        //TR03 - Corredor 42K para MARATON25
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MARATON25"), "Corredor 42K", "Inscripción a la maratón completa", 1200, 499);
-        //TR04 - Corredor 21K para MARATON25
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MARATON25"), "Corredor 21K", "Inscripción a la media maratón", 800, 700);
-        //TR05 - Corredor 10K para MARATON25
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MARATON25"), "Corredor 10K", "Inscripción a la carrera 10K", 500, 1000);
-        //TR06 - Corredor 42K para MARATON24
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MARATON24"), "Corredor 42K", "Inscripción a la maratón completa", 1000, 300);
-        //TR07 - Corredor 21K para MARATON24
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MARATON24"), "Corredor 21K", "Inscripción a la media maratón", 500, 500);
-        //TR08 - Corredor 42K para MARATON22
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MARATON22"), "Corredor 42K", "Inscripción a la maratón completa", 1100, 450);
-        //TR09 - Corredor 21K para MARATON22
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MARATON22"), "Corredor 21K", "Inscripción a la media maratón", 900, 750);
-        //TR10 - Corredor 10K para MARATON22
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MARATON22"), "Corredor 10K", "Inscripción a la carrera 10K", 650, 1400);
-        //TR11 - General para COMICS24
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("COMICS24"), "General", "Entrada para los 4 días de Montevideo Comics", 600, 1500);
-        //TR12 - Cosplayer para COMICS24
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("COMICS24"), "Cosplayer", "Entrada especial con acreditación para concurso cosplay", 300, 50);
-        //TR13 - General para COMICS25
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("COMICS25"), "General", "Entrada para los 4 días de Montevideo Comics", 800, 1000);
-        //TR14 - Cosplayer para COMICS25
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("COMICS25"), "Cosplayer", "Entrada especial con acreditación para concurso cosplay", 500, 100);
-        //TR15 - General para EXPOAGRO25
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("EXPOAGRO25"), "General", "Acceso a la exposición agropecuaria", 300, 5000);
-        //TR16 - Empresarial para EXPOAGRO25
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("EXPOAGRO25"), "Empresarial", "Acceso para empresas + networking", 2000, 5);
-        //TR17 - Full para CONFTECH26
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("CONFTECH26"), "Full", "Acceso ilimitado + Cena de gala", 1800, 300);
-        //TR18 - General para CONFTECH26
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("CONFTECH26"), "General", "Acceso general", 1500, 500);
-        //TR19 - Estudiante para CONFTECH26
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("CONFTECH26"), "Estudiante", "Acceso para estudiantes", 1000, 50);
-        //TR20 - Full para MWC
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MWC"), "Full", "Acceso ilimitado + Cena de gala", 750, 550);
-        //TR21 - General para MWC
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MWC"), "General", "Acceso general", 500, 400);
-        //TR22 - Estudiante para MWC
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("MWC"), "Estudiante", "Acceso para estudiantes", 250, 400);
-        //TR23 - Full para WS26
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("WS26"), "Full", "Acceso ilimitado + Cena de gala", 900, 30);
-        //TR24 - General para WS26
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("WS26"), "General", "Acceso general", 650, 5);
-        //TR25 - Estudiante para WS26
         controlador.AltaTipoRegistro(manejadorEvento.obtenerEdicion("WS26"), "Estudiante", "Acceso para estudiantes", 300, 1);
     }
-    
+
     public static void cargarRegistrosEjemplo() {
         logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
-        logica.Manejadores.manejadorUsuario manejadorUsuario = logica.Manejadores.manejadorUsuario.getInstancia();        // Formato: idRegistro, usuario, evento, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio
+        logica.Manejadores.manejadorUsuario manejadorUsuario = logica.Manejadores.manejadorUsuario.getInstancia();
         controlador.altaRegistroEdicionEvento("atorres MONROCK25", manejadorUsuario.getUsuarios().get("atorres"), manejadorEvento.obtenerEvento("Montevideo Rock"), manejadorEvento.obtenerEdicion("MONROCK25"), manejadorEvento.obtenerEdicion("MONROCK25").obtenerTipoRegistro("VIP"), java.time.LocalDate.of(2025, 5, 14), 4000, java.time.LocalDate.of(2025, 11, 20));
         controlador.altaRegistroEdicionEvento("atorres MARATON24", manejadorUsuario.getUsuarios().get("atorres"), manejadorEvento.obtenerEvento("Maratón de Montevideo"), manejadorEvento.obtenerEdicion("MARATON24"), manejadorEvento.obtenerEdicion("MARATON24").obtenerTipoRegistro("Corredor 21K"), java.time.LocalDate.of(2024, 7, 30), 500, java.time.LocalDate.of(2024, 9, 14));
         controlador.altaRegistroEdicionEvento("sofirod WS26", manejadorUsuario.getUsuarios().get("sofirod"), manejadorEvento.obtenerEvento("Conferencia de Tecnología"), manejadorEvento.obtenerEdicion("WS26"), manejadorEvento.obtenerEdicion("WS26").obtenerTipoRegistro("Estudiante"), java.time.LocalDate.of(2025, 8, 21), 300, java.time.LocalDate.of(2026, 1, 13));
@@ -463,7 +423,7 @@ public class CargaDatosPrueba {
         controlador.altaRegistroEdicionEvento("miseventos COMICS25", manejadorUsuario.getUsuarios().get("miseventos"), manejadorEvento.obtenerEvento("Montevideo Comics"), manejadorEvento.obtenerEdicion("COMICS25"), manejadorEvento.obtenerEdicion("COMICS25").obtenerTipoRegistro("Cosplayer"), java.time.LocalDate.of(2025, 8, 3), 500, java.time.LocalDate.of(2025, 8, 4));
         controlador.altaRegistroEdicionEvento("techcorp COMICS24", manejadorUsuario.getUsuarios().get("techcorp"), manejadorEvento.obtenerEvento("Montevideo Comics"), manejadorEvento.obtenerEdicion("COMICS24"), manejadorEvento.obtenerEdicion("COMICS24").obtenerTipoRegistro("General"), java.time.LocalDate.of(2024, 7, 16), 600, java.time.LocalDate.of(2024, 7, 18));
     }
-    
+
     public static void cargarPatrociniosEjemplo() throws ValorPatrocinioExcedidoException {
         logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
@@ -508,5 +468,4 @@ public class CargaDatosPrueba {
             "EXPOCAT"
         );
     }
-    
 }

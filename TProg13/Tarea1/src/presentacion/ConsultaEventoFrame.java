@@ -3,11 +3,11 @@ package presentacion;
 import javax.swing.*;
 import java.awt.*;
 import logica.Interfaces.*;
+import logica.Datatypes.DTEvento;
 
 public class ConsultaEventoFrame extends JInternalFrame {
     private IControladorEvento controladorEvento;
     private JComboBox<String> comboEventos;
-    private DefaultListModel<String> listModel;
     private JTextField txtNombre;
     private JTextArea txtDescripcion;
     private JTextField lblCategorias;
@@ -19,13 +19,15 @@ public class ConsultaEventoFrame extends JInternalFrame {
     private JTextField txtFecha;
     private JTextField txtSigla;
 
-    private JLabel lblImagenEvento; // << imagen
+    // imagen
+    private JLabel lblImagenEvento;
+    private String[] imagenesEventos; // paralelo a combo
 
     public ConsultaEventoFrame(IControladorUsuario iCU, IControladorEvento controladorEvento) {
         super("Consulta de Evento", true, true, true, true);
         this.controladorEvento = controladorEvento;
         this.controladorUsuario = iCU;
-        setBounds(100, 100, 700, 450);
+        setBounds(100, 100, 720, 460);
         setLayout(new BorderLayout());
 
         JPanel panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -35,14 +37,12 @@ public class ConsultaEventoFrame extends JInternalFrame {
         panelSeleccion.add(comboEventos);
         add(panelSeleccion, BorderLayout.NORTH);
 
-        // Imagen a la izquierda
-        lblImagenEvento = new JLabel("Sin imagen", SwingConstants.CENTER);
-        lblImagenEvento.setBorder(BorderFactory.createTitledBorder("Imagen del evento"));
-        lblImagenEvento.setPreferredSize(new Dimension(220, 240));
-        add(lblImagenEvento, BorderLayout.WEST);
+        JPanel centro = new JPanel(new BorderLayout());
+        add(centro, BorderLayout.CENTER);
 
         JPanel panelDatos = new JPanel();
         panelDatos.setLayout(new BoxLayout(panelDatos, BoxLayout.Y_AXIS));
+        centro.add(panelDatos, BorderLayout.CENTER);
 
         JPanel panelCampos = new JPanel(new GridBagLayout());
         // Nombre
@@ -150,6 +150,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
         panelCampos.add(txtSigla, gbcSiglaField);
 
         panelDatos.add(panelCampos);
+
         panelDatos.add(Box.createVerticalStrut(10));
         JPanel panelEdiciones = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lblEdiciones = new JLabel("Ediciones:");
@@ -158,7 +159,15 @@ public class ConsultaEventoFrame extends JInternalFrame {
         panelEdiciones.add(comboEdiciones);
         panelDatos.add(panelEdiciones);
 
-        add(panelDatos, BorderLayout.CENTER);
+        // Panel lateral derecho: imagen
+        JPanel derecha = new JPanel(new BorderLayout());
+        derecha.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        lblImagenEvento = new JLabel("Sin imagen", SwingConstants.CENTER);
+        lblImagenEvento.setBorder(BorderFactory.createTitledBorder("Imagen del evento"));
+        lblImagenEvento.setPreferredSize(new Dimension(240, 180));
+        derecha.add(lblImagenEvento, BorderLayout.NORTH);
+
+        centro.add(derecha, BorderLayout.EAST);
 
         comboEventos.addActionListener(e -> mostrarDatosEvento());
         comboEdiciones.addActionListener(e -> abrirConsultaEdicion());
@@ -166,19 +175,27 @@ public class ConsultaEventoFrame extends JInternalFrame {
 
     public void cargarEventos() {
         try {
-            java.util.List<logica.Datatypes.DTEvento> eventos = controladorEvento.listarEventos();
+            java.util.List<DTEvento> eventos = controladorEvento.listarEventos();
             String[] eventosArr = new String[eventos.size()];
             datosEventos = new String[eventos.size()][3];
             categoriasEventos = new String[eventos.size()][];
             edicionesEventos = new String[eventos.size()][];
+            imagenesEventos = new String[eventos.size()];
+
             for (int i = 0; i < eventos.size(); i++) {
-                logica.Datatypes.DTEvento ev = eventos.get(i);
+                DTEvento ev = eventos.get(i);
                 eventosArr[i] = ev.getNombre();
                 datosEventos[i][0] = ev.getNombre();
                 datosEventos[i][1] = ev.getDescripcion();
                 datosEventos[i][2] = ev.getFecha().toString();
                 categoriasEventos[i] = ev.getCategorias().toArray(new String[0]);
                 edicionesEventos[i] = ev.getEdiciones().toArray(new String[0]);
+                // imagen
+                try {
+                    imagenesEventos[i] = (String) DTEvento.class.getMethod("getImagen").invoke(ev);
+                } catch (Exception ignore) {
+                    imagenesEventos[i] = null;
+                }
             }
             comboEventos.setModel(new DefaultComboBoxModel<>(eventosArr));
             comboEventos.revalidate();
@@ -191,8 +208,10 @@ public class ConsultaEventoFrame extends JInternalFrame {
                 txtDescripcion.setText("");
                 txtFecha.setText("");
                 lblCategorias.setText("");
+                txtSigla.setText("");
                 comboEdiciones.setModel(new DefaultComboBoxModel<>(new String[]{}));
-                setImageLabel(lblImagenEvento, null, null, 220, 220);
+                lblImagenEvento.setIcon(null);
+                lblImagenEvento.setText("Sin imagen");
             }
         } catch (Exception ex) {
             comboEventos.setModel(new DefaultComboBoxModel<>(new String[]{"No hay eventos"}));
@@ -202,8 +221,10 @@ public class ConsultaEventoFrame extends JInternalFrame {
             txtDescripcion.setText("");
             txtFecha.setText("");
             lblCategorias.setText("");
+            txtSigla.setText("");
             comboEdiciones.setModel(new DefaultComboBoxModel<>(new String[]{}));
-            setImageLabel(lblImagenEvento, null, null, 220, 220);
+            lblImagenEvento.setIcon(null);
+            lblImagenEvento.setText("Sin imagen");
         }
     }
 
@@ -216,7 +237,8 @@ public class ConsultaEventoFrame extends JInternalFrame {
             lblCategorias.setText("");
             txtSigla.setText("");
             comboEdiciones.setModel(new DefaultComboBoxModel<>(new String[]{}));
-            setImageLabel(lblImagenEvento, null, null, 220, 220);
+            lblImagenEvento.setIcon(null);
+            lblImagenEvento.setText("Sin imagen");
             return;
         }
         txtNombre.setText(datosEventos[idx][0]);
@@ -229,24 +251,27 @@ public class ConsultaEventoFrame extends JInternalFrame {
         if (cats.length() > 2) cats.setLength(cats.length() - 2);
         lblCategorias.setText(cats.toString());
 
-        // Obtener la sigla e imagen del evento
+        // Sigla
+        String sigla = "";
         try {
-            java.util.List<logica.Datatypes.DTEvento> eventos = controladorEvento.listarEventos();
+            java.util.List<DTEvento> eventos = controladorEvento.listarEventos();
             if (idx < eventos.size()) {
-                String sigla = eventos.get(idx).getSigla();
-                txtSigla.setText(sigla);
-
-                String img = eventos.get(idx).getImagen();
-                setImageLabel(lblImagenEvento, "img/", img, 220, 220);
+                sigla = eventos.get(idx).getSigla();
             }
         } catch (Exception ex) {
-            txtSigla.setText("");
-            setImageLabel(lblImagenEvento, null, null, 220, 220);
+            sigla = "";
         }
+        txtSigla.setText(sigla);
 
         comboEdiciones.setModel(new DefaultComboBoxModel<>(edicionesEventos[idx]));
         comboEdiciones.revalidate();
         comboEdiciones.repaint();
+
+        // Imagen
+        String img = (imagenesEventos != null && idx < imagenesEventos.length) ? imagenesEventos[idx] : null;
+        ImageIcon icon = loadIcon(img, 260, 180);
+        lblImagenEvento.setIcon(icon);
+        lblImagenEvento.setText(icon == null ? "Sin imagen" : null);
     }
 
     private void abrirConsultaEdicion() {
@@ -267,7 +292,6 @@ public class ConsultaEventoFrame extends JInternalFrame {
             return;
         }
         String sigla = ed.getSigla();
-
         controladorEvento.seleccionarEdicion(sigla);
 
         ConsultaEdicionEventoFrame frameEdicion =
@@ -283,24 +307,26 @@ public class ConsultaEventoFrame extends JInternalFrame {
         }
     }
 
-    private static void setImageLabel(JLabel lbl, String baseDir, String fileName, int w, int h) {
-        if (fileName == null || fileName.isBlank()) {
-            lbl.setIcon(null);
-            lbl.setText("Sin imagen");
-            return;
-        }
-        java.io.File f = new java.io.File((baseDir == null ? "" : baseDir) + fileName);
-        if (!f.exists()) {
-            f = new java.io.File("src/" + (baseDir == null ? "" : baseDir) + fileName);
-        }
-        if (f.exists()) {
-            ImageIcon icon = new ImageIcon(f.getAbsolutePath());
-            Image scaled = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
-            lbl.setIcon(new ImageIcon(scaled));
-            lbl.setText("");
-        } else {
-            lbl.setIcon(null);
-            lbl.setText("Sin imagen");
+    // ==== IMÁGENES ====
+    private static ImageIcon loadIcon(String imgName, int w, int h) {
+        if (imgName == null || imgName.isBlank()) return null;
+        try {
+            String cpPath = "img/" + imgName;
+            java.net.URL url = Thread.currentThread().getContextClassLoader().getResource(cpPath);
+            Image base;
+            if (url != null) {
+                base = new ImageIcon(url).getImage();
+            } else {
+                java.io.File f1 = new java.io.File("src/img/" + imgName);
+                java.io.File f2 = new java.io.File("img/" + imgName);
+                java.io.File f = f1.exists() ? f1 : (f2.exists() ? f2 : null);
+                if (f == null) return null;
+                base = new ImageIcon(f.getAbsolutePath()).getImage();
+            }
+            Image scaled = base.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaled);
+        } catch (Exception e) {
+            return null;
         }
     }
 }

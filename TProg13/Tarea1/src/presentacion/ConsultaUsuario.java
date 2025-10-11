@@ -35,7 +35,8 @@ public class ConsultaUsuario extends JInternalFrame {
     private JComboBox<String> comboEds;
     private java.util.List<DTEdicion> listaEds = new ArrayList<>();
 
-    private JLabel lblImagenUsuario; // << imagen de perfil
+    // Imagen de usuario
+    private JLabel lblImagenUsuario;
 
     private boolean cargando = false;
 
@@ -48,7 +49,7 @@ public class ConsultaUsuario extends JInternalFrame {
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setSize(720, 560);
+        setSize(760, 600);
         setLayout(new BorderLayout(10, 10));
 
         // ===== Barra superior =====
@@ -65,16 +66,15 @@ public class ConsultaUsuario extends JInternalFrame {
 
         // ===== Centro con scroll =====
         JPanel centro = new JPanel();
-        centro.setLayout(new BoxLayout(centro, BoxLayout.Y_AXIS));
+        centro.setLayout(new BoxLayout(centro, BoxLayout.X_AXIS));
         add(new JScrollPane(centro,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
 
-        // ===== Imagen del usuario =====
-        lblImagenUsuario = new JLabel("Sin imagen", SwingConstants.CENTER);
-        lblImagenUsuario.setBorder(BorderFactory.createTitledBorder("Imagen de perfil"));
-        lblImagenUsuario.setPreferredSize(new Dimension(160, 180));
-        centro.add(lblImagenUsuario);
+        // Panel izquierdo: datos + específicos
+        JPanel izquierda = new JPanel();
+        izquierda.setLayout(new BoxLayout(izquierda, BoxLayout.Y_AXIS));
+        centro.add(izquierda);
 
         // ===== Panel datos básicos =====
         JPanel panelComunes = new JPanel(new GridBagLayout());
@@ -99,7 +99,7 @@ public class ConsultaUsuario extends JInternalFrame {
         lblFechaNac    = addRow(panelComunes, gc, row++, "Fecha de nacimiento:", txtFechaNac);
         lblInstitucion = addRow(panelComunes, gc, row++, "Institución:",         txtInstitucion);
 
-        centro.add(panelComunes);
+        izquierda.add(panelComunes);
 
         // ===== Panel específico (cards) =====
         cardTipo = new CardLayout();
@@ -179,7 +179,18 @@ public class ConsultaUsuario extends JInternalFrame {
             }
         });
 
-        centro.add(panelEspecifico);
+        izquierda.add(panelEspecifico);
+
+        // Panel derecho: imagen
+        JPanel derecha = new JPanel(new BorderLayout());
+        derecha.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        lblImagenUsuario = new JLabel();
+        lblImagenUsuario.setHorizontalAlignment(SwingConstants.CENTER);
+        lblImagenUsuario.setPreferredSize(new Dimension(220, 220));
+        lblImagenUsuario.setBorder(BorderFactory.createTitledBorder("Imagen"));
+        derecha.add(lblImagenUsuario, BorderLayout.NORTH);
+
+        centro.add(derecha);
 
         limpiarCampos();
         showVacio();
@@ -229,8 +240,10 @@ public class ConsultaUsuario extends JInternalFrame {
         txtNombre.setText(nvl(datos.getNombre()));
         txtCorreo.setText(nvl(datos.getEmail()));
 
-        // === IMAGEN DE USUARIO ===
-        setImageLabel(lblImagenUsuario, "img/", nvl(datos.getImagen()), 160, 160);
+        // Imagen
+        ImageIcon ico = loadIcon(datos.getImagen(), 200, 200);
+        lblImagenUsuario.setIcon(ico);
+        lblImagenUsuario.setText(ico == null ? "Sin imagen" : null);
 
         boolean esAsistente   = controlUsr.listarAsistentes()    != null &&
                                 controlUsr.listarAsistentes().containsKey(nickname);
@@ -308,7 +321,8 @@ public class ConsultaUsuario extends JInternalFrame {
         comboEds.setVisible(false);
         comboRegs.setModel(new DefaultComboBoxModel<>());
         cardTipo.show(panelEspecifico, "VACIO");
-        setImageLabel(lblImagenUsuario, null, null, 160, 160);
+        lblImagenUsuario.setIcon(null);
+        lblImagenUsuario.setText("Sin imagen");
     }
 
     private void limpiarCampos() {
@@ -357,25 +371,26 @@ public class ConsultaUsuario extends JInternalFrame {
 
     private static String nvl(String s) { return s == null ? "" : s; }
 
-    private static void setImageLabel(JLabel lbl, String baseDir, String fileName, int w, int h) {
-        if (fileName == null || fileName.isBlank()) {
-            lbl.setIcon(null);
-            lbl.setText("Sin imagen");
-            return;
-        }
-        java.io.File f = new java.io.File((baseDir == null ? "" : baseDir) + fileName);
-        if (!f.exists()) {
-            // intento alternativo en src/
-            f = new java.io.File("src/" + (baseDir == null ? "" : baseDir) + fileName);
-        }
-        if (f.exists()) {
-            ImageIcon icon = new ImageIcon(f.getAbsolutePath());
-            Image scaled = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
-            lbl.setIcon(new ImageIcon(scaled));
-            lbl.setText("");
-        } else {
-            lbl.setIcon(null);
-            lbl.setText("Sin imagen");
+    // ==== IMÁGENES ====
+    private static ImageIcon loadIcon(String imgName, int w, int h) {
+        if (imgName == null || imgName.isBlank()) return null;
+        try {
+            String cpPath = "img/" + imgName;
+            java.net.URL url = Thread.currentThread().getContextClassLoader().getResource(cpPath);
+            Image base;
+            if (url != null) {
+                base = new ImageIcon(url).getImage();
+            } else {
+                java.io.File f1 = new java.io.File("src/img/" + imgName);
+                java.io.File f2 = new java.io.File("img/" + imgName);
+                java.io.File f = f1.exists() ? f1 : (f2.exists() ? f2 : null);
+                if (f == null) return null;
+                base = new ImageIcon(f.getAbsolutePath()).getImage();
+            }
+            Image scaled = base.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaled);
+        } catch (Exception e) {
+            return null;
         }
     }
 }

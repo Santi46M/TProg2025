@@ -35,7 +35,8 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
     private JPanel panelGridRegistros;
     private JScrollPane scrollGridRegistros;
 
-    private JLabel lblImagenEdicion; // << imagen
+    // Imagen
+    private JLabel lblImagenEdicion;
 
     /**
      * @wbp.parser.constructor
@@ -61,14 +62,11 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         panelSeleccion.add(comboEdiciones);
         getContentPane().add(panelSeleccion, BorderLayout.NORTH);
 
-        // Imagen a la izquierda
-        lblImagenEdicion = new JLabel("Sin imagen", SwingConstants.CENTER);
-        lblImagenEdicion.setBorder(BorderFactory.createTitledBorder("Imagen de la edición"));
-        lblImagenEdicion.setPreferredSize(new Dimension(240, 260));
-        add(lblImagenEdicion, BorderLayout.WEST);
+        JPanel center = new JPanel(new BorderLayout());
+        add(center, BorderLayout.CENTER);
 
         JPanel panelDatos = new JPanel(new GridLayout(0, 2, 8, 6));
-        add(panelDatos, BorderLayout.CENTER);
+        center.add(panelDatos, BorderLayout.CENTER);
 
         panelDatos.add(labelR("Nombre Edición:"));  txtNombreEdicion = roField(panelDatos);
         panelDatos.add(labelR("Sigla:"));           txtSigla         = roField(panelDatos);
@@ -94,6 +92,15 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         scrollGridRegistros = new JScrollPane(panelGridRegistros);
         panelDatos.add(scrollGridRegistros);
         panelDatos.add(new JLabel());
+
+        // Lateral derecho con imagen
+        JPanel derecha = new JPanel(new BorderLayout());
+        derecha.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+        lblImagenEdicion = new JLabel("Sin imagen", SwingConstants.CENTER);
+        lblImagenEdicion.setPreferredSize(new Dimension(280, 210));
+        lblImagenEdicion.setBorder(BorderFactory.createTitledBorder("Imagen de la edición"));
+        derecha.add(lblImagenEdicion, BorderLayout.NORTH);
+        center.add(derecha, BorderLayout.EAST);
 
         comboEventos.addActionListener(e -> { if (!cambiando) cargarEdicionesEvento(); });
         comboEdiciones.addActionListener(e -> { if (!cambiando) mostrarDatosEdicion(); });
@@ -215,9 +222,6 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         txtPais.setText(ed.getPais());
         txtOrganizador.setText(ed.getOrganizador() != null ? ed.getOrganizador().getNickname() : "");
 
-        // Imagen de la edición (usa ed.getImagen())
-        setImageLabel(lblImagenEdicion, "img/", ed.getImagen(), 240, 240);
-
         comboTiposRegistro.removeAllItems();
         for (TipoRegistro tr : ed.getTiposRegistro()) comboTiposRegistro.addItem(tr.getNombre());
 
@@ -235,6 +239,11 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         }
         panelGridRegistros.revalidate();
         panelGridRegistros.repaint();
+
+        // Imagen
+        ImageIcon icon = loadIcon(ed.getImagen(), 300, 210);
+        lblImagenEdicion.setIcon(icon);
+        lblImagenEdicion.setText(icon == null ? "Sin imagen" : null);
     }
 
     // helpers
@@ -256,7 +265,8 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         panelGridRegistros.add(new JLabel("Costo", SwingConstants.CENTER));
         panelGridRegistros.revalidate();
         panelGridRegistros.repaint();
-        setImageLabel(lblImagenEdicion, null, null, 240, 240);
+        lblImagenEdicion.setIcon(null);
+        lblImagenEdicion.setText("Sin imagen");
     }
 
     private void seleccionarItemPorTexto(JComboBox<String> combo, String texto) {
@@ -291,24 +301,26 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         f.toFront();
     }
 
-    private static void setImageLabel(JLabel lbl, String baseDir, String fileName, int w, int h) {
-        if (fileName == null || fileName.isBlank()) {
-            lbl.setIcon(null);
-            lbl.setText("Sin imagen");
-            return;
-        }
-        java.io.File f = new java.io.File((baseDir == null ? "" : baseDir) + fileName);
-        if (!f.exists()) {
-            f = new java.io.File("src/" + (baseDir == null ? "" : baseDir) + fileName);
-        }
-        if (f.exists()) {
-            ImageIcon icon = new ImageIcon(f.getAbsolutePath());
-            Image scaled = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
-            lbl.setIcon(new ImageIcon(scaled));
-            lbl.setText("");
-        } else {
-            lbl.setIcon(null);
-            lbl.setText("Sin imagen");
+    // ==== IMÁGENES ====
+    private static ImageIcon loadIcon(String imgName, int w, int h) {
+        if (imgName == null || imgName.isBlank()) return null;
+        try {
+            String cpPath = "img/" + imgName;
+            java.net.URL url = Thread.currentThread().getContextClassLoader().getResource(cpPath);
+            Image base;
+            if (url != null) {
+                base = new ImageIcon(url).getImage();
+            } else {
+                java.io.File f1 = new java.io.File("src/img/" + imgName);
+                java.io.File f2 = new java.io.File("img/" + imgName);
+                java.io.File f = f1.exists() ? f1 : (f2.exists() ? f2 : null);
+                if (f == null) return null;
+                base = new ImageIcon(f.getAbsolutePath()).getImage();
+            }
+            Image scaled = base.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            return new ImageIcon(scaled);
+        } catch (Exception e) {
+            return null;
         }
     }
 }
