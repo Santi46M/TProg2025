@@ -19,13 +19,18 @@ public class LoginServlet extends HttpServlet {
         return req.getContextPath();
     }
 
+    private void cargarInstituciones(HttpServletRequest req) {
+        IControladorUsuario cu = fabrica.getInstance().getIControladorUsuario();
+        java.util.Set<String> instituciones = cu.getInstituciones();
+        req.getSession().setAttribute("instituciones", instituciones);
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
         String path = req.getServletPath();
-
         if ("/auth/login".equals(path)) {
+            cargarInstituciones(req);
             req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
             return;
         }

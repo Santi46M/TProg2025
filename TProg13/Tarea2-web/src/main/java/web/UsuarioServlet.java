@@ -30,6 +30,12 @@ public class UsuarioServlet extends HttpServlet {
     return s == null ? null : (String) s.getAttribute("nick");
   }
 
+  private void cargarInstituciones(HttpServletRequest req) {
+    // Carga las instituciones directamente desde la lógica, no desde la sesión
+    java.util.Collection<String> instituciones = cu.getInstituciones();
+    req.setAttribute("instituciones", instituciones);
+  }
+
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
@@ -44,6 +50,7 @@ public class UsuarioServlet extends HttpServlet {
 
     switch (path) {
       case "/usuario/AltaUsuario":
+        cargarInstituciones(req);
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
         
 

@@ -35,22 +35,22 @@ public class AltaRegistroServlet extends HttpServlet {
 
         if (path == null || "/".equals(path) || "/alta".equals(path)) {
             if (!requiereOrganizador(req, resp)) return;
-
-            // Lista de eventos con sus ediciones
-            List<DTEvento> eventos = ce().listarEventos();
-            req.setAttribute("eventos", eventos);
-
-            List<String> eventosConEdiciones = ce().listarEventosConEdicionesIngresadas();
+            HttpSession s = req.getSession(false);
+            String nick = s == null ? null : (String) s.getAttribute("nick");
             List<Ediciones> ediciones = new ArrayList<>();
-
-            for (String nombreEvento : eventosConEdiciones) {
-                List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
-                for (String nomEd : nombresEd) {
-                    Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);
-                    if (ed != null) ediciones.add(ed);
+            if (nick != null) {
+                // Solo ediciones organizadas por el usuario logueado
+                List<String> eventosConEdiciones = ce().listarEventosConEdicionesIngresadas();
+                for (String nombreEvento : eventosConEdiciones) {
+                    List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
+                    for (String nomEd : nombresEd) {
+                        Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);
+                        if (ed != null && ed.getOrganizador() != null && ed.getOrganizador().getNickname().equals(nick)) {
+                            ediciones.add(ed);
+                        }
+                    }
                 }
             }
-
             req.setAttribute("ediciones", ediciones);
             req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
             return;
@@ -87,14 +87,20 @@ public class AltaRegistroServlet extends HttpServlet {
                 float costo = Float.parseFloat(costoStr);
                 int cupo = Integer.parseInt(cupoStr);
                 Ediciones ed = ce().obtenerEdicionPorSigla(siglaEdicion);
-
+                HttpSession s = req.getSession(false);
+                String nick = s == null ? null : (String) s.getAttribute("nick");
                 if (ed == null) {
                     req.setAttribute("error", "No se encontró la edición seleccionada.");
                     recargarDatos(req);
                     req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                     return;
                 }
-
+                if (ed.getOrganizador() == null || !ed.getOrganizador().getNickname().equals(nick)) {
+                    req.setAttribute("error", "Solo el organizador de la edición puede crear tipos de registro para ella.");
+                    recargarDatos(req);
+                    req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+                    return;
+                }
                 ce().AltaTipoRegistro(ed, nombre, descripcion, costo, cupo);
                 req.setAttribute("mensaje", "Registro creado correctamente.");
                 req.getRequestDispatcher(JSP_OK).forward(req, resp);
@@ -111,20 +117,21 @@ public class AltaRegistroServlet extends HttpServlet {
     }
 
     private void recargarDatos(HttpServletRequest req) {
-        List<DTEvento> eventos = ce().listarEventos();
-        req.setAttribute("eventos", eventos);
-
-        List<String> eventosConEdiciones = ce().listarEventosConEdicionesIngresadas();
+        HttpSession s = req.getSession(false);
+        String nick = s == null ? null : (String) s.getAttribute("nick");
         List<Ediciones> ediciones = new ArrayList<>();
-
-        for (String nombreEvento : eventosConEdiciones) {
-            List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
-            for (String nomEd : nombresEd) {
-                Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);
-                if (ed != null) ediciones.add(ed);
+        if (nick != null) {
+            List<String> eventosConEdiciones = ce().listarEventosConEdicionesIngresadas();
+            for (String nombreEvento : eventosConEdiciones) {
+                List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
+                for (String nomEd : nombresEd) {
+                    Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);
+                    if (ed != null && ed.getOrganizador() != null && ed.getOrganizador().getNickname().equals(nick)) {
+                        ediciones.add(ed);
+                    }
+                }
             }
         }
-
         req.setAttribute("ediciones", ediciones);
     }
 
