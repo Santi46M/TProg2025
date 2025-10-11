@@ -38,19 +38,6 @@
         </div>
       </div>
 
-      <div class="input-group">
-        <label for="institucion">Institución</label>
-        <select name="institucion" id="institucion" required>
-          <option value="">-- Seleccione una institución --</option>
-          <% Collection<String> instituciones = (Collection<String>) request.getAttribute("instituciones");
-             if (instituciones != null) {
-               for (String inst : instituciones) { %>
-                 <option value="<%= inst %>"><%= inst %></option>
-          <%   }
-             } %>
-        </select>
-      </div>
-
       <div class="acciones-iniciar-sesion">
         <button type="submit" class="btn btn-iniciar-sesion">Ingresar</button>
         <a class="btn ghost btn-cancelar-iniciar-sesion" href="<%=ctx%>/">Cancelar</a>

@@ -18,30 +18,9 @@
 <body>
 
 <jsp:include page="/WEB-INF/templates/header.jsp" />
-
-<div class="container row" style="margin-top:1rem;">
-  <aside class="card aside-inicio">
-    <h3>Menú</h3>
-    <h4>Acciones</h4>
-    <ul>
-      <li><a href="<%=ctx%>/registro/inscripcion">Registrarse a Edición de Evento</a></li>
-    </ul>
-    <h4>Categorías</h4>
-    <ul class="menu-categorias">
-      <li><a href="#">Tecnología</a></li>
-      <li><a href="#">Innovación</a></li>
-      <li><a href="#">Literatura</a></li>
-      <li><a href="#">Cultura</a></li>
-      <li><a href="#">Música</a></li>
-      <li><a href="#">Deporte</a></li>
-      <li><a href="#">Salud</a></li>
-      <li><a href="#">Entretenimiento</a></li>
-      <li><a href="#">Negocios</a></li>
-    </ul>
-    <h4><a href="<%=ctx%>/usuario/ConsultaUsuario">Listar Usuarios</a></h4>
-  </aside>
-
-  <main class="container">
+<div class="container row" style="margin-top:1rem; display: flex; align-items: flex-start;">
+  <jsp:include page="/WEB-INF/templates/menu.jsp" />
+  <main class="container" style="flex:2; min-width:0;">
     <section class="form-card-registroEdicionEvento">
       <h2>Registrarse a Edición de Evento</h2>
       <% if (request.getAttribute("error") != null) { %>
@@ -73,7 +52,6 @@
     </section>
   </main>
 </div>
-
 <script>
   const data = {
     <% if (eventos != null) {

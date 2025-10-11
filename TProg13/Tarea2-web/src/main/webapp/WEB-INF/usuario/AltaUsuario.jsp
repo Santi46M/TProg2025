@@ -18,17 +18,10 @@
 <body>
 
 <jsp:include page="/WEB-INF/templates/header.jsp" />
-<!-- Layout principal con sidebar -->
-<div class="container row layout-alta-usuario">
-
- <!-- Sidebar -->
-
-     <jsp:include page="/WEB-INF/templates/menu.jsp" />
-
- 
-
+<div class="container row layout-alta-usuario" style="display:flex; align-items:flex-start;">
+  <jsp:include page="/WEB-INF/templates/menu.jsp" />
   <!-- Main -->
-  <main class="form-wrapper-alta-usuario">
+  <main class="form-wrapper-alta-usuario" style="flex:2; min-width:0;">
     <h1 class="titulo-alta-usuario">Crear cuenta</h1>
 
     <form id="altaForm" class="form-alta-usuario" method="post" action="<%=ctx%>/usuario/AltaUsuario" novalidate>

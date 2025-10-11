@@ -144,13 +144,12 @@ public class UsuarioServlet extends HttpServlet {
             null,
             null
         );
-        
         // Dejamos logueado al recién creado
         HttpSession s = req.getSession(true);
         s.setAttribute("nick", nick);
         s.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
-        resp.sendRedirect(ctx(req) + "/");
-        
+        resp.sendRedirect(ctx(req) + "/inicio");
+        return;
       } catch (UsuarioYaExisteException e) {
         req.setAttribute("error", e.getMessage());
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
