@@ -33,27 +33,7 @@
 </head>
 <body>
 
-<header class="site-header">
-  <div class="container">
-    <a class="brand" href="<%=ctx%>/inicio">Eventos.uy</a>
-
-    <nav class="main-nav">
-      <form class="search" action="<%=ctx%>/buscar" method="get" role="search" aria-label="Buscar">
-        <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-        <button class="btn" type="submit">Buscar</button>
-      </form>
-    </nav>
-
-    <nav class="user-nav" id="userNav">
-      <% if (nick == null) { %>
-        <a class="btn" href="<%=ctx%>/auth/login"><i class='bx bxs-user'></i> Iniciar sesión</a>
-      <% } else { %>
-        <span class="user-name">Hola, <strong><%= nick %></strong></span>
-        <a class="btn" href="<%=ctx%>/auth/logout"><i class='bx bxs-user'></i> Cerrar sesión</a>
-      <% } %>
-    </nav>
-  </div>
-</header>
+<jsp:include page="/WEB-INF/templates/header.jsp" />
 
 <div class="container row" style="margin-top:1rem;">
 

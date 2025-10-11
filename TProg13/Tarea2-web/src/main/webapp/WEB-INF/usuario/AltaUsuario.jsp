@@ -15,23 +15,7 @@
 </head>
 <body>
 
-<!-- Header -->
-<header class="site-header">
-  <div class="container">
-      <a class="brand" href="<%=ctx%>/inicio">Eventos.uy</a>
-    <nav class="main-nav">
-      <form class="search" action="<%=ctx%>/buscar" method="get" role="search">
-        <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-        <button class="btn" type="submit">Buscar</button>
-      </form>
-    </nav>
-    <nav class="user-nav" id="userNav">
-      <a class="btn ghost" href="<%=ctx%>/auth/login">Iniciar Sesión</a>
-      <a class="btn" href="<%=ctx%>/usuario/AltaUsuario">Registrarse</a>
-    </nav>
-  </div>
-</header>
-
+<jsp:include page="/WEB-INF/templates/header.jsp" />
 <!-- Layout principal con sidebar -->
 <div class="container row layout-alta-usuario">
 

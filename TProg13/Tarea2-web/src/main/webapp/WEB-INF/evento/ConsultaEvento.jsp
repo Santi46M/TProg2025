@@ -22,28 +22,7 @@
 <body>
 
 <!-- Header (igual al index) -->
-<header class="site-header">
-  <div class="container">
-    <a class="brand" href="<%=ctx%>/inicio">Eventos.uy</a>
-
-    <nav class="main-nav">
-      <form class="search" action="<%= ctx %>/buscar" method="get" role="search" aria-label="Buscar">
-        <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-        <button class="btn" type="submit">Buscar</button>
-      </form>
-    </nav>
-
-    <nav class="user-nav" id="userNav">
-      <% if (nick == null) { %>
-        <a class="btn ghost" href="<%= ctx %>/auth/login"><i class='bx bxs-user'></i> Iniciar sesión</a>
-        <a class="btn" href="<%= ctx %>/usuario/alta"><i class='bx bxs-user-plus'></i> Registrarse</a>
-      <% } else { %>
-        <span class="user-chip"><i class='bx bxs-user'></i> <%= nick %></span>
-        <a class="btn ghost" href="<%= ctx %>/auth/logout"><i class='bx bx-log-out'></i> Cerrar sesión</a>
-      <% } %>
-    </nav>
-  </div>
-</header>
+<jsp:include page="/WEB-INF/templates/header.jsp" />
 
 <div class="container row" style="margin-top:1rem;">
 
