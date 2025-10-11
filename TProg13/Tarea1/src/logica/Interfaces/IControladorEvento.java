@@ -36,5 +36,5 @@ public interface IControladorEvento {
     public List<String> listarEventosConEdicionesIngresadas();
     public List<String> listarEdicionesIngresadasDeEvento(String nombreEvento);
     public void aceptarRechazarEdicion(Ediciones edicion, boolean aceptar);
-    public void cambiarEstadoEdicion(Eventos evento, Ediciones edicion, boolean aceptar);
+    public void cambiarEstadoEdicion(String evento, String edicion, boolean aceptar);
 }

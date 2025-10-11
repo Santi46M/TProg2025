@@ -170,29 +170,54 @@ public class CargaDatosPrueba {
     
     public static void cargarUsuariosEjemplo() throws UsuarioYaExisteException {
         logica.Controladores.ControladorUsuario controlador = new logica.Controladores.ControladorUsuario();
-        manejadorUsuario manejador = manejadorUsuario.getInstancia();
-        // Asistentes
-        controlador.AltaUsuario("atorres", "Ana", "atorres@gmail.com", null, null, "Torres", java.time.LocalDate.of(1990, 5, 12), "Facultad de Ingeniería", false);
-        controlador.AltaUsuario("msilva", "Martin", "martin.silva@fing.edu.uy", null, null, "Silva", java.time.LocalDate.of(1987, 8, 21), "Facultad de Ingeniería", false);
-        controlador.AltaUsuario("sofirod", "Sofia", "srodriguez@outlook.com", null, null, "Rodriguez", java.time.LocalDate.of(1995, 2, 3), "Universidad Católica del Uruguay", false);
-        controlador.AltaUsuario("vale23", "Valentina", "valentina.costa@mail.com", null, null, "Costa", java.time.LocalDate.of(1992, 12, 1), null, false);
-        controlador.AltaUsuario("luciag", "Lucía", "lucia.garcia@mail.com", null, null, "García", java.time.LocalDate.of(1993, 11, 9), null, false);
-        controlador.AltaUsuario("andrearod", "Andrea", "andrea.rod@mail.com", null, null, "Rodríguez", java.time.LocalDate.of(2000, 6, 10), "Agencia Nacional de Investigación e Innovación (ANII)", false);
-        controlador.AltaUsuario("AnaG", "Ana", "ana.gomez@hotmail.com", null, null, "Gómez", java.time.LocalDate.of(1998, 3, 15), null, false);
-        controlador.AltaUsuario("JaviL", "Javier", "javier.lopez@outlook.com", null, null, "López", java.time.LocalDate.of(1995, 7, 22), null, false);
-        controlador.AltaUsuario("MariR", "María", "maria.rodriguez@gmail.com", null, null, "Rodríguez", java.time.LocalDate.of(2000, 11, 10), null, false);
-        controlador.AltaUsuario("SofiM", "Sofía", "sofia.martinez@yahoo.com", null, null, "Martínez", java.time.LocalDate.of(1997, 2, 5), null, false);
-        // Organizadores
-        //US04
-        controlador.AltaUsuario("miseventos", "MisEventos", "contacto@miseventos.com", "Empresa de organización de eventos.", "https://miseventos.com", null, null, null, true);
-        //US05
-        controlador.AltaUsuario("techcorp", "Corporación Tecnológica", "info@techcorp.com", "Empresa líder en tecnologías de la información.", null, null, null, null, true);
-        //US06
-        controlador.AltaUsuario("imm", "Intendencia de Montevideo", "contacto@imm.gub.uy", "Gobierno departamental de Montevideo.", "https://montevideo.gub.uy", null, null, null, true);
-        //US10
-        controlador.AltaUsuario("udelar", "Universidad de la República", "contacto@udelar.edu.uy", "Universidad pública de Uruguay.", "https://udelar.edu.uy", null, null, null, true);
-        //US11
-        controlador.AltaUsuario("mec", "Ministerio de Educación y Cultura", "mec@mec.gub.uy", "Institución pública promotora de cultura.", "https://mec.gub.uy", null, null, null, true);
+
+        // Asistentes (descripcion y link = null)
+        controlador.AltaUsuario("atorres", "Ana", "atorres@gmail.com", null, null, "Torres", 
+            java.time.LocalDate.of(1990, 5, 12), "Facultad de Ingeniería", false, "123.torres", "IMG-US01.jpg");
+
+        controlador.AltaUsuario("msilva", "Martin", "martin.silva@fing.edu.uy", null, null, "Silva", 
+            java.time.LocalDate.of(1987, 8, 21), "Facultad de Ingeniería", false, "msilva2025", "IMG-US02.jpg");
+
+        controlador.AltaUsuario("sofirod", "Sofia", "srodriguez@outlook.com", null, null, "Rodriguez", 
+            java.time.LocalDate.of(1995, 2, 3), "Universidad Católica del Uruguay", false, "srod.abc1", "IMG-US03.jpeg");
+
+        controlador.AltaUsuario("vale23", "Valentina", "valentina.costa@mail.com", null, null, "Costa", 
+            java.time.LocalDate.of(1992, 12, 1), null, false, "valen11c", "IMG-US07.jpeg");
+
+        controlador.AltaUsuario("luciag", "Lucía", "lucia.garcia@mail.com", null, null, "García", 
+            java.time.LocalDate.of(1993, 11, 9), null, false, "garcia.22l", "IMG-US08.jpeg");
+
+        controlador.AltaUsuario("andrearod", "Andrea", "andrea.rod@mail.com", null, null, "Rodríguez", 
+            java.time.LocalDate.of(2000, 6, 10), "Agencia Nacional de Investigación e Innovación (ANII)", false, "rod77and", "IMG-US09.jpeg");
+
+        controlador.AltaUsuario("AnaG", "Ana", "ana.gomez@hotmail.com", null, null, "Gómez", 
+            java.time.LocalDate.of(1998, 3, 15), null, false, "gomez88a", "IMG-US12.png");
+
+        controlador.AltaUsuario("JaviL", "Javier", "javier.lopez@outlook.com", null, null, "López", 
+            java.time.LocalDate.of(1995, 7, 22), null, false, "jl99lopez", "IMG-US13.jpeg");
+
+        controlador.AltaUsuario("MariR", "María", "maria.rodriguez@gmail.com", null, null, "Rodríguez", 
+            java.time.LocalDate.of(2000, 11, 10), null, false, "maria55r", "IMG-US14.jpeg");
+
+        controlador.AltaUsuario("SofiM", "Sofía", "sofia.martinez@yahoo.com", null, null, "Martínez", 
+            java.time.LocalDate.of(1997, 2, 5), null, false, "smarti99z", "IMG-US15.jpeg");
+
+
+        // Organizadores (apellido y fechaNacimiento = null)
+        controlador.AltaUsuario("miseventos", "MisEventos", "contacto@miseventos.com", 
+            "Empresa de organización de eventos.", "https://miseventos.com", null, null, null, true, "22miseventos", "IMG-US04.jpeg");
+
+        controlador.AltaUsuario("techcorp", "Corporación Tecnológica", "info@techcorp.com", 
+            "Empresa líder en tecnologías de la información.", null, null, null, null, true, "tech25corp", "IMG-US05.jpeg");
+
+        controlador.AltaUsuario("imm", "Intendencia de Montevideo", "contacto@imm.gub.uy", 
+            "Gobierno departamental de Montevideo.", "https://montevideo.gub.uy", null, null, null, true, "imm2025", "IMG-US06.png");
+
+        controlador.AltaUsuario("udelar", "Universidad de la República", "contacto@udelar.edu.uy", 
+            "Universidad pública de Uruguay.", "https://udelar.edu.uy", null, null, null, true, "25udelar", "IMG-US10.jpeg");
+
+        controlador.AltaUsuario("mec", "Ministerio de Educación y Cultura", "mec@mec.gub.uy", 
+            "Institución pública promotora de cultura.", "https://mec.gub.uy", null, null, null, true, "mec2025ok", "IMG-US11.png");
     }
     
     public static void cargarEdicionesEjemplo() throws Exception {
