@@ -32,15 +32,14 @@ public class AltaEventoFrame extends JInternalFrame {
     
     public AltaEventoFrame(IControladorUsuario iCU, IControladorEvento iCE) {
         super("Alta de Evento", true, true, true, true);
-        setBounds(new Rectangle(50, 50, 450, 300));
+        setBounds(new Rectangle(50, 50, 550, 400));
         setVisible(true);
-        
 
         GridBagLayout gridBagLayout = new GridBagLayout();
         gridBagLayout.columnWidths = new int[3];
-        gridBagLayout.rowHeights = new int[6];
+        gridBagLayout.rowHeights = new int[7];
         gridBagLayout.columnWeights = new double[]{1.0, 1.0, Double.MIN_VALUE};
-        gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gridBagLayout.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         getContentPane().setLayout(gridBagLayout);
 
         // Nombre
@@ -59,10 +58,10 @@ public class AltaEventoFrame extends JInternalFrame {
         gbc_txtNombre.gridx = 1;
         gbc_txtNombre.gridy = 0;
         getContentPane().add(txtNombre, gbc_txtNombre);
-        txtNombre.setColumns(10);
+        txtNombre.setColumns(15);
 
-        // Descripcion
-        JLabel lblDescripcion = new JLabel("Descripcion:");
+        // Descripción
+        JLabel lblDescripcion = new JLabel("Descripción:");
         GridBagConstraints gbc_lblDescripcion = new GridBagConstraints();
         gbc_lblDescripcion.insets = new Insets(0, 0, 5, 5);
         gbc_lblDescripcion.anchor = GridBagConstraints.WEST;
@@ -77,7 +76,7 @@ public class AltaEventoFrame extends JInternalFrame {
         gbc_txtDescripcion.gridx = 1;
         gbc_txtDescripcion.gridy = 1;
         getContentPane().add(txtDescripcion, gbc_txtDescripcion);
-        txtDescripcion.setColumns(10);
+        txtDescripcion.setColumns(15);
 
         // Fecha
         JLabel lblFecha = new JLabel("Fecha:");
@@ -114,10 +113,10 @@ public class AltaEventoFrame extends JInternalFrame {
         getContentPane().add(txtSigla, gbc_txtSigla);
         txtSigla.setColumns(10);
 
-        // Categoria
-        JLabel lblCategoria = new JLabel("Categorias:");
+        // Categorías
+        JLabel lblCategoria = new JLabel("Categorías:");
         GridBagConstraints gbc_lblCategoria = new GridBagConstraints();
-        gbc_lblCategoria.insets = new Insets(0, 0, 0, 5);
+        gbc_lblCategoria.insets = new Insets(0, 0, 5, 5);
         gbc_lblCategoria.anchor = GridBagConstraints.WEST;
         gbc_lblCategoria.gridx = 0;
         gbc_lblCategoria.gridy = 4;
@@ -125,27 +124,7 @@ public class AltaEventoFrame extends JInternalFrame {
 
         listModelCategorias = new DefaultListModel<>();
         listCategorias = new JList<>(listModelCategorias);
-        listCategorias.setCellRenderer(new ListCellRenderer<String>() {
-            @Override
-            public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus) {
-                JCheckBox checkBox = new JCheckBox(value, categoriasSeleccionadasFlags.get(index));
-                checkBox.setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
-                checkBox.setForeground(isSelected ? list.getSelectionForeground() : list.getForeground());
-                return checkBox;
-            }
-        });
-        listCategorias.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        listCategorias.setVisibleRowCount(5);
-        listCategorias.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                int index = listCategorias.locationToIndex(e.getPoint());
-                if (index >= 0 && index < categoriasSeleccionadasFlags.size()) {
-                    categoriasSeleccionadasFlags.set(index, !categoriasSeleccionadasFlags.get(index));
-                    listCategorias.repaint();
-                }
-            }
-        });
+        listCategorias.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         JScrollPane scrollCategorias = new JScrollPane(listCategorias);
         scrollCategorias.setPreferredSize(new Dimension(200, 80));
         GridBagConstraints gbc_listCategorias = new GridBagConstraints();
@@ -156,53 +135,90 @@ public class AltaEventoFrame extends JInternalFrame {
 
         cargarCategorias();
 
+        // --- NUEVO: Seleccionar imagen ---
+        JLabel lblImagen = new JLabel("Imagen:");
+        GridBagConstraints gbc_lblImagen = new GridBagConstraints();
+        gbc_lblImagen.insets = new Insets(0, 0, 5, 5);
+        gbc_lblImagen.anchor = GridBagConstraints.WEST;
+        gbc_lblImagen.gridx = 0;
+        gbc_lblImagen.gridy = 5;
+        getContentPane().add(lblImagen, gbc_lblImagen);
+
+        JLabel lblArchivo = new JLabel("Ninguna seleccionada");
+        JButton btnImagen = new JButton("Seleccionar...");
+        JPanel panelImg = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+        panelImg.add(lblArchivo);
+        panelImg.add(btnImagen);
+
+        GridBagConstraints gbc_panelImg = new GridBagConstraints();
+        gbc_panelImg.insets = new Insets(0, 0, 5, 0);
+        gbc_panelImg.fill = GridBagConstraints.HORIZONTAL;
+        gbc_panelImg.gridx = 1;
+        gbc_panelImg.gridy = 5;
+        getContentPane().add(panelImg, gbc_panelImg);
+
+        final String[] imagenSeleccionada = {null};
+        btnImagen.addActionListener(e -> {
+            JFileChooser fc = new JFileChooser();
+            fc.setDialogTitle("Seleccionar imagen del evento");
+            fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imágenes JPG y PNG", "jpg", "jpeg", "png"));
+            if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                java.io.File archivo = fc.getSelectedFile();
+                imagenSeleccionada[0] = archivo.getName();
+                lblArchivo.setText(archivo.getName());
+            }
+        });
+
         // Botones
         JButton btnAceptar = new JButton("Aceptar");
-        GridBagConstraints gbc_btnAceptar = new GridBagConstraints();
-        gbc_btnAceptar.gridx = 1;
-        gbc_btnAceptar.gridy = 5;
-        gbc_btnAceptar.insets = new Insets(10, 5, 5, 5);
-        getContentPane().add(btnAceptar, gbc_btnAceptar);
-
         JButton btnCancelar = new JButton("Cancelar");
-        GridBagConstraints gbc_btnCancelar = new GridBagConstraints();
-        gbc_btnCancelar.gridx = 2;
-        gbc_btnCancelar.gridy = 5;
-        gbc_btnCancelar.insets = new Insets(10, 5, 5, 0);
-        getContentPane().add(btnCancelar, gbc_btnCancelar);
 
+        JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panelBotones.add(btnAceptar);
+        panelBotones.add(btnCancelar);
+
+        GridBagConstraints gbc_panelBotones = new GridBagConstraints();
+        gbc_panelBotones.gridx = 1;
+        gbc_panelBotones.gridy = 6;
+        gbc_panelBotones.gridwidth = 2;
+        gbc_panelBotones.insets = new Insets(10, 5, 5, 5);
+        gbc_panelBotones.anchor = GridBagConstraints.EAST;
+        getContentPane().add(panelBotones, gbc_panelBotones);
+
+        // Acción aceptar
         btnAceptar.addActionListener(ev -> {
             String nombre = txtNombre.getText().trim();
             String descripcion = txtDescripcion.getText().trim();
             java.util.Date fechaDate = dateChooserFecha.getDate();
             String sigla = txtSigla.getText().trim();
-            java.util.List<String> categoriasSeleccionadas = new java.util.ArrayList<>();
-            for (int i = 0; i < listModelCategorias.size(); i++) {
-                if (categoriasSeleccionadasFlags.get(i)) {
-                    categoriasSeleccionadas.add(listModelCategorias.get(i));
-                }
-            }
+
+            java.util.List<String> categoriasSeleccionadas = listCategorias.getSelectedValuesList();
+
             if (nombre.isEmpty() || descripcion.isEmpty() || fechaDate == null || sigla.isEmpty() || categoriasSeleccionadas.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Todos los campos deben estar completos y debe seleccionar al menos una Categoría.");
+                JOptionPane.showMessageDialog(this, "Todos los campos deben estar completos y debe seleccionar al menos una categoría.");
                 return;
             }
+
             try {
                 java.time.LocalDate fechaAlta = fechaDate.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
                 ControladorEvento controlador = new ControladorEvento();
                 DTCategorias dtCategorias = new DTCategorias(categoriasSeleccionadas);
-                controlador.AltaEvento(nombre, descripcion, fechaAlta, sigla, dtCategorias);
+
+                controlador.AltaEvento(nombre, descripcion, fechaAlta, sigla, dtCategorias, imagenSeleccionada[0]);
+
                 JOptionPane.showMessageDialog(this, "Evento registrado con éxito.");
-                if (abrirConsultaRunnable != null) abrirConsultaRunnable.run();
                 this.dispose();
+
             } catch (EventoYaExisteException ex) {
-                JOptionPane.showMessageDialog(this,
-                    "Ya existe un evento con el nombre: '" + nombre + "'.",
+                JOptionPane.showMessageDialog(this, "Ya existe un evento con el nombre: '" + nombre + "'.",
                     "Error - Evento ya existente", JOptionPane.ERROR_MESSAGE);
             } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error al registrar el evento: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Error al registrar el evento: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
 
         btnCancelar.addActionListener(ev -> this.dispose());
     }
+
 }
