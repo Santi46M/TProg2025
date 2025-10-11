@@ -16,16 +16,10 @@
 
 
 <div class="container row" style="margin-top:1rem;">
-  <!-- Sidebar -->
-  <aside class="card">
-    <h3><i class='bx bx-list-ul'></i> Menú</h3>
-    <h4>Acciones</h4>
-    <ul>
-      <li><a href="<%=ctx%>/evento/alta"><i class='bx bx-edit'></i> Alta Evento</a></li>
-      <li><a href="<%=ctx%>/edicion/alta"><i class='bx bx-edit'></i> Alta de Edición Evento</a></li>
-      <li><a href="#"><i class='bx bx-edit'></i> Alta Tipo Registro</a></li>
-    </ul>
-  </aside>
+<!-- Sidebar -->
+
+	<jsp:include page="/WEB-INF/templates/menu.jsp" />
+
 
   <main class="container">
     <section class="form-card-altaEvento">

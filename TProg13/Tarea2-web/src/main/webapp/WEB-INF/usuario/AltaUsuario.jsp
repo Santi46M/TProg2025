@@ -11,6 +11,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="<%=ctx%>/css/style.css">
   <link rel="stylesheet" href="<%=ctx%>/css/altaUsuario.css">
+<link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 </head>
 <body>
@@ -19,23 +20,11 @@
 <!-- Layout principal con sidebar -->
 <div class="container row layout-alta-usuario">
 
-  <!-- Sidebar -->
-  <aside class="card">
-    <h3>Menú</h3>
-    <h4>Categorías</h4>
-    <ul>
-      <li><a href="#">Tecnología</a></li>
-      <li><a href="#">Innovación</a></li>
-      <li><a href="#">Literatura</a></li>
-      <li><a href="#">Cultura</a></li>
-      <li><a href="#">Música</a></li>
-      <li><a href="#">Deporte</a></li>
-      <li><a href="#">Salud</a></li>
-      <li><a href="#">Entretenimiento</a></li>
-      <li><a href="#">Negocios</a></li>
-    </ul>
-    <h4><a href="<%=ctx%>/usuario/listar">Listar Usuarios</a></h4>
-  </aside>
+ <!-- Sidebar -->
+
+     <jsp:include page="/WEB-INF/templates/menu.jsp" />
+
+ 
 
   <!-- Main -->
   <main class="form-wrapper-alta-usuario">

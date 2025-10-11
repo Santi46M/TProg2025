@@ -1,5 +1,5 @@
 #usuariosList {
-  display: flex;
+/*   display: flex; */
   flex-wrap: wrap;
   gap: 2rem;
   margin-top: 1rem;
@@ -54,14 +54,14 @@
 
 /* === AJUSTE DEL ASIDE === */
 .container.row {
-  display: flex;
+/*   display: flex; */
   align-items: flex-start;
   gap: 2rem;
 }
 
-aside.card {
+/* aside.card {
   flex: 0 0 250px;
   min-height: 200px;
   max-height: 600px;
   overflow-y: auto;
-}
+} */

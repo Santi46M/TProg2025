@@ -21,8 +21,9 @@
   <meta charset="UTF-8">
   <title>Consulta de Usuarios — Eventos.uy</title>
   <link rel="stylesheet" href="<%= ctx %>/css/style.css">
-  <link rel="stylesheet" href="<%= ctx %>/css/index.css">
-  <link rel="stylesheet" href="<%= ctx %>/css/ConsultaUsuario.css">
+<%--   <link rel="stylesheet" href="<%= ctx %>/css/index.css"> --%>
+<link rel="stylesheet" href="<%= ctx %>/css/ConsultaUsuario.css">
+  <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 </head>
 
@@ -33,22 +34,10 @@
 <!-- Layout -->
 <div class="container row layout-inicio">
   <!-- Sidebar -->
-  <aside class="card aside-inicio">
-    <h3>Menú</h3>
-    <h4>Categorías</h4>
-    <ul class="menu-categorias">
-      <li><a href="#">Tecnología</a></li>
-      <li><a href="#">Innovación</a></li>
-      <li><a href="#">Literatura</a></li>
-      <li><a href="#">Cultura</a></li>
-      <li><a href="#">Música</a></li>
-      <li><a href="#">Deporte</a></li>
-      <li><a href="#">Salud</a></li>
-      <li><a href="#">Entretenimiento</a></li>
-      <li><a href="#">Negocios</a></li>
-    </ul>
-    <h4><a href="<%=ctx%>/usuario/ConsultaUsuario">Listar Usuarios</a></h4>
-  </aside>
+
+	<jsp:include page="/WEB-INF/templates/menu.jsp" />
+
+  
 
   <!-- Main -->
   <main class="main-inicio">

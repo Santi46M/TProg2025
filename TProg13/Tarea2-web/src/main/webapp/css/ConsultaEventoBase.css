@@ -1,69 +1,66 @@
-/* ConsultaEvento base CSS */
-body, .event-card, .event-title, .event-header, .event-info, .event-info h3, .event-meta, .chips, .chip, .categorias-label, .editions, .edition-item, .edition-title {
-  font-family: Arial, Helvetica, sans-serif !important;
-  font-size: 1rem !important;
-  font-weight: normal;
-}
-.event-card {
-  background: none;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 0;
-  margin: 2rem auto;
-  max-width: 600px;
+/* ====== Layout igual al index ====== */
+.layout-inicio {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: inherit;
-}
-.event-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: row;
+  align-items: flex-start;
   justify-content: flex-start;
+  gap: 2rem;
+  padding: 1rem 2rem;
 }
-.event-cover {
-  width: 320px;
-  height: auto;
+
+/* Menú lateral */
+.aside-inicio {
+  flex: 0 0 220px; /* igual que en index */
+  background: #fff;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  margin-bottom: 1rem;
-  margin-right: 0;
-  box-shadow: none;
+  padding: 1rem;
+  box-sizing: border-box;
+  height: fit-content;
 }
-.event-title {
-  font-size: 2rem !important;
-  font-weight: bold;
-  margin: 0.5rem 0 1.5rem 0;
-  font-family: inherit;
-  text-align: center;
+
+/* Contenido principal */
+.consulta-evento-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
-.event-info {
+
+/* Tarjeta del evento */
+.event-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  padding: 1.5rem;
   width: 100%;
-  text-align: left;
-  font-family: inherit;
+  max-width: 800px;
 }
-.event-info h3 {
-  font-size: 1.2rem !important;
+
+.event-title {
+  font-size: 1.8rem;
   font-weight: bold;
-  margin-bottom: 0.5rem;
-  font-family: inherit;
+  margin-bottom: 1rem;
 }
+
+.event-info h3 {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
 .event-meta {
   color: #333;
   font-size: 1rem;
   margin-bottom: 1rem;
-  font-family: inherit;
 }
-.categorias-label {
-  font-weight: bold;
-  margin-right: 0.5rem;
-  font-family: inherit;
-}
+
 .chips {
   margin-bottom: 1rem;
-  display: inline-block;
-  font-family: inherit;
 }
+
 .chip {
   display: inline-block;
   background: #e0e0e0;
@@ -72,59 +69,67 @@ body, .event-card, .event-title, .event-header, .event-info, .event-info h3, .ev
   padding: 0.3em 1em;
   margin-right: 0.5em;
   font-size: 0.95em;
-  font-family: inherit;
 }
+
+/* Tarjeta de ediciones */
 .editions {
-  background: none;
-  border-radius: 0;
-  padding: 0;
-  margin-left: 2rem;
-  min-width: 220px;
-  max-width: 260px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  font-family: inherit;
-}
-.edition-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-  text-decoration: none;
-  color: inherit;
-  background: none;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
   width: 100%;
-  font-family: inherit;
+  max-width: 300px;
+  height: fit-content;
 }
-.edition-item img {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 6px;
-  margin-right: 1rem;
-  box-shadow: none;
-}
-.edition-title {
-  font-size: 1.1rem !important;
-  font-weight: bold;
-  font-family: inherit;
-}
-@media (min-width: 900px) {
-  .consulta-layout {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: flex-start;
-    gap: 2rem;
+
+/* Responsive */
+@media (max-width: 900px) {
+  .layout-inicio {
+    flex-direction: column;
+    align-items: stretch;
   }
-  .event-card {
-    max-width: 500px;
-    margin: 2rem 0;
+
+  .aside-inicio {
+    max-width: 100%;
   }
-  .editions {
-    margin-top: 2rem;
+
+  .consulta-evento-main {
+    flex: 1;
   }
 }
+
+
+/* === Ajustes del layout con menú lateral === */
+.layout-inicio {
+  display: grid;
+  grid-template-columns: 300px 3fr; /* 🔸 Menú más fino */
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+/* Menú lateral */
+.aside-inicio {
+  align-self: start;          /* evita que se estire verticalmente */
+  height: fit-content;        /* se ajusta al contenido */
+  min-width: 160px;           /* asegura ancho mínimo */
+  max-width: 400px;           /* limita ancho máximo */
+  position: sticky;           /* opcional: queda fijo al hacer scroll */
+  top: 100px;                 /* distancia del header */
+}
+
+/* Opcional: afinar el estilo visual */
+.aside-inicio.card {
+  padding: 0.75rem 2rem;
+  border-radius: 0.6rem;
+  background: #fff;
+  border: 1px solid var(--line);
+}
+
+.menu-categorias li {
+  margin-bottom: 1rem;
+}
+/* Contenedores */
+.container{ max-width:var(--max); margin:0 auto; padding:1rem; }
+.container.narrow{ max-width:720px; }
+
+

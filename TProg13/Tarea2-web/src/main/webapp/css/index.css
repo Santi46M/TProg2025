@@ -1,18 +1,35 @@
 /* ===== Estilos solo para la página de inicio ===== */
 
 /* Layout con aside angosto */
+/* Contenedor principal que incluye el aside y el contenido */
 .layout-inicio {
-  display: grid;
-  grid-template-columns: 260px 1fr; /* Sidebar fijo, main flexible */
-  gap: 1rem;
+  display: flex;
+  flex-direction: row;        /* Menú a la izquierda, contenido a la derecha */
+  align-items: flex-start;
+  gap: 2rem;                  /* Espacio entre menú y contenido */
+  padding: 1rem;
 }
 
-/* Sidebar más limpio */
-.aside-inicio {
+/* /* El aside siempre a la izquierda */
+/* .aside-inicio {
+  flex: 0 0 250px;            ancho fijo
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   padding: 1rem;
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: .6rem;
+  height: calc(100vh - 100px); ocupa toda la altura visible menos header
+  position: sticky;           se mantiene visible al hacer scroll
+  top: 80px;                  espacio bajo el header
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+} */ 
+/* Hace que el menú lateral solo mida lo que ocupa su contenido */
+
+
+
+/* Contenido principal (si tuvieras un div main al lado del aside) */
+.main-content {
+  flex: 1;
+  min-width: 0;
 }
 
 .aside-inicio h3 {
@@ -56,3 +73,4 @@
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1rem;
 }
+

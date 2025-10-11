@@ -1,13 +1,13 @@
 /* ==== Layout general ==== */
 .layout-alta-usuario {
   display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 1.5rem;
-  margin-top: 1.5rem;
+  grid-template-columns: 300px 3fr;
+  gap: 2rem;
+/*   margin-top: 1.5rem; */
 }
 
-/* ==== Sidebar igual que en index.css ==== */
-.layout-alta-usuario aside {
+/* /* //==== Sidebar igual que en index.css ==== */
+/* .layout-alta-usuario aside {
   padding: 1rem;
   background: #fff;
   border: 1px solid var(--line);
@@ -22,9 +22,9 @@
 .layout-alta-usuario aside h4 {
   margin-top: 1rem;
   font-size: 1rem;
-}
+} */ */
 
-.layout-alta-usuario aside ul {
+/* .layout-alta-usuario aside ul {
   list-style: none;
   padding-left: 0;
   margin: 0;
@@ -32,9 +32,9 @@
 
 .layout-alta-usuario aside li {
   margin-bottom: 0.4rem;
-}
+} */
 
-.layout-alta-usuario aside a {
+/* .layout-alta-usuario aside a {
   text-decoration: none;
   color: var(--text);
 }
@@ -43,7 +43,7 @@
   color: var(--brand);
   text-decoration: underline;
 }
-
+ */
 /* ==== Formulario ==== */
 .form-wrapper-alta-usuario {
   background: #fff;

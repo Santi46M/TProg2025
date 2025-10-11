@@ -416,7 +416,7 @@ legend{ padding:0 .4rem; font-weight:700; color:#374151; }
 }
 
 .registro-detalles-consultaTipoRegistro ul {
-  list-style: none;
+  /* list-style: none; */
   padding: 0;
   margin: 0;
 }
@@ -711,4 +711,6 @@ input[type="submit"] {
 .input-full {
   margin-top: 1.5rem;
 }
+
+
 
