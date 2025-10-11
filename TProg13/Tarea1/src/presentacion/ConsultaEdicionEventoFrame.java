@@ -35,6 +35,8 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
     private JPanel panelGridRegistros;
     private JScrollPane scrollGridRegistros;
 
+    private JLabel lblImagenEdicion; // << imagen
+
     /**
      * @wbp.parser.constructor
      */
@@ -46,7 +48,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         comboTiposRegistro = new JComboBox<>();
         comboPatrocinios = new JComboBox<>();
 
-        setBounds(100, 100, 800, 520);
+        setBounds(100, 100, 900, 560);
         setLayout(new BorderLayout());
 
         // Selección
@@ -58,6 +60,12 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         comboEdiciones = new JComboBox<>();
         panelSeleccion.add(comboEdiciones);
         getContentPane().add(panelSeleccion, BorderLayout.NORTH);
+
+        // Imagen a la izquierda
+        lblImagenEdicion = new JLabel("Sin imagen", SwingConstants.CENTER);
+        lblImagenEdicion.setBorder(BorderFactory.createTitledBorder("Imagen de la edición"));
+        lblImagenEdicion.setPreferredSize(new Dimension(240, 260));
+        add(lblImagenEdicion, BorderLayout.WEST);
 
         JPanel panelDatos = new JPanel(new GridLayout(0, 2, 8, 6));
         add(panelDatos, BorderLayout.CENTER);
@@ -207,6 +215,9 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         txtPais.setText(ed.getPais());
         txtOrganizador.setText(ed.getOrganizador() != null ? ed.getOrganizador().getNickname() : "");
 
+        // Imagen de la edición (usa ed.getImagen())
+        setImageLabel(lblImagenEdicion, "img/", ed.getImagen(), 240, 240);
+
         comboTiposRegistro.removeAllItems();
         for (TipoRegistro tr : ed.getTiposRegistro()) comboTiposRegistro.addItem(tr.getNombre());
 
@@ -245,6 +256,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         panelGridRegistros.add(new JLabel("Costo", SwingConstants.CENTER));
         panelGridRegistros.revalidate();
         panelGridRegistros.repaint();
+        setImageLabel(lblImagenEdicion, null, null, 240, 240);
     }
 
     private void seleccionarItemPorTexto(JComboBox<String> combo, String texto) {
@@ -272,16 +284,31 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         return t;
     }
 
-    private Component wrap(JComponent c) {
-        JPanel p = new JPanel(new BorderLayout());
-        p.add(c, BorderLayout.WEST);
-        return p;
-    }
-
     private void abrirEnDesktop(JInternalFrame f) {
         JDesktopPane desk = getDesktopPane();
         if (desk != null) desk.add(f);
         f.setVisible(true);
         f.toFront();
+    }
+
+    private static void setImageLabel(JLabel lbl, String baseDir, String fileName, int w, int h) {
+        if (fileName == null || fileName.isBlank()) {
+            lbl.setIcon(null);
+            lbl.setText("Sin imagen");
+            return;
+        }
+        java.io.File f = new java.io.File((baseDir == null ? "" : baseDir) + fileName);
+        if (!f.exists()) {
+            f = new java.io.File("src/" + (baseDir == null ? "" : baseDir) + fileName);
+        }
+        if (f.exists()) {
+            ImageIcon icon = new ImageIcon(f.getAbsolutePath());
+            Image scaled = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            lbl.setIcon(new ImageIcon(scaled));
+            lbl.setText("");
+        } else {
+            lbl.setIcon(null);
+            lbl.setText("Sin imagen");
+        }
     }
 }

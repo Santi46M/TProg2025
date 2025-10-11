@@ -35,6 +35,8 @@ public class ConsultaUsuario extends JInternalFrame {
     private JComboBox<String> comboEds;
     private java.util.List<DTEdicion> listaEds = new ArrayList<>();
 
+    private JLabel lblImagenUsuario; // << imagen de perfil
+
     private boolean cargando = false;
 
     public ConsultaUsuario(IControladorUsuario icu, IControladorEvento iCE) {
@@ -59,7 +61,6 @@ public class ConsultaUsuario extends JInternalFrame {
         comboUsuarios.setSelectedIndex(-1);
         barraSuperior.add(comboUsuarios);
 
-      
         add(barraSuperior, BorderLayout.NORTH);
 
         // ===== Centro con scroll =====
@@ -68,6 +69,12 @@ public class ConsultaUsuario extends JInternalFrame {
         add(new JScrollPane(centro,
                 ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER), BorderLayout.CENTER);
+
+        // ===== Imagen del usuario =====
+        lblImagenUsuario = new JLabel("Sin imagen", SwingConstants.CENTER);
+        lblImagenUsuario.setBorder(BorderFactory.createTitledBorder("Imagen de perfil"));
+        lblImagenUsuario.setPreferredSize(new Dimension(160, 180));
+        centro.add(lblImagenUsuario);
 
         // ===== Panel datos básicos =====
         JPanel panelComunes = new JPanel(new GridBagLayout());
@@ -222,6 +229,9 @@ public class ConsultaUsuario extends JInternalFrame {
         txtNombre.setText(nvl(datos.getNombre()));
         txtCorreo.setText(nvl(datos.getEmail()));
 
+        // === IMAGEN DE USUARIO ===
+        setImageLabel(lblImagenUsuario, "img/", nvl(datos.getImagen()), 160, 160);
+
         boolean esAsistente   = controlUsr.listarAsistentes()    != null &&
                                 controlUsr.listarAsistentes().containsKey(nickname);
         boolean esOrganizador = controlUsr.listarOrganizadores() != null &&
@@ -298,6 +308,7 @@ public class ConsultaUsuario extends JInternalFrame {
         comboEds.setVisible(false);
         comboRegs.setModel(new DefaultComboBoxModel<>());
         cardTipo.show(panelEspecifico, "VACIO");
+        setImageLabel(lblImagenUsuario, null, null, 160, 160);
     }
 
     private void limpiarCampos() {
@@ -314,6 +325,8 @@ public class ConsultaUsuario extends JInternalFrame {
         listaEds.clear();
         if (comboRegs != null) comboRegs.setModel(new DefaultComboBoxModel<>());
         if (comboEds != null) comboEds.setModel(new DefaultComboBoxModel<>());
+        lblImagenUsuario.setIcon(null);
+        lblImagenUsuario.setText("Sin imagen");
         cargando = false;
     }
 
@@ -343,4 +356,26 @@ public class ConsultaUsuario extends JInternalFrame {
     }
 
     private static String nvl(String s) { return s == null ? "" : s; }
+
+    private static void setImageLabel(JLabel lbl, String baseDir, String fileName, int w, int h) {
+        if (fileName == null || fileName.isBlank()) {
+            lbl.setIcon(null);
+            lbl.setText("Sin imagen");
+            return;
+        }
+        java.io.File f = new java.io.File((baseDir == null ? "" : baseDir) + fileName);
+        if (!f.exists()) {
+            // intento alternativo en src/
+            f = new java.io.File("src/" + (baseDir == null ? "" : baseDir) + fileName);
+        }
+        if (f.exists()) {
+            ImageIcon icon = new ImageIcon(f.getAbsolutePath());
+            Image scaled = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            lbl.setIcon(new ImageIcon(scaled));
+            lbl.setText("");
+        } else {
+            lbl.setIcon(null);
+            lbl.setText("Sin imagen");
+        }
+    }
 }
