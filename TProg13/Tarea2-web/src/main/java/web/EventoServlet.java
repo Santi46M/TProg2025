@@ -104,7 +104,7 @@ public class EventoServlet extends HttpServlet {
 
       try {
         // TODO: si tienen DTO de categorías, construirlo desde 'cats' y pasarlo
-        ce().AltaEvento(nombre, desc, LocalDate.now(), sigla, /*categorias*/ null);
+        ce().AltaEvento(nombre, desc, LocalDate.now(), sigla, /*categorias*/ null, sigla);
 
         String nombreEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8.name());
         resp.sendRedirect(ctx(req) + "/evento/ConsultaEvento?nombre=" + nombreEnc);

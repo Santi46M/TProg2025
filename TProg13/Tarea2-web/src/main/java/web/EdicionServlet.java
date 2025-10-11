@@ -154,7 +154,7 @@ public class EdicionServlet extends HttpServlet {
         // byte[] imgBytes = null; // imagen no se usa en la lógica real
         Eventos evObj = ce().consultaEvento(evento);
         Usuario org = (Usuario) req.getSession().getAttribute("usuario"); // ajusta si tu sesión usa otro atributo
-        ce().AltaEdicionEvento(evObj, org, nombre, nombre, desc, ini, fin, LocalDate.now(), ciudad, pais); // ajustado a la firma real
+        ce().AltaEdicionEvento(evObj, org, nombre, nombre, desc, ini, fin, LocalDate.now(), ciudad, pais, null); // ajustado a la firma real
 
         String evEnc = URLEncoder.encode(evento, StandardCharsets.UTF_8);
         String edEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8);
