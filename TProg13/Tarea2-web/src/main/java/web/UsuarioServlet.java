@@ -133,7 +133,9 @@ public class UsuarioServlet extends HttpServlet {
             apellido,        // para asistente
             fechaNac,        // para asistente
             institucion,     // para asistente
-            esOrganizador
+            esOrganizador,
+            null,
+            null
         );
         
         // Dejamos logueado al recién creado

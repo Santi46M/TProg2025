@@ -9,7 +9,7 @@ import logica.Interfaces.IControladorEvento;
 import logica.Datatypes.DTEvento;
 import logica.fabrica;
 
-@WebServlet({"/inicio", "/"})
+@WebServlet({"/inicio"})
 public class InicioServlet extends HttpServlet {
 
     private IControladorEvento ce() {
