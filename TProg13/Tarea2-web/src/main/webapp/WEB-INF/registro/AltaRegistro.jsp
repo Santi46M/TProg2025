@@ -56,24 +56,16 @@
       <% } %>
 
       <form action="<%=ctx%>/registro/alta" method="post" id="form-alta-tipo">
-        <!-- EVENTO -->
-        <div class="form-group-altaTipoRegistro">
-          <label>Evento <span style="color:red">*</span></label>
-          <select id="selectEvento" name="evento" required>
-            <option value="">-- Seleccione un evento --</option>
-            <% if (eventos != null) {
-                 for (DTEvento ev : eventos) { %>
-                   <option value="<%= ev.getNombre() %>"><%= ev.getNombre() %></option>
-            <%   }
-               } %>
-          </select>
-        </div>
-
         <!-- EDICIÓN filtrada -->
         <div class="form-group-altaTipoRegistro">
           <label>Edición del evento <span style="color:red">*</span></label>
-          <select id="selectEdicion" name="edicion" required disabled>
-            <option value="">-- Seleccione primero un evento --</option>
+          <select id="selectEdicion" name="edicion" required>
+            <option value="">-- Seleccione una edición --</option>
+            <% if (ediciones != null) {
+                 for (Ediciones ed : ediciones) { %>
+                   <option value="<%= ed.getSigla() %>"><%= ed.getNombre() %> (<%= ed.getEvento().getNombre() %>)</option>
+            <%   }
+               } %>
           </select>
         </div>
 
@@ -105,56 +97,6 @@
     </section>
   </main>
 </div>
-
-<!-- SCRIPT para cargar ediciones dinámicamente -->
-<script>
-  const data = {
-    <% if (eventos != null) {
-         for (DTEvento ev : eventos) {
-           List<String> eds = ev.getEdiciones();
-           if (eds != null && !eds.isEmpty()) {
-             out.print("\"" + ev.getNombre().replace("\"", "\\\"") + "\":[");
-             int i = 0;
-             for (String nomEd : eds) {
-               for (Ediciones ed : ediciones) {
-                 if (ed.getNombre().equals(nomEd)) {
-                   out.print("{\"sigla\":\"" + ed.getSigla().replace("\"", "\\\"") +
-                             "\",\"nombre\":\"" + ed.getNombre().replace("\"", "\\\"") + "\"}");
-                   if (i < eds.size() - 1) out.print(",");
-                   break;
-                 }
-               }
-               i++;
-             }
-             out.print("],");
-           }
-         }
-       } %>
-  };
-
-  const selectEvento = document.getElementById("selectEvento");
-  const selectEdicion = document.getElementById("selectEdicion");
-
-  selectEvento.addEventListener("change", function() {
-    const nombreEv = this.value;
-    const ediciones = data[nombreEv] || [];
-    selectEdicion.innerHTML = "";
-
-    if (ediciones.length === 0) {
-      selectEdicion.innerHTML = "<option value=''>-- No hay ediciones --</option>";
-      selectEdicion.disabled = true;
-    } else {
-      selectEdicion.innerHTML = "<option value=''>-- Seleccione una edición --</option>";
-      ediciones.forEach(ed => {
-        const opt = document.createElement("option");
-        opt.value = ed.sigla;        // Se envía la sigla al servlet
-        opt.textContent = ed.nombre; // Se muestra el nombre
-        selectEdicion.appendChild(opt);
-      });
-      selectEdicion.disabled = false;
-    }
-  });
-</script>
 
 </body>
 </html>

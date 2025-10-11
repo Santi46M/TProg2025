@@ -53,6 +53,7 @@
       <% if (request.getAttribute("error") != null) { %>
         <p class="error-msg"><%= request.getAttribute("error") %></p>
       <% } %>
+      <p id="error-categorias" class="error-msg" style="display:none;color:#c00;margin-bottom:1em;"></p>
 
       <form id="form-alta-evento" method="post" action="<%=ctx%>/evento/alta">
         <div class="form-group-altaEvento">
@@ -107,8 +108,12 @@
       if (sel.length === 0) {
         e.preventDefault();
         document.getElementById('fs-categorias').scrollIntoView({behavior:'smooth', block:'center'});
+        const errorCat = document.getElementById('error-categorias');
+        errorCat.textContent = 'Debe marcar al menos una categoría.';
+        errorCat.style.display = 'block';
         return;
       }
+      document.getElementById('error-categorias').style.display = 'none';
       document.getElementById('categorias').value = sel.join(',');
     });
   })();
