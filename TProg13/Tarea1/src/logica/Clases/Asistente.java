@@ -10,9 +10,9 @@ public class Asistente extends Usuario {
     private Institucion institucion;
     private Map<String, Registro> registros;
     
-    public Asistente(String nickname, String nombre, String email, String apellido, LocalDate fechaDeNacimiento, Institucion institucion) {
+    public Asistente(String nickname, String nombre, String email, String contraseña, String imagen, String apellido, LocalDate fechaDeNacimiento, Institucion institucion) {
     	
-    	super(nickname,nombre,email);
+    	super(nickname,nombre,email,contraseña);
     	this.apellido = apellido;
     	this.fechaDeNacimiento = fechaDeNacimiento;
     	this.institucion = institucion;

@@ -87,20 +87,76 @@ public class CargaDatosPrueba {
         java.util.List<String> catEv05 = java.util.Arrays.asList("Entretenimiento");
         java.util.List<String> catEv06 = java.util.Arrays.asList("Agro", "Negocios");
         java.util.List<String> catEv07 = java.util.Arrays.asList("Moda", "Investigación");
-        // EV01
-        controlador.AltaEvento("Conferencia de Tecnología", "Evento sobre innovación tecnológica", java.time.LocalDate.of(2025, 1, 10), "CONFTEC", new DTCategorias(catEv01));
+     // EV01
+        controlador.AltaEvento(
+            "Conferencia de Tecnología",
+            "Evento sobre innovación tecnológica",
+            java.time.LocalDate.of(2025, 1, 10),
+            "CONFTEC",
+            new DTCategorias(catEv01),
+            null
+        );
+
         // EV02
-        controlador.AltaEvento("Feria del Libro", "Encuentro anual de literatura", java.time.LocalDate.of(2025, 2, 1), "FERLIB", new DTCategorias(catEv02));
+        controlador.AltaEvento(
+            "Feria del Libro",
+            "Encuentro anual de literatura",
+            java.time.LocalDate.of(2025, 2, 1),
+            "FERLIB",
+            new DTCategorias(catEv02),
+            "src/img/IMG-EV02.jpeg"
+        );
+
         // EV03
-        controlador.AltaEvento("Montevideo Rock", "Festival de rock con artistas nacionales e internacionales", java.time.LocalDate.of(2023, 3, 15), "MONROCK", new DTCategorias(catEv03));
+        controlador.AltaEvento(
+            "Montevideo Rock",
+            "Festival de rock con artistas nacionales e internacionales",
+            java.time.LocalDate.of(2023, 3, 15),
+            "MONROCK",
+            new DTCategorias(catEv03),
+            "src/img/IMG-EV03.jpeg"
+        );
+
         // EV04
-        controlador.AltaEvento("Maratón de Montevideo", "Competencia deportiva anual en la capital", java.time.LocalDate.of(2022, 1, 1), "MARATON", new DTCategorias(catEv04));
+        controlador.AltaEvento(
+            "Maratón de Montevideo",
+            "Competencia deportiva anual en la capital",
+            java.time.LocalDate.of(2022, 1, 1),
+            "MARATON",
+            new DTCategorias(catEv04),
+            "src/img/IMG-EV04.png"
+        );
+
         // EV05
-        controlador.AltaEvento("Montevideo Comics", "Convención de historietas, cine y cultura geek", java.time.LocalDate.of(2024, 4, 10), "COMICS", new DTCategorias(catEv05));
+        controlador.AltaEvento(
+            "Montevideo Comics",
+            "Convención de historietas, cine y cultura geek",
+            java.time.LocalDate.of(2024, 4, 10),
+            "COMICS",
+            new DTCategorias(catEv05),
+            "src/img/IMG-EV05.png"
+        );
+
         // EV06
-        controlador.AltaEvento("Expointer Uruguay", "Exposición internacional agropecuaria y ganadera", java.time.LocalDate.of(2024, 12, 12), "EXPOAGRO", new DTCategorias(catEv06));
+        controlador.AltaEvento(
+            "Expointer Uruguay",
+            "Exposición internacional agropecuaria y ganadera",
+            java.time.LocalDate.of(2024, 12, 12),
+            "EXPOAGRO",
+            new DTCategorias(catEv06),
+            "src/img/IMG-EV06.png"
+        );
+
         // EV07
-        controlador.AltaEvento("Montevideo Fashion Week", "Pasarela de moda uruguaya e internacional", java.time.LocalDate.of(2025, 7, 20), "MFASHION", new DTCategorias(catEv07));
+        controlador.AltaEvento(
+            "Montevideo Fashion Week",
+            "Pasarela de moda uruguaya e internacional",
+            java.time.LocalDate.of(2025, 7, 20),
+            "MFASHION",
+            new DTCategorias(catEv07),
+            null
+        );
+
     }
     
 
@@ -143,79 +199,175 @@ public class CargaDatosPrueba {
         logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         logica.Manejadores.manejadorUsuario manejadorUsuario = logica.Manejadores.manejadorUsuario.getInstancia();
-        // Helper para obtener evento y validar
+
         Eventos ev;
-        // EDEV01
+
+        // EDEV01 — Montevideo Rock 2025 (tiene imagen)
         ev = manejadorEvento.obtenerEvento("Conferencia de Tecnología");
-        if (ev == null) { System.err.println("Evento Conferencia de Tecnología no encontrado"); } else {
+        if (ev == null) {
+            System.err.println("Evento Conferencia de Tecnología no encontrado");
+        } else {
             controlador.AltaEdicionEvento(
                 ev,
                 manejadorUsuario.getUsuarios().get("imm"),
-                "Montevideo Rock 2025", "MONROCK25", "", parseFecha("20/11/2025"), parseFecha("22/11/2025"), parseFecha("12/03/2025"), "Montevideo", "Uruguay"
+                "Montevideo Rock 2025",
+                "MONROCK25",
+                "",
+                parseFecha("20/11/2025"),
+                parseFecha("22/11/2025"),
+                parseFecha("12/03/2025"),
+                "Montevideo",
+                "Uruguay",
+                "src/img/IMG-EDEV01.jpeg"
             );
         }
-        // EDEV02
+
+        // EDEV02–EDEV04 — Maratón de Montevideo
         ev = manejadorEvento.obtenerEvento("Maratón de Montevideo");
-        if (ev == null) { System.err.println("Evento Maratón de Montevideo no encontrado"); } else {
+        if (ev == null) {
+            System.err.println("Evento Maratón de Montevideo no encontrado");
+        } else {
             controlador.AltaEdicionEvento(
                 ev,
                 manejadorUsuario.getUsuarios().get("imm"),
-                "Maratón de Montevideo 2025", "MARATON25", "", parseFecha("14/09/2025"), parseFecha("14/09/2025"), parseFecha("05/02/2025"), "Montevideo", "Uruguay"
+                "Maratón de Montevideo 2025",
+                "MARATON25",
+                "",
+                parseFecha("14/09/2025"),
+                parseFecha("14/09/2025"),
+                parseFecha("05/02/2025"),
+                "Montevideo",
+                "Uruguay",
+                "src/img/IMG-EDEV02.png"
             );
             controlador.AltaEdicionEvento(
                 ev,
                 manejadorUsuario.getUsuarios().get("imm"),
-                "Maratón de Montevideo 2024", "MARATON24", "", parseFecha("14/09/2024"), parseFecha("14/09/2024"), parseFecha("21/04/2024"), "Montevideo", "Uruguay"
+                "Maratón de Montevideo 2024",
+                "MARATON24",
+                "",
+                parseFecha("14/09/2024"),
+                parseFecha("14/09/2024"),
+                parseFecha("21/04/2024"),
+                "Montevideo",
+                "Uruguay",
+                "src/img/IMG-EDEV03.jpeg"
             );
             controlador.AltaEdicionEvento(
                 ev,
                 manejadorUsuario.getUsuarios().get("imm"),
-                "Maratón de Montevideo 2022", "MARATON22", "", parseFecha("14/09/2022"), parseFecha("14/09/2022"), parseFecha("21/05/2022"), "Montevideo", "Uruguay"
+                "Maratón de Montevideo 2022",
+                "MARATON22",
+                "",
+                parseFecha("14/09/2022"),
+                parseFecha("14/09/2022"),
+                parseFecha("21/05/2022"),
+                "Montevideo",
+                "Uruguay",
+                "src/img/IMG-EDEV04.jpeg"
             );
         }
-        // EDEV05
+
+        // EDEV05–EDEV06 — Montevideo Comics (ambas con imagen)
         ev = manejadorEvento.obtenerEvento("Montevideo Comics");
-        if (ev == null) { System.err.println("Evento Montevideo Comics no encontrado"); } else {
+        if (ev == null) {
+            System.err.println("Evento Montevideo Comics no encontrado");
+        } else {
             controlador.AltaEdicionEvento(
                 ev,
                 manejadorUsuario.getUsuarios().get("miseventos"),
-                "Montevideo Comics 2024", "COMICS24", "", parseFecha("18/07/2024"), parseFecha("21/07/2024"), parseFecha("20/06/2024"), "Montevideo", "Uruguay"
+                "Montevideo Comics 2024",
+                "COMICS24",
+                "",
+                parseFecha("18/07/2024"),
+                parseFecha("21/07/2024"),
+                parseFecha("20/06/2024"),
+                "Montevideo",
+                "Uruguay",
+                "src/img/IMG-EDEV05.jpeg"
             );
             controlador.AltaEdicionEvento(
                 ev,
                 manejadorUsuario.getUsuarios().get("miseventos"),
-                "Montevideo Comics 2025", "COMICS25", "", parseFecha("04/08/2025"), parseFecha("06/08/2025"), parseFecha("04/07/2025"), "Montevideo", "Uruguay"
+                "Montevideo Comics 2025",
+                "COMICS25",
+                "",
+                parseFecha("04/08/2025"),
+                parseFecha("06/08/2025"),
+                parseFecha("04/07/2025"),
+                "Montevideo",
+                "Uruguay",
+                "src/img/IMG-EDEV06.jpeg"
             );
         }
-        // EDEV07
+
+        // EDEV07 — Expointer Uruguay 2025 (con imagen)
         ev = manejadorEvento.obtenerEvento("Expointer Uruguay");
-        if (ev == null) { System.err.println("Evento Expointer Uruguay no encontrado"); } else {
+        if (ev == null) {
+            System.err.println("Evento Expointer Uruguay no encontrado");
+        } else {
             controlador.AltaEdicionEvento(
                 ev,
                 manejadorUsuario.getUsuarios().get("miseventos"),
-                "Expointer Uruguay 2025", "EXPOAGRO25", "", parseFecha("11/09/2025"), parseFecha("17/09/2025"), parseFecha("01/02/2025"), "Durazno", "Uruguay"
+                "Expointer Uruguay 2025",
+                "EXPOAGRO25",
+                "",
+                parseFecha("11/09/2025"),
+                parseFecha("17/09/2025"),
+                parseFecha("01/02/2025"),
+                "Durazno",
+                "Uruguay",
+                "src/img/IMG-EDEV07.jpeg"
             );
         }
-        // EDEV08
+
+        // EDEV08–EDEV10 — Ediciones de Conferencia de Tecnología
         ev = manejadorEvento.obtenerEvento("Conferencia de Tecnología");
-        if (ev == null) { System.err.println("Evento Conferencia de Tecnología no encontrado"); } else {
+        if (ev == null) {
+            System.err.println("Evento Conferencia de Tecnología no encontrado");
+        } else {
             controlador.AltaEdicionEvento(
                 ev,
                 manejadorUsuario.getUsuarios().get("udelar"),
-                "Tecnología Punta del Este 2026", "CONFTECH26", "", parseFecha("06/04/2026"), parseFecha("10/04/2026"), parseFecha("01/08/2025"), "Punta del Este", "Uruguay"
+                "Tecnología Punta del Este 2026",
+                "CONFTECH26",
+                "",
+                parseFecha("06/04/2026"),
+                parseFecha("10/04/2026"),
+                parseFecha("01/08/2025"),
+                "Punta del Este",
+                "Uruguay",
+                "src/img/IMG-EDEV08.jpeg"
             );
             controlador.AltaEdicionEvento(
                 ev,
                 manejadorUsuario.getUsuarios().get("techcorp"),
-                "Mobile World Congress 2025", "MWC", "", parseFecha("12/12/2025"), parseFecha("15/12/2025"), parseFecha("21/08/2025"), "Barcelona", "España"
+                "Mobile World Congress 2025",
+                "MWC",
+                "",
+                parseFecha("12/12/2025"),
+                parseFecha("15/12/2025"),
+                parseFecha("21/08/2025"),
+                "Barcelona",
+                "España",
+                null
             );
             controlador.AltaEdicionEvento(
                 ev,
                 manejadorUsuario.getUsuarios().get("techcorp"),
-                "Web Summit 2026", "WS26", "", parseFecha("13/01/2026"), parseFecha("01/02/2026"), parseFecha("04/06/2025"), "Lisboa", "Portugal"
+                "Web Summit 2026",
+                "WS26",
+                "",
+                parseFecha("13/01/2026"),
+                parseFecha("01/02/2026"),
+                parseFecha("04/06/2025"),
+                "Lisboa",
+                "Portugal",
+                null
             );
         }
     }
+
     
     public static void cargarTipoRegistroEjemplo() throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
         logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();

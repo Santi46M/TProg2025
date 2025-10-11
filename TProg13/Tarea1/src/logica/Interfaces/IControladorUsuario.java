@@ -16,9 +16,9 @@ import logica.Datatypes.*;
 public interface IControladorUsuario {
 
     // Crear usuarios
-    public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador) throws UsuarioYaExisteException;
-    public Organizador ingresarOrganizador(String nickname, String nombre, String email, String desc, String link);
-    public Asistente ingresarAsistente(String nickname, String nombre, String email, String apellido,LocalDate fechaDeNacimiento, Institucion institucion);
+    public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador, String contrasena, String imagen) throws UsuarioYaExisteException;
+    public Organizador ingresarOrganizador(String nickname, String nombre, String email, String contrasena, String imagen, String desc, String link);
+    public Asistente ingresarAsistente(String nickname, String nombre, String email, String contrasena, String imagen, String apellido,LocalDate fechaDeNacimiento, Institucion institucion);
     
     // Crear institución
     public void AltaInstitucion(String nombre, String descripcion, String link)throws InstitucionYaExisteException;
@@ -50,12 +50,13 @@ public interface IControladorUsuario {
     public DTRegistro obtenerRegistroSeleccionado();
     public String getUsuarioSeleccionadoNickname();
 	void modificarDatosUsuario(String nickname, String nombre, String descripcion, String link, String apellido, java.time.LocalDate fechaNacimiento, String institucion) throws excepciones.UsuarioNoExisteException, excepciones.UsuarioTipoIncorrectoException;
-    // Alta de usuario con contraseña e imagen
-    public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador, String contrasena, String imagen) throws UsuarioYaExisteException;
+
 
     // Inicio de sesión
     public boolean inicioSesion(String nickOrEmail, String contrasena);
 
     // Cierre de sesión
     public void cierreSesion();
+    
+    public boolean validarLogin(String nickOrEmail, String contrasena);
 }

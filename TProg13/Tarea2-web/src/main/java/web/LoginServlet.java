@@ -52,24 +52,44 @@ public class LoginServlet extends HttpServlet {
         String nickOrEmail = req.getParameter("email");
         String pass = req.getParameter("pass");
 
-        if (nickOrEmail == null || nickOrEmail.isBlank()) {
-            req.setAttribute("error", "Ingresá tu usuario (nickname).");
+        if (nickOrEmail == null || nickOrEmail.isBlank() || pass == null || pass.isBlank()) {
+            req.setAttribute("error", "Ingresá usuario y contraseña.");
             req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
             return;
         }
 
         String nick = nickOrEmail.trim();
 
-        Map<String, Usuario> usuarios = cu.listarUsuarios();
+        // ✅ Nueva validación con la lógica
+        boolean valido = cu.validarLogin(nick, pass); 
 
-        if (usuarios == null || !usuarios.containsKey(nick)) {
+        if (!valido) {
             req.setAttribute("estado_sesion", "LOGIN_INCORRECTO");
-            req.setAttribute("error", "Usuario no existe.");
+            req.setAttribute("error", "Usuario o contraseña incorrectos.");
             req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
             return;
         }
 
+        // ✅ Si llegó acá, el login fue correcto
+        Map<String, Usuario> usuarios = cu.listarUsuarios();
         Usuario usr = usuarios.get(nick);
+
+        // Por si el login fue por correo, intentamos buscar el nick real
+        if (usr == null) {
+            for (Usuario u : usuarios.values()) {
+                if (u.getEmail().equalsIgnoreCase(nickOrEmail)) {
+                    usr = u;
+                    nick = u.getNickname(); // si tu clase se llama así
+                    break;
+                }
+            }
+        }
+
+        if (usr == null) {
+            req.setAttribute("error", "Usuario no encontrado.");
+            req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
+            return;
+        }
 
         String rol = cu.esAsistente(nick) ? "ASISTENTE" : "ORGANIZADOR";
 

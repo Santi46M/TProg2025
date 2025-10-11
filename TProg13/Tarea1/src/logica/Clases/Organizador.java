@@ -12,8 +12,8 @@ public class Organizador extends Usuario {
     private String link;
     private Map<String, Ediciones> ediciones;
 
-    public Organizador(String nickname, String nombre, String email, String desc, String link) {
-    	super(nickname,nombre,email);
+    public Organizador(String nickname, String nombre, String email, String contrasena, String imagen, String desc, String link) {
+    	super(nickname,nombre,email,contrasena);
     	this.desc = desc;
     	this.link = link;
         this.ediciones = new HashMap<>();

@@ -15,12 +15,12 @@ public abstract class Usuario {
         this.contrasena = contrasena;
         this.imagen = imagen;
     }
+    
     public Usuario(String nickname, String nombre, String email, String contrasena) {
         this.nickname = nickname;
         this.nombre = nombre;
         this.email = email;
         this.contrasena = contrasena;
-        this.imagen = null;
     }
     
     public String getNickname() {

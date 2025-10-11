@@ -27,13 +27,13 @@ public class ControladorUsuario implements IControladorUsuario {
     private String usuarioSeleccionadoNickname = null;
     private String registroSeleccionadoId = null;
 
-    public Organizador ingresarOrganizador(String nickname, String nombre, String email, String desc, String link) {
-        return new Organizador(nickname, nombre, email, desc, link);
+    public Organizador ingresarOrganizador(String nickname, String nombre, String email, String contrasena, String imagen,  String desc, String link) {
+        return new Organizador(nickname, nombre, email, contrasena, imagen, desc, link);
     }
 
-    public Asistente ingresarAsistente(String nickname, String nombre, String email, String apellido,
+    public Asistente ingresarAsistente(String nickname, String nombre, String email, String contrasena, String imagen, String apellido,
                                        LocalDate fechaDeNacimiento, Institucion institucion) {
-        return new Asistente(nickname, nombre, email, apellido, fechaDeNacimiento, institucion);
+        return new Asistente(nickname, nombre, email, contrasena, imagen, apellido, fechaDeNacimiento, institucion);
     }
 
     public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link,
@@ -286,4 +286,25 @@ public class ControladorUsuario implements IControladorUsuario {
     public void cierreSesion() {
         // No hace nada por ahora
     }
-}
+    
+    @Override
+    public boolean validarLogin(String nickOrEmail, String contrasena) {
+        manejadorUsuario mu = manejadorUsuario.getInstancia();
+
+        // Buscar por nickname o por correo electrónico
+        Usuario u = mu.obtenerUsuarioPorNickOEmail(nickOrEmail);
+
+        // Si no existe, devolvemos false directamente
+        if (u == null) {
+            return false;
+        }
+
+        // Si la contraseña está vacía o no coincide → false
+        if (u.getContrasena() == null || !u.getContrasena().equals(contrasena)) {
+            return false;
+        }
+
+        // Si llegó acá → es válido
+        return true;
+    }
+	}

@@ -79,6 +79,21 @@ public class manejadorUsuario {
 	    return null; // o podés tirar una excepción si preferís
 	}
 	
+	public Usuario obtenerUsuarioPorNickOEmail(String valor) {
+	    // Buscar por nick
+	    Usuario u = usuarios.get(valor);
+	    if (u != null) return u;
+
+	    // Buscar por email
+	    for (Usuario user : usuarios.values()) {
+	        if (user.getEmail() != null && user.getEmail().equalsIgnoreCase(valor)) {
+	            return user;
+	        }
+	    }
+	    return null;
+	}
+
+	
 	public Boolean findCorreo(String correo) {
 		for (Map.Entry<String, Usuario> i : usuarios.entrySet()){
 			Usuario u = i.getValue();

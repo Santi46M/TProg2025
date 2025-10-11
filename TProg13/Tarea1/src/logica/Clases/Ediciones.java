@@ -36,7 +36,7 @@ public class Ediciones {
         this.organizador = organizador;
         this.ciudad = ciudad;
         this.pais = pais;
-        this.estado = EstadoEdicion.Ingresada;
+        this.estado = DTEstado.Ingresada;
     }
     public Ediciones(Eventos evento, String nombre, String sigla,
             LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
@@ -50,7 +50,7 @@ public class Ediciones {
     	this.organizador = organizador;
     	this.ciudad = ciudad;
     	this.pais = pais;
-    	this.estado = estado;
+    	this.estado = estadoEdicion;
     }
     
     public Ediciones(Eventos evento, String nombre, String sigla,
@@ -65,7 +65,7 @@ public class Ediciones {
         this.organizador = organizador;
         this.ciudad = ciudad;
         this.pais = pais;
-        this.estado = EstadoEdicion.Ingresada;
+        this.estado = DTEstado.Ingresada;
         this.imagen = imagen;
     }
 
@@ -179,16 +179,16 @@ public class Ediciones {
         this.registros.put(id, registro);
     }
     
-    public EstadoEdicion getEstado() {
+    public DTEstado getEstado() {
         return estado;
     }
 
-    public void setEstado(EstadoEdicion estado) {
+    public void setEstado(DTEstado estado) {
         this.estado = estado;
     }
 
     public boolean estaIngresada() {
-        return estado == EstadoEdicion.INGRESADA;
+        return estado == DTEstado.Ingresada;
     }
 
     public String getImagen() {
@@ -198,10 +198,4 @@ public class Ediciones {
         this.imagen = imagen;
     }
 
-    public DTEstado getEstadoEdicion() {
-        return estadoEdicion;
-    }
-    public void setEstadoEdicion(DTEstado estadoEdicion) {
-        this.estadoEdicion = estadoEdicion;
-    }
 }

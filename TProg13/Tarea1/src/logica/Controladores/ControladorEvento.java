@@ -266,7 +266,7 @@ public class ControladorEvento implements IControladorEvento {
         List<String> resultado = new ArrayList<>();
         for (Eventos e : manejador.obtenerEventos().values()) {
             for (Ediciones ed : e.getEdiciones().values()) {
-                if (ed.getEstado() == EstadoEdicion.INGRESADA) {
+                if (ed.getEstado() == DTEstado.Ingresada) {
                     resultado.add(e.getNombre());
                     break;
                 }
@@ -280,7 +280,7 @@ public class ControladorEvento implements IControladorEvento {
         List<String> resultado = new ArrayList<>();
         if (evento != null) {
             for (Ediciones ed : evento.getEdiciones().values()) {
-                if (ed.getEstado() == EstadoEdicion.INGRESADA) {
+                if (ed.getEstado() == DTEstado.Ingresada) {
                     resultado.add(ed.getNombre());
                 }
             }
@@ -290,7 +290,13 @@ public class ControladorEvento implements IControladorEvento {
 
     public void aceptarRechazarEdicion(Ediciones edicion, boolean aceptar) {
         if (edicion != null) {
-            edicion.setEstadoEdicion(aceptar ? DTEstado.Acetpada : DTEstado.Rechazada);
+            edicion.setEstado(aceptar ? DTEstado.Aceptada : DTEstado.Rechazada);
         }
+    }
+    
+    public void cambiarEstadoEdicion(Eventos evento, Ediciones edicion, boolean aceptar) {
+    			if (evento != null && edicion != null) {
+			edicion.setEstado(aceptar ? DTEstado.Aceptada : DTEstado.Rechazada);
+		}
     }
 }
