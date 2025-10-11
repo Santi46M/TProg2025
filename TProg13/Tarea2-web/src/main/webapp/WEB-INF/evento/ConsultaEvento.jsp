@@ -74,7 +74,22 @@
 
     <aside class="editions">
       <h3>Ediciones</h3>
-      <p>(Próximamente)</p>
+      <%
+        java.util.List<logica.Datatypes.DTEdicion> ediciones = (java.util.List<logica.Datatypes.DTEdicion>) request.getAttribute("evEdiciones");
+        if (ediciones == null || ediciones.isEmpty()) {
+      %>
+        <p>No hay ediciones asociadas a este evento.</p>
+      <% } else { %>
+        <ul class="ediciones-list">
+        <% for (logica.Datatypes.DTEdicion ed : ediciones) { %>
+          <li>
+            <strong><%= ed.getNombre() %></strong>
+            <span>(<%= ed.getFechaInicio() %> - <%= ed.getFechaFin() %>)</span>
+            <a class="btn" href="<%= ctx %>/edicion/ConsultaEdicion?evento=<%= java.net.URLEncoder.encode(evNombre, "UTF-8") %>&edicion=<%= java.net.URLEncoder.encode(ed.getNombre(), "UTF-8") %>">Ver detalles</a>
+          </li>
+        <% } %>
+        </ul>
+      <% } %>
     </aside>
   </main>
 </div>

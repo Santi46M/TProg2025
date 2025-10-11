@@ -17,6 +17,7 @@ import excepciones.EventoYaExisteException;
 import excepciones.FechasCruzadasException;
 import logica.Clases.Eventos;
 import logica.Clases.Usuario;
+import logica.Clases.Ediciones;
 
 @WebServlet("/edicion/*")
 @MultipartConfig // porque tu form tiene <input type="file" name="imagen">
@@ -37,7 +38,7 @@ public class EdicionServlet extends HttpServlet {
   // ===== Helpers =====
   private Usuario getUsuario(HttpServletRequest req) {
     HttpSession s = req.getSession(false);
-    return s == null ? null : (Usuario) s.getAttribute("usuario");
+    return s == null ? null : (Usuario) s.getAttribute("usuario_logueado");
   }
   private String getRol(HttpServletRequest req) {
     HttpSession s = req.getSession(false);
@@ -60,24 +61,16 @@ public class EdicionServlet extends HttpServlet {
         return;
       }
 
-      DTEdicion dt = ce().consultaEdicionEvento(evento, edicion); // ajustado a la firma real
-      if (dt == null) {
+      Ediciones edicionObj = ce().obtenerEdicion(evento, edicion); // Obtener la clase Ediciones
+      if (edicionObj == null) {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Edición no encontrada: " + edicion);
         return;
       }
-
-      // atributos para el JSP (ajustados a los getters reales)
+      req.setAttribute("edicion", edicionObj); // Pasar el objeto Ediciones
+      req.setAttribute("organizador", edicionObj.getOrganizador());
+      req.setAttribute("tiposRegistro", edicionObj.getTiposRegistro());
+      req.setAttribute("patrocinios", edicionObj.getPatrocinios());
       req.setAttribute("evNombre", evento);
-      req.setAttribute("edNombre", dt.getNombre());
-      req.setAttribute("edSigla", dt.getSigla());
-      req.setAttribute("edIni", dt.getFechaInicio());
-      req.setAttribute("edFin", dt.getFechaFin());
-      req.setAttribute("edAlta", dt.getFechaAlta());
-      req.setAttribute("edOrganizador", dt.getOrganizador());
-      req.setAttribute("edCiudad", dt.getCiudad());
-      req.setAttribute("edPais", dt.getPais());
-      //req.setAttribute("edEstado", dt.getEstado());
-
       req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
       return;
     }
@@ -150,10 +143,17 @@ public class EdicionServlet extends HttpServlet {
       }
 
       try {
+        // Obtener el organizador desde la sesión
+        Usuario org = getUsuario(req);
+        if (org == null) {
+          req.setAttribute("error", "Debe iniciar sesión como organizador para crear una edición.");
+          req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+          return;
+        }
+
         // Guardado en capa lógica. Ajustá firma: quizá pases bytes de imagen, stream, o null.
         // byte[] imgBytes = null; // imagen no se usa en la lógica real
         Eventos evObj = ce().consultaEvento(evento);
-        Usuario org = (Usuario) req.getSession().getAttribute("usuario"); // ajusta si tu sesión usa otro atributo
         ce().AltaEdicionEvento(evObj, org, nombre, nombre, desc, ini, fin, LocalDate.now(), ciudad, pais, null); // ajustado a la firma real
 
         String evEnc = URLEncoder.encode(evento, StandardCharsets.UTF_8);

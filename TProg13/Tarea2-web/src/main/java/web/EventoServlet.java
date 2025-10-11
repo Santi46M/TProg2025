@@ -54,6 +54,16 @@ public class EventoServlet extends HttpServlet {
       req.setAttribute("evDesc",   safe(() -> e.getDescripcion()));
       req.setAttribute("evFecha",  formatFecha(safeObj(() -> e.getFecha())));
       req.setAttribute("evCategorias", categoriasALista(safeObj(() -> e.getCategorias())));
+      // Obtener ediciones asociadas al evento
+      java.util.List<String> nombresEdiciones = ce().listarEdicionesEvento(nombre); // Devuelve List<String>
+      java.util.List<logica.Datatypes.DTEdicion> ediciones = new ArrayList<>();
+      if (nombresEdiciones != null) {
+        for (String nombreEd : nombresEdiciones) {
+          logica.Datatypes.DTEdicion ed = ce().consultaEdicionEvento(nombre, nombreEd);
+          if (ed != null) ediciones.add(ed);
+        }
+      }
+      req.setAttribute("evEdiciones", ediciones);
 
       req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
       return;
@@ -94,18 +104,23 @@ public class EventoServlet extends HttpServlet {
       String nombre = trim(req.getParameter("nombre"));
       String desc   = trim(req.getParameter("desc"));
       String sigla  = trim(req.getParameter("sigla"));
-      // String cats = trim(req.getParameter("categorias")); // si luego mapean a DTO
-
-      if (isBlank(nombre) || isBlank(sigla) || isBlank(desc)) {
-        req.setAttribute("error", "Nombre, sigla y descripción son obligatorios.");
+      String cats = trim(req.getParameter("categorias"));
+      List<String> categoriasList = new ArrayList<>();
+      if (!isBlank(cats)) {
+        for (String c : cats.split(",")) {
+          String t = c.trim();
+          if (!t.isEmpty()) categoriasList.add(t);
+        }
+      }
+      if (categoriasList.isEmpty()) {
+        req.setAttribute("error", "Debe asociar al menos una categoría al evento");
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
         return;
       }
-
+      // Crear DTCategorias a partir de la lista
+      logica.Datatypes.DTCategorias dtCategorias = new logica.Datatypes.DTCategorias(categoriasList);
       try {
-        // TODO: si tienen DTO de categorías, construirlo desde 'cats' y pasarlo
-        ce().AltaEvento(nombre, desc, LocalDate.now(), sigla, /*categorias*/ null, sigla);
-
+        ce().AltaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
         String nombreEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8.name());
         resp.sendRedirect(ctx(req) + "/evento/ConsultaEvento?nombre=" + nombreEnc);
       } catch (EventoYaExisteException e) {
