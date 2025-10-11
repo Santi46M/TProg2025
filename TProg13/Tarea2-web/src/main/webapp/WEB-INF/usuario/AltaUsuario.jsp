@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.*" %>
 <%
   String ctx   = request.getContextPath();
   String error = (String) request.getAttribute("error");
@@ -97,7 +98,15 @@
           </div>
           <div class="input-group">
             <label for="instIdA">Institución (opcional)</label>
-            <input id="instIdA" name="instIdA">
+            <select id="instIdA" name="instIdA">
+              <option value="">-- Seleccione una institución --</option>
+              <% Collection<String> instituciones = (Collection<String>) request.getAttribute("instituciones");
+                 if (instituciones != null) {
+                   for (String inst : instituciones) { %>
+                     <option value="<%= inst %>"><%= inst %></option>
+              <%   }
+                 } %>
+            </select>
           </div>
         </div>
       </section>
