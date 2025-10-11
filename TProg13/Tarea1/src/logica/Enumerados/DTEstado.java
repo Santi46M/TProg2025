@@ -1,7 +1,7 @@
 package logica.Enumerados;
 
-public enum DTNivel {
+public enum DTEstado {
     Ingresada,
-    Acetpada,
+    Aceptada,
     Rechazada
 }
