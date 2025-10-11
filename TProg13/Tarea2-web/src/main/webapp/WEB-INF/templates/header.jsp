@@ -28,8 +28,18 @@
       <!-- Usuario logueado -->
       <nav class="user-nav" id="userNav">
         <span class="user-name">Hola, <strong><%= nick %></strong></span>
-        <a class="btn" href="<%=ctx%>/usuario/perfil"><i class='bx bxs-user'></i> Ver Perfil</a>
-        <a class="btn" href="<%=ctx%>/auth/logout"><i class='bx bxs-log-out'></i> Cerrar sesión</a>
+        <form action="<%=ctx%>/usuario/perfil" method="get">
+  			<button type="submit" class="btn">
+    			 Ver Perfil
+  			</button>
+		</form>
+        <%-- <a class="btn" href="<%=ctx%>/usuario/perfil"><i class='bx bxs-user'></i> Ver Perfil</a> --%>
+        <form action="<%=ctx%>/auth/login" method="post">
+  			<button type="submit" class="btn">
+    			 Cerrar sesión
+  			</button>
+		</form>
+<%--         <a class="btn" href="<%=ctx%>/auth/logout"><i class='bx bxs-log-out'></i> Cerrar sesión</a> --%>
         <% if (!precargado) { %>
         	<form action="<%=ctx%>/precargar" method="post" style="display:inline;">
             	<button class="btn" type="submit">Precargar datos</button>
@@ -41,8 +51,18 @@
     <% } else { %>
       <!-- Visitante (no logueado) -->
       <nav class="user-nav" id="userNav">
-        <a class="btn ghost" href="<%=ctx%>/auth/login">Iniciar Sesión</a>
-        <a class="btn" href="<%=ctx%>/usuario/AltaUsuario">Registrarse</a>
+      	 <form action="<%=ctx%>/auth/login" method="post">
+  			<button type="submit" class="btn">
+    			 Iniciar Sesión
+  			</button>
+		</form>
+        <%-- <a class="btn ghost" href="<%=ctx%>/auth/login">Iniciar Sesión</a> --%>
+        <form action="<%=ctx%>/usuario/AltaUsuario" method="post">
+  			<button type="submit" class="btn">
+    			 Registrarse
+  			</button>
+		</form>
+        <%-- <a class="btn" href="<%=ctx%>/usuario/AltaUsuario">Registrarse</a> --%>
        	<% if (!precargado) { %>
       		<form action="<%=ctx%>/precargar" method="post" style="display:inline;">
             	<button class="btn" type="submit">Precargar datos</button>
