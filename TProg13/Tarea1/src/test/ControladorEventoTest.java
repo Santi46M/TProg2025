@@ -276,7 +276,9 @@ class ControladorEventoTest {
         try { dtnivel = TestUtils.tolerantNew("logica.Datatypes.DTNivel", "ORO", 1, 100); }
         catch (RuntimeException e) {
             try { dtnivel = TestUtils.tolerantNew("logica.Datatypes.DTNivel", "ORO"); }
-            catch (RuntimeException ex){ /* dejamos null, probamos igual */ }
+            catch (RuntimeException ex){
+            	/* dejamos null, probamos igual */ 
+            	}
         }
 
         // --- CLAVE: crear un TipoRegistro en la edición y recuperarlo desde la edición ---
