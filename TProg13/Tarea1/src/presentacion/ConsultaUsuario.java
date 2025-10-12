@@ -392,7 +392,7 @@ public class ConsultaUsuario extends JInternalFrame {
         }
     }
 
-    private static String nvl(String s) { return s == null ? "" : s; }
+    private static String nvl(String string) { return string == null ? "" : string; }
 
     // ==== IMÁGENES ====
     private static ImageIcon loadIcon(String imgName, int ancho, int altura) {

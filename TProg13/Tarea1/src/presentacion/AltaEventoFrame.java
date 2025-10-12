@@ -27,8 +27,8 @@ import logica.interfaces.IControladorUsuario;
 import com.toedter.calendar.JDateChooser;
 
 public class AltaEventoFrame extends JInternalFrame {
-    private Runnable abrirConsultaRunnable;
-    public void setAbrirConsultaRunnable(Runnable runCU) { this.abrirConsultaRunnable = runCU; }
+    //private Runnable abrirConsultaRunnable;
+    //public void setAbrirConsultaRunnable(Runnable runCU) { this.abrirConsultaRunnable = runCU; }
     private JList<String> listCategorias;
     private DefaultListModel<String> listModelCategorias;
     private java.util.List<Boolean> categoriasSeleccionadasFlags;

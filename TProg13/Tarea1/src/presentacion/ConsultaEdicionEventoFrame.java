@@ -35,7 +35,7 @@ import logica.interfaces.IControladorUsuario;
 
 public class ConsultaEdicionEventoFrame extends JInternalFrame {
 
-    private final IControladorUsuario icu;
+   // private final IControladorUsuario icu;
     private final IControladorEvento  ice;
 
     private JComboBox<String> comboEventos;
@@ -66,7 +66,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
      */
     public ConsultaEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento ICE) {
         super("Consulta Edición de Evento", true, true, true, true);
-        this.icu = iCU;
+      //  this.icu = iCU;
         this.ice = ICE;
 
         comboTiposRegistro = new JComboBox<>();
@@ -137,8 +137,8 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
             String nombreEvento  = comboEventos.getItemAt(eIdx);
             String nombreEdicion = comboEdiciones.getItemAt(dIdx);
             String nombreTipo    = comboTiposRegistro.getItemAt(tIdx);
-            ConsultaTipoRegistroFrame f = new ConsultaTipoRegistroFrame(iCU, ICE, nombreEvento, nombreEdicion, nombreTipo);
-            abrirEnDesktop(f);
+            ConsultaTipoRegistroFrame frame = new ConsultaTipoRegistroFrame(iCU, ICE, nombreEvento, nombreEdicion, nombreTipo);
+            abrirEnDesktop(frame);
         });
 
         comboPatrocinios.addActionListener(e -> {
@@ -150,8 +150,8 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
             String nombreEvento  = comboEventos.getItemAt(eIdx);
             String nombreEdicion = comboEdiciones.getItemAt(dIdx);
             String codigoPat     = comboPatrocinios.getItemAt(pIdx);
-            ConsultaPatrocinioFrame f = new ConsultaPatrocinioFrame(iCU, ICE, nombreEvento, nombreEdicion, codigoPat);
-            abrirEnDesktop(f);
+            ConsultaPatrocinioFrame frame = new ConsultaPatrocinioFrame(iCU, ICE, nombreEvento, nombreEdicion, codigoPat);
+            abrirEnDesktop(frame);
         });
 
         cargarEventos();
@@ -176,9 +176,9 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         this(iCU, ICE);
         if (siglaEdicion == null || siglaEdicion.isEmpty()) return;
 
-        Ediciones ed = ICE.obtenerEdicionPorSigla(siglaEdicion);
-        if (ed == null) return;
-        String nombreEdicion = ed.getNombre();
+        Ediciones edicion = ICE.obtenerEdicionPorSigla(siglaEdicion);
+        if (edicion == null) return;
+        String nombreEdicion = edicion.getNombre();
 
         String nombreEvento = ICE.encontrarEventoPorSigla(siglaEdicion);
         if (nombreEvento == null || nombreEvento.isEmpty()) return;
@@ -195,9 +195,9 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         edicionesEventos = new String[eventos.size()][];
 
         for (int i = 0; i < eventos.size(); i++) {
-            DTEvento ev = eventos.get(i);
-            arr[i] = ev.getNombre();
-            edicionesEventos[i] = ev.getEdiciones().toArray(new String[0]);
+            DTEvento evento = eventos.get(i);
+            arr[i] = evento.getNombre();
+            edicionesEventos[i] = evento.getEdiciones().toArray(new String[0]);
         }
 
         cambiando = true;
@@ -233,29 +233,29 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         String nombreEvento  = comboEventos.getItemAt(idxEvento);
         String nombreEdicion = comboEdiciones.getItemAt(idxEd);
 
-        Ediciones ed = ice.obtenerEdicion(nombreEvento, nombreEdicion);
-        if (ed == null) return;
+        Ediciones edicion = ice.obtenerEdicion(nombreEvento, nombreEdicion);
+        if (edicion == null) return;
 
-        txtNombreEdicion.setText(ed.getNombre());
-        txtSigla.setText(ed.getSigla());
-        txtFechaInicio.setText(String.valueOf(ed.getFechaInicio()));
-        txtFechaFin.setText(String.valueOf(ed.getFechaFin()));
-        txtFechaAlta.setText(String.valueOf(ed.getFechaAlta()));
-        txtCiudad.setText(ed.getCiudad());
-        txtPais.setText(ed.getPais());
-        txtOrganizador.setText(ed.getOrganizador() != null ? ed.getOrganizador().getNickname() : "");
+        txtNombreEdicion.setText(edicion.getNombre());
+        txtSigla.setText(edicion.getSigla());
+        txtFechaInicio.setText(String.valueOf(edicion.getFechaInicio()));
+        txtFechaFin.setText(String.valueOf(edicion.getFechaFin()));
+        txtFechaAlta.setText(String.valueOf(edicion.getFechaAlta()));
+        txtCiudad.setText(edicion.getCiudad());
+        txtPais.setText(edicion.getPais());
+        txtOrganizador.setText(edicion.getOrganizador() != null ? edicion.getOrganizador().getNickname() : "");
 
         comboTiposRegistro.removeAllItems();
-        for (TipoRegistro tr : ed.getTiposRegistro()) comboTiposRegistro.addItem(tr.getNombre());
+        for (TipoRegistro tr : edicion.getTiposRegistro()) comboTiposRegistro.addItem(tr.getNombre());
 
         comboPatrocinios.removeAllItems();
-        for (Patrocinio p : ed.getPatrocinios()) comboPatrocinios.addItem(p.getCodigoPatrocinio());
+        for (Patrocinio p : edicion.getPatrocinios()) comboPatrocinios.addItem(p.getCodigoPatrocinio());
 
         panelGridRegistros.removeAll();
         panelGridRegistros.add(new JLabel("Asistente", SwingConstants.CENTER));
         panelGridRegistros.add(new JLabel("Tipo de registro", SwingConstants.CENTER));
         panelGridRegistros.add(new JLabel("Costo", SwingConstants.CENTER));
-        for (logica.clases.Registro reg : ed.getRegistros().values()) {
+        for (logica.clases.Registro reg : edicion.getRegistros().values()) {
             panelGridRegistros.add(new JLabel(reg.getUsuario().getNickname()));
             panelGridRegistros.add(new JLabel(reg.getTipoRegistro().getNombre()));
             panelGridRegistros.add(new JLabel(String.valueOf(reg.getCosto())));
@@ -264,7 +264,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         panelGridRegistros.repaint();
 
         // Imagen
-        ImageIcon icon = loadIcon(ed.getImagen(), 300, 210);
+        ImageIcon icon = loadIcon(edicion.getImagen(), 300, 210);
         lblImagenEdicion.setIcon(icon);
         lblImagenEdicion.setText(icon == null ? "Sin imagen" : null);
     }
@@ -304,28 +304,28 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         }
     }
 
-    private JLabel labelR(String s) {
-        JLabel l = new JLabel(s);
-        l.setHorizontalAlignment(SwingConstants.LEFT);
-        return l;
+    private JLabel labelR(String string) {
+        JLabel label = new JLabel(string);
+        label.setHorizontalAlignment(SwingConstants.LEFT);
+        return label;
     }
 
     private JTextField roField(JPanel parent) {
-        JTextField t = new JTextField();
-        t.setEditable(false);
-        parent.add(t);
-        return t;
+        JTextField txt = new JTextField();
+        txt.setEditable(false);
+        parent.add(txt);
+        return txt;
     }
 
-    private void abrirEnDesktop(JInternalFrame f) {
+    private void abrirEnDesktop(JInternalFrame frame) {
         JDesktopPane desk = getDesktopPane();
-        if (desk != null) desk.add(f);
-        f.setVisible(true);
-        f.toFront();
+        if (desk != null) desk.add(frame);
+        frame.setVisible(true);
+        frame.toFront();
     }
 
     // ==== IMÁGENES ====
-    private static ImageIcon loadIcon(String imgName, int w, int h) {
+    private static ImageIcon loadIcon(String imgName, int ancho, int altura) {
         if (imgName == null || imgName.isBlank()) return null;
         try {
             String cpPath = "img/" + imgName;
@@ -334,13 +334,13 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
             if (url != null) {
                 base = new ImageIcon(url).getImage();
             } else {
-                java.io.File f1 = new java.io.File("src/img/" + imgName);
-                java.io.File f2 = new java.io.File("img/" + imgName);
-                java.io.File f = f1.exists() ? f1 : (f2.exists() ? f2 : null);
-                if (f == null) return null;
-                base = new ImageIcon(f.getAbsolutePath()).getImage();
+                java.io.File fileAux1 = new java.io.File("src/img/" + imgName);
+                java.io.File fileAux2 = new java.io.File("img/" + imgName);
+                java.io.File file = fileAux1.exists() ? fileAux1 : (fileAux2.exists() ? fileAux2 : null);
+                if (file == null) return null;
+                base = new ImageIcon(file.getAbsolutePath()).getImage();
             }
-            Image scaled = base.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            Image scaled = base.getScaledInstance(ancho, altura, Image.SCALE_SMOOTH);
             return new ImageIcon(scaled);
         } catch (IllegalStateException | NullPointerException ex) {
             return null;

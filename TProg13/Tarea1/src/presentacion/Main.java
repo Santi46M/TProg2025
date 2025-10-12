@@ -536,7 +536,7 @@ public class Main {
         menuItem.setForeground(P_MENU_FG);
     }
 
- /*   private void cambiarLookAndFeel(String nombre) {
+ /*  private void cambiarLookAndFeel(String nombre) {
         try {
             String clase = null;
             if ("System".equalsIgnoreCase(nombre)) {

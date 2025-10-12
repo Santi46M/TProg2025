@@ -15,15 +15,15 @@ import java.awt.Insets;
 
 import java.awt.FlowLayout;
 
-import logica.clases.Eventos;
+//import logica.clases.Eventos;
 import logica.interfaces.IControladorEvento;
 import logica.interfaces.IControladorUsuario;
 import excepciones.TipoRegistroYaExisteException;
-import java.util.List;
+//import java.util.List;
 
 public class AltaTipoRegistroFrame extends JInternalFrame {
     private IControladorEvento controlador;
-    private List<Eventos> listaEventos;
+//  private List<Eventos> listaEventos;
     private JComboBox<String> comboEventos;
     private JComboBox<String> comboEdiciones;
     private JTextField txtNombre;

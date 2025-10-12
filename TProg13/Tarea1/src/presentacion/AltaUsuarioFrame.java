@@ -107,11 +107,11 @@ public class AltaUsuarioFrame extends JInternalFrame {
         getContentPane().add(lblArchivoImagen);
 
         btnImagen.addActionListener(e -> {
-            JFileChooser fc = new JFileChooser();
-            fc.setDialogTitle("Seleccionar imagen de usuario");
-            fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imágenes JPG y PNG", "jpg", "jpeg", "png"));
-            if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                File archivo = fc.getSelectedFile();
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setDialogTitle("Seleccionar imagen de usuario");
+            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imágenes JPG y PNG", "jpg", "jpeg", "png"));
+            if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                File archivo = fileChooser.getSelectedFile();
                 imagenSeleccionada = archivo.getName(); // o archivo.getAbsolutePath()
                 lblArchivoImagen.setText(archivo.getName());
             }
@@ -219,7 +219,7 @@ public class AltaUsuarioFrame extends JInternalFrame {
         });
     }
 
-    protected void cmdRegistroUsuarioActionPerformed(ActionEvent e) {
+    protected void cmdRegistroUsuarioActionPerformed(ActionEvent event) {
         if (checkFormulario()) {
             try {
                 String nickname = textField.getText();
