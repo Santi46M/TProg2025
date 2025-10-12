@@ -38,9 +38,7 @@ String ctx  = request.getContextPath();
       </div>
       <div class="event-info">
         <h3>Datos de la Edición</h3>
-        <%
-        if (edicion != null) {
-        %>
+        <% if (edicion != null) { %>
           <div class="event-meta"><strong>Sigla:</strong> <%=edicion.getSigla()%></div>
           <div class="event-meta"><strong>Fecha inicio:</strong> <%=edicion.getFechaInicio()%></div>
           <div class="event-meta"><strong>Fecha fin:</strong> <%=edicion.getFechaFin()%></div>
@@ -48,15 +46,63 @@ String ctx  = request.getContextPath();
           <div class="event-meta"><strong>Ciudad:</strong> <%=edicion.getCiudad()%></div>
           <div class="event-meta"><strong>País:</strong> <%=edicion.getPais()%></div>
           <div class="event-meta"><strong>Estado:</strong> <%=edicion.getEstado()%></div>
-          <%
-          if (edicion.getImagen() != null && !edicion.getImagen().isEmpty()) {
-          %>
+          <% if (edicion.getImagen() != null && !edicion.getImagen().isEmpty()) { %>
             <div class="event-meta"><strong>Imagen:</strong><br><img src="<%=edicion.getImagen()%>" alt="Imagen de la edición" style="max-width:300px;max-height:200px;"></div>
-          <%
-          }
-          %>
+          <% } %>
+        <% } %>
+        <% java.util.List registros = (java.util.List) request.getAttribute("registros");
+           if (registros != null && !registros.isEmpty()) {
+             // Si el usuario es asistente y solo tiene su propio registro
+             if ("ASISTENTE".equals(rol) && registros.size() == 1) {
+               logica.clases.Registro r = (logica.clases.Registro) registros.get(0);
+        %>
+               <h3>Tu registro en esta edición</h3>
+               <table class="tabla-registros" style="width:100%; border-collapse:collapse; margin-bottom:1rem;">
+                 <thead>
+                   <tr>
+                     <th>Usuario</th>
+                     <th>Tipo</th>
+                     <th>Fecha registro</th>
+                     <th>Costo</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   <tr>
+                     <td><%= r.getUsuario().getNickname() %></td>
+                     <td><%= r.getTipoRegistro().getNombre() %></td>
+                     <td><%= r.getFechaRegistro() %></td>
+                     <td>$<%= r.getCosto() %></td>
+                   </tr>
+                 </tbody>
+               </table>
         <%
-        }
+             } else {
+        %>
+               <h3>Registros de la edición</h3>
+               <table class="tabla-registros" style="width:100%; border-collapse:collapse; margin-bottom:1rem;">
+                 <thead>
+                   <tr>
+                     <th>Usuario</th>
+                     <th>Tipo</th>
+                     <th>Fecha registro</th>
+                     <th>Costo</th>
+                   </tr>
+                 </thead>
+                 <tbody>
+                   <% for (Object rObj : registros) {
+                        logica.clases.Registro r = (logica.clases.Registro) rObj; %>
+                     <tr>
+                       <td><%= r.getUsuario().getNickname() %></td>
+                       <td><%= r.getTipoRegistro().getNombre() %></td>
+                       <td><%= r.getFechaRegistro() %></td>
+                       <td>$<%= r.getCosto() %></td>
+                     </tr>
+                   <% } %>
+                 </tbody>
+               </table>
+        <%
+             }
+           }
         %>
       </div>
     </section>
