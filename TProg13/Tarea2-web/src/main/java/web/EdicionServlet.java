@@ -10,14 +10,14 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
 import logica.fabrica;
-import logica.Interfaces.IControladorEvento;   // <-- ajustá si el nombre real difiere
-import logica.Datatypes.DTEdicion;             // <-- ajustá si usás otro DTO
+import logica.interfaces.IControladorEvento;   // <-- ajustá si el nombre real difiere
+import logica.datatypes.DTEdicion;             // <-- ajustá si usás otro DTO
 import excepciones.EdicionYaExisteException;   // <-- ajustá a tu excepción real
 import excepciones.EventoYaExisteException;
 import excepciones.FechasCruzadasException;
-import logica.Clases.Eventos;
-import logica.Clases.Usuario;
-import logica.Clases.Ediciones;
+import logica.clases.Eventos;
+import logica.clases.Usuario;
+import logica.clases.Ediciones;
 
 @WebServlet("/edicion/*")
 @MultipartConfig // porque tu form tiene <input type="file" name="imagen">
@@ -154,7 +154,7 @@ public class EdicionServlet extends HttpServlet {
         // Guardado en capa lógica. Ajustá firma: quizá pases bytes de imagen, stream, o null.
         // byte[] imgBytes = null; // imagen no se usa en la lógica real
         Eventos evObj = ce().consultaEvento(evento);
-        ce().AltaEdicionEvento(evObj, org, nombre, nombre, desc, ini, fin, LocalDate.now(), ciudad, pais, null); // ajustado a la firma real
+        ce().altaEdicionEvento(evObj, org, nombre, nombre, desc, ini, fin, LocalDate.now(), ciudad, pais, null); // ajustado a la firma real
 
         String evEnc = URLEncoder.encode(evento, StandardCharsets.UTF_8);
         String edEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8);

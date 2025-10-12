@@ -8,9 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import logica.fabrica;
-import logica.Interfaces.IControladorEvento;
-import logica.Clases.Ediciones;
-import logica.Datatypes.DTEvento;
+import logica.interfaces.IControladorEvento;
+import logica.clases.Ediciones;
+import logica.datatypes.DTEvento;
 
 @WebServlet("/registro/*")
 public class AltaRegistroServlet extends HttpServlet {
@@ -93,7 +93,7 @@ public class AltaRegistroServlet extends HttpServlet {
                     req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                     return;
                 }
-                ce().AltaTipoRegistro(ed, nombre, descripcion, costo, cupo);
+                ce().altaTipoRegistro(ed, nombre, descripcion, costo, cupo);
                 // Redirección igual que en alta evento
                 String evento = ed.getEvento().getNombre();
                 String eventoEnc = java.net.URLEncoder.encode(evento, java.nio.charset.StandardCharsets.UTF_8.name());

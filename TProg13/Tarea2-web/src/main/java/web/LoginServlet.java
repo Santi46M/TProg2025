@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 import logica.fabrica;
-import logica.Interfaces.IControladorUsuario;
-import logica.Clases.Usuario;
+import logica.interfaces.IControladorUsuario;
+import logica.clases.Usuario;
 
 @WebServlet(urlPatterns = {"/auth/login", "/auth/logout"})
 public class LoginServlet extends HttpServlet {

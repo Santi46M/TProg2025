@@ -7,11 +7,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import logica.fabrica;
-import logica.Clases.Usuario;
-import logica.Datatypes.DTDatosUsuario;
-import logica.Datatypes.DTEvento;
-import logica.Interfaces.IControladorUsuario;
-import logica.Interfaces.IControladorEvento;
+import logica.clases.Usuario;
+import logica.datatypes.DTDatosUsuario;
+import logica.datatypes.DTEvento;
+import logica.interfaces.IControladorUsuario;
+import logica.interfaces.IControladorEvento;
 
 @WebServlet("/usuario/ConsultaUsuario")
 public class ConsultaUsuarioServlet extends HttpServlet {

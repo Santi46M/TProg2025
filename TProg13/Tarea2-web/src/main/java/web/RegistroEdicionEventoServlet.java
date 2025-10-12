@@ -8,14 +8,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import logica.fabrica;
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
-import logica.Clases.Ediciones;
-import logica.Clases.Usuario;
-import logica.Clases.Asistente;
-import logica.Clases.Eventos;
-import logica.Clases.TipoRegistro;
-import logica.Datatypes.DTEvento;
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
+import logica.clases.Ediciones;
+import logica.clases.Usuario;
+import logica.clases.Asistente;
+import logica.clases.Eventos;
+import logica.clases.TipoRegistro;
+import logica.datatypes.DTEvento;
 import java.time.LocalDate;
 import java.util.UUID;
 
