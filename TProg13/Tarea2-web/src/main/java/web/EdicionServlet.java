@@ -71,6 +71,29 @@ public class EdicionServlet extends HttpServlet {
       req.setAttribute("tiposRegistro", edicionObj.getTiposRegistro());
       req.setAttribute("patrocinios", edicionObj.getPatrocinios());
       req.setAttribute("evNombre", evento);
+      // --- lógica para mostrar registros solo al organizador ---
+      HttpSession session = req.getSession(false);
+      String nickSesion = session != null ? (String) session.getAttribute("nick") : null;
+      boolean esOrganizador = nickSesion != null && edicionObj.getOrganizador() != null && nickSesion.equals(edicionObj.getOrganizador().getNickname());
+      java.util.List<logica.clases.Registro> registrosList = null;
+      if (esOrganizador) {
+        java.util.Map<String, logica.clases.Registro> registrosMap = edicionObj.getRegistros();
+        registrosList = new java.util.ArrayList<>(registrosMap.values());
+      } else if (nickSesion != null) {
+        // Mostrar solo el registro del asistente logueado en esta edición
+        logica.clases.Usuario usuarioLogueado = logica.manejadores.manejadorUsuario.getInstancia().findUsuario(nickSesion);
+        if (usuarioLogueado instanceof logica.clases.Asistente asistente) {
+          registrosList = new java.util.ArrayList<>();
+          java.util.Map<String, logica.clases.Registro> registrosAsist = asistente.getRegistros();
+          for (logica.clases.Registro r : registrosAsist.values()) {
+            if (r.getEdicion() != null && r.getEdicion().getNombre().equals(edicionObj.getNombre()) && r.getEdicion().getEvento().getNombre().equals(edicionObj.getEvento().getNombre())) {
+              registrosList.add(r);
+            }
+          }
+        }
+      }
+      if (registrosList == null) registrosList = new java.util.ArrayList<>();
+      req.setAttribute("registros", registrosList);
       req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
       return;
     }
