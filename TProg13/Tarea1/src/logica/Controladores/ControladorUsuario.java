@@ -12,16 +12,32 @@ import java.util.Set;
 import java.time.LocalDate;
 import java.util.HashSet;
 
-import logica.Manejadores.*;
 import logica.Interfaces.IControladorUsuario;
-import logica.Clases.*;
-import logica.Datatypes.*;
+
+//Manejadores
+import logica.Manejadores.manejadorAuxiliar;
+import logica.Manejadores.ManejadorEvento;
+import logica.Manejadores.manejadorUsuario;
+
+//Clases
+import logica.Clases.Asistente;
+import logica.Clases.Categoria;
+import logica.Clases.Ediciones;
+import logica.Clases.Institucion;
+import logica.Clases.Organizador;
+import logica.Clases.Registro;
+import logica.Clases.Usuario;
+
+//Datatypes
+import logica.Datatypes.DTDatosUsuario;
+import logica.Datatypes.DTEdicion;
+import logica.Datatypes.DTRegistro;
 
 public class ControladorUsuario implements IControladorUsuario {
 	
-    manejadorUsuario manejador = manejadorUsuario.getInstancia();
-    ManejadorEvento manejadorEv = ManejadorEvento.getInstancia();
-    manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
+    private manejadorUsuario manejador = manejadorUsuario.getInstancia();
+    private ManejadorEvento manejadorEv = ManejadorEvento.getInstancia();
+    private manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
 
     // --- estado de selección para consultas ---
     private String usuarioSeleccionadoNickname = null;
@@ -36,7 +52,7 @@ public class ControladorUsuario implements IControladorUsuario {
         return new Asistente(nickname, nombre, email, contrasena, imagen, apellido, fechaDeNacimiento, institucion);
     }
 
-    public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link,
+    public void altaUsuario(String nickname, String nombre, String correo, String descripcion, String link,
                             String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador, String contrasena, String imagen) throws UsuarioYaExisteException {
 
         // verificar unicidad de nickname y correo
@@ -60,7 +76,7 @@ public class ControladorUsuario implements IControladorUsuario {
         manejador.addUsuario(nuevoUsuario);
     }
 
-    public void AltaInstitucion(String nombre, String descripcion, String link) throws InstitucionYaExisteException {
+    public void altaInstitucion(String nombre, String descripcion, String link) throws InstitucionYaExisteException {
         if (manejador.findInstitucion(nombre) != null) {
             throw new InstitucionYaExisteException("La institución " + nombre + " ya existe");        
             }
@@ -172,7 +188,7 @@ public class ControladorUsuario implements IControladorUsuario {
         return lista;
     }
     
-    public void ConsultaUsuario(String nickname) throws UsuarioNoExisteException {
+    public void consultaUsuario(String nickname) throws UsuarioNoExisteException {
         Usuario u = manejador.findUsuario(nickname);
         if (u == null) {
             throw new UsuarioNoExisteException(nickname);
@@ -219,7 +235,7 @@ public class ControladorUsuario implements IControladorUsuario {
         return usuarioSeleccionadoNickname;
     }
 
-    public void AltaCategoriaSinGUI(String nombre) throws CategoriaYaExisteException {
+    public void altaCategoriaSinGUI(String nombre) throws CategoriaYaExisteException {
         if (manejadorAux.existeCategoria(nombre)) {
             throw new CategoriaYaExisteException(nombre);
         }

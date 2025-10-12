@@ -10,18 +10,24 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 
-import logica.Clases.*;
-import logica.Datatypes.*;
+//Clases
+import logica.Clases.Asistente;
+import logica.Clases.Institucion;
+import logica.Clases.Organizador;
+import logica.Clases.Usuario;
+//Datatypes
+import logica.Datatypes.DTDatosUsuario;
+import logica.Datatypes.DTRegistro;
 
 public interface IControladorUsuario {
 
     // Crear usuarios
-    public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador, String contrasena, String imagen) throws UsuarioYaExisteException;
+    public void altaUsuario(String nickname, String nombre, String correo, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador, String contrasena, String imagen) throws UsuarioYaExisteException;
     public Organizador ingresarOrganizador(String nickname, String nombre, String email, String contrasena, String imagen, String desc, String link);
     public Asistente ingresarAsistente(String nickname, String nombre, String email, String contrasena, String imagen, String apellido, LocalDate fechaDeNacimiento, Institucion institucion);
     
     // Crear institución
-    public void AltaInstitucion(String nombre, String descripcion, String link)throws InstitucionYaExisteException;
+    public void altaInstitucion(String nombre, String descripcion, String link)throws InstitucionYaExisteException;
 
     // Listados
     public Map<String, Usuario> listarUsuarios();
@@ -41,7 +47,7 @@ public interface IControladorUsuario {
     public boolean esAsistente(String nickname);
 
     // Categorías
-    public void AltaCategoriaSinGUI(String nombre) throws CategoriaYaExisteException;
+    public void altaCategoriaSinGUI(String nombre) throws CategoriaYaExisteException;
     
 
     public void seleccionarRegistro(String id);

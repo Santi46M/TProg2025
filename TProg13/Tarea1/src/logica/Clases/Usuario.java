@@ -49,10 +49,7 @@ public abstract class Usuario {
     // }
     
     public boolean esAsistente(Usuario u) {
-    	if (u instanceof Asistente) {
-    		return true;
-    	}
-    	else return false;
+        return u instanceof Asistente;
     }
     
    /* public boolean esOrganizador(Usuario u) {
