@@ -43,11 +43,11 @@
              java.util.List<String> evEds  = ev.getEdiciones();
         %>
           <article class="card event-card list">
-            <%-- Si tenés imagen, descomentá esto y servila desde /img
+            <%
             String img = ev.getImagen();
             if (img != null && !img.isBlank()) { %>
               <img class="event-cover" src="<%=ctx%>/img/<%=img%>" alt="Imagen de <%=nombre%>">
-            <% } --%>
+            <% }%>
 
             <h3 class="event-title"><%= nombre %></h3>
             <p class="event-sub"><%= (sigla==null||sigla.isBlank()) ? "—" : sigla %></p>
