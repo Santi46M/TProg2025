@@ -1,13 +1,21 @@
 package presentacion;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.BorderFactory;
+
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+
 import java.util.List;
 import logica.Interfaces.IControladorEvento;
 
 public class AceptarEdicionEventoFrame extends JInternalFrame {
-    private IControladorEvento ICE;
+    private IControladorEvento ice;
 
     private JComboBox<String> comboEventos;
     private JComboBox<String> comboEdiciones;
@@ -16,7 +24,7 @@ public class AceptarEdicionEventoFrame extends JInternalFrame {
 
     public AceptarEdicionEventoFrame(IControladorEvento ICE) {
         super("Aceptar/Rechazar Edición de Evento", true, true, true, true);
-        this.ICE = ICE;
+        this.ice = ICE;
         setSize(500, 250);
         setLayout(new BorderLayout());
 
@@ -46,7 +54,7 @@ public class AceptarEdicionEventoFrame extends JInternalFrame {
 
     public void cargarEventos() {
         comboEventos.removeAllItems();
-        List<String> eventos = ICE.listarEventosConEdicionesIngresadas();
+        List<String> eventos = ice.listarEventosConEdicionesIngresadas();
         for (String nombre : eventos) {
             comboEventos.addItem(nombre);
         }
@@ -57,7 +65,7 @@ public class AceptarEdicionEventoFrame extends JInternalFrame {
         comboEdiciones.removeAllItems();
         String evento = (String) comboEventos.getSelectedItem();
         if (evento != null) {
-            List<String> ediciones = ICE.listarEdicionesIngresadasDeEvento(evento);
+            List<String> ediciones = ice.listarEdicionesIngresadasDeEvento(evento);
             for (String ed : ediciones) {
                 comboEdiciones.addItem(ed);
             }
@@ -71,7 +79,7 @@ public class AceptarEdicionEventoFrame extends JInternalFrame {
             JOptionPane.showMessageDialog(this, "Debes seleccionar un evento y una edición", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        ICE.cambiarEstadoEdicion(evento, edicion, aceptar);
+        ice.cambiarEstadoEdicion(evento, edicion, aceptar);
         JOptionPane.showMessageDialog(this, "Edición " + (aceptar ? "confirmada" : "rechazada") + " correctamente.");
         cargarEdiciones(); // recarga ediciones en caso de que ya no haya más ingresadas
         

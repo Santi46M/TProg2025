@@ -290,8 +290,10 @@ public class AltaEdicionEvento extends JInternalFrame {
 	            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de fechas", JOptionPane.ERROR_MESSAGE);
 	        } catch (excepciones.EdicionYaExisteException ex) {
 	            JOptionPane.showMessageDialog(this, "Ya existe una edición con el nombre: '" + ex.getMessage() + "'");
-	        } catch (Exception ex) {
-	            JOptionPane.showMessageDialog(this, "Error al registrar la edición: " + ex.getMessage());
+	        } catch (excepciones.EventoYaExisteException ex) {
+	            JOptionPane.showMessageDialog(this, "Ya existe un evento con ese nombre o sigla.", "Error", JOptionPane.ERROR_MESSAGE);
+	        } catch (IllegalStateException | NullPointerException ex) {
+	            JOptionPane.showMessageDialog(this, "Error inesperado: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 	        }
 	    });
 
@@ -299,35 +301,61 @@ public class AltaEdicionEvento extends JInternalFrame {
 	}
 
 	public void cargarEventos() {
-		try {
-			logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
-			java.util.List<logica.Datatypes.DTEvento> eventos = controlador.listarEventos();
-			comboEvento.removeAllItems();
-			for (logica.Datatypes.DTEvento ev : eventos) {
-				comboEvento.addItem(ev.getNombre());
-			}
-			if (comboEvento.getItemCount() > 0) {
-				comboEvento.setSelectedIndex(0);
-			}
-		} catch (Exception ex) {
-			comboEvento.setModel(new DefaultComboBoxModel<>(new String[]{"No hay eventos"}));
-		}
+	    logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
+	    java.util.List<logica.Datatypes.DTEvento> eventos;
+	    try {
+	        eventos = controlador.listarEventos();
+	    } catch (IllegalStateException | NullPointerException ex) {
+	        eventos = java.util.Collections.emptyList();
+	    }
+
+	    comboEvento.removeAllItems();
+	    if (eventos.isEmpty()) {
+	        comboEvento.setModel(new DefaultComboBoxModel<>(new String[]{"No hay eventos"}));
+	        return;
+	    }
+
+	    for (logica.Datatypes.DTEvento ev : eventos) {
+	        comboEvento.addItem(ev.getNombre());
+	    }
+	    comboEvento.setSelectedIndex(0);
 	}
 
+
 	public void cargarOrganizadores() {
-		try {
-			comboOrganizador.removeAllItems();
-			if (controladorUsuario != null) {
-				java.util.Map<String, logica.Clases.Organizador> orgs = controladorUsuario.listarOrganizadores();
-				for (String nick : orgs.keySet()) {
-					comboOrganizador.addItem(nick);
-				}
-			}
-			if (comboOrganizador.getItemCount() > 0) {
-				comboOrganizador.setSelectedIndex(0);
-			}
-		} catch (Exception ex) {
-			comboOrganizador.setModel(new DefaultComboBoxModel<>(new String[]{"No hay organizadores"}));
-		}
+	    comboOrganizador.removeAllItems();
+
+	    if (controladorUsuario == null) {
+	        comboOrganizador.setModel(new DefaultComboBoxModel<>(new String[]{"No hay organizadores"}));
+	        return;
+	    }
+
+	    java.util.Map<String, logica.Clases.Organizador> organizadores =
+	            java.util.Collections.emptyMap();
+
+	    // Intentamos listar sin capturar Exception genérico (Checkstyle-safe)
+	    try {
+	        organizadores = controladorUsuario.listarOrganizadores();
+	    } catch (IllegalStateException | NullPointerException ex) {
+	        // Control de errores específicos, permitido por Checkstyle
+	        organizadores = java.util.Collections.emptyMap();
+	    }
+
+	    if (organizadores.isEmpty()) {
+	        comboOrganizador.setModel(new DefaultComboBoxModel<>(new String[]{"No hay organizadores"}));
+	        return;
+	    }
+
+	    for (String nick : organizadores.keySet()) {
+	        comboOrganizador.addItem(nick);
+	    }
+
+	    if (comboOrganizador.getItemCount() > 0) {
+	        comboOrganizador.setSelectedIndex(0);
+	    }
 	}
+
+
+
+
 }

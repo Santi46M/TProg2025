@@ -1,10 +1,27 @@
 package presentacion;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+
+import java.awt.Insets;
+import java.awt.Rectangle;
 import excepciones.EventoYaExisteException;
 import logica.Controladores.ControladorEvento;
-import logica.Interfaces.*;
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
 import logica.Datatypes.DTCategorias;
 import com.toedter.calendar.JDateChooser;
 
@@ -24,7 +41,7 @@ public class AltaEventoFrame extends JInternalFrame {
                 listModelCategorias.addElement(cat);
                 categoriasSeleccionadasFlags.add(false);
             }
-        } catch (Exception ex) {
+        } catch (IllegalStateException | NullPointerException ex) {
             listModelCategorias.addElement("No se pudieron cargar las categorías.");
             categoriasSeleccionadasFlags.add(false);
         }
@@ -212,7 +229,7 @@ public class AltaEventoFrame extends JInternalFrame {
             } catch (EventoYaExisteException ex) {
                 JOptionPane.showMessageDialog(this, "Ya existe un evento con el nombre: '" + nombre + "'.",
                     "Error - Evento ya existente", JOptionPane.ERROR_MESSAGE);
-            } catch (Exception ex) {
+            } catch (IllegalStateException | NullPointerException ex) {
                 JOptionPane.showMessageDialog(this, "Error al registrar el evento: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
             }
