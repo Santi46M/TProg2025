@@ -95,8 +95,7 @@
           <h2>Ediciones de eventos</h2>
           <ul class="lista-ediciones">
             <% for (DTEdicion e : usuario.getEdiciones()) { 
-                //ACTUALIZAR logica. jar  String estado = e.getEstado();
-                 String estado = "";
+                String estado = e.getEstado().toString();
                  boolean mostrar = "Aceptada".equalsIgnoreCase(estado) || 
                                   (esSuPropioPerfil && ("Ingresada".equalsIgnoreCase(estado) || "Rechazada".equalsIgnoreCase(estado)));
                  if (mostrar) {
