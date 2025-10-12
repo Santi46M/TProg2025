@@ -191,10 +191,10 @@ public class ControladorUsuario implements IControladorUsuario {
         // Lógica adicional según caso de uso
     }
 
-    public DTRegistro obtenerDatosRegistros(String id) {
+    public DTRegistro obtenerDatosRegistros(String identificador) {
         DTRegistro dto = null;
-        if (manejadorEv.existeRegistro(id)) {
-            Registro reg = manejadorEv.obtenerRegistro(id);
+        if (manejadorEv.existeRegistro(identificador)) {
+            Registro reg = manejadorEv.obtenerRegistro(identificador);
             dto = new DTRegistro(
                 reg.getId(),
                 reg.getUsuario().getNickname(),
