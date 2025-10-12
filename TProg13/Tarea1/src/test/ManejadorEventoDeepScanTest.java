@@ -1,24 +1,31 @@
 package test;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("ManejadorEvento – deep scan de estructuras (Map/Collection)")
 class ManejadorEventoDeepScanTest {
 
-    Object ce, cu;
+    private Object ce, cu;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws Throwable {
         TestUtils.resetAll();
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         Method getter;
-        try { getter = fab.getMethod("getInstance"); }
-        catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
+        try { getter = fab.getMethod("getInstance");
+        } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
         cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
@@ -31,7 +38,11 @@ class ManejadorEventoDeepScanTest {
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                 "orgDS", "Org DS", "o@x", "d", "l", " Ap",
                 LocalDate.of(1990, 1, 1), "Inst_DS", true);
-        try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "DS-Cat"); } catch (Throwable ignored) {}
+        try {
+            TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "DS-Cat");
+        } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException ignored) {
+            // método no invocable / falló al ejecutar: seguimos
+        }
 
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("DS-Cat"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
@@ -60,7 +71,9 @@ class ManejadorEventoDeepScanTest {
                     } else if (res instanceof Collection<?> col) {
                         if (!col.isEmpty()) { sawSomething = true; break; }
                     }
-                } catch (Throwable ignored) {}
+                } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException ignored) {
+                	 // método no invocable / falló al ejecutar: seguimos con el siguiente
+                }
             }
         }
 
