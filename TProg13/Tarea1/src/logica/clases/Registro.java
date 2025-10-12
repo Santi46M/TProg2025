@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 
 public class Registro {
-    private String id;
+    private String identificador;
     private float costo;
     private Usuario usuario;
     private Ediciones edicion;
@@ -14,8 +14,8 @@ public class Registro {
     private LocalDate fechaRegistro;
     private LocalDate fechaInicio;
 
-    public Registro(String id, Usuario usuario, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
-        this.id = id;
+    public Registro(String identificador, Usuario usuario, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
+        this.identificador = identificador;
         this.usuario = usuario;
         this.edicion = edicion;
         this.tipoRegistro = tipoRegistro;
@@ -25,8 +25,8 @@ public class Registro {
     }
 
     // Getters y setters
-    public String getId() { return id; }
-    public void setId(String id) { this.id = id; }
+    public String getId() { return identificador; }
+    public void setId(String identificador) { this.identificador = identificador; }
     public Usuario getUsuario() { return usuario; }
     public void setUsuario(Usuario usuario) { this.usuario = usuario; }
     public Ediciones getEdicion() { return edicion; }

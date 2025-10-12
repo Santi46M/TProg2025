@@ -23,8 +23,8 @@ public class Asistente extends Usuario {
     	return registros;
     }
     
-    public void addRegistro(String id, Registro registro) {
-    	this.registros.put(id, registro);
+    public void addRegistro(String ident, Registro registro) {
+    	this.registros.put(ident, registro);
     }
     
     public Institucion getInstitucion() {
@@ -53,5 +53,10 @@ public class Asistente extends Usuario {
 
     public void setFechaDeNacimiento(LocalDate fechaDeNacimiento) {
         this.fechaDeNacimiento = fechaDeNacimiento;
+    }
+    // La necesitamos para que la clase usuario sea abstracta
+    @Override
+    public String getTipoUsuario() {
+        return "Asistente";
     }
 }

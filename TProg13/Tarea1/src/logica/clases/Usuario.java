@@ -48,8 +48,8 @@ public abstract class Usuario {
     //     this.email = email;
     // }
     
-    public boolean esAsistente(Usuario u) {
-        return u instanceof Asistente;
+    public boolean esAsistente(Usuario user) {
+        return user instanceof Asistente;
     }
     
    /* public boolean esOrganizador(Usuario u) {
@@ -75,4 +75,7 @@ public abstract class Usuario {
     public void setImagen(String imagen) {
         this.imagen = imagen;
     }
+    // Lo necesitamos para que la calse sea abstracta
+    // 🔹 Método abstracto: cada subclase dirá qué tipo es
+    public abstract String getTipoUsuario();
 }
