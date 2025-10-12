@@ -199,8 +199,8 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
             List<String> aceptadas = new ArrayList<>();
             // dto.getEdiciones() trae nombres; validamos estado uno por uno
             for (String edName : dto.getEdiciones()) {
-                Ediciones ed = ice.obtenerEdicion(nombreEv, edName);
-                if (esAceptada(ed)) {
+                Ediciones edicion = ice.obtenerEdicion(nombreEv, edName);
+                if (esAceptada(edicion)) {
                     aceptadas.add(edName);
                 }
             }
@@ -290,13 +290,13 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
     // ====== Helpers ======
 
     // Aceptada si getEstado() existe y es "ACEPTADA"/"Aceptada" (String) o enum Aceptada
-    private static boolean esAceptada(Ediciones ed) {
-        if (ed == null) return false;
+    private static boolean esAceptada(Ediciones edicion) {
+        if (edicion == null) return false;
         try {
-            Object estado = ed.getEstado(); // soporta String o Enum
+            Object estado = edicion.getEstado(); // soporta String o Enum
             if (estado == null) return false;
-            String s = String.valueOf(estado);
-            return "ACEPTADA".equalsIgnoreCase(s) || "Aceptada".equalsIgnoreCase(s);
+            String est = String.valueOf(estado);
+            return "ACEPTADA".equalsIgnoreCase(est) || "Aceptada".equalsIgnoreCase(est);
         } catch (Throwable t) {
             // Si la clase no tiene estado, por seguridad no la mostramos
             return false;

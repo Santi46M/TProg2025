@@ -449,11 +449,11 @@ public class ControladorEvento implements IControladorEvento {
         if (nombreEvento == null || nombreEvento.isBlank()) {
             throw new IllegalArgumentException("Nombre de evento inválido");
         }
-        Eventos ev = manejador.obtenerEvento(nombreEvento); // ajustá si tu manejador busca por sigla/ID
-        if (ev == null) {
+        Eventos evento = manejador.obtenerEvento(nombreEvento); // ajustá si tu manejador busca por sigla/ID
+        if (evento == null) {
             throw new IllegalArgumentException("Evento no encontrado: " + nombreEvento);
         }
-        ev.setImagen(imagenPath); // asegurate de haber agregado get/setImagenPath en la entidad
+        evento.setImagen(imagenPath); // asegurate de haber agregado get/setImagenPath en la entidad
         // Si tu Manejador requiere persistir/cerrar transacción, hacelo aquí (p.ej., me().guardar(ev);)
     }
 }

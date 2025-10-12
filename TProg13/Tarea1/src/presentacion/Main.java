@@ -166,20 +166,20 @@ public class Main {
             String[] usuarios = usuariosMap.keySet().toArray(new String[0]);
             String[][] datosUsuarios = new String[usuarios.length][7];
             for (int i = 0; i < usuarios.length; i++) {
-                logica.clases.Usuario u = usuariosMap.get(usuarios[i]);
-                datosUsuarios[i][0] = u.getNickname();
-                datosUsuarios[i][1] = u.getEmail();
-                datosUsuarios[i][2] = u.getNombre();
-                if (u instanceof logica.clases.Asistente a) {
-                    datosUsuarios[i][3] = a.getApellido() != null ? a.getApellido() : "";
-                    datosUsuarios[i][4] = a.getFechaDeNacimiento() != null ? a.getFechaDeNacimiento().toString() : "";
+                logica.clases.Usuario usuario = usuariosMap.get(usuarios[i]);
+                datosUsuarios[i][0] = usuario.getNickname();
+                datosUsuarios[i][1] = usuario.getEmail();
+                datosUsuarios[i][2] = usuario.getNombre();
+                if (usuario instanceof logica.clases.Asistente asistente) {
+                    datosUsuarios[i][3] = asistente.getApellido() != null ? asistente.getApellido() : "";
+                    datosUsuarios[i][4] = asistente.getFechaDeNacimiento() != null ? asistente.getFechaDeNacimiento().toString() : "";
                     datosUsuarios[i][5] = "";
-                    datosUsuarios[i][6] = a.getInstitucion() != null ? a.getInstitucion().getNombre() : "";
-                } else if (u instanceof logica.clases.Organizador o) {
+                    datosUsuarios[i][6] = asistente.getInstitucion() != null ? asistente.getInstitucion().getNombre() : "";
+                } else if (usuario instanceof logica.clases.Organizador organizador) {
                     datosUsuarios[i][3] = "";
                     datosUsuarios[i][4] = "";
-                    datosUsuarios[i][5] = o.getDesc() != null ? o.getDesc() : "";
-                    datosUsuarios[i][6] = o.getLink() != null ? o.getLink() : "";
+                    datosUsuarios[i][5] = organizador.getDesc() != null ? organizador.getDesc() : "";
+                    datosUsuarios[i][6] = organizador.getLink() != null ? organizador.getLink() : "";
                 } else {
                     datosUsuarios[i][3] = "";
                     datosUsuarios[i][4] = "";
@@ -342,18 +342,18 @@ public class Main {
     }
 
     // ===== Helpers de posicionamiento =====
-    private void showCentered(JInternalFrame f) {
-        Dimension d = desktopPane.getSize();
-        int w = Math.max((int) (d.width * 0.8), 800);
-        int h = Math.max((int) (d.height * 0.8), 500);
-        f.setSize(new Dimension(w, h));
-        f.setLocation(new Point((d.width - w) / 2, (d.height - h) / 2));
-        f.setVisible(true);
+    private void showCentered(JInternalFrame framee) {
+        Dimension dimension = desktopPane.getSize();
+        int ancho = Math.max((int) (dimension.width * 0.8), 800);
+        int altura = Math.max((int) (dimension.height * 0.8), 500);
+        framee.setSize(new Dimension(ancho, altura));
+        framee.setLocation(new Point((dimension.width - ancho) / 2, (dimension.height - altura) / 2));
+        framee.setVisible(true);
         try {
-            f.setSelected(true);
+            framee.setSelected(true);
         } catch (PropertyVetoException ignore) {
             // Si el frame veta el foco, simplemente lo dejamos visible
         }
-        f.toFront();
+        framee.toFront();
     }
 }

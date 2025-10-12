@@ -58,10 +58,10 @@ public class AceptarEdicionEventoFrame extends JInternalFrame {
 
         // NUEVO: cargar datos al abrir y cuando la ventana se reactive
         addInternalFrameListener(new InternalFrameAdapter() {
-            @Override public void internalFrameOpened(InternalFrameEvent e) {
+            @Override public void internalFrameOpened(InternalFrameEvent event) {
                 cargarEventos(); // primera carga
             }
-            @Override public void internalFrameActivated(InternalFrameEvent e) {
+            @Override public void internalFrameActivated(InternalFrameEvent event) {
                 // refresco "barato": recarga eventos y posiciona en el actual si existía
                 String seleccionado = (String) comboEventos.getSelectedItem();
                 cargarEventos();
@@ -150,9 +150,9 @@ public class AceptarEdicionEventoFrame extends JInternalFrame {
         btnRechazar.setEnabled(enabled);
     }
 
-    private void mostrarError(String titulo, Exception ex) {
+    private void mostrarError(String titulo, Exception except) {
         JOptionPane.showMessageDialog(this,
-                titulo + (ex.getMessage() != null ? (": " + ex.getMessage()) : ""),
+                titulo + (except.getMessage() != null ? (": " + except.getMessage()) : ""),
                 "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
