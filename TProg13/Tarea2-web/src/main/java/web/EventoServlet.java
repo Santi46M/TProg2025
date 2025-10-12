@@ -11,11 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import logica.fabrica;
-import logica.Interfaces.IControladorEvento;
-import logica.Datatypes.DTEvento;
-import logica.Clases.Eventos;
+import logica.interfaces.IControladorEvento;
+import logica.datatypes.DTCategorias;
+import logica.datatypes.DTEdicion;
+import logica.datatypes.DTEvento;
+import logica.clases.Eventos;
 import excepciones.EventoYaExisteException;
-import logica.Controladores.ControladorEvento;
+import logica.controladores.ControladorEvento;
 
 @WebServlet("/evento/*")
 public class EventoServlet extends HttpServlet {
@@ -60,10 +62,10 @@ public class EventoServlet extends HttpServlet {
 
       // Obtener ediciones asociadas al evento
       java.util.List<String> nombresEdiciones = ce.listarEdicionesEvento(nombre);
-      java.util.List<logica.Datatypes.DTEdicion> ediciones = new ArrayList<>();
+      java.util.List<DTEdicion> ediciones = new ArrayList<>();
       if (nombresEdiciones != null) {
         for (String nombreEd : nombresEdiciones) {
-          logica.Datatypes.DTEdicion ed = ce.consultaEdicionEvento(nombre, nombreEd);
+          DTEdicion ed = ce.consultaEdicionEvento(nombre, nombreEd);
           if (ed != null) ediciones.add(ed);
         }
       }
@@ -88,7 +90,7 @@ public class EventoServlet extends HttpServlet {
     	  // ?categoria=... (opcional). Si no viene, lista todo.
     	  String cat = trim(req.getParameter("categoria"));
 
-    	  java.util.List<logica.Datatypes.DTEvento> lista;
+    	  java.util.List<DTEvento> lista;
     	  if (!isBlank(cat)) {
     	    // estático, lo hicimos en ControladorEvento
     	    lista = ce.listarEventosPorCategoria(cat);
@@ -98,7 +100,7 @@ public class EventoServlet extends HttpServlet {
     	  }
 
     	  // Para pintar el menú de categorías en la vista de listado
-    	  java.util.List<String> categorias = logica.Controladores.ControladorEvento.listarCategorias();
+    	  java.util.List<String> categorias = ControladorEvento.listarCategorias();
     	  req.setAttribute("categorias", categorias);
 
     	  req.setAttribute("lista", lista);
@@ -139,9 +141,9 @@ public class EventoServlet extends HttpServlet {
         return;
       }
       // Crear DTCategorias a partir de la lista
-      logica.Datatypes.DTCategorias dtCategorias = new logica.Datatypes.DTCategorias(categoriasList);
+      DTCategorias dtCategorias = new DTCategorias(categoriasList);
       try {
-        ce.AltaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
+        ce.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
         String nombreEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8.name());
         resp.sendRedirect(ctx(req) + "/evento/ConsultaEvento?nombre=" + nombreEnc);
       } catch (EventoYaExisteException e) {

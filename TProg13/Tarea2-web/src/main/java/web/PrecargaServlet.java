@@ -6,7 +6,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import logica.CargaDatosPrueba;
 import logica.fabrica;
-import logica.Interfaces.IControladorEvento;
+import logica.interfaces.IControladorEvento;
 
 @WebServlet("/precargar")
 public class PrecargaServlet extends HttpServlet {

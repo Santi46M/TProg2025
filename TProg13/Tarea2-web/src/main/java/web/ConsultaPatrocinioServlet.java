@@ -5,9 +5,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import logica.fabrica;
-import logica.Interfaces.IControladorEvento;
-import logica.Clases.Ediciones;
-import logica.Clases.Patrocinio;
+import logica.interfaces.IControladorEvento;
+import logica.clases.Ediciones;
+import logica.clases.Patrocinio;
 
 @WebServlet("/edicion/ConsultaPatrocinio")
 public class ConsultaPatrocinioServlet extends HttpServlet {

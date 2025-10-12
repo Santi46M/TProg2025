@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 
 import logica.fabrica;
-import logica.Interfaces.IControladorUsuario;
-import logica.Datatypes.DTDatosUsuario;
+import logica.interfaces.IControladorUsuario;
+import logica.datatypes.DTDatosUsuario;
 import excepciones.UsuarioYaExisteException;
 import excepciones.UsuarioNoExisteException;
 import excepciones.UsuarioTipoIncorrectoException;
@@ -179,7 +179,7 @@ public class UsuarioServlet extends HttpServlet {
       // === Crear usuario ===
       boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rol);
       try {
-        cu.AltaUsuario(
+        cu.altaUsuario(
             nick,
             nombre,
             correo,
