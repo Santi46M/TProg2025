@@ -10,7 +10,8 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 @DisplayName("Entidades básicas – constructores/getters")
 class EntityPojoTest {
 
-    @Test @DisplayName("Usuario (vía controlador)")
+    @Test 
+    @DisplayName("Usuario (vía controlador)")
     void usuario() throws Exception {
         TestUtils.resetAll();
 
@@ -34,7 +35,8 @@ class EntityPojoTest {
         ReflectionPojoSupport.exercisePojo(u);
     }
 
-    @Test @DisplayName("Asistente (vía controlador)")
+    @Test 
+    @DisplayName("Asistente (vía controlador)")
     void asistente() throws Exception {
         TestUtils.resetAll();
 
@@ -53,7 +55,8 @@ class EntityPojoTest {
         ReflectionPojoSupport.exercisePojo(asis);
     }
 
-    @Test @DisplayName("Organizador (vía controlador)")
+    @Test 
+    @DisplayName("Organizador (vía controlador)")
     void organizador() throws Exception {
         TestUtils.resetAll();
 
