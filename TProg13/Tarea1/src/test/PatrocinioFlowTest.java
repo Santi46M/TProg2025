@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("Flujo de Patrocinio – tolerante")
 class PatrocinioFlowTest {
 
-    Object ce, cu;
+    private Object ce, cu;
 
     @BeforeEach
     void setUp() throws Exception {
