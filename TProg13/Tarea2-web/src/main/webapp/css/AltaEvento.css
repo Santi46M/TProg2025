@@ -221,4 +221,79 @@
     margin-left: 0;
     width: 90%;
   }
+  
+  /* ======== Crear Evento — mejoras visuales ======== */
+.form-card--wide{
+  max-width: 820px;
+  margin: 1.5rem auto;
+  box-shadow: 0 4px 14px rgba(0,0,0,.06);
 }
+
+.form-header{ margin-bottom: 1rem; }
+.form-title{ margin: 0 0 .25rem; font-size: 1.6rem; font-weight: 800; color: var(--ink); }
+.form-subtitle{ margin: 0; color: #555; }
+
+.grid-2{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 760px){ .grid-2{ grid-template-columns: 1fr; } }
+
+.form-group-altaEvento input,
+.form-group-altaEvento textarea{
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.form-group-altaEvento input:focus,
+.form-group-altaEvento textarea:focus{
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.15);
+}
+
+.req{ color:#dc2626; font-weight:700; }
+
+/* Ayudas y errores */
+.helper{ display:block; color:#6b7280; font-size:.85rem; margin-top:.35rem; }
+.helper-error{ color:#dc2626; font-weight:600; margin:.25rem 0 1rem; }
+.hidden{ display:none !important; }
+
+.alert{
+  display:flex; align-items:center; gap:.5rem;
+  padding:.6rem .8rem; border-radius:.5rem; margin:.5rem 0 1rem;
+  border:1px solid #fecaca; background:#fef2f2; color:#991b1b;
+}
+.alert i{ font-size:1.15rem; }
+
+/* Botonera */
+.actions{ display:flex; gap:.6rem; margin-top: 1rem; flex-wrap: wrap; }
+.btn-guardar-altaEvento{
+  background: var(--brand);
+  border:1px solid var(--brand);
+  color:#fff; font-weight:700;
+  padding:.6rem 1rem; border-radius:.6rem;
+}
+.btn-guardar-altaEvento:hover{ background:#004a99; border-color:#004a99; }
+.btn-cancelar-altaEvento{
+  background:#6b7280; border:1px solid #6b7280; color:#fff; font-weight:700;
+  padding:.6rem 1rem; border-radius:.6rem;
+}
+.btn-cancelar-altaEvento:hover{ background:#4b5563; border-color:#4b5563; }
+
+/* Checkboxes en grilla */
+.checkbox-grid-ev{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:.6rem 1rem;
+  max-width: 520px;
+}
+@media (max-width:700px){ .checkbox-grid-ev{ grid-template-columns: 1fr; } }
+.checkbox-grid-ev label{
+  display:grid; grid-template-columns: 1fr auto; align-items:center;
+  padding:.35rem .5rem; border:1px solid #e5e7eb; border-radius:.45rem; background:#fff;
+}
+.checkbox-grid-ev input[type="checkbox"]{ justify-self:center; }
+  
+}
+
+
