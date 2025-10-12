@@ -124,12 +124,12 @@ public class ConsultaPatrocinioFrame extends JInternalFrame {
         java.util.List<String[]> patsList = new java.util.ArrayList<>();
         java.util.List<String[]> datosList = new java.util.ArrayList<>();
         for (int i = 0; i < listaEventos.size(); i++) {
-            logica.datatypes.DTEvento ev = listaEventos.get(i);
-            eventos[i] = ev.getNombre();
-            java.util.List<String> eds = controlador.listarEdicionesEvento(ev.getNombre());
+            logica.datatypes.DTEvento evento = listaEventos.get(i);
+            eventos[i] = evento.getNombre();
+            java.util.List<String> eds = controlador.listarEdicionesEvento(evento.getNombre());
             edicionesPorEvento[i] = eds.toArray(new String[0]);
             for (String ed : eds) {
-                logica.clases.Ediciones edi = controlador.obtenerEdicion(ev.getNombre(), ed);
+                logica.clases.Ediciones edi = controlador.obtenerEdicion(evento.getNombre(), ed);
                 java.util.List<String> pats = new java.util.ArrayList<>();
                 java.util.List<String> datosPat = new java.util.ArrayList<>();
                 if (edi != null) {

@@ -206,16 +206,16 @@ public class ConsultaEventoFrame extends JInternalFrame {
             imagenesEventos = new String[eventos.size()];
 
             for (int i = 0; i < eventos.size(); i++) {
-                DTEvento ev = eventos.get(i);
-                eventosArr[i] = ev.getNombre();
-                datosEventos[i][0] = ev.getNombre();
-                datosEventos[i][1] = ev.getDescripcion();
-                datosEventos[i][2] = ev.getFecha().toString();
-                categoriasEventos[i] = ev.getCategorias().toArray(new String[0]);
-                edicionesEventos[i] = ev.getEdiciones().toArray(new String[0]);
+                DTEvento evento = eventos.get(i);
+                eventosArr[i] = evento.getNombre();
+                datosEventos[i][0] = evento.getNombre();
+                datosEventos[i][1] = evento.getDescripcion();
+                datosEventos[i][2] = evento.getFecha().toString();
+                categoriasEventos[i] = evento.getCategorias().toArray(new String[0]);
+                edicionesEventos[i] = evento.getEdiciones().toArray(new String[0]);
                 // imagen
                 try {
-                    imagenesEventos[i] = (String) DTEvento.class.getMethod("getImagen").invoke(ev);
+                    imagenesEventos[i] = (String) DTEvento.class.getMethod("getImagen").invoke(evento);
                 } catch (NoSuchMethodException | IllegalAccessException | java.lang.reflect.InvocationTargetException
                         | IllegalStateException | NullPointerException ex) {
                     imagenesEventos[i] = null;
@@ -311,12 +311,12 @@ public class ConsultaEventoFrame extends JInternalFrame {
         String nombreEvento  = comboEventos.getItemAt(idxEvento);
         String nombreEdicion = edicionesEventos[idxEvento][idxEd];
 
-        logica.clases.Ediciones ed = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
-        if (ed == null) {
+        logica.clases.Ediciones edicion = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
+        if (edicion == null) {
             JOptionPane.showMessageDialog(this, "No se encontró la edición seleccionada.");
             return;
         }
-        String sigla = ed.getSigla();
+        String sigla = edicion.getSigla();
         controladorEvento.seleccionarEdicion(sigla);
 
         ConsultaEdicionEventoFrame frameEdicion =
@@ -333,7 +333,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
     }
 
     // ==== IMÁGENES ====
-    private static ImageIcon loadIcon(String imgName, int w, int h) {
+    private static ImageIcon loadIcon(String imgName, int ancho, int altura) {
         if (imgName == null || imgName.isBlank()) return null;
         try {
             String cpPath = "img/" + imgName;
@@ -342,13 +342,13 @@ public class ConsultaEventoFrame extends JInternalFrame {
             if (url != null) {
                 base = new ImageIcon(url).getImage();
             } else {
-                java.io.File f1 = new java.io.File("src/img/" + imgName);
-                java.io.File f2 = new java.io.File("img/" + imgName);
-                java.io.File f = f1.exists() ? f1 : (f2.exists() ? f2 : null);
-                if (f == null) return null;
-                base = new ImageIcon(f.getAbsolutePath()).getImage();
+                java.io.File fileAux1 = new java.io.File("src/img/" + imgName);
+                java.io.File fileAux2 = new java.io.File("img/" + imgName);
+                java.io.File file = fileAux1.exists() ? fileAux1 : (fileAux2.exists() ? fileAux2 : null);
+                if (file == null) return null;
+                base = new ImageIcon(file.getAbsolutePath()).getImage();
             }
-            Image scaled = base.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            Image scaled = base.getScaledInstance(ancho, altura, Image.SCALE_SMOOTH);
             return new ImageIcon(scaled);
         } catch (IllegalStateException | NullPointerException ex) {
             return null;

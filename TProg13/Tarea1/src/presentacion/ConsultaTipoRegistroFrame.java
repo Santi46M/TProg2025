@@ -254,10 +254,10 @@ public class ConsultaTipoRegistroFrame extends JInternalFrame {
             txtCosto.setText("");
             return;
         }
-        TipoRegistro tr = tiposActuales.get(idxTipo);
-        txtNombre.setText(tr.getNombre());
-        txtDescripcion.setText(tr.getDescripcion());
-        txtCupo.setText(String.valueOf(tr.getCupo()));
-        txtCosto.setText(String.valueOf(tr.getCosto()));
+        TipoRegistro tipoReg = tiposActuales.get(idxTipo);
+        txtNombre.setText(tipoReg.getNombre());
+        txtDescripcion.setText(tipoReg.getDescripcion());
+        txtCupo.setText(String.valueOf(tipoReg.getCupo()));
+        txtCosto.setText(String.valueOf(tipoReg.getCosto()));
     }
 }

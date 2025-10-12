@@ -26,8 +26,8 @@ import java.awt.Insets;
 import java.awt.Image;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import excepciones.UsuarioNoExisteException;
 import logica.clases.Usuario;
@@ -79,8 +79,8 @@ public class ConsultaUsuario extends JInternalFrame {
         JPanel barraSuperior = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 10));
         barraSuperior.add(new JLabel("Usuario:"));
 
-        Vector<String> usuarios = new Vector<>(controlUsr.listarUsuarios().keySet());
-        comboUsuarios = new JComboBox<>(usuarios);
+        List<String> usuarios = new ArrayList<>(controlUsr.listarUsuarios().keySet());
+        comboUsuarios = new JComboBox<>(usuarios.toArray(new String[0]));
         comboUsuarios.setPreferredSize(new Dimension(300, 26));
         comboUsuarios.setSelectedIndex(-1);
         barraSuperior.add(comboUsuarios);
@@ -102,10 +102,10 @@ public class ConsultaUsuario extends JInternalFrame {
         // ===== Panel datos básicos =====
         JPanel panelComunes = new JPanel(new GridBagLayout());
         panelComunes.setBorder(BorderFactory.createTitledBorder("Datos básicos"));
-        GridBagConstraints gc = new GridBagConstraints();
-        gc.insets = new Insets(6, 8, 6, 8);
-        gc.fill = GridBagConstraints.HORIZONTAL;
-        gc.weightx = 1.0;
+        GridBagConstraints grid = new GridBagConstraints();
+        grid.insets = new Insets(6, 8, 6, 8);
+        grid.fill = GridBagConstraints.HORIZONTAL;
+        grid.weightx = 1.0;
 
         txtNick        = mkText(false);
         txtNombre      = mkText(false);
@@ -115,12 +115,12 @@ public class ConsultaUsuario extends JInternalFrame {
         txtInstitucion = mkText(false);
 
         int row = 0;
-        lblNick        = addRow(panelComunes, gc, row++, "Nickname:",            txtNick);
-        lblNombre      = addRow(panelComunes, gc, row++, "Nombre:",              txtNombre);
-        lblApellido    = addRow(panelComunes, gc, row++, "Apellido:",            txtApellido);
-        lblCorreo      = addRow(panelComunes, gc, row++, "Correo:",              txtCorreo);
-        lblFechaNac    = addRow(panelComunes, gc, row++, "Fecha de nacimiento:", txtFechaNac);
-        lblInstitucion = addRow(panelComunes, gc, row++, "Institución:",         txtInstitucion);
+        lblNick        = addRow(panelComunes, grid, row++, "Nickname:",            txtNick);
+        lblNombre      = addRow(panelComunes, grid, row++, "Nombre:",              txtNombre);
+        lblApellido    = addRow(panelComunes, grid, row++, "Apellido:",            txtApellido);
+        lblCorreo      = addRow(panelComunes, grid, row++, "Correo:",              txtCorreo);
+        lblFechaNac    = addRow(panelComunes, grid, row++, "Fecha de nacimiento:", txtFechaNac);
+        lblInstitucion = addRow(panelComunes, grid, row++, "Institución:",         txtInstitucion);
 
         izquierda.add(panelComunes);
 
@@ -157,9 +157,9 @@ public class ConsultaUsuario extends JInternalFrame {
             if (cargando) return;
             int idx = comboRegs.getSelectedIndex();
             if (idx >= 0 && idx < listaRegs.size()) {
-                DTRegistro r = listaRegs.get(idx);
+                DTRegistro reg = listaRegs.get(idx);
                 ConsultaRegistroFrame frame =
-                        new ConsultaRegistroFrame(controlUsr, controlEvt, txtNick.getText(), r.getId());
+                        new ConsultaRegistroFrame(controlUsr, controlEvt, txtNick.getText(), reg.getId());
                 if (getDesktopPane() != null) getDesktopPane().add(frame);
                 frame.setVisible(true);
                 frame.toFront();
@@ -193,9 +193,9 @@ public class ConsultaUsuario extends JInternalFrame {
             if (cargando) return;
             int idx = comboEds.getSelectedIndex();
             if (idx >= 0 && idx < listaEds.size()) {
-                DTEdicion ed = listaEds.get(idx);
+                DTEdicion edi = listaEds.get(idx);
                 ConsultaEdicionEventoFrame frame =
-                        new ConsultaEdicionEventoFrame(controlUsr, controlEvt, ed.getSigla());
+                        new ConsultaEdicionEventoFrame(controlUsr, controlEvt, edi.getSigla());
                 if (getDesktopPane() != null) getDesktopPane().add(frame);
                 frame.setVisible(true);
                 frame.toFront();
@@ -235,8 +235,8 @@ public class ConsultaUsuario extends JInternalFrame {
 
     public void recargarUsuarios() {
         cargando = true;
-        Vector<String> usuarios = new Vector<>(controlUsr.listarUsuarios().keySet());
-        comboUsuarios.setModel(new DefaultComboBoxModel<>(usuarios));
+        List<String> usuarios = new ArrayList<>(controlUsr.listarUsuarios().keySet());
+        comboUsuarios.setModel(new DefaultComboBoxModel<>(usuarios.toArray(new String[0])));
         comboUsuarios.setSelectedIndex(-1);
         limpiarCampos();
         showVacio();
@@ -369,17 +369,17 @@ public class ConsultaUsuario extends JInternalFrame {
 
     // ===================== Helpers UI =====================
     private static JTextField mkText(boolean editable) {
-        JTextField t = new JTextField();
-        t.setEditable(editable);
-        return t;
+        JTextField txt = new JTextField();
+        txt.setEditable(editable);
+        return txt;
     }
 
-    private static JLabel addRow(JPanel panel, GridBagConstraints gc, int row, String label, JComponent comp) {
+    private static JLabel addRow(JPanel panel, GridBagConstraints gird, int row, String label, JComponent comp) {
         JLabel lbl = new JLabel(label);
-        gc.gridx = 0; gc.gridy = row; gc.weightx = 0; gc.gridwidth = 1;
-        panel.add(lbl, gc);
-        gc.gridx = 1; gc.gridy = row; gc.weightx = 1; gc.gridwidth = 2;
-        panel.add(comp, gc);
+        gird.gridx = 0; gird.gridy = row; gird.weightx = 0; gird.gridwidth = 1;
+        panel.add(lbl, gird);
+        gird.gridx = 1; gird.gridy = row; gird.weightx = 1; gird.gridwidth = 2;
+        panel.add(comp, gird);
         return lbl;
     }
 
@@ -395,7 +395,7 @@ public class ConsultaUsuario extends JInternalFrame {
     private static String nvl(String s) { return s == null ? "" : s; }
 
     // ==== IMÁGENES ====
-    private static ImageIcon loadIcon(String imgName, int w, int h) {
+    private static ImageIcon loadIcon(String imgName, int ancho, int altura) {
         if (imgName == null || imgName.isBlank()) return null;
         try {
             String cpPath = "img/" + imgName;
@@ -404,13 +404,13 @@ public class ConsultaUsuario extends JInternalFrame {
             if (url != null) {
                 base = new ImageIcon(url).getImage();
             } else {
-                java.io.File f1 = new java.io.File("src/img/" + imgName);
-                java.io.File f2 = new java.io.File("img/" + imgName);
-                java.io.File f = f1.exists() ? f1 : (f2.exists() ? f2 : null);
-                if (f == null) return null;
-                base = new ImageIcon(f.getAbsolutePath()).getImage();
+                java.io.File fileAux1 = new java.io.File("src/img/" + imgName);
+                java.io.File fileAux2 = new java.io.File("img/" + imgName);
+                java.io.File file = fileAux1.exists() ? fileAux1 : (fileAux2.exists() ? fileAux2 : null);
+                if (file == null) return null;
+                base = new ImageIcon(file.getAbsolutePath()).getImage();
             }
-            Image scaled = base.getScaledInstance(w, h, Image.SCALE_SMOOTH);
+            Image scaled = base.getScaledInstance(ancho, altura, Image.SCALE_SMOOTH);
             return new ImageIcon(scaled);
         } catch (IllegalStateException | NullPointerException ex) {
             return null;

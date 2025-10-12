@@ -16,7 +16,8 @@ import logica.interfaces.IControladorUsuario;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.Vector;
 
@@ -25,7 +26,7 @@ public class ConsultaRegistroFrame extends JInternalFrame {
     private JPanel panelSeleccion;
     private JComboBox<String> comboAsistentes;
     private JComboBox<String> comboRegistros;
-    private Vector<String> asistentes;
+    private List<String> asistentes;
     private IControladorUsuario controlUsr;
 
     // Detalle
@@ -45,9 +46,8 @@ public class ConsultaRegistroFrame extends JInternalFrame {
         // Barra superior
         panelSeleccion = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lblAsistente = new JLabel("Asistente:");
-        asistentes = new Vector<>();
-        asistentes.addAll(controlUsr.listarAsistentes().keySet());
-        comboAsistentes = new JComboBox<>(asistentes);
+        asistentes = new ArrayList<>();
+        comboAsistentes = new JComboBox<>(asistentes.toArray(new String[0]));
 
         JLabel lblRegistro = new JLabel("Registro:");
         comboRegistros = new JComboBox<>();
