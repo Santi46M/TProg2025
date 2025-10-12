@@ -1,9 +1,22 @@
 package test;
-import static org.junit.jupiter.api.Assertions.*;
 
-import java.lang.reflect.*;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 final class ReflectionPojoSupport {
     private ReflectionPojoSupport() {}
@@ -14,24 +27,27 @@ final class ReflectionPojoSupport {
         return makeInstance(fqcn, 0);
     }
 
-    @SuppressWarnings("unchecked")
     private static Object makeInstance(String fqcn, int depth) {
         try {
             Class<?> c = Class.forName(fqcn);
 
-            if (c.isEnum()) { // primer literal
+            if (c.isEnum()) {
                 Object[] vals = c.getEnumConstants();
                 return vals != null && vals.length > 0 ? vals[0] : null;
             }
 
-            // 1) ctor vacío
+            // 1) Constructor vacío
             try {
                 Constructor<?> k0 = c.getDeclaredConstructor();
                 k0.setAccessible(true);
                 return k0.newInstance();
-            } catch (NoSuchMethodException ignored) {}
+            } catch (NoSuchMethodException e) {
+                // no hay ctor vacío, seguimos
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                return null;
+            }
 
-            // 2) ctores ordenados por menor cantidad de params
+            // 2) Constructores ordenados por menor cantidad de parámetros
             Constructor<?>[] ks = c.getDeclaredConstructors();
             Arrays.sort(ks, Comparator.comparingInt(Constructor::getParameterCount));
             for (Constructor<?> k : ks) {
@@ -40,16 +56,23 @@ final class ReflectionPojoSupport {
                 boolean ok = true;
                 for (int i = 0; i < ts.length; i++) {
                     args[i] = sampleFor(ts[i], depth + 1);
-                    if (args[i] == null && ts[i].isPrimitive()) { ok = false; break; }
+                    if (args[i] == null && ts[i].isPrimitive()) {
+                        ok = false;
+                        break;
+                    }
                 }
-                if (!ok) continue;
+                if (!ok) {
+                    continue;
+                }
                 try {
                     k.setAccessible(true);
                     return k.newInstance(args);
-                } catch (Throwable ignored) { /* probamos siguiente ctor */ }
+                } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                    // intentamos siguiente ctor
+                }
             }
             return null;
-        } catch (Throwable t) {
+        } catch (ClassNotFoundException e) {
             return null;
         }
     }
@@ -75,7 +98,7 @@ final class ReflectionPojoSupport {
         }
         if (Map.class.isAssignableFrom(t)) return new HashMap<>();
 
-        // Evitar recursiones profundas en dominio propio
+        // Evitar recursión infinita en dominio propio
         if (depth <= 1 && t.getName().startsWith("logica.")) {
             Object o = makeInstance(t.getName(), depth + 1);
             if (o != null) return o;
@@ -86,7 +109,7 @@ final class ReflectionPojoSupport {
             Constructor<?> k0 = t.getDeclaredConstructor();
             k0.setAccessible(true);
             return k0.newInstance();
-        } catch (Throwable ignored) {
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
             return null;
         }
     }
@@ -97,10 +120,14 @@ final class ReflectionPojoSupport {
         assertNotNull(o);
         // getters "getX"/"isX" sin parámetros
         for (Method m : o.getClass().getMethods()) {
-            if (m.getParameterCount() == 0 &&
-               (m.getName().startsWith("get") || m.getName().startsWith("is")) &&
-               !m.getReturnType().equals(void.class)) {
-                try { m.invoke(o); } catch (Throwable ignored) {}
+            if (m.getParameterCount() == 0
+                    && (m.getName().startsWith("get") || m.getName().startsWith("is"))
+                    && !m.getReturnType().equals(void.class)) {
+                try {
+                    m.invoke(o);
+                } catch (IllegalAccessException | InvocationTargetException ignored) {
+                    // getter inaccesible o con error → continuar
+                }
             }
         }
         // equals/hashCode/toString básicos
