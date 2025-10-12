@@ -1,9 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.*,logica.datatypes.DTEvento,logica.clases.Ediciones" %>
+<%@ page import="java.util.*,logica.datatypes.DTEvento,logica.clases.Ediciones,logica.enumerados.DTEstado" %>
 <%
   String ctx = request.getContextPath();
   List<DTEvento> eventos = (List<DTEvento>) request.getAttribute("eventos");
   List<Ediciones> ediciones = (List<Ediciones>) request.getAttribute("ediciones");
+  Map<String, List<Ediciones>> mapa = (Map<String, List<Ediciones>>) request.getAttribute("edicionesPorEvento");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -18,7 +19,7 @@
 <body>
 
 <jsp:include page="/WEB-INF/templates/header.jsp" />
-<div class="container row" style="margin-top:1rem; display: flex; align-items: flex-start;">
+<div class="container row" style="margin-top:1rem; display:flex; align-items:flex-start;">
   <jsp:include page="/WEB-INF/templates/menu.jsp" />
   <main class="container" style="flex:2; min-width:0;">
     <section class="form-card-registroEdicionEvento">
@@ -52,28 +53,28 @@
     </section>
   </main>
 </div>
+
 <script>
+  // data: { "Evento": [ {sigla:"...", nombre:"..."}, ... ], ... }
   const data = {
-    <% if (eventos != null) {
-         for (DTEvento ev : eventos) {
-           List<String> eds = ev.getEdiciones();
-           if (eds != null && !eds.isEmpty()) {
-             out.print("\"" + ev.getNombre().replace("\"", "\\\"") + "\":[");
-             int i = 0;
-             for (String nomEd : eds) {
-               for (Ediciones ed : ediciones) {
-                 if (ed.getNombre().equals(nomEd) && "ACEPTADA".equals(ed.getEstado())) {
-                   out.print("{\"sigla\":\"" + ed.getSigla().replace("\"", "\\\"") + "\",\"nombre\":\"" + ed.getNombre().replace("\"", "\\\"") + "\"}");
-                   if (i < eds.size() - 1) out.print(",");
-                   break;
-                 }
-               }
-               i++;
-             }
-             out.print("],");
-           }
+  <% if (mapa != null && !mapa.isEmpty()) {
+       int ecount = 0;
+       for (Map.Entry<String, List<Ediciones>> entry : mapa.entrySet()) {
+         String evName = entry.getKey() == null ? "" : entry.getKey().replace("\"","\\\"");
+         List<Ediciones> list = entry.getValue();
+         if (list == null || list.isEmpty()) continue;
+         if (ecount++ > 0) out.print(",");
+         out.print("\"" + evName + "\":[");
+         for (int i = 0; i < list.size(); i++) {
+           Ediciones ed = list.get(i);
+           String sigla = ed.getSigla() == null ? "" : ed.getSigla().replace("\"","\\\"");
+           String nombre = ed.getNombre() == null ? "" : ed.getNombre().replace("\"","\\\"");
+           out.print("{\"sigla\":\"" + sigla + "\",\"nombre\":\"" + nombre + "\"}");
+           if (i < list.size() - 1) out.print(",");
          }
-       } %>
+         out.print("]");
+       }
+     } %>
   };
 
   const selectEvento = document.getElementById("selectEvento");
@@ -81,16 +82,16 @@
 
   selectEvento.addEventListener("change", function() {
     const nombreEv = this.value;
-    const ediciones = data[nombreEv] || [];
+    const eds = data[nombreEv] || [];
     selectEdicion.innerHTML = "";
-    if (ediciones.length === 0) {
+    if (eds.length === 0) {
       selectEdicion.innerHTML = "<option value=''>-- No hay ediciones aceptadas --</option>";
       selectEdicion.disabled = true;
     } else {
       selectEdicion.innerHTML = "<option value=''>-- Seleccione una edición --</option>";
-      ediciones.forEach(ed => {
+      eds.forEach(function(ed) {
         const opt = document.createElement("option");
-        opt.value = ed.sigla;
+        opt.value = ed.sigla;     // se envía 'sigla' al POST
         opt.textContent = ed.nombre;
         selectEdicion.appendChild(opt);
       });

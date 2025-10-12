@@ -4,23 +4,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.time.LocalDate;
+import java.util.*;
 
 import logica.fabrica;
 import logica.interfaces.IControladorEvento;
 import logica.interfaces.IControladorUsuario;
-import logica.clases.Ediciones;
-import logica.clases.Usuario;
-import logica.clases.Asistente;
-import logica.clases.Eventos;
-import logica.clases.TipoRegistro;
+import logica.clases.*;
 import logica.datatypes.DTEvento;
 import logica.enumerados.DTEstado;
-
-import java.time.LocalDate;
-import java.util.UUID;
 
 @WebServlet("/registro/inscripcion")
 public class RegistroEdicionEventoServlet extends HttpServlet {
@@ -28,17 +20,9 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
     private static final String JSP_INSCRIPCION = "/WEB-INF/registro/RegistroEdicionEvento.jsp";
     private static final String JSP_OK = "/WEB-INF/registro/AltaRegistroOK.jsp";
 
-    private IControladorEvento ce() {
-        return fabrica.getInstance().getIControladorEvento();
-    }
-
-    private IControladorUsuario cu() {
-        return logica.fabrica.getInstance().getIControladorUsuario();
-    }
-
-    private String ctx(HttpServletRequest req) {
-        return req.getContextPath();
-    }
+    private IControladorEvento ce() { return fabrica.getInstance().getIControladorEvento(); }
+    private IControladorUsuario cu() { return fabrica.getInstance().getIControladorUsuario(); }
+    private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -46,20 +30,33 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         if (!requiereAsistente(req, resp)) return;
 
-        // Listar eventos y ediciones aceptadas
+        // 1) Traigo todos los eventos
         List<DTEvento> eventos = ce().listarEventos();
         req.setAttribute("eventos", eventos);
 
-        List<String> eventosConEdiciones = ce().listarEventosConEdicionesIngresadas();
+        // 2) Para cada evento, traigo sus ediciones y filtro Aceptadas
         List<Ediciones> edicionesAceptadas = new ArrayList<>();
-        for (String nombreEvento : eventosConEdiciones) {
+        Map<String, List<Ediciones>> edicionesPorEvento = new LinkedHashMap<>();
+
+        for (DTEvento ev : eventos) {
+            String nombreEvento = ev.getNombre();
             List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
+            if (nombresEd == null) continue;
+
             for (String nomEd : nombresEd) {
                 Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);
-                if (ed != null && "ACEPTADA".equals(ed.getEstado())) edicionesAceptadas.add(ed);
+                if (ed != null && ed.getEstado() == DTEstado.Aceptada) {
+                    edicionesAceptadas.add(ed);
+                    edicionesPorEvento
+                        .computeIfAbsent(nombreEvento, k -> new ArrayList<>())
+                        .add(ed);
+                }
             }
         }
+
         req.setAttribute("ediciones", edicionesAceptadas);
+        req.setAttribute("edicionesPorEvento", edicionesPorEvento);
+
         req.getRequestDispatcher(JSP_INSCRIPCION).forward(req, resp);
     }
 
@@ -99,9 +96,9 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
 
             Eventos evento = ed.getEvento();
 
-            // ✔ Selecciona el primer tipo disponible desde una Collection<TipoRegistro>
+            // Primer tipo disponible
             TipoRegistro tipoRegistro = null;
-            Collection<TipoRegistro> tipos = ed.getTiposRegistro(); // <-- aquí es Collection
+            Collection<TipoRegistro> tipos = ed.getTiposRegistro();
             if (tipos != null && !tipos.isEmpty()) {
                 tipoRegistro = tipos.iterator().next();
             }
@@ -125,27 +122,37 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             req.getRequestDispatcher(JSP_OK).forward(req, resp);
 
         } catch (IllegalArgumentException e) {
-            // Manejo “amigable” de validaciones de dominio
             req.setAttribute("error", e.getMessage());
             recargarDatos(req);
             req.getRequestDispatcher(JSP_INSCRIPCION).forward(req, resp);
         }
     }
 
-
     private void recargarDatos(HttpServletRequest req) {
         List<DTEvento> eventos = ce().listarEventos();
         req.setAttribute("eventos", eventos);
-        List<String> eventosConEdiciones = ce().listarEventosConEdicionesIngresadas();
+
         List<Ediciones> edicionesAceptadas = new ArrayList<>();
-        for (String nombreEvento : eventosConEdiciones) {
+        Map<String, List<Ediciones>> edicionesPorEvento = new LinkedHashMap<>();
+
+        for (DTEvento ev : eventos) {
+            String nombreEvento = ev.getNombre();
             List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
+            if (nombresEd == null) continue;
+
             for (String nomEd : nombresEd) {
                 Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);
-                if (ed != null && "ACEPTADA".equals(ed.getEstado())) edicionesAceptadas.add(ed);
+                if (ed != null && ed.getEstado() == DTEstado.Aceptada) {
+                    edicionesAceptadas.add(ed);
+                    edicionesPorEvento
+                        .computeIfAbsent(nombreEvento, k -> new ArrayList<>())
+                        .add(ed);
+                }
             }
         }
+
         req.setAttribute("ediciones", edicionesAceptadas);
+        req.setAttribute("edicionesPorEvento", edicionesPorEvento);
     }
 
     private boolean requiereAsistente(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -158,11 +165,6 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         return true;
     }
 
-    private static String trim(String s) {
-        return s == null ? null : s.trim();
-    }
-
-    private static boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
-    }
+    private static String trim(String s) { return s == null ? null : s.trim(); }
+    private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
 }

@@ -291,7 +291,7 @@ public class CargaDatosPrueba {
                     parseFecha("14/09/2024"), parseFecha("14/09/2024"), parseFecha("21/04/2024"),
                     "Montevideo", "Uruguay", "IMG-EDEV03.jpeg"
                 );
-                setEstadoEdicion.accept("MARATON24", DTEstado.Rechazada);
+                setEstadoEdicion.accept("MARATON24", DTEstado.Aceptada);
 
                 // 2022 — Ingresada
                 ce.altaEdicionEvento(
@@ -300,7 +300,7 @@ public class CargaDatosPrueba {
                     parseFecha("14/09/2022"), parseFecha("14/09/2022"), parseFecha("21/05/2022"),
                     "Montevideo", "Uruguay", "IMG-EDEV04.jpeg"
                 );
-                setEstadoEdicion.accept("MARATON22", DTEstado.Ingresada);
+                setEstadoEdicion.accept("MARATON22", DTEstado.Rechazada);
                 }catch (excepciones.EventoYaExisteException | excepciones.FechasCruzadasException ex) {
                     System.err.println("No se pudo crear la edición 'Montevideo Rock 2025': " + ex.getMessage());
                 }
@@ -329,7 +329,7 @@ public class CargaDatosPrueba {
                     parseFecha("04/08/2025"), parseFecha("06/08/2025"), parseFecha("04/07/2025"),
                     "Montevideo", "Uruguay", "IMG-EDEV06.jpeg"
                 );
-                setEstadoEdicion.accept("COMICS25", DTEstado.Ingresada);
+                setEstadoEdicion.accept("COMICS25", DTEstado.Aceptada);
             }catch (excepciones.EventoYaExisteException | excepciones.FechasCruzadasException ex) {
                 System.err.println("No se pudo crear la edición 'Montevideo Rock 2025': " + ex.getMessage());
             }
@@ -347,7 +347,7 @@ public class CargaDatosPrueba {
                             parseFecha("11/09/2025"), parseFecha("17/09/2025"), parseFecha("01/02/2025"),
                             "Durazno", "Uruguay", "IMG-EDEV07.jpeg"
                         );
-                        setEstadoEdicion.accept("EXPOAGRO25", DTEstado.Aceptada);
+                        setEstadoEdicion.accept("EXPOAGRO25", DTEstado.Ingresada);
                 }catch (excepciones.EventoYaExisteException | excepciones.FechasCruzadasException ex) {
                     System.err.println("No se pudo crear la edición 'Montevideo Rock 2025': " + ex.getMessage());
                 }
@@ -376,7 +376,7 @@ public class CargaDatosPrueba {
                         parseFecha("12/12/2025"), parseFecha("15/12/2025"), parseFecha("21/08/2025"),
                         "Barcelona", "España", null
                     );
-                    setEstadoEdicion.accept("MWC", DTEstado.Ingresada);
+                    setEstadoEdicion.accept("MWC", DTEstado.Aceptada);
 
                     // WS26 — Ingresada
                     ce.altaEdicionEvento(
@@ -385,11 +385,36 @@ public class CargaDatosPrueba {
                         parseFecha("13/01/2026"), parseFecha("01/02/2026"), parseFecha("04/06/2025"),
                         "Lisboa", "Portugal", null
                     );
-                    setEstadoEdicion.accept("WS26", DTEstado.Ingresada);
+                    setEstadoEdicion.accept("WS26", DTEstado.Aceptada);
                 }catch (excepciones.EventoYaExisteException | excepciones.FechasCruzadasException ex) {
                     System.err.println("No se pudo crear la edición 'Montevideo Rock 2025': " + ex.getMessage());
                 }
 
+            }
+        }
+        
+        {
+            Eventos ev = mEv.obtenerEvento("Montevideo Fashion Week");
+            if (ev != null) {
+                try {
+                	ce.altaEdicionEvento(
+                            ev,
+                            mUs.getUsuarios().get("mec"),
+                            "Montevideo Fashion Week 2026",
+                            "MFW26",
+                            "",
+                            parseFecha("16/02/2026"),
+                            parseFecha("20/02/2026"),
+                            parseFecha("02/10/2025"),
+                            "Nueva York",
+                            "Estados Unidos",
+                            "IMG-EDEV11.jpeg"
+                        );
+                        setEstadoEdicion.accept("MFW26", DTEstado.Ingresada);
+                }catch (excepciones.EventoYaExisteException | excepciones.FechasCruzadasException ex) {
+                    System.err.println("No se pudo crear la edición 'Montevideo Fashion Week 2026': " + ex.getMessage());
+                }
+            	
             }
         }
     }

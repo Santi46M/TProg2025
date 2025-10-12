@@ -13,16 +13,16 @@
             <ruleset>Best Practices</ruleset>
         </rule>
         <rule>
+            <name>UnusedPrivateField</name>
+            <ruleset>Best Practices</ruleset>
+        </rule>
+        <rule>
             <name>PackageCase</name>
             <ruleset>Code Style</ruleset>
         </rule>
         <rule>
             <name>ShortVariable</name>
             <ruleset>Code Style</ruleset>
-        </rule>
-        <rule>
-            <name>UnusedPrivateField</name>
-            <ruleset>Best Practices</ruleset>
         </rule>
     </rules>
     <includeDerivedFiles>false</includeDerivedFiles>
