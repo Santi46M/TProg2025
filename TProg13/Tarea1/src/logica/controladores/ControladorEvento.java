@@ -184,12 +184,12 @@ public class ControladorEvento implements IControladorEvento {
         Collection<logica.clases.Eventos> eventos =
                 ManejadorEvento.getInstancia().obtenerEventos().values();
 
-        for (Eventos ev : eventos) {
-            List<String> cats = extraerNombresCategorias(ev.getCategorias());
-            for (String c : cats) {
-                if (c != null) {
-                    String t = c.trim();
-                    if (!t.isEmpty()) set.add(t);
+        for (Eventos eventoIter : eventos) {
+            List<String> cats = extraerNombresCategorias(eventoIter.getCategorias());
+            for (String nombreCatIter : cats) {
+                if (nombreCatIter != null) {
+                    String nombreCatIterTrim = nombreCatIter.trim();
+                    if (!nombreCatIterTrim.isEmpty()) set.add(nombreCatIterTrim);
                 }
             }
         }
@@ -224,11 +224,11 @@ public class ControladorEvento implements IControladorEvento {
     }
 
     /** Agrega el nombre a la lista si puede obtenerlo del objeto */
-    private static void addNombre(List<String> out, Object v) {
-        if (v == null) return;
+    private static void addNombre(List<String> out, Object objAux) {
+        if (objAux == null) return;
 
-        if (v instanceof String s) {
-            if (!s.isBlank()) out.add(s);
+        if (objAux instanceof String textObj) {
+            if (!textObj.isBlank()) out.add(textObj);
             return;
         }
         // si tus clases concretas están disponibles, probá directo:
@@ -237,21 +237,21 @@ public class ControladorEvento implements IControladorEvento {
 
         // fallback por reflexión (getNombre())
         try {
-            var m = v.getClass().getMethod("getNombre");
-            Object nombre = m.invoke(v);
-            if (nombre instanceof String s && !s.isBlank()) out.add(s);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
+            var nombreObj = objAux.getClass().getMethod("getNombre");
+            Object nombre = nombreObj.invoke(objAux);
+            if (nombre instanceof String nombreObjString && !nombreObjString.isBlank()) out.add(nombreObjString);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException exept) {
             // sin getNombre(): se omite
         }
 
     }
 
-    private static String normalizar(String s) {
-        if (s == null) return "";
-        String t = s.trim().toLowerCase(Locale.ROOT);
-        t = java.text.Normalizer.normalize(t, java.text.Normalizer.Form.NFD)
+    private static String normalizar(String textNorm) {
+        if (textNorm == null) return "";
+        String textTrim = textNorm.trim().toLowerCase(Locale.ROOT);
+        textTrim = java.text.Normalizer.normalize(textTrim, java.text.Normalizer.Form.NFD)
                 .replaceAll("\\p{M}", ""); // quita tildes
-        return t;
+        return textTrim;
     }
     
  // En ControladorEvento
@@ -316,14 +316,14 @@ public class ControladorEvento implements IControladorEvento {
     public List<DTEvento> listarEventos() {
         Map<String, Eventos> eventos = manejador.obtenerEventos();
         List<DTEvento> lista = new ArrayList<>();
-        for (Eventos e : eventos.values()) {
+        for (Eventos eventIter : eventos.values()) {
             lista.add(new DTEvento(
-                e.getNombre(),
-                e.getSigla(),
-                e.getDescripcion(),
-                e.getFecha(),
-                new ArrayList<>(e.getCategorias().keySet()),
-                new ArrayList<>(e.getEdiciones().keySet())
+                eventIter.getNombre(),
+                eventIter.getSigla(),
+                eventIter.getDescripcion(),
+                eventIter.getFecha(),
+                new ArrayList<>(eventIter.getCategorias().keySet()),
+                new ArrayList<>(eventIter.getEdiciones().keySet())
             ));
         }
         return lista;
@@ -341,30 +341,30 @@ public class ControladorEvento implements IControladorEvento {
         return evento.obtenerEdicion(nombreEdicion);
     }
 
-    public DTRegistro consultaRegistro(Usuario u, String idRegistro) {
-        if (!(u instanceof Asistente)) {
-            throw new UsuarioNoEsAsistente(u.getNickname());
+    public DTRegistro consultaRegistro(Usuario user, String idRegistro) {
+        if (!(user instanceof Asistente)) {
+            throw new UsuarioNoEsAsistente(user.getNickname());
         }
-        Asistente a = (Asistente) u;
-        Registro r = a.getRegistros().get(idRegistro);
-        if (r == null) {
+        Asistente userAsis = (Asistente) user;
+        Registro registroUserAsis = userAsis.getRegistros().get(idRegistro);
+        if (registroUserAsis == null) {
             throw new RegistroNoExiste(idRegistro);
         }
         return new DTRegistro(
-            r.getId(),
-            u.getNombre(),
-            r.getEdicion().getNombre(),
-            r.getTipoRegistro().getNombre(),
-            r.getFechaRegistro(),
-            r.getCosto(),
-            r.getFechaInicio()
+            registroUserAsis.getId(),
+            user.getNombre(),
+            registroUserAsis.getEdicion().getNombre(),
+            registroUserAsis.getTipoRegistro().getNombre(),
+            registroUserAsis.getFechaRegistro(),
+            registroUserAsis.getCosto(),
+            registroUserAsis.getFechaInicio()
         );
     }
 
     // --- selección de edición para consultas ---
     public void seleccionarEdicion(String sigla) {
-        Ediciones ed = manejador.obtenerEdicion(sigla);
-        if (ed == null) {
+        Ediciones edicionIter = manejador.obtenerEdicion(sigla);
+        if (edicionIter == null) {
             throw new RuntimeException("No existe la edición con sigla: " + sigla);
         }
         this.edicionSeleccionadaSigla = sigla;
@@ -376,17 +376,17 @@ public class ControladorEvento implements IControladorEvento {
 
     public DTEdicion obtenerEdicionSeleccionada() {
         if (edicionSeleccionadaSigla == null) return null;
-        Ediciones ed = manejador.obtenerEdicion(edicionSeleccionadaSigla);
-        if (ed == null) return null;
+        Ediciones edicionIter = manejador.obtenerEdicion(edicionSeleccionadaSigla);
+        if (edicionIter == null) return null;
         return new DTEdicion(
-            ed.getNombre(),
-            ed.getSigla(),
-            ed.getFechaInicio(),
-            ed.getFechaFin(),
-            ed.getFechaAlta(),
-            ed.getOrganizador() != null ? ed.getOrganizador().getNickname() : null,
-            ed.getCiudad(),
-            ed.getPais()
+            edicionIter.getNombre(),
+            edicionIter.getSigla(),
+            edicionIter.getFechaInicio(),
+            edicionIter.getFechaFin(),
+            edicionIter.getFechaAlta(),
+            edicionIter.getOrganizador() != null ? edicionIter.getOrganizador().getNickname() : null,
+            edicionIter.getCiudad(),
+            edicionIter.getPais()
         );
     }
     @Override
@@ -396,19 +396,19 @@ public class ControladorEvento implements IControladorEvento {
     
     @Override
     public String encontrarEventoPorSigla(String siglaEdicion) {
-        Ediciones ed = manejador.obtenerEdicion(siglaEdicion);
-        if (ed != null && ed.getEvento() != null) {
-            return ed.getEvento().getNombre();
+        Ediciones edicionIter = manejador.obtenerEdicion(siglaEdicion);
+        if (edicionIter != null && edicionIter.getEvento() != null) {
+            return edicionIter.getEvento().getNombre();
         }
         return null;
     }
     
     public List<String> listarEventosConEdicionesIngresadas() {
         List<String> resultado = new ArrayList<>();
-        for (Eventos e : manejador.obtenerEventos().values()) {
-            for (Ediciones ed : e.getEdiciones().values()) {
-                if (ed.getEstado() == DTEstado.Ingresada) {
-                    resultado.add(e.getNombre());
+        for (Eventos eventoIter : manejador.obtenerEventos().values()) {
+            for (Ediciones edicionIter : eventoIter.getEdiciones().values()) {
+                if (edicionIter.getEstado() == DTEstado.Ingresada) {
+                    resultado.add(eventoIter.getNombre());
                     break;
                 }
             }
@@ -420,9 +420,9 @@ public class ControladorEvento implements IControladorEvento {
         Eventos evento = manejador.obtenerEvento(nombreEvento);
         List<String> resultado = new ArrayList<>();
         if (evento != null) {
-            for (Ediciones ed : evento.getEdiciones().values()) {
-                if (ed.getEstado() == DTEstado.Ingresada) {
-                    resultado.add(ed.getNombre());
+            for (Ediciones edicionIter : evento.getEdiciones().values()) {
+                if (edicionIter.getEstado() == DTEstado.Ingresada) {
+                    resultado.add(edicionIter.getNombre());
                 }
             }
         }
@@ -436,11 +436,11 @@ public class ControladorEvento implements IControladorEvento {
     }
     
     public void cambiarEstadoEdicion(String evento, String edicion, boolean aceptar) {
-    	Eventos ev = manejador.obtenerEvento(evento);
-		if (ev != null) {
-			Ediciones ed = ev.obtenerEdicion(edicion);
-			if (ed != null) {
-				ed.setEstado(aceptar ? DTEstado.Aceptada : DTEstado.Rechazada);
+    	Eventos eventoIter = manejador.obtenerEvento(evento);
+		if (eventoIter != null) {
+			Ediciones edicionIter = eventoIter.obtenerEdicion(edicion);
+			if (edicionIter != null) {
+				edicionIter.setEstado(aceptar ? DTEstado.Aceptada : DTEstado.Rechazada);
 			}
 		}
     }

@@ -28,7 +28,7 @@ import com.toedter.calendar.JDateChooser;
 
 public class AltaEventoFrame extends JInternalFrame {
     private Runnable abrirConsultaRunnable;
-    public void setAbrirConsultaRunnable(Runnable r) { this.abrirConsultaRunnable = r; }
+    public void setAbrirConsultaRunnable(Runnable runCU) { this.abrirConsultaRunnable = runCU; }
     private JList<String> listCategorias;
     private DefaultListModel<String> listModelCategorias;
     private java.util.List<Boolean> categoriasSeleccionadasFlags;
@@ -177,11 +177,11 @@ public class AltaEventoFrame extends JInternalFrame {
 
         final String[] imagenSeleccionada = {null};
         btnImagen.addActionListener(e -> {
-            JFileChooser fc = new JFileChooser();
-            fc.setDialogTitle("Seleccionar imagen del evento");
-            fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imágenes JPG y PNG", "jpg", "jpeg", "png"));
-            if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-                java.io.File archivo = fc.getSelectedFile();
+            JFileChooser fileSelected = new JFileChooser();
+            fileSelected.setDialogTitle("Seleccionar imagen del evento");
+            fileSelected.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imágenes JPG y PNG", "jpg", "jpeg", "png"));
+            if (fileSelected.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+                java.io.File archivo = fileSelected.getSelectedFile();
                 imagenSeleccionada[0] = archivo.getName();
                 lblArchivo.setText(archivo.getName());
             }

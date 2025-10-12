@@ -96,52 +96,52 @@ public class ControladorUsuario implements IControladorUsuario {
     }
 
     public void actualizarAsistente(String nickname, String apellido, LocalDate fechaNacimiento) throws UsuarioYaExisteException, UsuarioTipoIncorrectoException, UsuarioNoExisteException {
-        Usuario u = manejador.findUsuario(nickname);
-        if (u == null) {
+        Usuario user = manejador.findUsuario(nickname);
+        if (user == null) {
             throw new UsuarioNoExisteException(nickname);
         }
-        if (!(u instanceof Asistente)) {
+        if (!(user instanceof Asistente)) {
             throw new UsuarioTipoIncorrectoException(nickname);
         }
-        Asistente a = (Asistente) u;
-        a.setApellido(apellido);
-        a.setFechaDeNacimiento(fechaNacimiento);
+        Asistente asistUser = (Asistente) user;
+        asistUser.setApellido(apellido);
+        asistUser.setFechaDeNacimiento(fechaNacimiento);
     }
 
     public void actualizarOrganizador(String nickname, String desc, String link) throws UsuarioNoExisteException, UsuarioTipoIncorrectoException {
-        Usuario u = manejador.findUsuario(nickname);
-        if (u == null) {
+        Usuario user = manejador.findUsuario(nickname);
+        if (user == null) {
             throw new UsuarioNoExisteException(nickname);
         }
-        if (!(u instanceof Organizador)) {
+        if (!(user instanceof Organizador)) {
             throw new UsuarioTipoIncorrectoException(nickname);
         }
-        Organizador o = (Organizador) u;
-        o.setDesc(desc);
-        o.setLink(link);
+        Organizador orgUser = (Organizador) user;
+        orgUser.setDesc(desc);
+        orgUser.setLink(link);
     }
 
     public DTDatosUsuario obtenerDatosUsuario(String nickname) throws UsuarioNoExisteException {
-        Usuario u = manejador.findUsuario(nickname);
-        if (u == null) {
+        Usuario user = manejador.findUsuario(nickname);
+        if (user == null) {
             throw new UsuarioNoExisteException(nickname);
         }
 
         // guardamos el usuario consultado
         this.usuarioSeleccionadoNickname = nickname;
 
-        DTDatosUsuario dto = new DTDatosUsuario(u.getNickname(), u.getNombre(), u.getEmail());
-        if (u instanceof Asistente) {
-            Asistente a = (Asistente) u;
-            dto.setApellido(a.getApellido());
-            dto.setFechaNac(a.getFechaDeNacimiento());
-            dto.setRegistros(obtenerRegistrosAsistente(a));
-            dto.setInstitucion(obtenerInstitucion(a));
-        } else if (u instanceof Organizador) {
-            Organizador o = (Organizador) u;
-            dto.setDesc(o.getDesc());
-            dto.setLink(o.getLink());
-            dto.setEdicion(listarEdicionesAPartirDeOrganizador(o));
+        DTDatosUsuario dto = new DTDatosUsuario(user.getNickname(), user.getNombre(), user.getEmail());
+        if (user instanceof Asistente) {
+            Asistente asisUser = (Asistente) user;
+            dto.setApellido(asisUser.getApellido());
+            dto.setFechaNac(asisUser.getFechaDeNacimiento());
+            dto.setRegistros(obtenerRegistrosAsistente(asisUser));
+            dto.setInstitucion(obtenerInstitucion(asisUser));
+        } else if (user instanceof Organizador) {
+            Organizador orgUser = (Organizador) user;
+            dto.setDesc(orgUser.getDesc());
+            dto.setLink(orgUser.getLink());
+            dto.setEdicion(listarEdicionesAPartirDeOrganizador(orgUser));
         }
         return dto;
     }
@@ -165,36 +165,36 @@ public class ControladorUsuario implements IControladorUsuario {
         return dtr;
     }
 
-    public static Set<DTEdicion> listarEdicionesAPartirDeOrganizador(Organizador o) {
+    public static Set<DTEdicion> listarEdicionesAPartirDeOrganizador(Organizador orgUser) {
         Set<DTEdicion> lista = new HashSet<>();
-        for (Ediciones e : o.getEdiciones().values()) {
+        for (Ediciones edicionIter : orgUser.getEdiciones().values()) {
             lista.add(new DTEdicion(
-                e.getNombre(),
-                e.getSigla(),
-                e.getFechaInicio(),
-                e.getFechaFin(),
-                e.getFechaAlta(),
-                o.getNombre(),
-                e.getCiudad(),
-                e.getPais(),
-                e.getEstado()));
+                edicionIter.getNombre(),
+                edicionIter.getSigla(),
+                edicionIter.getFechaInicio(),
+                edicionIter.getFechaFin(),
+                edicionIter.getFechaAlta(),
+                orgUser.getNombre(),
+                edicionIter.getCiudad(),
+                edicionIter.getPais(),
+                edicionIter.getEstado()));
         }
         return lista;
     }
     
     public void consultaUsuario(String nickname) throws UsuarioNoExisteException {
-        Usuario u = manejador.findUsuario(nickname);
-        if (u == null) {
+        Usuario user = manejador.findUsuario(nickname);
+        if (user == null) {
             throw new UsuarioNoExisteException(nickname);
         }
         this.usuarioSeleccionadoNickname = nickname;
         // Lógica adicional según caso de uso
     }
 
-    public DTRegistro obtenerDatosRegistros(String id) {
+    public DTRegistro obtenerDatosRegistros(String identificador) {
         DTRegistro dto = null;
-        if (manejadorEv.existeRegistro(id)) {
-            Registro reg = manejadorEv.obtenerRegistro(id);
+        if (manejadorEv.existeRegistro(identificador)) {
+            Registro reg = manejadorEv.obtenerRegistro(identificador);
             dto = new DTRegistro(
                 reg.getId(),
                 reg.getUsuario().getNickname(),
@@ -213,11 +213,11 @@ public class ControladorUsuario implements IControladorUsuario {
     }
 
     // --- manejo de selección de Registro ---
-    public void seleccionarRegistro(String id) {
-        if (!manejadorEv.existeRegistro(id)) {
-            throw new RegistroNoExiste(id);
+    public void seleccionarRegistro(String ident) {
+        if (!manejadorEv.existeRegistro(ident)) {
+            throw new RegistroNoExiste(ident);
         }
-        this.registroSeleccionadoId = id;
+        this.registroSeleccionadoId = ident;
     }
 
     public String getRegistroSeleccionadoId() {
@@ -233,8 +233,8 @@ public class ControladorUsuario implements IControladorUsuario {
         if (manejadorAux.existeCategoria(nombre)) {
             throw new CategoriaYaExisteException(nombre);
         }
-        Categoria c = new Categoria(nombre);
-        manejadorAux.agregarCategoria(c.getNombre(), c);
+        Categoria catIter = new Categoria(nombre);
+        manejadorAux.agregarCategoria(catIter.getNombre(), catIter);
     }
 
     public Institucion getInstitucionPorNombre(String nombre) {
@@ -250,22 +250,22 @@ public class ControladorUsuario implements IControladorUsuario {
     }
 
     public void modificarDatosUsuario(String nickname, String nombre, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion) throws UsuarioNoExisteException, UsuarioTipoIncorrectoException {
-        Usuario u = manejador.findUsuario(nickname);
-        if (u == null) {
+        Usuario user = manejador.findUsuario(nickname);
+        if (user == null) {
             throw new UsuarioNoExisteException(nickname);
         }
-        u.setNombre(nombre);
-        if (u instanceof Organizador) {
-            Organizador o = (Organizador) u;
-            o.setDesc(descripcion);
-            o.setLink(link);
-        } else if (u instanceof Asistente) {
-            Asistente a = (Asistente) u;
-            a.setApellido(apellido);
-            a.setFechaDeNacimiento(fechaNacimiento);
+        user.setNombre(nombre);
+        if (user instanceof Organizador) {
+            Organizador orgUser = (Organizador) user;
+            orgUser.setDesc(descripcion);
+            orgUser.setLink(link);
+        } else if (user instanceof Asistente) {
+            Asistente asisUser = (Asistente) user;
+            asisUser.setApellido(apellido);
+            asisUser.setFechaDeNacimiento(fechaNacimiento);
             if (institucion != null && !institucion.isEmpty()) {
                 Institucion inst = manejador.findInstitucion(institucion);
-                a.setInstitucion(inst);
+                asisUser.setInstitucion(inst);
             }
         } else {
             throw new UsuarioTipoIncorrectoException(nickname);
@@ -276,9 +276,9 @@ public class ControladorUsuario implements IControladorUsuario {
     public boolean inicioSesion(String nickOrEmail, String contrasena) {
         Usuario usuario = manejador.findUsuario(nickOrEmail);
         if (usuario == null) {
-            for (Usuario u : manejador.getUsuarios().values()) {
-                if (u.getEmail().equals(nickOrEmail)) {
-                    usuario = u;
+            for (Usuario user : manejador.getUsuarios().values()) {
+                if (user.getEmail().equals(nickOrEmail)) {
+                    usuario = user;
                     break;
                 }
             }
@@ -301,18 +301,18 @@ public class ControladorUsuario implements IControladorUsuario {
     
     @Override
     public boolean validarLogin(String nickOrEmail, String contrasena) {
-        manejadorUsuario mu = manejadorUsuario.getInstancia();
+        manejadorUsuario manejadorUser = manejadorUsuario.getInstancia();
 
         // Buscar por nickname o por correo electrónico
-        Usuario u = mu.obtenerUsuarioPorNickOEmail(nickOrEmail);
+        Usuario user = manejadorUser.obtenerUsuarioPorNickOEmail(nickOrEmail);
 
         // Si no existe, devolvemos false directamente
-        if (u == null) {
+        if (user == null) {
             return false;
         }
 
         // Si la contraseña está vacía o no coincide → false
-        if (u.getContrasena() == null || !u.getContrasena().equals(contrasena)) {
+        if (user.getContrasena() == null || !user.getContrasena().equals(contrasena)) {
             return false;
         }
 
