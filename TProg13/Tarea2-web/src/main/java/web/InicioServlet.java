@@ -10,6 +10,7 @@ import logica.Datatypes.DTEvento;
 import logica.fabrica;
 
 @WebServlet({"/inicio"})
+
 public class InicioServlet extends HttpServlet {
 
     private IControladorEvento ce() {

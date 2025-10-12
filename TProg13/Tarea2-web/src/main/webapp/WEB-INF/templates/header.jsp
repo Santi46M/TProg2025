@@ -51,13 +51,13 @@
     <% } else { %>
       <!-- Visitante (no logueado) -->
       <nav class="user-nav" id="userNav">
-      	 <form action="<%=ctx%>/auth/login" method="post">
+      	 <form action="<%=ctx%>/auth/login" method="get">
   			<button type="submit" class="btn">
     			 Iniciar Sesión
   			</button>
 		</form>
         <%-- <a class="btn ghost" href="<%=ctx%>/auth/login">Iniciar Sesión</a> --%>
-        <form action="<%=ctx%>/usuario/AltaUsuario" method="post">
+        <form action="<%=ctx%>/usuario/AltaUsuario" method="get">
   			<button type="submit" class="btn">
     			 Registrarse
   			</button>
