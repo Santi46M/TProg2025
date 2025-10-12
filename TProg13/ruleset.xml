@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Custom PMD Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0">
+  <description>
+    Reglas personalizadas para el proyecto:
+    - AbstractClassWithoutAbstractMethod
+    - LooseCoupling
+    - PackageCase
+    - ShortVariable
+    - UnusedPrivateField
+  </description>
+
+  <!-- Diseño -->
+  <rule ref="category/java/design.xml/AbstractClassWithoutAbstractMethod"/>
+  <rule ref="category/java/design.xml/LooseCoupling"/>
+
+  <!-- Estilo -->
+  <rule ref="category/java/codestyle.xml/PackageCase"/>
+  <rule ref="category/java/codestyle.xml/ShortVariable"/>
+
+  <!-- Buenas prácticas -->
+  <rule ref="category/java/bestpractices.xml/UnusedPrivateField"/>
+</ruleset>
