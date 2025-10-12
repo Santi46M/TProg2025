@@ -4,7 +4,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -36,6 +35,9 @@ public class EventoServlet extends HttpServlet {
   private static final String JSP_REGISTRO = "/WEB-INF/evento/RegistrarseEvento.jsp";
   private static final String JSP_LISTAR   = "/WEB-INF/evento/listado.jsp";
 
+  // Guardaremos en /img/eventos
+  private static final String IMG_REL_BASE = "/eventos";
+
   // ===== Lógica =====
   private final IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
@@ -66,7 +68,7 @@ public class EventoServlet extends HttpServlet {
       req.setAttribute("evDesc",   safe(() -> e.getDescripcion()));
       req.setAttribute("evFecha",  formatFecha(safeObj(() -> e.getFecha())));
       req.setAttribute("evCategorias", categoriasALista(safeObj(() -> e.getCategorias())));
-      req.setAttribute("evImagen", safe(() -> e.getImagen())); // NUEVO: imagen asociada
+      req.setAttribute("evImagen", safe(() -> e.getImagen())); // campo imagen en tu entidad
 
       // Obtener ediciones asociadas al evento
       List<String> nombresEdiciones = ce.listarEdicionesEvento(nombre);
@@ -146,8 +148,8 @@ public class EventoServlet extends HttpServlet {
         return;
       }
 
-      // Manejo de la imagen (opcional)
-      String imagenRelPath = null; // p.ej. "/uploads/eventos/MISIGLA.jpg"
+      // Manejo de la imagen (opcional) — ahora guardamos en /img/eventos
+      String imagenRelPath = null; // p.ej. "/img/eventos/MISIGLA.jpg"
       try {
         Part imgPart = null;
         try { imgPart = req.getPart("imagen"); } catch (IllegalStateException ise) { imgPart = null; }
@@ -160,24 +162,27 @@ public class EventoServlet extends HttpServlet {
             return;
           }
 
-          // Carpeta física dentro de la webapp: /uploads/eventos
-          String baseUploads = getServletContext().getRealPath("/uploads/eventos");
-          if (baseUploads == null) {
-            System.err.println("WARN: getRealPath('/uploads/eventos') es null; no se guardará imagen en webapp.");
+          // Carpeta física de /img/eventos dentro de la webapp
+          String baseImg = getServletContext().getRealPath(IMG_REL_BASE);
+          if (baseImg == null) {
+            System.err.println("WARN: getRealPath('" + IMG_REL_BASE + "') es null; no se guardará la imagen en la webapp.");
           } else {
-            Files.createDirectories(Path.of(baseUploads));
+            Files.createDirectories(Path.of(baseImg));
 
             String original = getSafeFilename(imgPart);
             String ext = getExtension(original);
             if (isBlank(ext)) ext = guessExtensionFromContentType(ctype);
             if (isBlank(ext)) ext = ".bin";
 
+            // Si querés reemplazar siempre por sigla: mismo nombre; si querés evitar colisiones, agregá timestamp.
             String finalName = (isBlank(sigla) ? "evento" : sigla) + ext;
-            Path destino = Path.of(baseUploads, finalName);
+            // Alternativa para evitar choque: 
+            // String finalName = (isBlank(sigla) ? "evento" : sigla) + "-" + System.currentTimeMillis() + ext;
 
+            Path destino = Path.of(baseImg, finalName);
             imgPart.write(destino.toAbsolutePath().toString());
 
-            imagenRelPath = "/uploads/eventos/" + finalName; // usable desde el JSP
+            imagenRelPath = IMG_REL_BASE + "/" + finalName; // usable desde el JSP: <img src="${ctx}${evImagen}">
           }
         }
       } catch (Exception fileEx) {

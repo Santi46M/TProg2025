@@ -12,6 +12,7 @@ import logica.datatypes.DTDatosUsuario;
 import logica.datatypes.DTEvento;
 import logica.interfaces.IControladorUsuario;
 import logica.interfaces.IControladorEvento;
+import excepciones.UsuarioNoExisteException; // <-- IMPORTANTE
 
 @WebServlet("/usuario/ConsultaUsuario")
 public class ConsultaUsuarioServlet extends HttpServlet {
@@ -22,26 +23,32 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
     request.setCharacterEncoding("UTF-8");
 
+    final boolean forzarListado = isTrue(request.getParameter("listar"))
+        || "list".equalsIgnoreCase(trim(request.getParameter("view")));
+
     String nick = trim(request.getParameter("nick"));
-    // Fallback: si no vino 'nick', usar el de sesión (usuario logueado)
-    if (isBlank(nick)) {
+
+    if (!forzarListado && isBlank(nick)) {
       HttpSession s = request.getSession(false);
       if (s != null) nick = (String) s.getAttribute("nick");
     }
 
-    IControladorUsuario ctrlUsuario = fabrica.getInstance().getIControladorUsuario();
+    final IControladorUsuario ctrlUsuario = fabrica.getInstance().getIControladorUsuario();
 
-    try {
-      if (!isBlank(nick)) {
-        // === PERFIL DE USUARIO ===
+    if (forzarListado || isBlank(nick)) {
+      // === LISTA ===
+      Map<String, Usuario> usuarios = ctrlUsuario.listarUsuarios();
+      request.setAttribute("usuarios", usuarios == null ? List.of() : usuarios.values());
+    } else {
+      // === PERFIL ===
+      try {
         DTDatosUsuario usuario = ctrlUsuario.obtenerDatosUsuario(nick);
         request.setAttribute("usuario", usuario);
 
-        // Mapa auxiliar: edicion → evento
-        IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
-        List<DTEvento> eventos = ce.listarEventos();
-        Map<String, String> edicionToEvento = new HashMap<>();
-
+        // Mapa edicion -> evento para armar links
+        final IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
+        final List<DTEvento> eventos = ce.listarEventos();
+        final Map<String, String> edicionToEvento = new HashMap<>();
         if (eventos != null) {
           for (DTEvento ev : eventos) {
             if (ev != null && ev.getEdiciones() != null) {
@@ -55,28 +62,32 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         }
         request.setAttribute("edicionToEvento", edicionToEvento);
 
-      } else {
-        // === LISTADO DE USUARIOS ===
+      } catch (UsuarioNoExisteException unee) {
+        // Usuario no encontrado: 404 + mensaje para la JSP
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        request.setAttribute("error", "El usuario \"" + nick + "\" no existe.");
+        // opcional: también mostrar listado para facilitar navegación:
         Map<String, Usuario> usuarios = ctrlUsuario.listarUsuarios();
-        request.setAttribute("usuarios",
-            usuarios == null ? List.of() : usuarios.values());
+        request.setAttribute("usuarios", usuarios == null ? List.of() : usuarios.values());
       }
-
-    } catch (Exception e) {
-      e.printStackTrace();
-      request.setAttribute("error", "Error al consultar el usuario: " + e.getMessage());
     }
 
-    request.getRequestDispatcher("/WEB-INF/usuario/ConsultaUsuario.jsp").forward(request, response);
+    request.getRequestDispatcher("/WEB-INF/usuario/ConsultaUsuario.jsp")
+           .forward(request, response);
   }
 
-  // Permitir usar <form method="post"> si lo preferís
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     doGet(request, response);
   }
 
+  // ===== Helpers =====
   private static String trim(String s) { return s == null ? null : s.trim(); }
   private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
+  private static boolean isTrue(String v) {
+    if (v == null) return false;
+    String s = v.trim().toLowerCase(java.util.Locale.ROOT);
+    return "1".equals(s) || "true".equals(s) || "on".equals(s) || "yes".equals(s) || "y".equals(s);
+  }
 }

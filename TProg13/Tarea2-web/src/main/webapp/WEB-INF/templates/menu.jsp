@@ -61,8 +61,10 @@ String ctx = request.getContextPath();
   </ul>
 
   <h4>
-    <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline">
-      <button type="submit" class="linklike">Listar Usuarios</button>
-    </form>
+   <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline">
+  <input type="hidden" name="listar" value="1">
+  <button type="submit" class="linklike">Listar Usuarios</button>
+</form>
+
   </h4>
 </aside>
