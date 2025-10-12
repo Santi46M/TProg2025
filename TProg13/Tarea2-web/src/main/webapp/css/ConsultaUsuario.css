@@ -1,8 +1,9 @@
-#usuariosList {
-/*   display: flex; */
+.usuarios-grid {
+  display: flex;
   flex-wrap: wrap;
   gap: 2rem;
   margin-top: 1rem;
+  justify-content: flex-start; /* o center si querés centrarlos */
 }
 
 .usuario-card {
