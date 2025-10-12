@@ -17,9 +17,9 @@ class ControladorUsuarioAltaCategoriaSinGUITest {
         try { getter = fab.getMethod("getInstance"); 
         } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
-        Object cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
+        Object controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
 
-        TestUtils.tryInvoke(cu, new String[]{"AltaCategoriaSinGUI"}, "SweepCat");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaCategoriaSinGUI"}, "SweepCat");
         assertTrue(true);
     }
 }

@@ -56,10 +56,10 @@ public class ManejadorEvento {
     }
     
     public boolean existeEdicion(String nombre){
-		for (Map.Entry<String, Ediciones> i : ediciones.entrySet()){
-			Ediciones e = i.getValue();
+		for (Map.Entry<String, Ediciones> edicionesIter : ediciones.entrySet()){
+			Ediciones edicionIter = edicionesIter.getValue();
 			//System.out.println(u.getEmail());
-			if (e.getNombre().equals(nombre)) {
+			if (edicionIter.getNombre().equals(nombre)) {
 				return true;				
 			}
 		}
@@ -105,11 +105,11 @@ public class ManejadorEvento {
         registros.put(registro.getId(), registro);
     }
 
-    public Registro obtenerRegistro(String id) {
-        return registros.get(id);
+    public Registro obtenerRegistro(String identificador) {
+        return registros.get(identificador);
     }
-    public boolean existeRegistro(String id) {
-    		if (obtenerRegistro(id) != null) {
+    public boolean existeRegistro(String identificador) {
+    		if (obtenerRegistro(identificador) != null) {
     			return true;
     		}
     		

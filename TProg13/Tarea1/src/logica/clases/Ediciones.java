@@ -143,8 +143,8 @@ public class Ediciones {
         this.pais = pais;
     }
 
-	public void agregarTipoRegistro(String id, TipoRegistro tipo) {
-		this.tiposRegistro.put(id, tipo);
+	public void agregarTipoRegistro(String ident, TipoRegistro tipo) {
+		this.tiposRegistro.put(ident, tipo);
 		
 	}
 
@@ -177,8 +177,8 @@ public class Ediciones {
         return null;
     }
 
-    public void agregarRegistro(String id, Registro registro) {
-        this.registros.put(id, registro);
+    public void agregarRegistro(String ident, Registro registro) {
+        this.registros.put(ident, registro);
     }
     
     public DTEstado getEstado() {

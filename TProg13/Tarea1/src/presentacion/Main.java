@@ -159,7 +159,7 @@ public class Main {
         menuSistema.add(itemCargaDatos);
         itemCargaDatos.addActionListener(new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     CargaDatosPrueba.cargar();
                     JOptionPane.showMessageDialog(frame,
@@ -189,7 +189,7 @@ public class Main {
         styleMenuItem(itemAltaUsuario);
         menuUsuario.add(itemAltaUsuario);
         itemAltaUsuario.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     if (creUsrInternalFrame == null || creUsrInternalFrame.isClosed()) {
                         creUsrInternalFrame = new AltaUsuarioFrame(icu, ice);
@@ -210,7 +210,7 @@ public class Main {
         styleMenuItem(itemConsultaUsuario);
         menuUsuario.add(itemConsultaUsuario);
         itemConsultaUsuario.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
             	try {
             	    if (conUsrInternalFrame == null || conUsrInternalFrame.isClosed()) {
             	        conUsrInternalFrame = new ConsultaUsuario(icu, ice);
@@ -231,7 +231,7 @@ public class Main {
         styleMenuItem(itemAltaInstitucion);
         menuUsuario.add(itemAltaInstitucion);
         itemAltaInstitucion.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     if (altaInstitucionFrame == null || altaInstitucionFrame.isClosed()) {
                         altaInstitucionFrame = new AltaInstitucionFrame(icu, ice);
@@ -251,28 +251,28 @@ public class Main {
         styleMenuItem(itemModificarUsuario);
         menuUsuario.add(itemModificarUsuario);
         itemModificarUsuario.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     java.util.Map<String, logica.clases.Usuario> usuariosMap = icu.listarUsuarios();
                     String[] usuarios = usuariosMap.keySet().toArray(new String[0]);
                     String[][] datosUsuarios = new String[usuarios.length][7];
                     for (int i = 0; i < usuarios.length; i++) {
-                        logica.clases.Usuario u = usuariosMap.get(usuarios[i]);
-                        datosUsuarios[i][0] = u.getNickname();
-                        datosUsuarios[i][1] = u.getEmail();
-                        datosUsuarios[i][2] = u.getNombre();
-                        if (u instanceof logica.clases.Asistente) {
-                            logica.clases.Asistente a = (logica.clases.Asistente) u;
-                            datosUsuarios[i][3] = a.getApellido() != null ? a.getApellido() : "";
-                            datosUsuarios[i][4] = a.getFechaDeNacimiento() != null ? a.getFechaDeNacimiento().toString() : "";
+                        logica.clases.Usuario usuario = usuariosMap.get(usuarios[i]);
+                        datosUsuarios[i][0] = usuario.getNickname();
+                        datosUsuarios[i][1] = usuario.getEmail();
+                        datosUsuarios[i][2] = usuario.getNombre();
+                        if (usuario instanceof logica.clases.Asistente) {
+                            logica.clases.Asistente asistente = (logica.clases.Asistente) usuario;
+                            datosUsuarios[i][3] = asistente.getApellido() != null ? asistente.getApellido() : "";
+                            datosUsuarios[i][4] = asistente.getFechaDeNacimiento() != null ? asistente.getFechaDeNacimiento().toString() : "";
                             datosUsuarios[i][5] = "";
-                            datosUsuarios[i][6] = a.getInstitucion() != null ? a.getInstitucion().getNombre() : "";
-                        } else if (u instanceof logica.clases.Organizador) {
-                            logica.clases.Organizador o = (logica.clases.Organizador) u;
+                            datosUsuarios[i][6] = asistente.getInstitucion() != null ? asistente.getInstitucion().getNombre() : "";
+                        } else if (usuario instanceof logica.clases.Organizador) {
+                            logica.clases.Organizador oorganizador = (logica.clases.Organizador) usuario;
                             datosUsuarios[i][3] = "";
                             datosUsuarios[i][4] = "";
-                            datosUsuarios[i][5] = o.getDesc() != null ? o.getDesc() : "";
-                            datosUsuarios[i][6] = o.getLink() != null ? o.getLink() : "";
+                            datosUsuarios[i][5] = oorganizador.getDesc() != null ? oorganizador.getDesc() : "";
+                            datosUsuarios[i][6] = oorganizador.getLink() != null ? oorganizador.getLink() : "";
                         } else {
                             datosUsuarios[i][3] = "";
                             datosUsuarios[i][4] = "";
@@ -298,7 +298,7 @@ public class Main {
         styleMenuItem(itemConsultaEvento);
         menuEvento.add(itemConsultaEvento);
         itemConsultaEvento.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     if (consultaEventoFrame == null || consultaEventoFrame.isClosed()) {
                         consultaEventoFrame = new ConsultaEventoFrame(icu, ice);
@@ -340,7 +340,7 @@ public class Main {
         styleMenuItem(itemConsultaTipoRegistro);
         menuEvento.add(itemConsultaTipoRegistro);
         itemConsultaTipoRegistro.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     if (consultaTipoRegistroFrame == null || consultaTipoRegistroFrame.isClosed()) {
                         consultaTipoRegistroFrame = new ConsultaTipoRegistroFrame(icu, ice);
@@ -361,7 +361,7 @@ public class Main {
         styleMenuItem(itemConsultaRegistro);
         menuUsuario.add(itemConsultaRegistro);
         itemConsultaRegistro.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     if (consultaRegistroFrame == null || consultaRegistroFrame.isClosed()) {
                         consultaRegistroFrame = new ConsultaRegistroFrame(icu, ice);
@@ -382,7 +382,7 @@ public class Main {
         styleMenuItem(itemConsultaPatrocinio);
         menuEvento.add(itemConsultaPatrocinio);
         itemConsultaPatrocinio.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     if (consultaPatrocinioFrame == null || consultaPatrocinioFrame.isClosed()) {
                         consultaPatrocinioFrame = new ConsultaPatrocinioFrame(icu, ice);
@@ -403,7 +403,7 @@ public class Main {
         styleMenuItem(itemAltaEvento);
         menuEvento.add(itemAltaEvento);
         itemAltaEvento.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     if (altaEventoFrame == null || altaEventoFrame.isClosed()) {
                         altaEventoFrame = new AltaEventoFrame(icu, ice);
@@ -424,7 +424,7 @@ public class Main {
         styleMenuItem(itemAltaTipoRegistro);
         menuEvento.add(itemAltaTipoRegistro);
         itemAltaTipoRegistro.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     if (altaTipoRegistroFrame == null || altaTipoRegistroFrame.isClosed()) {
                         altaTipoRegistroFrame = new AltaTipoRegistroFrame(icu, ice);
@@ -445,7 +445,7 @@ public class Main {
         styleMenuItem(itemAltaPatrocinio);
         menuEvento.add(itemAltaPatrocinio);
         itemAltaPatrocinio.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     if (altaPatrocinioFrame == null || altaPatrocinioFrame.isClosed()) {
                         altaPatrocinioFrame = new AltaPatrocinioFrame(icu, ice);
@@ -466,7 +466,7 @@ public class Main {
         styleMenuItem(itemAltaEdicionEvento);
         menuEvento.add(itemAltaEdicionEvento);
         itemAltaEdicionEvento.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     if (altaEdicionEventoFrame == null || altaEdicionEventoFrame.isClosed()) {
                         altaEdicionEventoFrame = new AltaEdicionEvento(icu, ice);
@@ -488,7 +488,7 @@ public class Main {
         styleMenuItem(itemRegistroEdicionEvento);
         menuUsuario.add(itemRegistroEdicionEvento);
         itemRegistroEdicionEvento.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed(ActionEvent event) {
                 try {
                     if (registroEdicionEventoFrame == null || registroEdicionEventoFrame.isClosed()) {
                         registroEdicionEventoFrame = new RegistroEdicionEventoFrame(icu, ice);
@@ -525,18 +525,18 @@ public class Main {
         });
     }
 
-    private void styleMenu(JMenu m) {
-        m.setOpaque(true);
-        m.setBackground(P_MENU_BG);
-        m.setForeground(P_MENU_FG);
+    private void styleMenu(JMenu menu) {
+        menu.setOpaque(true);
+        menu.setBackground(P_MENU_BG);
+        menu.setForeground(P_MENU_FG);
     }
-    private void styleMenuItem(JMenuItem mi) {
-        mi.setOpaque(true);
-        mi.setBackground(P_MENU_BG);
-        mi.setForeground(P_MENU_FG);
+    private void styleMenuItem(JMenuItem menuItem) {
+        menuItem.setOpaque(true);
+        menuItem.setBackground(P_MENU_BG);
+        menuItem.setForeground(P_MENU_FG);
     }
 
-    private void cambiarLookAndFeel(String nombre) {
+ /*   private void cambiarLookAndFeel(String nombre) {
         try {
             String clase = null;
             if ("System".equalsIgnoreCase(nombre)) {
@@ -690,5 +690,5 @@ public class Main {
             }
         }
         return datosList.toArray(new String[0][0]);
-    }
+    }*/
 }

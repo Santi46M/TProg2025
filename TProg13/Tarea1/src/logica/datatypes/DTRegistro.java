@@ -3,7 +3,7 @@ package logica.datatypes;
 import java.time.LocalDate;
 
 public class DTRegistro {
-    private String id;
+    private String identificador;
     private String usuario;
     private String edicion;
     private String tipoRegistro; 
@@ -12,8 +12,8 @@ public class DTRegistro {
     private LocalDate fechaInicio;
 
     
-    public DTRegistro(String id, String usuario, String edicion, String tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
-        this.id = id;
+    public DTRegistro(String identificador, String usuario, String edicion, String tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
+        this.identificador = identificador;
         this.usuario = usuario;
         this.edicion = edicion;
         this.tipoRegistro = tipoRegistro;
@@ -24,7 +24,7 @@ public class DTRegistro {
 
     
     public String getId() {
-        return id;
+        return identificador;
     }
 
     public String getUsuario() {

@@ -49,43 +49,43 @@ public class manejadorUsuario {
 	public Set<String> getInstituciones() {
 		return this.instituciones;
 	}
-	public void addUsuario(Usuario u) {
-		this.usuarios.put(u.getNickname(), u);
-		if (u instanceof Asistente) {
-			Asistente ast = findAsistente(u.getNickname());
+	public void addUsuario(Usuario user) {
+		this.usuarios.put(user.getNickname(), user);
+		if (user instanceof Asistente) {
+			Asistente ast = findAsistente(user.getNickname());
 			this.asistentes.put(ast.getNickname(), ast);
 		}else {
-			Organizador org = findOrganizador(u.getNickname());
+			Organizador org = findOrganizador(user.getNickname());
 			this.organizadores.put(org.getNickname(), org);
 		}
 	}
-	public void addInstitucion(Institucion i) {
-		this.instituciones.add(i.getNombre());
-		this.institucionesMap.put(i.getNombre(), i);
+	public void addInstitucion(Institucion insti) {
+		this.instituciones.add(insti.getNombre());
+		this.institucionesMap.put(insti.getNombre(), insti);
 	}
 	public Usuario findUsuario(String nickname) {
 		return usuarios.get(nickname);
 	}
 	
 	public Organizador findOrganizador(String nickname) {
-	    Usuario u = usuarios.get(nickname);
-	    if (u instanceof Organizador) {
-	        return (Organizador) u;
+	    Usuario user = usuarios.get(nickname);
+	    if (user instanceof Organizador) {
+	        return (Organizador) user;
 	    }
 	    return null; // o podés tirar una excepción si preferís
 	}
 	public Asistente findAsistente(String nickname) {
-	    Usuario u = usuarios.get(nickname);
-	    if (u instanceof Asistente) {
-	        return (Asistente) u;
+	    Usuario user = usuarios.get(nickname);
+	    if (user instanceof Asistente) {
+	        return (Asistente) user;
 	    }
 	    return null; // o podés tirar una excepción si preferís
 	}
 	
 	public Usuario obtenerUsuarioPorNickOEmail(String valor) {
 	    // Buscar por nick
-	    Usuario u = usuarios.get(valor);
-	    if (u != null) return u;
+	    Usuario usuariosIter = usuarios.get(valor);
+	    if (usuariosIter != null) return usuariosIter;
 
 	    // Buscar por email
 	    for (Usuario user : usuarios.values()) {
@@ -98,9 +98,9 @@ public class manejadorUsuario {
 
 	
 	public Boolean findCorreo(String correo) {
-		for (Map.Entry<String, Usuario> i : usuarios.entrySet()){
-			Usuario u = i.getValue();
-			if (u.getEmail().equals(correo)) {
+		for (Map.Entry<String, Usuario> insti : usuarios.entrySet()){
+			Usuario user = insti.getValue();
+			if (user.getEmail().equals(correo)) {
 				return true;
 				
 			}

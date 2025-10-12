@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test;
 @DisplayName("ControladorEvento – tolerancia a duplicados")
 class EventosDuplicateToleranceTest {
 
-    private Object ce;
-    private Object cu;
+    private Object controladorEv;
+    private Object controladorUs;
 
-    public Object getCe() { return ce; }
-    public Object getCu() { return cu; }
+    public Object getCe() { return controladorEv; }
+    public Object getCu() { return controladorUs; }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -26,32 +26,32 @@ class EventosDuplicateToleranceTest {
         try { getter = fab.getMethod("getInstance"); } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
 
-        this.cu = TestUtils.tryInvoke(fabrica, new String[] { "getIUsuario", "getIControladorUsuario" });
+        this.controladorUs = TestUtils.tryInvoke(fabrica, new String[] { "getIUsuario", "getIControladorUsuario" });
         try {
-            this.ce = TestUtils.tryInvoke(fabrica, new String[] { "getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento" });
+            this.controladorEv = TestUtils.tryInvoke(fabrica, new String[] { "getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento" });
         } catch (AssertionError ignored) {
-            this.ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
+            this.controladorEv = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
         }
 
         // base
-        TestUtils.tryInvoke(cu, new String[] { "AltaInstitucion" }, "Inst_DU", "d", "w");
-        TestUtils.tryInvoke(cu, new String[] { "AltaUsuario" },
+        TestUtils.tryInvoke(controladorUs, new String[] { "AltaInstitucion" }, "Inst_DU", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[] { "AltaUsuario" },
                 "orgDU", "Org DU", "org@x", "d", "l", "Ap",
                 LocalDate.of(1990, 1, 1), "Inst_DU", true);
 
         // categoría sin capturar Throwable
-        TestUtils.tryInvoke(ce, new String[] { "AltaCategoria" }, "DU-Cat");
+        TestUtils.tryInvoke(controladorEv, new String[] { "AltaCategoria" }, "DU-Cat");
     }
 
     @Test
     @DisplayName("AltaEvento duplicado → lanza IAE o es idempotente")
     void altaEventoDuplicado() throws Throwable {
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", java.util.List.of("DU-Cat"));
-        TestUtils.tryInvoke(ce, new String[] { "AltaEvento" }, "DU-Ev", "d", LocalDate.now(), "DUEV", cats);
+        TestUtils.tryInvoke(controladorEv, new String[] { "AltaEvento" }, "DU-Ev", "d", LocalDate.now(), "DUEV", cats);
 
         boolean lanzoIAE = false;
         try {
-            TestUtils.invokeUnwrapped(ce, new String[] { "AltaEvento" }, "DU-Ev", "d", LocalDate.now(), "DUEV", cats);
+            TestUtils.invokeUnwrapped(controladorEv, new String[] { "AltaEvento" }, "DU-Ev", "d", LocalDate.now(), "DUEV", cats);
         } catch (IllegalArgumentException e) {
             lanzoIAE = true; // validación estricta aceptada
         }
@@ -66,10 +66,10 @@ class EventosDuplicateToleranceTest {
 
         // asegurar evento (idempotente)
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", java.util.List.of("DU-Cat"));
-        TestUtils.tryInvoke(ce, new String[] { "AltaEvento" }, "DU-Ev", "d", hoy, "DUEV", cats);
+        TestUtils.tryInvoke(controladorEv, new String[] { "AltaEvento" }, "DU-Ev", "d", hoy, "DUEV", cats);
 
         // 1) Alta inicial (aceptamos nombre o sigla del evento)
-        altaEdicionFlexible(ce, "DU-Ev", "DUEV",
+        altaEdicionFlexible(controladorEv, "DU-Ev", "DUEV",
                 "ED", "EDU", "x",
                 hoy.plusDays(1), hoy.plusDays(2), hoy,
                 "orgDU", "City", "UY");
@@ -77,7 +77,7 @@ class EventosDuplicateToleranceTest {
         // 2) Intento duplicado: si no lanza → idempotente; si lanza IAE → válido estricto
         boolean lanzoIAE = false;
         try {
-            altaEdicionFlexible(ce, "DU-Ev", "DUEV",
+            altaEdicionFlexible(controladorEv, "DU-Ev", "DUEV",
                     "ED", "EDU", "x",
                     hoy.plusDays(1), hoy.plusDays(2), hoy,
                     "orgDU", "City", "UY");

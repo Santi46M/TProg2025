@@ -244,18 +244,18 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         edicionesPorEvento = new String[listaEventos.size()][];
         java.util.List<String[]> tiposList = new java.util.ArrayList<>();
         java.util.List<Double> costosList = new java.util.ArrayList<>();
-        for (int i = 0; i < listaEventos.size(); i++) {
-            logica.datatypes.DTEvento ev = listaEventos.get(i);
-            eventos[i] = ev.getNombre();
-            java.util.List<String> eds = controlador.listarEdicionesEvento(ev.getNombre());
-            edicionesPorEvento[i] = eds.toArray(new String[0]);
-            for (String ed : eds) {
-                logica.clases.Ediciones edi = controlador.obtenerEdicion(ev.getNombre(), ed);
+        for (int iter = 0; iter < listaEventos.size(); iter++) {
+            logica.datatypes.DTEvento eventIter = listaEventos.get(iter);
+            eventos[iter] = eventIter.getNombre();
+            java.util.List<String> edicionesAux = controlador.listarEdicionesEvento(eventIter.getNombre());
+            edicionesPorEvento[iter] = edicionesAux.toArray(new String[0]);
+            for (String nombreEdicion : edicionesAux) {
+                logica.clases.Ediciones edicionSelected = controlador.obtenerEdicion(eventIter.getNombre(), nombreEdicion);
                 java.util.List<String> tipos = new java.util.ArrayList<>();
-                if (edi != null) {
-                    for (logica.clases.TipoRegistro tr : edi.getTiposRegistro()) {
-                        tipos.add(tr.getNombre());
-                        costosList.add((double) tr.getCosto());
+                if (edicionSelected != null) {
+                    for (logica.clases.TipoRegistro tipoRegistroEdicion : edicionSelected.getTiposRegistro()) {
+                        tipos.add(tipoRegistroEdicion.getNombre());
+                        costosList.add((double) tipoRegistroEdicion.getCosto());
                     }
                 }
                 tiposList.add(tipos.toArray(new String[0]));
@@ -265,18 +265,18 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         costosTipoRegistro = costosList.stream().mapToDouble(Double::doubleValue).toArray();
         instituciones = logica.manejadores.manejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
         codigosPatrocinio = new HashSet<>();
-        for (var p : logica.manejadores.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
-            if (p != null && p.getCodigoPatrocinio() != null)
-                codigosPatrocinio.add(p.getCodigoPatrocinio().toLowerCase());
+        for (var patrocinioIter : logica.manejadores.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+            if (patrocinioIter != null && patrocinioIter.getCodigoPatrocinio() != null)
+                codigosPatrocinio.add(patrocinioIter.getCodigoPatrocinio().toLowerCase());
         }
         patrociniosInstitucionEdicion = new HashSet<>();
-        for (var p : logica.manejadores.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
-            if (p != null && p.getInstitucion() != null && p.getEdicion() != null && p.getInstitucion().getNombre() != null && p.getEdicion().getNombre() != null)
-                patrociniosInstitucionEdicion.add(p.getInstitucion().getNombre().toLowerCase() + "-" + p.getEdicion().getNombre().toLowerCase());
+        for (var patrocinioIter : logica.manejadores.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+            if (patrocinioIter != null && patrocinioIter.getInstitucion() != null && patrocinioIter.getEdicion() != null && patrocinioIter.getInstitucion().getNombre() != null && patrocinioIter.getEdicion().getNombre() != null)
+                patrociniosInstitucionEdicion.add(patrocinioIter.getInstitucion().getNombre().toLowerCase() + "-" + patrocinioIter.getEdicion().getNombre().toLowerCase());
         }
         // Cargar combos
         comboEventos.removeAllItems();
-        for (String ev : eventos) comboEventos.addItem(ev);
+        for (String eventoIter : eventos) comboEventos.addItem(eventoIter);
         comboInstituciones.removeAllItems();
         for (String inst : instituciones) comboInstituciones.addItem(inst);
         if (eventos.length > 0) {
@@ -293,7 +293,7 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         comboEdiciones.removeAllItems();
         int idxEvento = comboEventos.getSelectedIndex();
         if (idxEvento < 0 || edicionesPorEvento == null || edicionesPorEvento.length <= idxEvento) return;
-        for (String ed : edicionesPorEvento[idxEvento]) comboEdiciones.addItem(ed);
+        for (String edicionIter : edicionesPorEvento[idxEvento]) comboEdiciones.addItem(edicionIter);
         if (comboEdiciones.getItemCount() > 0) comboEdiciones.setSelectedIndex(0);
     }
     private void cargarTipos() {
@@ -301,8 +301,8 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         int idxEvento = comboEventos.getSelectedIndex();
         int idxEdicion = comboEdiciones.getSelectedIndex();
         int idxTipo = 0;
-        for (int i = 0; i < idxEvento; i++) {
-            idxTipo += edicionesPorEvento[i].length;
+        for (int iter = 0; iter < idxEvento; iter++) {
+            idxTipo += edicionesPorEvento[iter].length;
         }
         idxTipo += idxEdicion;
         if (idxEvento < 0 || idxEdicion < 0 || tiposPorEdicion == null || tiposPorEdicion.length <= idxTipo) return;

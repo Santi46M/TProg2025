@@ -16,8 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @DisplayName("ControladorEvento – listarEdicionesEvento vacío")
 class ControladorEventoListarVacioTest {
 
-	private Object ce;
-	private Object cu;
+	private Object controladorEv;
+	private Object controladorUs;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -31,19 +31,19 @@ class ControladorEventoListarVacioTest {
         	}
         Object fabrica = getter.invoke(null);
 
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
+        controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
+            controladorEv = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError ignored) {
-            ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
+            controladorEv = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
         }
 
         // base: org persistido + categoría
-        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_LE", "d", "w");
-        TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_LE", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
                 "orgLE", "Org LE", "org@x", "d", "l", "Ap",
                 LocalDate.of(1990, 1, 1), "Inst_LE", true);
-        TestUtils.tryInvoke(ce, new String[]{"AltaCategoria"}, "LE-Cat");
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaCategoria"}, "LE-Cat");
 
         
     }
@@ -52,10 +52,10 @@ class ControladorEventoListarVacioTest {
     @DisplayName("Un evento sin ediciones lista vacío (o no nulo)")
     void listaVacia() {
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", java.util.List.of("LE-Cat"));
-        TestUtils.tryInvoke(ce, new String[]{"AltaEvento"}, "SoloEvento", "d", LocalDate.now(), "SE", cats);
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaEvento"}, "SoloEvento", "d", LocalDate.now(), "SE", cats);
 
         @SuppressWarnings("unchecked")
-        List<String> eds = (List<String>) TestUtils.tryInvoke(ce, new String[]{"listarEdicionesEvento"}, "SoloEvento");
+        List<String> eds = (List<String>) TestUtils.tryInvoke(controladorEv, new String[]{"listarEdicionesEvento"}, "SoloEvento");
         assertNotNull(eds);
         assertTrue(eds.isEmpty() || eds.size() >= 0); // aceptamos que sea vacío
     }

@@ -10,64 +10,64 @@ class DtoPojoTest {
     @Test 
     @DisplayName("DTCategorias")
     void dtCategorias() {
-        Object o = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTCategorias");
-        assumeTrue(o != null, "No se pudo instanciar DTCategorias");
-        ReflectionPojoSupport.exercisePojo(o);
+        Object objeto = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTCategorias");
+        assumeTrue(objeto != null, "No se pudo instanciar DTCategorias");
+        ReflectionPojoSupport.exercisePojo(objeto);
     }
 
     @Test 
     @DisplayName("DTDAtosUsuario / DTDatosUsuario")
     void dtDatosUsuario() {
-        Object o = ReflectionPojoSupport.makeInstance("logica.DTDatosUsuario");
-        assumeTrue(o != null, "No se pudo instanciar DTDatosUsuario");
-        ReflectionPojoSupport.exercisePojo(o);
+        Object objeto = ReflectionPojoSupport.makeInstance("logica.DTDatosUsuario");
+        assumeTrue(objeto != null, "No se pudo instanciar DTDatosUsuario");
+        ReflectionPojoSupport.exercisePojo(objeto);
     }
 
     @Test 
     @DisplayName("DTEdicion")
     void dtEdicion() {
-        Object o = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTEdicion");
-        assumeTrue(o != null, "No se pudo instanciar DTEdicion");
-        ReflectionPojoSupport.exercisePojo(o);
+        Object objeto = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTEdicion");
+        assumeTrue(objeto != null, "No se pudo instanciar DTEdicion");
+        ReflectionPojoSupport.exercisePojo(objeto);
     }
 
     @Test 
     @DisplayName("DTEvento")
     void dtEvento() {
-        Object o = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTEvento");
-        assumeTrue(o != null, "No se pudo instanciar DTEvento");
-        ReflectionPojoSupport.exercisePojo(o);
+        Object objeto = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTEvento");
+        assumeTrue(objeto != null, "No se pudo instanciar DTEvento");
+        ReflectionPojoSupport.exercisePojo(objeto);
     }
 
     @Test 
     @DisplayName("DTNivel")
     void dtNivel() {
-        Object o = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTNivel");
-        assumeTrue(o != null, "No se pudo instanciar DTNivel");
-        ReflectionPojoSupport.exercisePojo(o);
+        Object objeto = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTNivel");
+        assumeTrue(objeto != null, "No se pudo instanciar DTNivel");
+        ReflectionPojoSupport.exercisePojo(objeto);
     }
 
     @Test 
     @DisplayName("DTPatrocinio")
     void dtPatrocinio() {
-        Object o = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTPatrocinio");
-        assumeTrue(o != null, "No se pudo instanciar DTPatrocinio");
-        ReflectionPojoSupport.exercisePojo(o);
+        Object objeto = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTPatrocinio");
+        assumeTrue(objeto != null, "No se pudo instanciar DTPatrocinio");
+        ReflectionPojoSupport.exercisePojo(objeto);
     }
 
     @Test 
     @DisplayName("DTRegistro")
     void dtRegistro() {
-        Object o = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTRegistro");
-        assumeTrue(o != null, "No se pudo instanciar DTRegistro");
-        ReflectionPojoSupport.exercisePojo(o);
+        Object objeto = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTRegistro");
+        assumeTrue(objeto != null, "No se pudo instanciar DTRegistro");
+        ReflectionPojoSupport.exercisePojo(objeto);
     }
 
     @Test 
     @DisplayName("DTTipoRegistro")
     void dtTipoRegistro() {
-        Object o = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTTipoRegistro");
-        assumeTrue(o != null, "No se pudo instanciar DTTipoRegistro");
-        ReflectionPojoSupport.exercisePojo(o);
+        Object objeto = ReflectionPojoSupport.makeInstance("logica.Datatypes.DTTipoRegistro");
+        assumeTrue(objeto != null, "No se pudo instanciar DTTipoRegistro");
+        ReflectionPojoSupport.exercisePojo(objeto);
     }
 }

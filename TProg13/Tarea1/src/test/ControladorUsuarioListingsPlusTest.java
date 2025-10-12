@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("ControladorUsuario – listados y ediciones por organizador")
 class ControladorUsuarioListingsPlusTest {
 
-    private Object cu, ce;
+    private Object controladorUs, controladorEv;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -28,39 +28,39 @@ class ControladorUsuarioListingsPlusTest {
         try { getter = fab.getMethod("getInstance"); 
         } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
+        controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
+            controladorEv = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError ignored) {
-            ce = Class.forName("logica.Controladores.ControladorEvento").getDeclaredConstructor().newInstance();
+            controladorEv = Class.forName("logica.Controladores.ControladorEvento").getDeclaredConstructor().newInstance();
         }
 
-        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_LPU", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_LPU", "d", "w");
     }
 
     @Test
     @DisplayName("AltaUsuario múltiple: listarUsuarios/Asistentes/Organizadores y getInstituciones")
     void listadosBasicos() {
         // 2 asistentes
-        TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
                 "a1", "A Uno", "a1@x", "d", "l", "Ap",
                 LocalDate.of(2000, 1, 1), "Inst_LPU", false);
-        TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
                 "a2", "A Dos", "a2@x", "d", "l", "Ap",
                 LocalDate.of(2001, 2, 2), "Inst_LPU", false);
         // 1 organizador
-        TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
                 "o1", "O Uno", "o1@x", "d", "l", "Ap",
                 LocalDate.of(1990, 1, 1), "Inst_LPU", true);
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> users = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarUsuarios"});
+        Map<String, Object> users = (Map<String, Object>) TestUtils.tryInvoke(controladorUs, new String[]{"listarUsuarios"});
         @SuppressWarnings("unchecked")
-        Map<String, Object> asistentes = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarAsistentes"});
+        Map<String, Object> asistentes = (Map<String, Object>) TestUtils.tryInvoke(controladorUs, new String[]{"listarAsistentes"});
         @SuppressWarnings("unchecked")
-        Map<String, Object> orgs = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarOrganizadores"});
+        Map<String, Object> orgs = (Map<String, Object>) TestUtils.tryInvoke(controladorUs, new String[]{"listarOrganizadores"});
         @SuppressWarnings("unchecked")
-        Set<String> insts = (Set<String>) TestUtils.tryInvoke(cu, new String[]{"getInstituciones"});
+        Set<String> insts = (Set<String>) TestUtils.tryInvoke(controladorUs, new String[]{"getInstituciones"});
 
         assertNotNull(users);  assertNotNull(asistentes);  assertNotNull(orgs);  assertNotNull(insts);
         assertTrue(users.size() >= 3);
@@ -73,14 +73,14 @@ class ControladorUsuarioListingsPlusTest {
     @DisplayName("listarEdicionesAPartirDeOrganizador (si está disponible)")
     void listarEdicionesDeOrganizador() throws Exception {
         // preparamos un evento/edición del organizador o1
-        TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
                 "o1", "O Uno", "o1@x", "d", "l", "Ap",
                 LocalDate.of(1990, 1, 1), "Inst_LPU", true);
-        TestUtils.tryInvoke(ce, new String[]{"AltaCategoria"}, "LP-Cat");
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaCategoria"}, "LP-Cat");
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("LP-Cat"));
-        TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaEvento"},
                 "LP-Ev", "d", LocalDate.now(), "LPEV", cats);
-        TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
                 "LP-Ev", "LP-Ed", "LPED", "x",
                 LocalDate.now().plusDays(1), LocalDate.now().plusDays(2), LocalDate.now(),
                 "o1", "City", "UY");

@@ -20,10 +20,9 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 
 public class ModificarDatosUsuarioFrame extends JInternalFrame {
-    private IControladorUsuario icu;
     public ModificarDatosUsuarioFrame(IControladorUsuario ICU, String[] usuarios, String[][] datosUsuarios) {
         super("Modificar Datos de Usuario", true, true, true, true);
-        this.icu = ICU;
+
         setBounds(80, 80, 500, 450);
         setVisible(true);
         setLayout(new BorderLayout());

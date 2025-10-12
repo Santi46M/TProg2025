@@ -41,14 +41,14 @@ public interface IControladorUsuario {
     // Consulta
     public DTDatosUsuario obtenerDatosUsuario(String nickname) throws UsuarioNoExisteException;
     public Set<DTRegistro> obtenerRegistrosAsistente(Asistente asist);
-    public DTRegistro obtenerDatosRegistros(String id);
+    public DTRegistro obtenerDatosRegistros(String identificador);
     public boolean esAsistente(String nickname);
 
     // Categorías
     public void altaCategoriaSinGUI(String nombre) throws CategoriaYaExisteException;
     
 
-    public void seleccionarRegistro(String id);
+    public void seleccionarRegistro(String identificador);
 
     public String getRegistroSeleccionadoId();
     public DTRegistro obtenerRegistroSeleccionado();

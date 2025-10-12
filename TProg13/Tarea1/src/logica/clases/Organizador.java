@@ -44,8 +44,8 @@ public class Organizador extends Usuario {
         return lista;
     }
 
-    public void agregarEdicion(Ediciones ed) {
-    	ediciones.put(ed.getNombre(), ed);
+    public void agregarEdicion(Ediciones edic) {
+    	ediciones.put(edic.getNombre(), edic);
     }
     
     public void setDesc(String desc) {
@@ -58,5 +58,10 @@ public class Organizador extends Usuario {
 
     public void setLink(String link) {
         this.link = link;
+    }
+    
+    @Override
+    public String getTipoUsuario() {
+        return "Organizador";
     }
 }

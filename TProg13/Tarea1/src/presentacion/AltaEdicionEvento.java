@@ -216,11 +216,11 @@ public class AltaEdicionEvento extends JInternalFrame {
 
 	    final String[] imagenSeleccionada = {null};
 	    btnImagen.addActionListener(e -> {
-	        JFileChooser fc = new JFileChooser();
-	        fc.setDialogTitle("Seleccionar imagen de la edición");
-	        fc.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imágenes JPG y PNG", "jpg", "jpeg", "png"));
-	        if (fc.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
-	            java.io.File archivo = fc.getSelectedFile();
+	        JFileChooser fileSelected = new JFileChooser();
+	        fileSelected.setDialogTitle("Seleccionar imagen de la edición");
+	        fileSelected.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Imágenes JPG y PNG", "jpg", "jpeg", "png"));
+	        if (fileSelected.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+	            java.io.File archivo = fileSelected.getSelectedFile();
 	            imagenSeleccionada[0] = archivo.getName(); // o archivo.getAbsolutePath() si preferís
 	            lblArchivo.setText(archivo.getName());
 	        }
@@ -252,20 +252,20 @@ public class AltaEdicionEvento extends JInternalFrame {
 	            String ciudad = txtCiudad.getText().trim();
 	            String pais = txtPais.getText().trim();
 
-	            java.util.Date fi = dateChooserInicio.getDate();
-	            java.util.Date ff = dateChooserFin.getDate();
-	            java.util.Date fa = dateChooserAlta.getDate();
+	            java.util.Date fechaInicioSelected = dateChooserInicio.getDate();
+	            java.util.Date fechaFinalSelected = dateChooserFin.getDate();
+	            java.util.Date fechaAltaSelected = dateChooserAlta.getDate();
 
 	            if (eventoNombre == null || organizadorNick == null || nombre.isEmpty() ||
 	                sigla.isEmpty() || ciudad.isEmpty() || pais.isEmpty() ||
-	                fi == null || ff == null || fa == null) {
+	                fechaInicioSelected == null || fechaFinalSelected == null || fechaAltaSelected == null) {
 	                JOptionPane.showMessageDialog(this, "Todos los campos deben estar completos.");
 	                return;
 	            }
 
-	            LocalDate fInicio = fi.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
-	            LocalDate fFin = ff.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
-	            LocalDate fAlta = fa.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+	            LocalDate fInicio = fechaInicioSelected.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+	            LocalDate fFin = fechaFinalSelected.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+	            LocalDate fAlta = fechaAltaSelected.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 
 	            logica.controladores.ControladorEvento controladorEvento = new logica.controladores.ControladorEvento();
 	            logica.manejadores.ManejadorEvento manejadorEvento = logica.manejadores.ManejadorEvento.getInstancia();

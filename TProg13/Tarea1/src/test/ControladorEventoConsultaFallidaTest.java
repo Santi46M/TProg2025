@@ -25,17 +25,17 @@ class ControladorEventoConsultaFallidaTest {
         }
         Object fabrica = getter.invoke(null);
 
-        Object ce;
+        Object controladorEv;
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{
+            controladorEv = TestUtils.tryInvoke(fabrica, new String[]{
                     "getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError e) {
-            ce = Class.forName("logica.Controladores.ControladorEvento")
+            controladorEv = Class.forName("logica.Controladores.ControladorEvento")
                     .getDeclaredConstructor().newInstance();
         }
 
         // ✅ ce no es efectivamente final, así que copiamos
-        final Object ceFinal = ce;
+        final Object ceFinal = controladorEv;
 
      // Acepta "cualquier" excepción: no hay catches genéricos, Checkstyle OK
         ejecutarEsperando(Throwable.class,
@@ -53,13 +53,13 @@ class ControladorEventoConsultaFallidaTest {
     }
 
  // Si NO debe lanzar nada:
-    private void ejecutarSinExcepcion(ThrowingRunnable r) {
-        assertDoesNotThrow(r::run);
+    private void ejecutarSinExcepcion(ThrowingRunnable run) {
+        assertDoesNotThrow(run::run);
     }
 
     // Si DEBE lanzar una excepción específica:
-    private <T extends Throwable> T ejecutarEsperando(Class<T> tipo, ThrowingRunnable r) {
-        return assertThrows(tipo, r::run);
+    private <Tirable extends Throwable> Tirable ejecutarEsperando(Class<Tirable> tipo, ThrowingRunnable run) {
+        return assertThrows(tipo, run::run);
     }
 
     @FunctionalInterface

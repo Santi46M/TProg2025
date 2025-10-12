@@ -24,41 +24,41 @@ class DTOsCoverageSweepTest {
         tryConstructAndExercise("logica.Datatypes.DTNivel");
 
         // DTCategorias: primero con colección, si no, sin args
-        Object dc = tryNew("logica.Datatypes.DTCategorias", new Class<?>[]{Collection.class}, List.of("Tec", "Datos"));
-        if (dc == null) {
-            dc = tryNewNoArgs("logica.Datatypes.DTCategorias");
+        Object dataCategorias = tryNew("logica.Datatypes.DTCategorias", new Class<?>[]{Collection.class}, List.of("Tec", "Datos"));
+        if (dataCategorias == null) {
+            dataCategorias = tryNewNoArgs("logica.Datatypes.DTCategorias");
         }
-        if (dc != null) {
-            ReflectionPojoSupport.exercisePojo(dc);
+        if (dataCategorias != null) {
+            ReflectionPojoSupport.exercisePojo(dataCategorias);
         }
 
         assertTrue(true);
     }
 
-    private void tryConstructAndExercise(String cn) {
-        Object o = null;
+    private void tryConstructAndExercise(String ceene) {
+        Object objeto = null;
 
         // 1) ctor sin args
-        if (o == null) {
-            o = tryNewNoArgs(cn);
+        if (objeto == null) {
+            objeto = tryNewNoArgs(ceene);
         }
         // 2) intento típico con fechas/strings
-        if (o == null) {
-            o = tryNew(cn,
+        if (objeto == null) {
+            objeto = tryNew(ceene,
                     new Class<?>[]{String.class, String.class, String.class, LocalDate.class, LocalDate.class},
                     "N", "S", "D", LocalDate.now(), LocalDate.now());
         }
         // 3) strings
-        if (o == null) {
-            o = tryNew(cn, new Class<?>[]{String.class, String.class, String.class}, "N", "S", "D");
+        if (objeto == null) {
+            objeto = tryNew(ceene, new Class<?>[]{String.class, String.class, String.class}, "N", "S", "D");
         }
         // 4) un string
-        if (o == null) {
-            o = tryNew(cn, new Class<?>[]{String.class}, "N");
+        if (objeto == null) {
+            objeto = tryNew(ceene, new Class<?>[]{String.class}, "N");
         }
 
-        if (o != null) {
-            ReflectionPojoSupport.exercisePojo(o);
+        if (objeto != null) {
+            ReflectionPojoSupport.exercisePojo(objeto);
         }
     }
 
@@ -66,10 +66,10 @@ class DTOsCoverageSweepTest {
 
     private Object tryNewNoArgs(String fqcn) {
         try {
-            Class<?> c = Class.forName(fqcn);
-            Constructor<?> k0 = c.getDeclaredConstructor();
-            k0.setAccessible(true);
-            return k0.newInstance();
+            Class<?> clase = Class.forName(fqcn);
+            Constructor<?> constructor = clase.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return constructor.newInstance();
         } catch (ClassNotFoundException
                  | NoSuchMethodException
                  | InstantiationException
@@ -82,10 +82,10 @@ class DTOsCoverageSweepTest {
 
     private Object tryNew(String fqcn, Class<?>[] paramTypes, Object... args) {
         try {
-            Class<?> c = Class.forName(fqcn);
-            Constructor<?> k = c.getDeclaredConstructor(paramTypes);
-            k.setAccessible(true);
-            return k.newInstance(args);
+            Class<?> clase = Class.forName(fqcn);
+            Constructor<?> constructor = clase.getDeclaredConstructor(paramTypes);
+            constructor.setAccessible(true);
+            return constructor.newInstance(args);
         } catch (ClassNotFoundException
                  | NoSuchMethodException
                  | InstantiationException
