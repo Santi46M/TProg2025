@@ -102,106 +102,30 @@
                                   (esSuPropioPerfil && ("Ingresada".equalsIgnoreCase(estado) || "Rechazada".equalsIgnoreCase(estado)));
                  if (mostrar) {
             %>
-              <div class="card usuario-card">
-                <h3>
-                  <!-- Podés dejar <a> o cambiar a <form> si preferís -->
-                  <a href="<%=ctx%>/usuario/ConsultaUsuario?nick=<%=u.getNickname()%>">
-                    <i class='bx <%= esOrg ? "bxs-microphone" : "bxs-id-card" %>'></i>
-                    <%=u.getNickname()%>
-                  </a>
-                </h3>
-                <p><strong>Nombre:</strong> <%=u.getNombre()%></p>
-                <p><strong>Email:</strong> <%=u.getEmail()%></p>
-                <% if (esOrg) { %>
-                  <span class="rol-tag org">Organizador</span>
-                <% } else if (esAsist) { %>
-                  <span class="rol-tag asist">Asistente</span>
-                <% } %>
-              </div>
+              <li>
+                <strong><%= e.getNombre() %></strong>
+                (<%= e.getFechaInicio() %> → <%= e.getFechaFin() %>) —
+                <span><%= e.getCiudad() %>, <%= e.getPais() %></span>
+                <em class="estado"> — <%= estado %></em>
+              </li>
             <% } %>
           <% } %>
-        </div>
-
-      <!-- ====== PERFIL INDIVIDUAL ====== -->
-      <% } else { %>
-        <h1>Perfil de <%= usuario.getNickname() %></h1>
-        <div class="usuario-detalle">
-          <p><strong>Nombre:</strong> <%= usuario.getNombre() %></p>
-          <p><strong>Email:</strong> <%= usuario.getEmail() %></p>
-          <% if (usuario.getInstitucion() != null) { %>
-            <p><strong>Institución:</strong> <%= usuario.getInstitucion() %></p>
-          <% } %>
-          <% if (usuario.getDesc() != null) { %>
-            <p><strong>Descripción:</strong> <%= usuario.getDesc() %></p>
-          <% } %>
-
-          <%
-  boolean esMiPerfil = (nickSesion != null && usuario != null && nickSesion.equals(usuario.getNickname()));
-  boolean tieneEdiciones = (usuario != null && usuario.getEdiciones() != null && !usuario.getEdiciones().isEmpty());
-  @SuppressWarnings("unchecked")
-  java.util.Map<String,String> edicionToEvento = (java.util.Map<String,String>) request.getAttribute("edicionToEvento");
-%>
-
-<% if (tieneEdiciones) { %>
-  <h2>Ediciones de eventos</h2>
-  <ul class="lista-ediciones">
-    <% for (DTEdicion e : usuario.getEdiciones()) {
-         String estado = e.getEstado();
-         estado = (estado == null) ? "" : estado.trim();
-         boolean aceptada = "ACEPTADA".equalsIgnoreCase(estado);
-         boolean mostrar = esMiPerfil || aceptada; // propio: todas; terceros/visit: solo aceptadas
-         if (!mostrar) continue;
-
-         String liClass = "estado-" + (estado.isEmpty() ? "sin-estado" : estado.toLowerCase());
-         String edNombre = e.getNombre();
-         String evNombre = (edicionToEvento == null) ? null : edicionToEvento.get(edNombre);
-    %>
-      <li class="<%= liClass %>">
-        <% if (aceptada) { %>
-          <!-- Aceptadas: ver detalle (GET) -->
-          <form action="<%= ctx %>/edicion/ConsultaEdicionDeEvento" method="get" style="display:inline;">
-            <%-- Si tu endpoint de consulta también requiere 'evento', lo mandamos: --%>
-            <% if (evNombre != null) { %>
-              <input type="hidden" name="evento" value="<%= evNombre %>">
-            <% } %>
-            <input type="hidden" name="edicion" value="<%= edNombre %>">
-            <button type="submit" class="linklike"><strong><%= edNombre %></strong></button>
-          </form>
-        <% } else { %>
-          <!-- No aceptadas: solo texto -->
-          <strong><%= edNombre %></strong>
+        </ul>
         <% } %>
-
-        (<%= e.getFechaInicio() %> → <%= e.getFechaFin() %>) —
-        <span><%= e.getCiudad() %>, <%= e.getPais() %></span>
-        <% if (!estado.isEmpty()) { %>
-          <em class="estado"> — <%= estado %></em>
-        <% } %>
-
-        <% if (esMiPerfil) { %>
-          <!-- Acciones de moderación SOLO en mi perfil -->
-          <form action="<%= ctx %>/edicion/aceptar" method="get" style="display:inline; margin-left:.5rem;">
-            <% if (evNombre != null) { %>
-              <input type="hidden" name="evento" value="<%= evNombre %>">
+        <% if (esAsist) { %>
+          <h2>Eventos registrados</h2>
+          <ul class="lista-eventos">
+            <% for (DTRegistro r : usuario.getRegistros()) { 
+                // No existe getEstado(), getNombre(), getFechaFin(), getCiudad(), getPais() en DTRegistro
+                // Mostramos los datos disponibles
+            %>
+              <li>
+                <strong>Edición:</strong> <%= r.getEdicion() %> | <strong>Tipo:</strong> <%= r.getTipoRegistro() %> | <strong>Fecha registro:</strong> <%= r.getFechaRegistro() %> | <strong>Costo:</strong> $<%= r.getCosto() %> | <strong>Inicio:</strong> <%= r.getFechaInicio() %>
+              </li>
             <% } %>
-            <input type="hidden" name="edicion" value="<%= edNombre %>">
-            <button type="submit" class="linklike">Aceptar</button>
-          </form>
-          <form action="<%= ctx %>/edicion/rechazar" method="get" style="display:inline; margin-left:.5rem;">
-            <% if (evNombre != null) { %>
-              <input type="hidden" name="evento" value="<%= evNombre %>">
-            <% } %>
-            <input type="hidden" name="edicion" value="<%= edNombre %>">
-            <button type="submit" class="linklike">Rechazar</button>
-          </form>
+          </ul>
         <% } %>
-      </li>
-    <% } %>
-  </ul>
-<% } %>
-
-          <a href="<%=ctx%>/usuario/ConsultaUsuario" class="btn">Volver al listado</a>
-        </div>
+      </div>
       <% } %>
     </main>
   </div>
