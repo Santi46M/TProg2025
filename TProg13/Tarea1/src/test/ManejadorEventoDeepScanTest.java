@@ -20,26 +20,26 @@ class ManejadorEventoDeepScanTest {
         try { getter = fab.getMethod("getInstance"); }
         catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario"});
+        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento","getIControladorEvento","getControladorEvento","getEvento"});
+            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError ignored) {
             ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
         }
 
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_DS", "d", "w");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "orgDS","Org DS","o@x","d","l","Ap",
-                LocalDate.of(1990,1,1),"Inst_DS", true);
+                "orgDS", "Org DS", "o@x", "d", "l", " Ap",
+                LocalDate.of(1990, 1, 1), "Inst_DS", true);
         try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "DS-Cat"); } catch (Throwable ignored) {}
 
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("DS-Cat"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
-                "DS-Event","d", LocalDate.now(),"DSEV", cats);
+                "DS-Event", "d", LocalDate.now(), "DSEV", cats);
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
-                "DS-Event","ED-A","EDAS","x",
+                "DS-Event", "ED-A", "EDAS", "x",
                 LocalDate.now().plusDays(1), LocalDate.now().plusDays(2), LocalDate.now(),
-                "orgDS","City","UY");
+                "orgDS", "City", "UY");
     }
 
     @Test
@@ -55,7 +55,7 @@ class ManejadorEventoDeepScanTest {
             if (m.getParameterCount() == 0) {
                 try {
                     Object res = m.invoke(me);
-                    if (res instanceof Map<?,?> mp) {
+                    if (res instanceof Map<?, ?> mp) {
                         if (!mp.isEmpty()) { sawSomething = true; break; }
                     } else if (res instanceof Collection<?> col) {
                         if (!col.isEmpty()) { sawSomething = true; break; }
@@ -71,7 +71,7 @@ class ManejadorEventoDeepScanTest {
                 for (Field f : c.getDeclaredFields()) {
                     f.setAccessible(true);
                     Object obj = f.get(me);
-                    if (obj instanceof Map<?,?> mp && !mp.isEmpty()) { sawSomething = true; break; }
+                    if (obj instanceof Map<?, ?> mp && !mp.isEmpty()) { sawSomething = true; break; }
                     if (obj instanceof Collection<?> col && !col.isEmpty()) { sawSomething = true; break; }
                 }
                 c = c.getSuperclass();

@@ -39,7 +39,7 @@ class ControladorEventoEdgeCasesTest {
         // 3) Controlador de EVENTO: por fábrica si existe; si no, instancio la impl concreta
         try {
             ce = TestUtils.tryInvoke(fabrica, new String[]{
-                "getIEvento","getIControladorEvento", "getControladorEvento", "getEvento"
+                "getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"
             });
         } catch (AssertionError ignored) {
             Class<?> ceClazz = Class.forName("logica.ControladorEvento");
@@ -74,7 +74,7 @@ class ControladorEventoEdgeCasesTest {
      // 4) Base: Institución + ORG persistido (usá AltaUsuario para que aparezca en los mapas)
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_A", "d", "w");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "org1","Org Uno","org1@x", "desc", "link",
+                "org1", "Org Uno", "org1@x", "desc", "link",
                 "Ap", java.time.LocalDate.of(1990, 1, 1), "Inst_A", true);
 
         // 5) Dar de alta la categoría que usará el evento ("Tec")
@@ -158,7 +158,7 @@ class ControladorEventoEdgeCasesTest {
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
                 "Conf", "Main2", "M2", "ok",
                 hoy.plusDays(1), hoy.plusDays(2), hoy,
-                "org1","City", "UY");
+                "org1", "City", "UY");
 
         Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf", "Main2");
         assertNotNull(ed);

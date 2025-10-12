@@ -343,8 +343,8 @@ class ControladorEventoTest {
                                 return tr;
                             }
                         }
-                    } else if (res instanceof java.util.Map<?,?> map) {
-                        for (Object tr : ((java.util.Map<?,?>) res).values()) {
+                    } else if (res instanceof java.util.Map<?, ?> map) {
+                        for (Object tr : ((java.util.Map<?, ?>) res).values()) {
                             if (tr == null) continue;
                             var mNom = TestUtils.findMethod(tr, "getNombre", "nombre");
                             if (mNom != null) {
@@ -367,8 +367,8 @@ class ControladorEventoTest {
                             for (Object tr : col) {
                                 if (tr != null && tr.getClass().getName().endsWith("TipoRegistro")) return tr;
                             }
-                        } else if (res instanceof java.util.Map<?,?> map) {
-                            for (Object tr : ((java.util.Map<?,?>) res).values()) {
+                        } else if (res instanceof java.util.Map<?, ?> map) {
+                            for (Object tr : ((java.util.Map<?, ?>) res).values()) {
                                 if (tr != null && tr.getClass().getName().endsWith("TipoRegistro")) return tr;
                             }
                         }

@@ -20,9 +20,9 @@ class ControladorUsuarioListingsPlusTest {
         try { getter = fab.getMethod("getInstance"); }
         catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario"});
+        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento","getIControladorEvento","getControladorEvento","getEvento"});
+            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError ignored) {
             ce = Class.forName("logica.Controladores.ControladorEvento").getDeclaredConstructor().newInstance();
         }
@@ -35,22 +35,22 @@ class ControladorUsuarioListingsPlusTest {
     void listadosBasicos() {
         // 2 asistentes
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "a1","A Uno","a1@x","d","l","Ap",
-                LocalDate.of(2000,1,1),"Inst_LPU", false);
+                "a1", "A Uno", "a1@x", "d", "l", "Ap",
+                LocalDate.of(2000, 1, 1), "Inst_LPU", false);
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "a2","A Dos","a2@x","d","l","Ap",
-                LocalDate.of(2001,2,2),"Inst_LPU", false);
+                "a2", "A Dos", "a2@x", "d", "l", "Ap",
+                LocalDate.of(2001, 2, 2), "Inst_LPU", false);
         // 1 organizador
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "o1","O Uno","o1@x","d","l","Ap",
-                LocalDate.of(1990,1,1),"Inst_LPU", true);
+                "o1", "O Uno", "o1@x", "d", "l", "Ap",
+                LocalDate.of(1990, 1, 1), "Inst_LPU", true);
 
         @SuppressWarnings("unchecked")
-        Map<String,Object> users = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarUsuarios"});
+        Map<String, Object> users = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarUsuarios"});
         @SuppressWarnings("unchecked")
-        Map<String,Object> asistentes = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarAsistentes"});
+        Map<String, Object> asistentes = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarAsistentes"});
         @SuppressWarnings("unchecked")
-        Map<String,Object> orgs = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarOrganizadores"});
+        Map<String, Object> orgs = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarOrganizadores"});
         @SuppressWarnings("unchecked")
         Set<String> insts = (Set<String>) TestUtils.tryInvoke(cu, new String[]{"getInstituciones"});
 
@@ -66,16 +66,16 @@ class ControladorUsuarioListingsPlusTest {
     void listarEdicionesDeOrganizador() throws Exception {
         // preparamos un evento/edición del organizador o1
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "o1","O Uno","o1@x","d","l","Ap",
-                LocalDate.of(1990,1,1),"Inst_LPU", true);
+                "o1", "O Uno", "o1@x", "d", "l", "Ap",
+                LocalDate.of(1990, 1, 1), "Inst_LPU", true);
         try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "LP-Cat"); } catch (Throwable ignored) {}
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("LP-Cat"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
-                "LP-Ev","d", LocalDate.now(),"LPEV", cats);
+                "LP-Ev", "d", LocalDate.now(), "LPEV", cats);
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
-                "LP-Ev","LP-Ed","LPED","x",
+                "LP-Ev", "LP-Ed", "LPED", "x",
                 LocalDate.now().plusDays(1), LocalDate.now().plusDays(2), LocalDate.now(),
-                "o1","City","UY");
+                "o1", "City", "UY");
 
   /*      // organizador dominio (si no podemos alcanzarlo, no fallamos el test)
         Object org = DomainAccess.obtenerUsuario("o1");

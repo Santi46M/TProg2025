@@ -28,7 +28,7 @@ class PatrocinioFlowTest {
 
         cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento","getIControladorEvento", "getControladorEvento", "getEvento"});
+            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError ignored) {
             ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
         }
@@ -49,7 +49,7 @@ class PatrocinioFlowTest {
                     Object res = m.invoke(ed);
                     if (res instanceof Collection<?> col) {
                         for (Object o : col) if (o != null && o.getClass().getSimpleName().endsWith("Patrocinio")) return o;
-                    } else if (res instanceof Map<?,?> mp) {
+                    } else if (res instanceof Map<?, ?> mp) {
                         for (Object o : mp.values()) if (o != null && o.getClass().getSimpleName().endsWith("Patrocinio")) return o;
                     }
                 } catch (Throwable ignored) {}
@@ -155,7 +155,7 @@ class PatrocinioFlowTest {
                                 return tr;
                             }
                         }
-                    } else if (res instanceof java.util.Map<?,?> map) {
+                    } else if (res instanceof java.util.Map<?, ?> map) {
                         for (Object tr : map.values()) {
                             if (tr == null) continue;
                             var mNom = TestUtils.findMethod(tr, "getNombre", "nombre");
@@ -179,7 +179,7 @@ class PatrocinioFlowTest {
                             for (Object tr : col) {
                                 if (tr != null && tr.getClass().getSimpleName().endsWith("TipoRegistro")) return tr;
                             }
-                        } else if (res instanceof java.util.Map<?,?> map) {
+                        } else if (res instanceof java.util.Map<?, ?> map) {
                             for (Object tr : map.values()) {
                                 if (tr != null && tr.getClass().getSimpleName().endsWith("TipoRegistro")) return tr;
                             }

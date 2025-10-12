@@ -35,14 +35,14 @@ final class DomainAccess {
     static Object obtenerUsuario(String nick) {
         Object mu = getManejadorUsuario();
         try {
-            for (String m : new String[]{"obtenerUsuario","getUsuario","buscarUsuario"}) {
+            for (String m : new String[]{"obtenerUsuario", "getUsuario", "buscarUsuario"}) {
                 try { return mu.getClass().getMethod(m, String.class).invoke(mu, nick); }
                 catch (NoSuchMethodException ignored) {}
             }
         } catch (Exception e) { throw new RuntimeException(e); }
 
         // Fallback a campos privados típicos
-        Object v = TestUtils.getFromPrivateMaps(mu, nick, "usuarios","organizadores","asistentes");
+        Object v = TestUtils.getFromPrivateMaps(mu, nick, "usuarios", "organizadores", "asistentes");
         if (v != null) return v;
 
         // Escaneo genérico de maps/collections
@@ -55,7 +55,7 @@ final class DomainAccess {
         Object mu = getManejadorUsuario();
 
         // 1) Métodos públicos habituales con (String)
-        for (String m : new String[]{"obtenerInstitucion","getInstitucion","buscarInstitucion"}) {
+        for (String m : new String[]{"obtenerInstitucion", "getInstitucion", "buscarInstitucion"}) {
             try { return mu.getClass().getMethod(m, String.class).invoke(mu, nombre); }
             catch (NoSuchMethodException ignored) {}
             catch (Exception e) { throw new RuntimeException(e); }
@@ -63,8 +63,8 @@ final class DomainAccess {
 
         // 2) Campos privados más comunes
         Object v = TestUtils.getFromPrivateMaps(mu, nombre,
-                "instituciones","insts","mapaInstituciones","mapInstituciones",
-                "institucionesMap","mapaDeInstituciones","institMap");
+                "instituciones", "insts", "mapaInstituciones", "mapInstituciones",
+                "institucionesMap", "mapaDeInstituciones", "institMap");
         if (v != null) return v;
 
         // 3) Escaneo genérico de métodos sin parámetros que devuelven Map/Collection
@@ -110,13 +110,13 @@ final class DomainAccess {
         if (container == null) return null;
 
         try {
-            if (container instanceof java.util.Map<?,?> map) {
+            if (container instanceof java.util.Map<?, ?> map) {
                 // 1) por clave exacta
                 if (map.containsKey(keyOrName)) return map.get(keyOrName);
                 // 2) por valor que "parezca" la clase buscada y nombre
                 for (Object v : map.values()) {
                     if (v != null && v.getClass().getSimpleName().toLowerCase().contains(classNameHint.toLowerCase())) {
-                        Method g = findAny(v.getClass(), "getNombre","getName","nombre");
+                        Method g = findAny(v.getClass(), "getNombre", "getName", "nombre");
                         if (g != null) {
                             Object n = g.invoke(v);
                             if (keyOrName.equals(String.valueOf(n))) return v;
@@ -126,12 +126,12 @@ final class DomainAccess {
             } else if (container instanceof java.util.Collection<?> col) {
                 for (Object v : col) {
                     if (v != null && v.getClass().getSimpleName().toLowerCase().contains(classNameHint.toLowerCase())) {
-                        Method g = findAny(v.getClass(), "getNombre","getName","nombre");
+                        Method g = findAny(v.getClass(), "getNombre", "getName", "nombre");
                         if (g != null) {
                             Object n = g.invoke(v);
                             if (keyOrName.equals(String.valueOf(n))) return v;
                         }
-                    } else if (v instanceof java.util.Map<?,?> m) {
+                    } else if (v instanceof java.util.Map<?, ?> m) {
                         Object inner = pickFromContainer(m, keyOrName, classNameHint);
                         if (inner != null) return inner;
                     }

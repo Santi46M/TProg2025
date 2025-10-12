@@ -20,9 +20,9 @@ class EventosDuplicateToleranceTest {
         catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
 
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario"});
+        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento","getIControladorEvento","getControladorEvento","getEvento"});
+            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError ignored) {
             ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
         }
@@ -30,8 +30,8 @@ class EventosDuplicateToleranceTest {
         // base
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_DU", "d", "w");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "orgDU","Org DU","org@x","d","l","Ap",
-                LocalDate.of(1990,1,1),"Inst_DU", true);
+                "orgDU", "Org DU", "org@x", "d", "l", "Ap",
+                LocalDate.of(1990, 1, 1), "Inst_DU", true);
 
         try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "DU-Cat"); } catch (Throwable ignored) {}
     }
@@ -68,14 +68,14 @@ class EventosDuplicateToleranceTest {
         altaEdicionFlexible(ce, "DU-Ev", "DUEV",
                 "ED", "EDU", "x",
                 hoy.plusDays(1), hoy.plusDays(2), hoy,
-                "orgDU","City","UY");
+                "orgDU", "City", "UY");
 
         // 2) Intento duplicado: si no lanza, lo tomamos como idempotente
         try {
             altaEdicionFlexible(ce, "DU-Ev", "DUEV",
                     "ED", "EDU", "x",
                     hoy.plusDays(1), hoy.plusDays(2), hoy,
-                    "orgDU","City","UY");
+                    "orgDU", "City", "UY");
             assertTrue(true); // idempotente
         } catch (RuntimeException t) {
             assertNotNull(t); // validación estricta (también válido)

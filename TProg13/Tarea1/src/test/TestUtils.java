@@ -75,7 +75,7 @@ final class TestUtils {
             outer: for (Constructor<?> k : c.getDeclaredConstructors()) {
                 if (k.getParameterCount() != args.length) continue;
                 Class<?>[] ts = k.getParameterTypes();
-                for (int i=0;i<ts.length;i++) {
+                for (int i=0; i<ts.length; i++) {
                     if (args[i]==null) continue;
                     if (!ts[i].isAssignableFrom(args[i].getClass())) continue outer;
                 }

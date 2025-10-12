@@ -22,9 +22,9 @@ class ManejadorEventoStateMoreTest {
         catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
 
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario"});
+        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento","getIControladorEvento","getControladorEvento","getEvento"});
+            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError ignored) {
             ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
         }
@@ -32,8 +32,8 @@ class ManejadorEventoStateMoreTest {
         // base: org + categoría
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_ME2", "d", "w");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "orgME2","Org ME2","o@x","d","l","Ap",
-                LocalDate.of(1990,1,1),"Inst_ME2", true);
+                "orgME2", "Org ME2", "o@x", "d", "l", "Ap",
+                LocalDate.of(1990, 1, 1), "Inst_ME2", true);
         try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "ME2-Cat"); } catch (Throwable ignored) {}
     }
 
@@ -42,12 +42,12 @@ class ManejadorEventoStateMoreTest {
     void manejadorTieneCosas() throws Exception {
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("ME2-Cat"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
-                "ME2-Ev","d", LocalDate.now(),"ME2", cats);
+                "ME2-Ev", "d", LocalDate.now(), "ME2", cats);
 
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
-                "ME2-Ev","ED1","ED1S","x",
+                "ME2-Ev", "ED1", "ED1S", "x",
                 LocalDate.now().plusDays(1), LocalDate.now().plusDays(2), LocalDate.now(),
-                "orgME2","City","UY");
+                "orgME2", "City", "UY");
 
         Object me = DomainAccess.getManejadorEvento();
         assertNotNull(me);
@@ -56,7 +56,7 @@ class ManejadorEventoStateMoreTest {
         try {
             Method m = me.getClass().getMethod("getEventos");
             Object res = m.invoke(me);
-            if (res instanceof Map<?,?> mp) {
+            if (res instanceof Map<?, ?> mp) {
                 assertFalse(mp.isEmpty());
             } else if (res instanceof Collection<?> col) {
                 assertFalse(col.isEmpty());
@@ -65,7 +65,7 @@ class ManejadorEventoStateMoreTest {
 
         // obtenerEvento/getEvento/buscarEvento
         boolean found = false;
-        for (String name : new String[]{"obtenerEvento","getEvento","buscarEvento"}) {
+        for (String name : new String[]{"obtenerEvento", "getEvento", "buscarEvento"}) {
             try {
                 Method m = me.getClass().getMethod(name, String.class);
                 Object ev = m.invoke(me, "ME2-Ev");

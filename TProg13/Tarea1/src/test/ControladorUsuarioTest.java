@@ -23,7 +23,7 @@ class ControladorUsuarioTest {
         try { getter = fab.getMethod("getInstance"); }
         catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         fabrica = getter.invoke(null);
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario"});
+        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         assertNotNull(cu);
     }
 
@@ -54,7 +54,7 @@ class ControladorUsuarioTest {
         // Si la key no es el nickname, buscamos por el valor (getter getNickname/getNick/getNombre)
         if (!ok) {
             for (Object val : orgs.values()) {
-                var mNick = TestUtils.findMethod(val, "getNickname","getNick","getNombre","getId");
+                var mNick = TestUtils.findMethod(val, "getNickname", "getNick", "getNombre", "getId");
                 try {
                     if (mNick != null && "org1".equals(String.valueOf(mNick.invoke(val)))) { ok = true; break; }
                 } catch (Exception ignored) {}
@@ -65,7 +65,7 @@ class ControladorUsuarioTest {
         if (!ok) {
             TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                     "org1", "Org Uno", "org1@x", "desc", "link",
-                    "Ap", java.time.LocalDate.of(1990,1,1), "Inst_A", true);
+                    "Ap", java.time.LocalDate.of(1990, 1, 1),  "Inst_A", true);
 
             orgs = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarOrganizadores"});
             ok = orgs.containsKey("org1");
@@ -81,14 +81,14 @@ class ControladorUsuarioTest {
 
         Object inst = DomainAccess.obtenerInstitucion("Inst_A");
         if (inst != null) {
-            Object asis = TestUtils.tryInvoke(cu, new String[]{"ingresarAsistente","IngresarDatosAsis"},
-                    "ana", "Ana", "ana@x", "Ap", LocalDate.of(2000,1,1), inst);
+            Object asis = TestUtils.tryInvoke(cu, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
+                    "ana", "Ana", "ana@x", "Ap", LocalDate.of(2000, 1, 1), inst);
             assertNotNull(asis);
         } else {
             // Fallback: si no podemos acceder al dominio Institucion, usamos AltaUsuario
             TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                     "ana", "Ana", "ana@x", "desc", "link",
-                    "Ap", LocalDate.of(2000,1,1), "Inst_A", false);
+                    "Ap", LocalDate.of(2000, 1, 1), "Inst_A", false);
         }
 
         @SuppressWarnings("unchecked")
@@ -102,13 +102,13 @@ class ControladorUsuarioTest {
 
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                 "nickA", "Nombre A", "a@x", "descA", "linkA",
-                "ApA", LocalDate.of(1999,1,1), "Inst_A", false);
+                "ApA", LocalDate.of(1999, 1, 1), "Inst_A", false);
         Map<String, Object> asisMap = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarAsistentes"});
         assertTrue(asisMap.containsKey("nickA"));
 
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                 "nickO", "Nombre O", "o@x", "descO", "linkO",
-                "ApO", LocalDate.of(1998,2,2), "Inst_A", true);
+                "ApO", LocalDate.of(1998, 2, 2), "Inst_A", true);
         Map<String, Object> orgs = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarOrganizadores"});
         assertTrue(orgs.containsKey("nickO"));
 
@@ -124,14 +124,14 @@ class ControladorUsuarioTest {
 
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                 "dup", "Dup", "dup@x", "d", "l",
-                "Ap", LocalDate.of(1997,3,3), "Inst_B", false);
+                "Ap", LocalDate.of(1997, 3, 3), "Inst_B", false);
 
         Class<? extends Throwable> UYE =
                 (Class<? extends Throwable>) Class.forName("excepciones.UsuarioYaExisteException");
 
         assertThrows(UYE, () -> TestUtils.invokeUnwrapped(cu, new String[]{"AltaUsuario"},
                 "dup", "Dup", "dup@x", "d", "l",
-                "Ap", LocalDate.of(1997,3,3), "Inst_B", true));
+                "Ap", LocalDate.of(1997, 3, 3), "Inst_B", true));
     }
     @Test
     @DisplayName("actualizarAsistente modifica apellido y fecha (sin depender de DomainAccess)")
@@ -141,21 +141,21 @@ class ControladorUsuarioTest {
         // Alta de asistente con AltaUsuario (queda persistido en los mapas)
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                 "beto", "Beto", "b@x", "desc", "link",
-                "Viejo", LocalDate.of(1990,1,1), "Inst_C", false);
+                "Viejo", LocalDate.of(1990, 1, 1), "Inst_C", false);
 
         // Actualización
         TestUtils.tryInvoke(cu, new String[]{"actualizarAsistente"},
-                "beto", "Nuevo", LocalDate.of(1995,5,5));
+                "beto", "Nuevo", LocalDate.of(1995, 5, 5));
 
         // Verificar vía DTO
         Object dto = TestUtils.tryInvoke(cu, new String[]{"obtenerDatosUsuario"}, "beto");
         assertNotNull(dto);
 
-        var mAp = TestUtils.findMethod(dto, "getApellido","apellido");
-        var mFn = TestUtils.findMethod(dto, "getFechaNacimiento","getNacimiento","fechaNacimiento");
+        var mAp = TestUtils.findMethod(dto, "getApellido", "apellido");
+        var mFn = TestUtils.findMethod(dto, "getFechaNacimiento", "getNacimiento", "fechaNacimiento");
         try {
             if (mAp != null) assertEquals("Nuevo", mAp.invoke(dto));
-            if (mFn != null) assertEquals(LocalDate.of(1995,5,5), mFn.invoke(dto));
+            if (mFn != null) assertEquals(LocalDate.of(1995, 5, 5), mFn.invoke(dto));
         } catch (Exception e) {
             fail(e);
         }
@@ -178,8 +178,8 @@ class ControladorUsuarioTest {
         // Verificar vía DTO
         Object dto = TestUtils.tryInvoke(cu, new String[]{"obtenerDatosUsuario"}, "maria");
         assertNotNull(dto);
-        var mDesc = TestUtils.findMethod(dto, "getDescripcion","descripcion");
-        var mLink = TestUtils.findMethod(dto, "getLink","link","getWeb");
+        var mDesc = TestUtils.findMethod(dto, "getDescripcion", "descripcion");
+        var mLink = TestUtils.findMethod(dto, "getLink", "link", "getWeb");
         try {
             if (mDesc != null) assertEquals("desc1", mDesc.invoke(dto));
             if (mLink != null) assertEquals("link1", mLink.invoke(dto));
@@ -192,7 +192,7 @@ class ControladorUsuarioTest {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_E", "d", "w");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                 "luz", "Luz", "l@x", "d", "l",
-                "Ap", LocalDate.of(2001,7,7), "Inst_E", false);
+                "Ap", LocalDate.of(2001, 7, 7), "Inst_E", false);
 
         Object dto = TestUtils.tryInvoke(cu, new String[]{"obtenerDatosUsuario"}, "luz");
         assertNotNull(dto);
@@ -227,7 +227,7 @@ class ControladorUsuarioTest {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_G", "d", "w");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                 "cata", "Cata", "c@x", "d", "l",
-                "Ap", LocalDate.of(2002,2,2), "Inst_G", false);
+                "Ap", LocalDate.of(2002, 2, 2), "Inst_G", false);
 
         TestUtils.tryInvoke(cu, new String[]{"ConsultaUsuario"}, "cata");
         assertTrue(true);

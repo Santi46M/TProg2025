@@ -36,7 +36,7 @@ class FabricaSmokeTest {
         Object fabrica = getter.invoke(null);
 
         // Usuario: debe existir
-        Object cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario"});
+        Object cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         assertNotNull(cu);
         Class<?> ICU = Class.forName("logica.Interfaces.IControladorUsuario");
         assertTrue(ICU.isAssignableFrom(cu.getClass()), "Debe devolver IControladorUsuario");
@@ -45,7 +45,7 @@ class FabricaSmokeTest {
         Object ce = null;
         try {
             ce = TestUtils.tryInvoke(fabrica, new String[]{
-                "getIEvento","getIControladorEvento","getControladorEvento","getEvento"
+                "getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"
             });
         } catch (AssertionError ignored) {}
         if (ce != null) {

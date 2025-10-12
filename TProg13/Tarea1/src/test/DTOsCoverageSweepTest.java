@@ -21,7 +21,7 @@ class DTOsCoverageSweepTest {
 
         // DTCategorias suele requerir una colección; probamos ambas formas
         Object dc = null;
-        try { dc = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("Tec","Datos")); } catch (RuntimeException ignored) {}
+        try { dc = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("Tec", "Datos")); } catch (RuntimeException ignored) {}
         if (dc == null) {
             try { dc = TestUtils.tolerantNew("logica.Datatypes.DTCategorias"); } catch (RuntimeException ignored) {}
         }
@@ -38,10 +38,10 @@ class DTOsCoverageSweepTest {
 
         // 2) intentos “típicos” (fechas/strings) por si el DTO lo requiere
         if (o == null) {
-            try { o = TestUtils.tolerantNew(cn, "N","S","D", LocalDate.now(), LocalDate.now()); } catch (RuntimeException ignored) {}
+            try { o = TestUtils.tolerantNew(cn, "N", "S", "D", LocalDate.now(), LocalDate.now()); } catch (RuntimeException ignored) {}
         }
         if (o == null) {
-            try { o = TestUtils.tolerantNew(cn, "N","S","D"); } catch (RuntimeException ignored) {}
+            try { o = TestUtils.tolerantNew(cn, "N", "S", "D"); } catch (RuntimeException ignored) {}
         }
         if (o == null) {
             try { o = TestUtils.tolerantNew(cn, "N"); } catch (RuntimeException ignored) {}

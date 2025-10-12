@@ -21,16 +21,16 @@ class ManejadorUsuarioIntrospectTest {
         catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
 
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario"});
+        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
 
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_MU", "d", "w");
         // 1 asistente + 1 organizador
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "uA","U A","ua@x","d","l","Ap",
-                LocalDate.of(2000,1,1),"Inst_MU", false);
+                "uA", "U A", "ua@x", "d", "l", "Ap",
+                LocalDate.of(2000, 1, 1), "Inst_MU", false);
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "uB","U B","ub@x","d","l","Ap",
-                LocalDate.of(1990,1,1),"Inst_MU", true);
+                "uB", "U B", "ub@x", "d", "l", "Ap",
+                LocalDate.of(1990, 1, 1), "Inst_MU", true);
     }
 
     @Test
@@ -46,7 +46,7 @@ class ManejadorUsuarioIntrospectTest {
             if (m.getParameterCount() == 0) {
                 try {
                     Object res = m.invoke(mu);
-                    if (res instanceof Map<?,?> mp && !mp.isEmpty()) { saw = true; break; }
+                    if (res instanceof Map<?, ?> mp && !mp.isEmpty()) { saw = true; break; }
                     if (res instanceof Collection<?> col && !col.isEmpty()) { saw = true; break; }
                 } catch (Throwable ignored) {}
             }
@@ -60,7 +60,7 @@ class ManejadorUsuarioIntrospectTest {
                     f.setAccessible(true);
                     try {
                         Object obj = f.get(mu);
-                        if (obj instanceof Map<?,?> mp && !mp.isEmpty()) { saw = true; break; }
+                        if (obj instanceof Map<?, ?> mp && !mp.isEmpty()) { saw = true; break; }
                         if (obj instanceof Collection<?> col && !col.isEmpty()) { saw = true; break; }
                     } catch (Throwable ignored) {}
                 }

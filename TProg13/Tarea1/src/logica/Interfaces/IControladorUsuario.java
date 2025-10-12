@@ -18,7 +18,7 @@ public interface IControladorUsuario {
     // Crear usuarios
     public void AltaUsuario(String nickname, String nombre, String correo, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador, String contrasena, String imagen) throws UsuarioYaExisteException;
     public Organizador ingresarOrganizador(String nickname, String nombre, String email, String contrasena, String imagen, String desc, String link);
-    public Asistente ingresarAsistente(String nickname, String nombre, String email, String contrasena, String imagen, String apellido,LocalDate fechaDeNacimiento, Institucion institucion);
+    public Asistente ingresarAsistente(String nickname, String nombre, String email, String contrasena, String imagen, String apellido, LocalDate fechaDeNacimiento, Institucion institucion);
     
     // Crear institución
     public void AltaInstitucion(String nombre, String descripcion, String link)throws InstitucionYaExisteException;
