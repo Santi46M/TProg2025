@@ -21,16 +21,23 @@ public class ConsultaUsuarioServlet extends HttpServlet {
       throws ServletException, IOException {
 
     request.setCharacterEncoding("UTF-8");
+
     String nick = trim(request.getParameter("nick"));
+    // Fallback: si no vino 'nick', usar el de sesión (usuario logueado)
+    if (isBlank(nick)) {
+      HttpSession s = request.getSession(false);
+      if (s != null) nick = (String) s.getAttribute("nick");
+    }
+
     IControladorUsuario ctrlUsuario = fabrica.getInstance().getIControladorUsuario();
 
     try {
-      if (nick != null && !nick.isEmpty()) {
+      if (!isBlank(nick)) {
         // === PERFIL DE USUARIO ===
         DTDatosUsuario usuario = ctrlUsuario.obtenerDatosUsuario(nick);
         request.setAttribute("usuario", usuario);
 
-        // Construir un mapa auxiliar: edicion → evento
+        // Mapa auxiliar: edicion → evento
         IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
         List<DTEvento> eventos = ce.listarEventos();
         Map<String, String> edicionToEvento = new HashMap<>();
@@ -46,12 +53,12 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             }
           }
         }
-
         request.setAttribute("edicionToEvento", edicionToEvento);
+
       } else {
         // === LISTADO DE USUARIOS ===
         Map<String, Usuario> usuarios = ctrlUsuario.listarUsuarios();
-        request.setAttribute("usuarios", 
+        request.setAttribute("usuarios",
             usuarios == null ? List.of() : usuarios.values());
       }
 
@@ -63,7 +70,13 @@ public class ConsultaUsuarioServlet extends HttpServlet {
     request.getRequestDispatcher("/WEB-INF/usuario/ConsultaUsuario.jsp").forward(request, response);
   }
 
-  private static String trim(String s) {
-    return s == null ? null : s.trim();
+  // Permitir usar <form method="post"> si lo preferís
+  @Override
+  protected void doPost(HttpServletRequest request, HttpServletResponse response)
+      throws ServletException, IOException {
+    doGet(request, response);
   }
+
+  private static String trim(String s) { return s == null ? null : s.trim(); }
+  private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
 }
