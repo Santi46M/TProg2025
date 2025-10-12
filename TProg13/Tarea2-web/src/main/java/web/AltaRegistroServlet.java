@@ -87,24 +87,20 @@ public class AltaRegistroServlet extends HttpServlet {
                 float costo = Float.parseFloat(costoStr);
                 int cupo = Integer.parseInt(cupoStr);
                 Ediciones ed = ce().obtenerEdicionPorSigla(siglaEdicion);
-                HttpSession s = req.getSession(false);
-                String nick = s == null ? null : (String) s.getAttribute("nick");
                 if (ed == null) {
                     req.setAttribute("error", "No se encontró la edición seleccionada.");
                     recargarDatos(req);
                     req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                     return;
                 }
-                if (ed.getOrganizador() == null || !ed.getOrganizador().getNickname().equals(nick)) {
-                    req.setAttribute("error", "Solo el organizador de la edición puede crear tipos de registro para ella.");
-                    recargarDatos(req);
-                    req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-                    return;
-                }
                 ce().AltaTipoRegistro(ed, nombre, descripcion, costo, cupo);
-                req.setAttribute("mensaje", "Registro creado correctamente.");
-                req.getRequestDispatcher(JSP_OK).forward(req, resp);
-
+                // Redirección igual que en alta evento
+                String evento = ed.getEvento().getNombre();
+                String eventoEnc = java.net.URLEncoder.encode(evento, java.nio.charset.StandardCharsets.UTF_8.name());
+                String edicionEnc = java.net.URLEncoder.encode(ed.getNombre(), java.nio.charset.StandardCharsets.UTF_8.name());
+                String tipoEnc = java.net.URLEncoder.encode(nombre, java.nio.charset.StandardCharsets.UTF_8.name());
+                resp.sendRedirect(ctx(req) + "/registro/ConsultaTipoRegistro?evento=" + eventoEnc + "&edicion=" + edicionEnc + "&tipoRegistro=" + tipoEnc);
+                return;
             } catch (Exception e) {
                 req.setAttribute("error", e.getMessage());
                 recargarDatos(req);
