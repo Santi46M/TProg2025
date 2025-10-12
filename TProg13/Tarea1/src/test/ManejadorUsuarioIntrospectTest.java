@@ -17,9 +17,9 @@ import org.junit.jupiter.api.Test;
 @DisplayName("ManejadorUsuario – introspección de estructuras con datos")
 class ManejadorUsuarioIntrospectTest {
 
-    private Object cu;
+    private Object controladorUs;
 
-    public Object getCu() { return cu; }
+    public Object getCu() { return controladorUs; }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -29,14 +29,14 @@ class ManejadorUsuarioIntrospectTest {
         try { getter = fab.getMethod("getInstance"); } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
 
-        cu = TestUtils.tryInvoke(fabrica, new String[] { "getIUsuario", "getIControladorUsuario" });
+        controladorUs = TestUtils.tryInvoke(fabrica, new String[] { "getIUsuario", "getIControladorUsuario" });
 
-        TestUtils.tryInvoke(cu, new String[] { "AltaInstitucion" }, "Inst_MU", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[] { "AltaInstitucion" }, "Inst_MU", "d", "w");
         // 1 asistente + 1 organizador
-        TestUtils.tryInvoke(cu, new String[] { "AltaUsuario" },
+        TestUtils.tryInvoke(controladorUs, new String[] { "AltaUsuario" },
                 "uA", "U A", "ua@x", "d", "l", "Ap",
                 LocalDate.of(2000, 1, 1), "Inst_MU", false);
-        TestUtils.tryInvoke(cu, new String[] { "AltaUsuario" },
+        TestUtils.tryInvoke(controladorUs, new String[] { "AltaUsuario" },
                 "uB", "U B", "ub@x", "d", "l", "Ap",
                 LocalDate.of(1990, 1, 1), "Inst_MU", true);
     }
@@ -44,17 +44,17 @@ class ManejadorUsuarioIntrospectTest {
     @Test
     @DisplayName("Maps/Listas en ManejadorUsuario contienen elementos (métodos y campos)")
     void scanManejadorUsuario() {
-        Object mu = DomainAccess.getManejadorUsuario();
-        assertNotNull(mu);
+        Object manejadorUs = DomainAccess.getManejadorUsuario();
+        assertNotNull(manejadorUs);
 
         boolean saw = false;
 
         // Métodos sin params que devuelven Map/Collection
-        for (Method m : mu.getClass().getMethods()) {
-            if (m.getParameterCount() == 0) {
+        for (Method metodo : manejadorUs.getClass().getMethods()) {
+            if (metodo.getParameterCount() == 0) {
                 try {
-                    Object res = m.invoke(mu);
-                    if (res instanceof Map<?, ?> mp && !mp.isEmpty()) { saw = true; break; }
+                    Object res = metodo.invoke(manejadorUs);
+                    if (res instanceof Map<?, ?> mapa && !mapa.isEmpty()) { saw = true; break; }
                     if (res instanceof Collection<?> col && !col.isEmpty()) { saw = true; break; }
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     // método no accesible o lanza al invocar → seguimos con el siguiente
@@ -65,20 +65,20 @@ class ManejadorUsuarioIntrospectTest {
 
         // Campos privados como fallback
         if (!saw) {
-            Class<?> c = mu.getClass();
-            while (c != null && !saw) {
-                for (Field f : c.getDeclaredFields()) {
+            Class<?> clase = manejadorUs.getClass();
+            while (clase != null && !saw) {
+                for (Field f : clase.getDeclaredFields()) {
                     f.setAccessible(true);
                     try {
-                        Object obj = f.get(mu);
-                        if (obj instanceof Map<?, ?> mp && !mp.isEmpty()) { saw = true; break; }
+                        Object obj = f.get(manejadorUs);
+                        if (obj instanceof Map<?, ?> mapa && !mapa.isEmpty()) { saw = true; break; }
                         if (obj instanceof Collection<?> col && !col.isEmpty()) { saw = true; break; }
                     } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
                         // campo no accesible → probamos el siguiente
                         continue;
                     }
                 }
-                c = c.getSuperclass();
+                clase = clase.getSuperclass();
             }
         }
 

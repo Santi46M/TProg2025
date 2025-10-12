@@ -25,10 +25,10 @@ class ManejadoresSingletonTest {
         // Soporta logica.ManejadorUsuario y logica.manejadorUsuario
         Class<?> clazz = TestUtils.loadAny("logica.Manejadores.ManejadorUsuario", "logica.Manejadores.manejadorUsuario");
         Method getter = getGetter(clazz);
-        Object a = getter.invoke(null);
-        Object b = getter.invoke(null);
-        assertNotNull(a);
-        assertSame(a, b, "ManejadorUsuario no es singleton (a != b)");
+        Object objeto1 = getter.invoke(null);
+        Object objeto2 = getter.invoke(null);
+        assertNotNull(objeto1);
+        assertSame(objeto1, objeto2, "ManejadorUsuario no es singleton (a != b)");
     }
 
     @Test
@@ -37,9 +37,9 @@ class ManejadoresSingletonTest {
         // Soporta logica.ManejadorEvento y logica.manejadorEvento
         Class<?> clazz = TestUtils.loadAny("logica.Manejadores.ManejadorEvento", "logica.Manejadores.manejadorEvento");
         Method getter = getGetter(clazz);
-        Object a = getter.invoke(null);
-        Object b = getter.invoke(null);
-        assertNotNull(a);
-        assertSame(a, b, "ManejadorEvento no es singleton (a != b)");
+        Object objeto1 = getter.invoke(null);
+        Object objeto2 = getter.invoke(null);
+        assertNotNull(objeto1);
+        assertSame(objeto1, objeto2, "ManejadorEvento no es singleton (a != b)");
     }
 }

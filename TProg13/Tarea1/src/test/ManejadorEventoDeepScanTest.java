@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("ManejadorEvento – deep scan de estructuras (Map/Collection)")
 class ManejadorEventoDeepScanTest {
 
-    private Object ce, cu;
+    private Object controladorEv, controladorUs;
 
     @BeforeEach
     void setUp() throws Throwable {
@@ -27,27 +27,27 @@ class ManejadorEventoDeepScanTest {
         try { getter = fab.getMethod("getInstance");
         } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
+        controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
+            controladorEv = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError ignored) {
-            ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
+            controladorEv = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
         }
 
-        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_DS", "d", "w");
-        TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_DS", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
                 "orgDS", "Org DS", "o@x", "d", "l", " Ap",
                 LocalDate.of(1990, 1, 1), "Inst_DS", true);
         try {
-            TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "DS-Cat");
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"AltaCategoria"}, "DS-Cat");
         } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException ignored) {
             // método no invocable / falló al ejecutar: seguimos
         }
 
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("DS-Cat"));
-        TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaEvento"},
                 "DS-Event", "d", LocalDate.now(), "DSEV", cats);
-        TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
                 "DS-Event", "ED-A", "EDAS", "x",
                 LocalDate.now().plusDays(1), LocalDate.now().plusDays(2), LocalDate.now(),
                 "orgDS", "City", "UY");
@@ -56,18 +56,18 @@ class ManejadorEventoDeepScanTest {
     @Test
     @DisplayName("Escaneo genérico: alguna estructura contiene el evento/edición")
     void deepScan() throws Exception {
-        Object me = DomainAccess.getManejadorEvento();
-        assertNotNull(me);
+        Object manejadorEv = DomainAccess.getManejadorEvento();
+        assertNotNull(manejadorEv);
 
         boolean sawSomething = false;
 
         // métodos sin params que devuelven Map/Collection
-        for (Method m : me.getClass().getMethods()) {
-            if (m.getParameterCount() == 0) {
+        for (Method metodo : manejadorEv.getClass().getMethods()) {
+            if (metodo.getParameterCount() == 0) {
                 try {
-                    Object res = m.invoke(me);
-                    if (res instanceof Map<?, ?> mp) {
-                        if (!mp.isEmpty()) { sawSomething = true; break; }
+                    Object res = metodo.invoke(manejadorEv);
+                    if (res instanceof Map<?, ?> mapa) {
+                        if (!mapa.isEmpty()) { sawSomething = true; break; }
                     } else if (res instanceof Collection<?> col) {
                         if (!col.isEmpty()) { sawSomething = true; break; }
                     }
@@ -79,15 +79,15 @@ class ManejadorEventoDeepScanTest {
 
         // campos privados también
         if (!sawSomething) {
-            Class<?> c = me.getClass();
-            while (c != null && !sawSomething) {
-                for (Field f : c.getDeclaredFields()) {
-                    f.setAccessible(true);
-                    Object obj = f.get(me);
-                    if (obj instanceof Map<?, ?> mp && !mp.isEmpty()) { sawSomething = true; break; }
+            Class<?> clase = manejadorEv.getClass();
+            while (clase != null && !sawSomething) {
+                for (Field campo : clase.getDeclaredFields()) {
+                    campo.setAccessible(true);
+                    Object obj = campo.get(manejadorEv);
+                    if (obj instanceof Map<?, ?> mapa && !mapa.isEmpty()) { sawSomething = true; break; }
                     if (obj instanceof Collection<?> col && !col.isEmpty()) { sawSomething = true; break; }
                 }
-                c = c.getSuperclass();
+                clase = clase.getSuperclass();
             }
         }
 

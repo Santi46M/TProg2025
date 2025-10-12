@@ -8,8 +8,8 @@ import logica.fabrica;
 public class FabricaSingletonTest {
     @Test
     void getInstanceDevuelveSiempreLaMisma() {
-        fabrica f1 = fabrica.getInstance();
-        fabrica f2 = fabrica.getInstance();
-        assertSame(f1, f2);
+        fabrica fabrica1 = fabrica.getInstance();
+        fabrica fabrica2 = fabrica.getInstance();
+        assertSame(fabrica1, fabrica2);
     }
 }

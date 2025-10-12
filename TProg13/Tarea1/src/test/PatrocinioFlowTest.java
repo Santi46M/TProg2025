@@ -17,11 +17,11 @@ import org.junit.jupiter.api.Test;
 @DisplayName("Flujo de Patrocinio – tolerante")
 class PatrocinioFlowTest {
 
-    private Object ce;
-    private Object cu;
+    private Object controladorEv;
+    private Object controladorUs;
 
-    public Object getCe() { return ce; }
-    public Object getCu() { return cu; }
+    public Object getCe() { return controladorEv; }
+    public Object getCu() { return controladorUs; }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -31,37 +31,37 @@ class PatrocinioFlowTest {
         try { getter = fab.getMethod("getInstance"); } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
 
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
+        controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
+            controladorEv = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError ignored) {
-            ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
+            controladorEv = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
         }
 
         // base: org persistido + categoría
-        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_P", "d", "w");
-        TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_P", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
                 "orgP", "Org P", "org@x", "d", "l", "Ap",
                 LocalDate.of(1990, 1, 1), "Inst_P", true);
 
         // categoría (sin capturar Throwable/RuntimeException)
-        TestUtils.tryInvoke(ce, new String[]{"AltaCategoria"}, "Pat-Cat");
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaCategoria"}, "Pat-Cat");
     }
 
     // Busca un objeto cuya clase termine en "Patrocinio" dentro de 'ed' (colecciones/mapas)
-    private Object findPatrocinio(Object ed) {
-        for (Method m : ed.getClass().getMethods()) {
+    private Object findPatrocinio(Object edicion) {
+        for (Method m : edicion.getClass().getMethods()) {
             if (m.getParameterCount() == 0) {
                 try {
-                    Object res = m.invoke(ed);
+                    Object res = m.invoke(edicion);
                     if (res instanceof Collection<?> col) {
                         for (Object o : col) {
                             if (o != null && o.getClass().getSimpleName().endsWith("Patrocinio")) {
                                 return o;
                             }
                         }
-                    } else if (res instanceof Map<?, ?> mp) {
-                        for (Object o : mp.values()) {
+                    } else if (res instanceof Map<?, ?> mapa) {
+                        for (Object o : mapa.values()) {
                             if (o != null && o.getClass().getSimpleName().endsWith("Patrocinio")) {
                                 return o;
                             }
@@ -81,20 +81,20 @@ class PatrocinioFlowTest {
     void altaPatrocinio() throws Throwable {
         // Evento + edición base
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", java.util.List.of("Pat-Cat"));
-        TestUtils.tryInvoke(ce, new String[]{"AltaEvento"}, "TechDayP", "d", LocalDate.now(), "TDP", cats);
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaEvento"}, "TechDayP", "d", LocalDate.now(), "TDP", cats);
 
         LocalDate hoy = LocalDate.now();
-        TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
                 "TechDayP", "Main", "TDP25", "Principal",
                 hoy.plusDays(3), hoy.plusDays(4), hoy,
                 "orgP", "City", "UY");
 
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "TechDayP", "Main");
-        assertNotNull(ed);
+        Object edicion = TestUtils.tryInvoke(controladorEv, new String[]{"obtenerEdicion"}, "TechDayP", "Main");
+        assertNotNull(edicion);
 
         // Intentamos resolver un TipoRegistro existente en la edición.
         // (Si tu impl no expone listados, el resolver hace un scan tolerante)
-        Object tipo = resolverTipoRegistro(ed, "SPONSOR");
+        Object tipo = resolverTipoRegistro(edicion, "SPONSOR");
 
         // Fallback: si tu diseño usa enum TipoRegistro, intentamos el primero disponible
         if (tipo == null) {
@@ -134,18 +134,18 @@ class PatrocinioFlowTest {
                     new Class<?>[]{String.class}, "ORO");
         }
 
-        boolean ok = true;
+        boolean bandera = true;
         try {
-            TestUtils.invokeUnwrapped(ce, new String[]{"AltaPatrocinio"},
-                    ed, inst, dtnivel, tipo, 5000, hoy, 10, "PAT-001");
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"AltaPatrocinio"},
+                    edicion, inst, dtnivel, tipo, 5000, hoy, 10, "PAT-001");
         } catch (IllegalArgumentException e) {
-            ok = false; // validación estricta (parámetros inválidos)
+            bandera = false; // validación estricta (parámetros inválidos)
         } catch (ReflectiveOperationException e) {
-            ok = false; // errores de reflexión desde la capa invocada
+            bandera = false; // errores de reflexión desde la capa invocada
         }
 
-        if (ok) {
-            Object pat = findPatrocinio(ed);
+        if (bandera) {
+            Object pat = findPatrocinio(edicion);
             if (pat != null) {
                 ReflectionPojoSupport.exercisePojo(pat);
             } else {
@@ -159,15 +159,15 @@ class PatrocinioFlowTest {
     }
 
     // Intenta recuperar un TipoRegistro desde una Edicion usando varios caminos comunes
-    private Object resolverTipoRegistro(Object ed, String nombreDeseado) {
+    private Object resolverTipoRegistro(Object edicion, String nombreDeseado) {
         // 1) Métodos directos por nombre
-        for (String mn : new String[]{"obtenerTipoRegistro", "getTipoRegistro"}) {
-            Method m = TestUtils.findMethod(ed, mn, String.class);
-            if (m != null) {
+        for (String metodosPorNombre : new String[]{"obtenerTipoRegistro", "getTipoRegistro"}) {
+            Method metodo = TestUtils.findMethod(edicion, metodosPorNombre, String.class);
+            if (metodo != null) {
                 try {
-                    Object tr = m.invoke(ed, nombreDeseado);
-                    if (tr != null) {
-                        return tr;
+                    Object intento = metodo.invoke(edicion, nombreDeseado);
+                    if (intento != null) {
+                        return intento;
                     }
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     // seguimos probando
@@ -177,11 +177,11 @@ class PatrocinioFlowTest {
         }
 
         // 2) Listados de tipos (Collection/Map) y match por nombre
-        for (String mn : new String[]{"getTiposRegistro", "getTiposRegistros", "getTipos", "listarTiposRegistro"}) {
-            Method m = TestUtils.findMethod(ed, mn, new Class<?>[0]);
-            if (m != null) {
+        for (String tiposReg : new String[]{"getTiposRegistro", "getTiposRegistros", "getTipos", "listarTiposRegistro"}) {
+            Method metodo = TestUtils.findMethod(edicion, tiposReg, new Class<?>[0]);
+            if (metodo != null) {
                 try {
-                    Object res = m.invoke(ed);
+                    Object res = metodo.invoke(edicion);
                     if (res instanceof Collection<?> col) {
                         for (Object tr : col) {
                             if (tr == null) {
@@ -189,8 +189,8 @@ class PatrocinioFlowTest {
                             }
                             Method mNom = TestUtils.findMethod(tr, "getNombre", new Class<?>[0]);
                             if (mNom != null) {
-                                String n = String.valueOf(mNom.invoke(tr));
-                                if (nombreDeseado.equals(n)) {
+                                String nombre = String.valueOf(mNom.invoke(tr));
+                                if (nombreDeseado.equals(nombre)) {
                                     return tr;
                                 }
                             } else {
@@ -205,8 +205,8 @@ class PatrocinioFlowTest {
                             }
                             Method mNom = TestUtils.findMethod(tr, "getNombre", new Class<?>[0]);
                             if (mNom != null) {
-                                String n = String.valueOf(mNom.invoke(tr));
-                                if (nombreDeseado.equals(n)) {
+                                String nombre = String.valueOf(mNom.invoke(tr));
+                                if (nombreDeseado.equals(nombre)) {
                                     return tr;
                                 }
                             } else {
@@ -222,10 +222,10 @@ class PatrocinioFlowTest {
         }
 
         // 3) Último recurso: escanear getters sin args que devuelvan Collection/Map y buscar algo que parezca TipoRegistro
-        for (Method m : ed.getClass().getMethods()) {
+        for (Method m : edicion.getClass().getMethods()) {
             if (m.getParameterCount() == 0) {
                 try {
-                    Object res = m.invoke(ed);
+                    Object res = m.invoke(edicion);
                     if (res instanceof Collection<?> col) {
                         for (Object tr : col) {
                             if (tr != null && tr.getClass().getSimpleName().endsWith("TipoRegistro")) {
@@ -252,10 +252,10 @@ class PatrocinioFlowTest {
 
     private Object tryNewNoArgs(String fqcn) {
         try {
-            Class<?> c = Class.forName(fqcn);
-            var k0 = c.getDeclaredConstructor();
-            k0.setAccessible(true);
-            return k0.newInstance();
+            Class<?> clase = Class.forName(fqcn);
+            var variable = clase.getDeclaredConstructor();
+            variable.setAccessible(true);
+            return variable.newInstance();
         } catch (ClassNotFoundException
                  | NoSuchMethodException
                  | InstantiationException
@@ -267,10 +267,10 @@ class PatrocinioFlowTest {
 
     private Object tryNew(String fqcn, Class<?>[] paramTypes, Object... args) {
         try {
-            Class<?> c = Class.forName(fqcn);
-            var k = c.getDeclaredConstructor(paramTypes);
-            k.setAccessible(true);
-            return k.newInstance(args);
+            Class<?> clase = Class.forName(fqcn);
+            var variable = clase.getDeclaredConstructor(paramTypes);
+            variable.setAccessible(true);
+            return variable.newInstance(args);
         } catch (ClassNotFoundException
                  | NoSuchMethodException
                  | InstantiationException

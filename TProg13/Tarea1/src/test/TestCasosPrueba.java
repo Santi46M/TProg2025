@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import excepciones.UsuarioYaExisteException;
 import logica.fabrica;
 import logica.CargaDatosPrueba;
-import logica.interfaces.IControladorEvento;
 import logica.interfaces.IControladorUsuario;
 import logica.manejadores.ManejadorEvento;
 import logica.manejadores.manejadorAuxiliar;
@@ -24,7 +23,6 @@ public class TestCasosPrueba {
     static private fabrica fabrica = new fabrica();
     
     static private IControladorUsuario cUsuario = fabrica.getIControladorUsuario();
-    static private IControladorEvento cEvento = fabrica.getIControladorEvento();
     static private manejadorAuxiliar mAux = manejadorAuxiliar.getInstancia();
     static private manejadorUsuario mUsr = manejadorUsuario.getInstancia();
     static private ManejadorEvento mEv = ManejadorEvento.getInstancia();
@@ -68,7 +66,7 @@ public class TestCasosPrueba {
     
     @Test
    	void testUsuarioYaExisteEmail() { 
-    	UsuarioYaExisteException ex = Assertions.assertThrows(
+    	UsuarioYaExisteException existe = Assertions.assertThrows(
        		   UsuarioYaExisteException.class, () -> {cUsuario.altaUsuario(
        				   "paniTorres",
        				   "pani",
@@ -83,7 +81,7 @@ public class TestCasosPrueba {
      				   "imagen.jpg"
        			  ); }
        		);
-          Assertions.assertEquals("Ya existe un usuario con ese email", ex.getMessage());
+          Assertions.assertEquals("Ya existe un usuario con ese email", existe.getMessage());
    	}
     
     @Test 

@@ -33,13 +33,13 @@ class InstitucionPojoExtraTest {
             throw new IllegalStateException("No se pudo invocar el método de fábrica", e);
         }
 
-        Object cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
+        Object controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
 
         // Alta por CU (lado “oficial”)
-        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_X", "Desc X", "webX");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_X", "Desc X", "webX");
 
         // Verificación de que fue registrada
-        Object setObj = TestUtils.tryInvoke(cu, new String[]{"getInstituciones"});
+        Object setObj = TestUtils.tryInvoke(controladorUs, new String[]{"getInstituciones"});
         if (setObj instanceof java.util.Set<?> set) {
             assertTrue(set.contains("Inst_X"));
         }
@@ -54,13 +54,13 @@ class InstitucionPojoExtraTest {
 
                 // Seteos manuales por si existen setters
                 try {
-                    Method m;
-                    if ((m = TestUtils.findMethod(inst, "setNombre", String.class)) != null)
-                        m.invoke(inst, "Inst_X");
-                    if ((m = TestUtils.findMethod(inst, "setDescripcion", String.class)) != null)
-                        m.invoke(inst, "Desc X");
-                    if ((m = TestUtils.findMethod(inst, "setLink", String.class)) != null)
-                        m.invoke(inst, "webX");
+                    Method metodo;
+                    if ((metodo = TestUtils.findMethod(inst, "setNombre", String.class)) != null)
+                        metodo.invoke(inst, "Inst_X");
+                    if ((metodo = TestUtils.findMethod(inst, "setDescripcion", String.class)) != null)
+                        metodo.invoke(inst, "Desc X");
+                    if ((metodo = TestUtils.findMethod(inst, "setLink", String.class)) != null)
+                        metodo.invoke(inst, "webX");
                 } catch (IllegalAccessException | InvocationTargetException ignored) {
                     // setters inaccesibles → continuar
                 }

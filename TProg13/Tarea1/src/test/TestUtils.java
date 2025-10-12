@@ -15,11 +15,11 @@ final class TestUtils {
 
     /* ---------- Invocación flexible ---------- */
 
-    static Method findMethod(Object o, String... names) {
-        for (String n : names) {
-            for (Method m : o.getClass().getMethods()) {
-                if (m.getName().equals(n)) {
-                    return m;
+    static Method findMethod(Object objeto, String... names) {
+        for (String name : names) {
+            for (Method method : objeto.getClass().getMethods()) {
+                if (method.getName().equals(name)) {
+                    return method;
                 }
             }
         }
@@ -27,13 +27,13 @@ final class TestUtils {
     }
 
     static Object tryInvoke(Object target, String[] names, Object... args) {
-        Method m = findMethod(target, names);
-        if (m == null) {
+        Method method = findMethod(target, names);
+        if (method == null) {
             String all = Arrays.stream(target.getClass().getMethods()).map(Method::getName).toList().toString();
             fail("No se encontró ninguno de: " + String.join(", ", names) +
                  " en " + target.getClass().getName() + ". Públicos: " + all);
         }
-        try { return m.invoke(target, args); 
+        try { return method.invoke(target, args); 
         } catch (InvocationTargetException e) { throw new RuntimeException(e.getTargetException()); 
         } catch (IllegalAccessException | IllegalArgumentException e) { throw new RuntimeException(e); }
     }
@@ -52,12 +52,12 @@ final class TestUtils {
 
     /* ---------- Reset SOLO de singletons reales (Fábrica y Manejadores) ---------- */
 
-    static void resetSingleton(Class<?> c) {
+    static void resetSingleton(Class<?> clase) {
         for (var fname : new String[] { "instancia", "instance" }) {
             try {
-                Field f = c.getDeclaredField(fname);
-                f.setAccessible(true);
-                f.set(null, null);
+                Field field = clase.getDeclaredField(fname);
+                field.setAccessible(true);
+                field.set(null, null);
                 return;
             } catch (NoSuchFieldException e) {
                 continue; // probamos el siguiente nombre de campo
@@ -86,21 +86,21 @@ final class TestUtils {
 
     static Object tolerantNew(String fqcn, Object... args) {
         try {
-            Class<?> c = Class.forName(fqcn);
+            Class<?> clase = Class.forName(fqcn);
             outer:
-            for (Constructor<?> k : c.getDeclaredConstructors()) {
-                if (k.getParameterCount() != args.length) { continue; }
-                Class<?>[] ts = k.getParameterTypes();
-                for (int i = 0; i < ts.length; i++) {
+            for (Constructor<?> construct : clase.getDeclaredConstructors()) {
+                if (construct.getParameterCount() != args.length) { continue; }
+                Class<?>[] teese = construct.getParameterTypes();
+                for (int i = 0; i < teese.length; i++) {
                     if (args[i] == null) { continue; }
-                    if (!ts[i].isAssignableFrom(args[i].getClass())) { continue outer; }
+                    if (!teese[i].isAssignableFrom(args[i].getClass())) { continue outer; }
                 }
-                k.setAccessible(true);
-                return k.newInstance(args);
+                construct.setAccessible(true);
+                return construct.newInstance(args);
             }
-            Constructor<?> k0 = c.getDeclaredConstructor();
-            k0.setAccessible(true);
-            return k0.newInstance();
+            Constructor<?> construct1 = clase.getDeclaredConstructor();
+            construct1.setAccessible(true);
+            return construct1.newInstance();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Clase no encontrada: " + fqcn, e);
         } catch (NoSuchMethodException e) {
@@ -112,14 +112,14 @@ final class TestUtils {
 
     @SuppressWarnings("unchecked")
     static Object getFromPrivateMaps(Object holder, String key, String... fields) {
-        Class<?> c = holder.getClass();
+        Class<?> clase = holder.getClass();
         for (String fname : fields) {
             try {
-                Field f = c.getDeclaredField(fname);
-                f.setAccessible(true);
-                Object v = f.get(holder);
-                if (v instanceof Map<?, ?> m) {
-                    return ((Map<String, Object>) m).get(key);
+                Field field = clase.getDeclaredField(fname);
+                field.setAccessible(true);
+                Object objeto = field.get(holder);
+                if (objeto instanceof Map<?, ?> mapa) {
+                    return ((Map<String, Object>) mapa).get(key);
                 }
             } catch (NoSuchFieldException e) {
                 continue; // probamos siguiente campo
@@ -132,22 +132,22 @@ final class TestUtils {
 
     // Lanza la excepción original (sin envolver) para poder usar assertThrows con su tipo real.
     static Object invokeUnwrapped(Object target, String[] names, Object... args) throws Throwable {
-        Method m = findMethod(target, names);
-        if (m == null) {
+        Method method = findMethod(target, names);
+        if (method == null) {
             String all = Arrays.stream(target.getClass().getMethods()).map(Method::getName).toList().toString();
             throw new AssertionError("No se encontró ninguno de: " + String.join(", ", names) +
                                      " en " + target.getClass().getName() + ". Públicos: " + all);
         }
-        try { return m.invoke(target, args); 
+        try { return method.invoke(target, args); 
         } catch (InvocationTargetException e) { throw e.getTargetException(); 
         } catch (IllegalAccessException | IllegalArgumentException e) { throw e; }
     }
 
     static Method findMethod(Object target, String name, Class<?>... paramTypes) {
         try {
-            Method m = target.getClass().getMethod(name, paramTypes);
-            m.setAccessible(true);
-            return m;
+            Method method = target.getClass().getMethod(name, paramTypes);
+            method.setAccessible(true);
+            return method;
         } catch (NoSuchMethodException e) {
             return null;
         }
