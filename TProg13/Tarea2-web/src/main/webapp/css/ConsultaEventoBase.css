@@ -119,7 +119,7 @@
 
 /* Opcional: afinar el estilo visual */
 .aside-inicio.card {
-  padding: 0.75rem 2rem;
+  padding: 0.75rem 1rem;
   border-radius: 0.6rem;
   background: #fff;
   border: 1px solid var(--line);

@@ -15,7 +15,7 @@ aside.card,
   min-width: 160px;
   max-width: 400px;
   top: 100px;
-  padding: 0.75rem 2rem;
+  padding: 0.75rem 1rem;
   border-radius: 0.6rem;
   background: #fff;
   border: 1px solid var(--line);

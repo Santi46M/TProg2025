@@ -41,16 +41,66 @@
         <p class="error"><%= error %></p>
       <% } %>
 
-      <!-- ====== LISTADO GENERAL ====== -->
-      <% if (usuario == null) { %>
-        <h1>Usuarios registrados</h1>
-        <div class="usuarios-grid">
-          <% if (usuarios == null || usuarios.isEmpty()) { %>
-            <p>No hay usuarios registrados.</p>
-          <% } else { %>
-            <% for (Usuario u : usuarios) {
-                 boolean esOrg = (u instanceof logica.Clases.Organizador);
-                 boolean esAsist = (u instanceof logica.Clases.Asistente);
+  <!-- Main -->
+  <main class="main-inicio">
+    <% if (error != null) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
+    <% if (usuario == null) { %>
+      <h1>Usuarios registrados</h1>
+      <div class="usuarios-grid">
+        <% if (usuarios == null || usuarios.isEmpty()) { %>
+          <p>No hay usuarios registrados.</p>
+        <% } else { %>
+          <% for (Usuario u : usuarios) { 
+               boolean esOrg = (u instanceof logica.Clases.Organizador);
+               boolean esAsist = (u instanceof logica.Clases.Asistente);
+          %>
+            <div class="card usuario-card">
+              <h3>
+                <a href="<%=ctx%>/usuario/ConsultaUsuario?nick=<%=u.getNickname()%>">
+                  <i class='bx <%= esOrg ? "bxs-microphone" : "bxs-id-card" %>'></i> <%=u.getNickname()%>
+                </a>
+              </h3>
+              <p><strong>Nombre:</strong> <%=u.getNombre()%></p>
+              <p><strong>Email:</strong> <%=u.getEmail()%></p>
+              <% if (esOrg) { %>
+                <span class="rol-tag org">Organizador</span>
+              <% } else if (esAsist) { %>
+                <span class="rol-tag asist">Asistente</span>
+              <% } %>
+            </div>
+          <% } %>
+        <% } %>
+      </div>
+
+    <% } else { %>
+      <h1>Perfil de <%= usuario.getNickname() %></h1>
+      <div class="usuario-detalle">
+        <p><strong>Nombre:</strong> <%= usuario.getNombre() %></p>
+        <p><strong>Email:</strong> <%= usuario.getEmail() %></p>
+        <% if (usuario.getInstitucion() != null) { %>
+          <p><strong>Institución:</strong> <%= usuario.getInstitucion() %></p>
+        <% } %>
+        <% if (usuario.getDesc() != null) { %>
+          <p><strong>Descripción:</strong> <%= usuario.getDesc() %></p>
+        <% } %>
+
+        <% 
+          boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname());
+          boolean esOrg = usuario.getEdiciones() != null && !usuario.getEdiciones().isEmpty();
+          boolean esAsist = usuario.getRegistros() != null && !usuario.getRegistros().isEmpty();
+        %>
+
+        <% if (esOrg) { %>
+          <h2>Ediciones de eventos</h2>
+          <ul class="lista-ediciones">
+            <% for (DTEdicion e : usuario.getEdiciones()) { 
+                String estado = e.getEstado().toString();
+                 boolean mostrar = "Aceptada".equalsIgnoreCase(estado) || 
+                                  (esSuPropioPerfil && ("Ingresada".equalsIgnoreCase(estado) || "Rechazada".equalsIgnoreCase(estado)));
+                 if (mostrar) {
             %>
               <div class="card usuario-card">
                 <h3>

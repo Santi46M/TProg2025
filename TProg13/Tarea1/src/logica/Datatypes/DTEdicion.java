@@ -1,5 +1,5 @@
 package logica.Datatypes;
-
+import logica.Enumerados.*;
 import java.time.LocalDate;
 
 import logica.Enumerados.DTEstado;
@@ -13,7 +13,7 @@ public class DTEdicion {
     private String organizador;
     private String ciudad;
     private String pais;
-    private String estado;
+    private DTEstado estado;
 
     public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String organizador, String ciudad, String pais) {
         this.nombre = nombre;
@@ -27,7 +27,7 @@ public class DTEdicion {
     }
     
     public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
-            LocalDate fechaAlta, String organizador, String ciudad, String pais, String estado) {
+            LocalDate fechaAlta, String organizador, String ciudad, String pais, DTEstado estado) {
 this.nombre = nombre;
 this.sigla = sigla;
 this.fechaInicio = fechaInicio;
@@ -61,7 +61,7 @@ this.estado = (estado == null ? null : estado.name()); // o estado.toString()
     public String getOrganizador() { return organizador; }
     public String getCiudad() { return ciudad; }
     public String getPais() { return pais; }
-    public String getEstado() { return estado; }
+    public DTEstado getEstado() { return estado; }
     
     
 }
