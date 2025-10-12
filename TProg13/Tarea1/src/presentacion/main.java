@@ -17,12 +17,7 @@ import logica.fabrica;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
-import excepciones.CupoTipoRegistroInvalidoException;
-import excepciones.CostoTipoRegistroInvalidoException;
-import excepciones.EventoYaExisteException;
-import excepciones.InstitucionYaExisteException;
-import excepciones.TipoRegistroYaExisteException;
-import excepciones.ValorPatrocinioExcedidoException;
+
 	
 
 import java.awt.event.ActionEvent;
