@@ -1,8 +1,8 @@
 package test;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import org.junit.jupiter.api.*;
+import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 @DisplayName("DTOs – constructores y getters (reflexión)")
 class DtoPojoTest {

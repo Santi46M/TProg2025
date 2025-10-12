@@ -1,7 +1,14 @@
 package test;
-import static org.junit.jupiter.api.Assertions.*;
-import java.lang.reflect.*;
-import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 final class TestUtils {
     private TestUtils() {}
@@ -11,7 +18,9 @@ final class TestUtils {
     static Method findMethod(Object o, String... names) {
         for (String n : names) {
             for (Method m : o.getClass().getMethods()) {
-                if (m.getName().equals(n)) return m;
+                if (m.getName().equals(n)) {
+                    return m;
+                }
             }
         }
         return null;
@@ -20,22 +29,23 @@ final class TestUtils {
     static Object tryInvoke(Object target, String[] names, Object... args) {
         Method m = findMethod(target, names);
         if (m == null) {
-            String all = Arrays.stream(target.getClass().getMethods())
-                .map(Method::getName).toList().toString();
+            String all = Arrays.stream(target.getClass().getMethods()).map(Method::getName).toList().toString();
             fail("No se encontró ninguno de: " + String.join(", ", names) +
                  " en " + target.getClass().getName() + ". Públicos: " + all);
         }
-        try { return m.invoke(target, args); }
-        catch (InvocationTargetException e) { throw new RuntimeException(e.getTargetException()); }
-        catch (Exception e) { throw new RuntimeException(e); }
+        try { return m.invoke(target, args); 
+        } catch (InvocationTargetException e) { throw new RuntimeException(e.getTargetException()); 
+        } catch (IllegalAccessException | IllegalArgumentException e) { throw new RuntimeException(e); }
     }
 
     /* ---------- Carga tolerante de clases (soporta fabrica minúscula) ---------- */
 
     static Class<?> loadAny(String... names) {
         for (String n : names) {
-            try { return Class.forName(n); }
-            catch (Throwable ignored) {} // atrapamos también NoClassDefFoundError
+            try { 
+            	return Class.forName(n); 
+            	} catch (ClassNotFoundException e) { continue; 
+            	} catch (LinkageError e) { continue; } // clase encontrada pero no cargable: probamos siguiente
         }
         throw new RuntimeException("No pude cargar ninguna clase: " + Arrays.toString(names));
     }
@@ -43,27 +53,32 @@ final class TestUtils {
     /* ---------- Reset SOLO de singletons reales (Fábrica y Manejadores) ---------- */
 
     static void resetSingleton(Class<?> c) {
-        for (var fname : new String[]{"instancia", "instance"}) {
+        for (var fname : new String[] { "instancia", "instance" }) {
             try {
                 Field f = c.getDeclaredField(fname);
                 f.setAccessible(true);
                 f.set(null, null);
                 return;
-            } catch (NoSuchFieldException ignored) {
-            } catch (Exception e) { throw new RuntimeException(e); }
+            } catch (NoSuchFieldException e) {
+                continue; // probamos el siguiente nombre de campo
+            } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     static void resetAll() {
         for (String cn : List.of(
                 "logica.Fabrica",
-                "logica.fabrica",              // <— por si tu factory es minúscula
+                "logica.fabrica",
                 "logica.ManejadorUsuario",
-                "logica.manejadorUsuario",     // <— NUEVO
+                "logica.manejadorUsuario",
                 "logica.ManejadorEvento",
-                "logica.manejadorEvento"       // <— NUEVO
+                "logica.manejadorEvento"
         )) {
-            try { resetSingleton(Class.forName(cn)); } catch (Throwable ignored) {}
+            try { resetSingleton(Class.forName(cn)); 
+            } catch (ClassNotFoundException e) { continue; 
+            } catch (LinkageError e) { continue; }
         }
     }
 
@@ -72,12 +87,13 @@ final class TestUtils {
     static Object tolerantNew(String fqcn, Object... args) {
         try {
             Class<?> c = Class.forName(fqcn);
-            outer: for (Constructor<?> k : c.getDeclaredConstructors()) {
-                if (k.getParameterCount() != args.length) continue;
+            outer:
+            for (Constructor<?> k : c.getDeclaredConstructors()) {
+                if (k.getParameterCount() != args.length) { continue; }
                 Class<?>[] ts = k.getParameterTypes();
-                for (int i=0; i<ts.length; i++) {
-                    if (args[i]==null) continue;
-                    if (!ts[i].isAssignableFrom(args[i].getClass())) continue outer;
+                for (int i = 0; i < ts.length; i++) {
+                    if (args[i] == null) { continue; }
+                    if (!ts[i].isAssignableFrom(args[i].getClass())) { continue outer; }
                 }
                 k.setAccessible(true);
                 return k.newInstance(args);
@@ -85,9 +101,11 @@ final class TestUtils {
             Constructor<?> k0 = c.getDeclaredConstructor();
             k0.setAccessible(true);
             return k0.newInstance();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Clase no encontrada: " + fqcn, e);
         } catch (NoSuchMethodException e) {
             throw new RuntimeException("No hay constructor compatible en " + fqcn, e);
-        } catch (Exception e) {
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
             throw new RuntimeException(e);
         }
     }
@@ -100,29 +118,34 @@ final class TestUtils {
                 Field f = c.getDeclaredField(fname);
                 f.setAccessible(true);
                 Object v = f.get(holder);
-                if (v instanceof Map<?, ?> m) return ((Map<String, Object>) m).get(key);
-            } catch (NoSuchFieldException ignored) {
-            } catch (Exception e) { throw new RuntimeException(e); }
+                if (v instanceof Map<?, ?> m) {
+                    return ((Map<String, Object>) m).get(key);
+                }
+            } catch (NoSuchFieldException e) {
+                continue; // probamos siguiente campo
+            } catch (IllegalAccessException | IllegalArgumentException | SecurityException e) {
+                throw new RuntimeException(e);
+            }
         }
         return null;
     }
-    
- // Lanza la excepción original (sin envolver) para poder usar assertThrows con su tipo real.
+
+    // Lanza la excepción original (sin envolver) para poder usar assertThrows con su tipo real.
     static Object invokeUnwrapped(Object target, String[] names, Object... args) throws Throwable {
         Method m = findMethod(target, names);
         if (m == null) {
-            String all = Arrays.stream(target.getClass().getMethods())
-                .map(Method::getName).toList().toString();
+            String all = Arrays.stream(target.getClass().getMethods()).map(Method::getName).toList().toString();
             throw new AssertionError("No se encontró ninguno de: " + String.join(", ", names) +
                                      " en " + target.getClass().getName() + ". Públicos: " + all);
         }
-        try { return m.invoke(target, args); }
-        catch (InvocationTargetException e) { throw e.getTargetException(); }
+        try { return m.invoke(target, args); 
+        } catch (InvocationTargetException e) { throw e.getTargetException(); 
+        } catch (IllegalAccessException | IllegalArgumentException e) { throw e; }
     }
-    
-    static java.lang.reflect.Method findMethod(Object target, String name, Class<?>... paramTypes) {
+
+    static Method findMethod(Object target, String name, Class<?>... paramTypes) {
         try {
-            java.lang.reflect.Method m = target.getClass().getMethod(name, paramTypes);
+            Method m = target.getClass().getMethod(name, paramTypes);
             m.setAccessible(true);
             return m;
         } catch (NoSuchMethodException e) {

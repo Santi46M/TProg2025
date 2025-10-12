@@ -1,12 +1,15 @@
 package test;
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.Test;
+import org.junit.jupiter.api.DisplayName;
 
 @DisplayName("TipoRegistro – existe y es usable (enum o clase)")
 class TipoRegistroEnumTest {
 
     @Test
-    void tipoRegistro_existe_y_usable() throws Exception {
+    void tipoRegistroExisteUsable() throws Exception {
         Class<?> c = Class.forName("logica.Clases.TipoRegistro");
         assertNotNull(c, "No existe logica.Clases.TipoRegistro");
 
