@@ -394,12 +394,12 @@ public class CargaDatosPrueba {
         }
         
         {
-            Eventos ev = mEv.obtenerEvento("Montevideo Fashion Week");
+            Eventos ev = manejadorEve.obtenerEvento("Montevideo Fashion Week");
             if (ev != null) {
                 try {
-                	ce.altaEdicionEvento(
+                	controladorEve.altaEdicionEvento(
                             ev,
-                            mUs.getUsuarios().get("mec"),
+                            manejadorUsu.getUsuarios().get("mec"),
                             "Montevideo Fashion Week 2026",
                             "MFW26",
                             "",
