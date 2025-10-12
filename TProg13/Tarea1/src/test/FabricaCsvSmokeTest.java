@@ -23,10 +23,10 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 class FabricaCsvSmokeTest {
 
     private Object fabrica;
-    private Object cu;
+    private Object controladorUs;
 
     public Object getFabrica() { return fabrica; }
-    public Object getCu() { return cu; }
+    public Object getCu() { return controladorUs; }
 
     @BeforeEach
     void setUp() throws Exception {
@@ -36,11 +36,11 @@ class FabricaCsvSmokeTest {
         try { getter = fab.getMethod("getInstance"); } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         this.fabrica = getter.invoke(null);
 
-        this.cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
-        assertNotNull(cu);
+        this.controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
+        assertNotNull(controladorUs);
 
         // Institución base por si el CSV la requiere
-        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_CSV", "desc", "web");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_CSV", "desc", "web");
     }
 
     private Method findCsvMethod(Object fab) {
@@ -68,39 +68,39 @@ class FabricaCsvSmokeTest {
                 "ana;Ana;ana@x;d;l;Ap;1999-01-01;Inst_CSV;false\n" +
                 "orgcsv;Org CSV;org@x;d;l;Ap;1998-02-02;Inst_CSV;true\n";
 
-        Class<?> p = csv.getParameterTypes()[0];
+        Class<?> parametro = csv.getParameterTypes()[0];
         Object arg;
 
-        if (p == String.class) {
+        if (parametro == String.class) {
             Path tmp = Files.createTempFile("usuarios", ".csv");
             Files.writeString(tmp, csvData, StandardCharsets.UTF_8);
             arg = tmp.toString();
-        } else if (InputStream.class.isAssignableFrom(p)) {
+        } else if (InputStream.class.isAssignableFrom(parametro)) {
             arg = new ByteArrayInputStream(csvData.getBytes(StandardCharsets.UTF_8));
-        } else if (Reader.class.isAssignableFrom(p)) {
+        } else if (Reader.class.isAssignableFrom(parametro)) {
             arg = new StringReader(csvData);
-        } else if (File.class.isAssignableFrom(p)) {
+        } else if (File.class.isAssignableFrom(parametro)) {
             Path tmp = Files.createTempFile("usuarios", ".csv");
             Files.writeString(tmp, csvData, StandardCharsets.UTF_8);
             arg = tmp.toFile();
-        } else if (Path.class.isAssignableFrom(p)) {
+        } else if (Path.class.isAssignableFrom(parametro)) {
             Path tmp = Files.createTempFile("usuarios", ".csv");
             Files.writeString(tmp, csvData, StandardCharsets.UTF_8);
             arg = tmp;
         } else {
             // parámetro desconocido: test “no aplica”
-            assumeTrue(false, "Tipo de parámetro no soportado: " + p);
+            assumeTrue(false, "Tipo de parámetro no soportado: " + parametro);
             return;
         }
 
-        boolean ok = true;
-        try { csv.invoke(fabrica, arg); } catch (ReflectiveOperationException | IllegalArgumentException e) { ok = false; }
+        boolean bandera = true;
+        try { csv.invoke(fabrica, arg); } catch (ReflectiveOperationException | IllegalArgumentException e) { bandera = false; }
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> users = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarUsuarios"});
+        Map<String, Object> users = (Map<String, Object>) TestUtils.tryInvoke(controladorUs, new String[]{"listarUsuarios"});
         assertNotNull(users);
 
-        if (ok) {
+        if (bandera) {
             // si el CSV se cargó, debería aparecer alguno de estos nicks
             assertTrue(users.containsKey("ana") || users.containsKey("orgcsv"));
         } else {

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 @DisplayName("ControladorUsuario – ConsultaUsuario/obtenerDatos/updates encadenados")
 class ControladorUsuarioConsultaPlusTest {
 
-    private Object cu;
+    private Object controladorUs;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -28,56 +28,56 @@ class ControladorUsuarioConsultaPlusTest {
         	getter = fab.getMethod("getInstancia"); 
         }
         Object fabrica = getter.invoke(null);
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
-        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_CUP", "d", "w");
+        controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_CUP", "d", "w");
     }
 
     @Test
     @DisplayName("ConsultaUsuario + obtenerDatosUsuario tras varias actualizaciones")
     void consultaYDatos() {
         // alta asistente
-        TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
                 "cupi", "Cu Pi", "cupi@x", "d", "l", "Ap0",
                 LocalDate.of(2000, 1, 1), "Inst_CUP", false);
 
         // actualizar asistente
-        TestUtils.tryInvoke(cu, new String[]{"actualizarAsistente"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"actualizarAsistente"},
                 "cupi", "Ap1", LocalDate.of(2001, 1, 1));
 
         // llamada a ConsultaUsuario (sea lo que sea que haga, no debería romper)
         assertDoesNotThrow(() ->
-        TestUtils.invokeUnwrapped(cu, new String[]{"ConsultaUsuario"}, "cupi")
+        TestUtils.invokeUnwrapped(controladorUs, new String[]{"ConsultaUsuario"}, "cupi")
         		);
 
      // obtener datos y verificar cambios
-        Object dto = TestUtils.tryInvoke(cu, new String[]{"obtenerDatosUsuario"}, "cupi");
+        Object dto = TestUtils.tryInvoke(controladorUs, new String[]{"obtenerDatosUsuario"}, "cupi");
         assertNotNull(dto);
 
         var mAp = TestUtils.findMethod(dto, "getApellido", "apellido");
         var mFn = TestUtils.findMethod(dto, "getFechaNacimiento", "getNacimiento", "fechaNacimiento");
 
         if (mAp != null) {
-            var ap = assertDoesNotThrow(() -> String.valueOf(mAp.invoke(dto)));
-            assertEquals("Ap1", ap);
+            var variable = assertDoesNotThrow(() -> String.valueOf(mAp.invoke(dto)));
+            assertEquals("Ap1", variable);
         }
         if (mFn != null) {
-            var fn = assertDoesNotThrow(() -> (LocalDate) mFn.invoke(dto));
-            assertEquals(LocalDate.of(2001, 1, 1), fn);
+            var variable = assertDoesNotThrow(() -> (LocalDate) mFn.invoke(dto));
+            assertEquals(LocalDate.of(2001, 1, 1), variable);
         }
     }
     @Test
     @DisplayName("Cambiar a organizador y actualizarOrganizador")
     void cambioYUpdateOrganizador() {
         // alta como organizador
-        TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
                 "orgx", "Org X" , "orgx@x", "d0", "l0", "Ap",
                 LocalDate.of(1990, 1, 1), "Inst_CUP", true);
 
         // actualizar datos de organizador
-        TestUtils.tryInvoke(cu, new String[]{"actualizarOrganizador"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"actualizarOrganizador"},
                 "orgx", "d1", "l1");
 
-        Object dto = TestUtils.tryInvoke(cu, new String[]{"obtenerDatosUsuario"}, "orgx");
+        Object dto = TestUtils.tryInvoke(controladorUs, new String[]{"obtenerDatosUsuario"}, "orgx");
         assertNotNull(dto);
 
         var mDesc = TestUtils.findMethod(dto, "getDescripcion", "descripcion");

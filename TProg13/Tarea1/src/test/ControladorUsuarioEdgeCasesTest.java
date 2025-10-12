@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @DisplayName("ControladorUsuario – Edge cases (errores comunes)")
 class ControladorUsuarioEdgeCasesTest {
 
-    private Object fabrica, cu;
+    private Object fabrica, controladorUs;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -26,14 +26,14 @@ class ControladorUsuarioEdgeCasesTest {
         try { getter = fab.getMethod("getInstance"); 
         } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         fabrica = getter.invoke(null);
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
+        controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
     }
 
     @Test
     @DisplayName("actualizarAsistente sobre nick inexistente → lanza")
     void actualizarAsistenteInexistente() {
         assertThrows(Exception.class, () ->
-            TestUtils.invokeUnwrapped(cu, new String[]{"actualizarAsistente"},
+            TestUtils.invokeUnwrapped(controladorUs, new String[]{"actualizarAsistente"},
                 "noexiste", "Ap", LocalDate.of(2000, 1, 1))
         );
     }
@@ -42,7 +42,7 @@ class ControladorUsuarioEdgeCasesTest {
     @DisplayName("actualizarOrganizador sobre nick inexistente → lanza")
     void actualizarOrganizadorInexistente() {
         assertThrows(Exception.class, () ->
-            TestUtils.invokeUnwrapped(cu, new String[]{"actualizarOrganizador"},
+            TestUtils.invokeUnwrapped(controladorUs, new String[]{"actualizarOrganizador"},
                 "noexiste", "desc", "link")
         );
     }
@@ -53,12 +53,12 @@ class ControladorUsuarioEdgeCasesTest {
         boolean lanzo;
         try {
             assertThrows(Exception.class, () ->
-                TestUtils.invokeUnwrapped(cu, new String[]{"obtenerDatosUsuario"}, "noexiste")
+                TestUtils.invokeUnwrapped(controladorUs, new String[]{"obtenerDatosUsuario"}, "noexiste")
             );
             lanzo = true;
         } catch (AssertionError ae) {
             lanzo = false; // no lanzó: esperamos null
-            Object dto = TestUtils.tryInvoke(cu, new String[]{"obtenerDatosUsuario"}, "noexiste");
+            Object dto = TestUtils.tryInvoke(controladorUs, new String[]{"obtenerDatosUsuario"}, "noexiste");
             assertNull(dto);
         }
         assertTrue(lanzo || !lanzo); // sólo para callar “resultado no usado”
@@ -67,11 +67,11 @@ class ControladorUsuarioEdgeCasesTest {
     @Test
     @DisplayName("AltaInstitucion duplicada → idempotente o lanza (aceptamos ambos)")
     void altaInstitucionDuplicada() {
-        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_X", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_X", "d", "w");
         // si lanza, lo aceptamos; si no, también (idempotente)
         try {
             assertThrows(Exception.class, () ->
-                TestUtils.invokeUnwrapped(cu, new String[]{"AltaInstitucion"}, "Inst_X", "d2", "w2")
+                TestUtils.invokeUnwrapped(controladorUs, new String[]{"AltaInstitucion"}, "Inst_X", "d2", "w2")
             );
         } catch (AssertionError ignored) {
             // no lanzó: lo tomamos como idempotente
@@ -84,7 +84,7 @@ class ControladorUsuarioEdgeCasesTest {
         boolean lanzo;
         try {
             assertThrows(Exception.class, () ->
-                TestUtils.invokeUnwrapped(cu, new String[]{"ingresarAsistente"},
+                TestUtils.invokeUnwrapped(controladorUs, new String[]{"ingresarAsistente"},
                     "a1", "A", "a@x", "Ap", LocalDate.of(2000, 1, 1), null)
             );
             lanzo = true;
@@ -92,7 +92,7 @@ class ControladorUsuarioEdgeCasesTest {
             lanzo = false; // no lanzó: verificamos que no haya quedado creado
             @SuppressWarnings("unchecked")
             Map<String, Object> asisMap =
-                (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarAsistentes"});
+                (Map<String, Object>) TestUtils.tryInvoke(controladorUs, new String[]{"listarAsistentes"});
             assertFalse(asisMap.containsKey("a1"),
                 "No lanzó y dejó 'a1' creado; debería ignorar o lanzar.");
         }

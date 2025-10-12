@@ -18,12 +18,12 @@ class ControladorEventoEdgeCasesTest {
 
     // Encapsulados + getters (regla de Checkstyle)
     private Object fabrica;
-    private Object ce;
-    private Object cu;
+    private Object controladorEv;
+    private Object controladorUs;
 
     public Object getFabrica() { return fabrica; }
-    public Object getCe() { return ce; }
-    public Object getCu() { return cu; }
+    public Object getCe() { return controladorEv; }
+    public Object getCu() { return controladorUs; }
 
     @BeforeEach
     void setUp() throws Throwable {
@@ -40,55 +40,55 @@ class ControladorEventoEdgeCasesTest {
         this.fabrica = getter.invoke(null);
 
         // 2) Controlador de USUARIO por fábrica (existe en tu caso)
-        this.cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario", "getControladorUsuario"});
+        this.controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario", "getControladorUsuario"});
 
         // 3) Controlador de EVENTO: por fábrica si existe; si no, instancia concreta
         try {
-            this.ce = TestUtils.tryInvoke(fabrica, new String[]{
+            this.controladorEv = TestUtils.tryInvoke(fabrica, new String[]{
                 "getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"
             });
         } catch (AssertionError ignored) {
             Class<?> ceClazz = Class.forName("logica.ControladorEvento");
             try {
-                Constructor<?> k0 = ceClazz.getDeclaredConstructor();
-                k0.setAccessible(true);
-                this.ce = k0.newInstance();
+                Constructor<?> consturcto = ceClazz.getDeclaredConstructor();
+                consturcto.setAccessible(true);
+                this.controladorEv = consturcto.newInstance();
             } catch (NoSuchMethodException noDefault) {
-                Constructor<?> k = ceClazz.getDeclaredConstructors()[0];
-                k.setAccessible(true);
-                Class<?>[] pts = k.getParameterTypes();
+                Constructor<?> construct = ceClazz.getDeclaredConstructors()[0];
+                construct.setAccessible(true);
+                Class<?>[] pts = construct.getParameterTypes();
                 Object[] args = new Object[pts.length];
                 for (int i = 0; i < pts.length; i++) {
-                    Class<?> t = pts[i];
-                    if (t.isPrimitive()) {
-                        if (t == boolean.class) args[i] = false;
-                        else if (t == char.class) args[i] = '\0';
-                        else if (t == byte.class) args[i] = (byte) 0;
-                        else if (t == short.class) args[i] = (short) 0;
-                        else if (t == int.class) args[i] = 0;
-                        else if (t == long.class) args[i] = 0L;
-                        else if (t == float.class) args[i] = 0f;
-                        else if (t == double.class) args[i] = 0d;
+                    Class<?> clase = pts[i];
+                    if (clase.isPrimitive()) {
+                        if (clase == boolean.class) args[i] = false;
+                        else if (clase == char.class) args[i] = '\0';
+                        else if (clase == byte.class) args[i] = (byte) 0;
+                        else if (clase == short.class) args[i] = (short) 0;
+                        else if (clase == int.class) args[i] = 0;
+                        else if (clase == long.class) args[i] = 0L;
+                        else if (clase == float.class) args[i] = 0f;
+                        else if (clase == double.class) args[i] = 0d;
                     } else {
                         args[i] = null; // si tu ctor requiere no-nulos, armamos dummies
                     }
                 }
-                this.ce = k.newInstance(args);
+                this.controladorEv = construct.newInstance(args);
             }
         }
 
         // 4) Base: Institución + ORG persistido
-        TestUtils.tryInvoke(this.cu, new String[]{"AltaInstitucion"}, "Inst_A", "d", "w");
-        TestUtils.tryInvoke(this.cu, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(this.controladorUs, new String[]{"AltaInstitucion"}, "Inst_A", "d", "w");
+        TestUtils.tryInvoke(this.controladorUs, new String[]{"AltaUsuario"},
                 "org1", "Org Uno", "org1@x", "desc", "link",
                 "Ap", java.time.LocalDate.of(1990, 1, 1), "Inst_A", true);
 
         // 5) Categoría idempotente
-        altaCategoriaIdempotente(this.ce, "Tec");
+        altaCategoriaIdempotente(this.controladorEv, "Tec");
 
         // 6) Evento base
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", java.util.List.of("Tec"));
-        TestUtils.tryInvoke(this.ce, new String[]{"AltaEvento"},
+        TestUtils.tryInvoke(this.controladorEv, new String[]{"AltaEvento"},
                 "Conf", "Desc", java.time.LocalDate.now(), "CONF", cats);
     }
 
@@ -100,20 +100,20 @@ class ControladorEventoEdgeCasesTest {
 
         try {
             // estricto: debería lanzar
-            TestUtils.invokeUnwrapped(ce, new String[]{"altaEdicionEvento"},
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"altaEdicionEvento"},
                 "Conf", nombre, "B01", "x",
                 hoy.plusDays(5), hoy.plusDays(4), hoy,
                 "org1", "City", "UY");
 
             // si no lanzó → aceptamos; verificamos normalización si hay getters
-            Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf", nombre);
-            assertNotNull(ed, "La edición debería existir si no lanzó excepción");
+            Object edicion = TestUtils.tryInvoke(controladorEv, new String[]{"obtenerEdicion"}, "Conf", nombre);
+            assertNotNull(edicion, "La edición debería existir si no lanzó excepción");
 
-            Method mIni = TestUtils.findMethod(ed, "getFechaInicio", "fechaInicio");
-            Method mFin = TestUtils.findMethod(ed, "getFechaFin", "fechaFin");
+            Method mIni = TestUtils.findMethod(edicion, "getFechaInicio", "fechaInicio");
+            Method mFin = TestUtils.findMethod(edicion, "getFechaFin", "fechaFin");
             if (mIni != null && mFin != null) {
-                LocalDate ini = (LocalDate) mIni.invoke(ed);
-                LocalDate fin = (LocalDate) mFin.invoke(ed);
+                LocalDate ini = (LocalDate) mIni.invoke(edicion);
+                LocalDate fin = (LocalDate) mFin.invoke(edicion);
                 assertFalse(fin.isBefore(ini), "Si no lanza, debe normalizar (fin ≥ inicio)");
             }
         } catch (IllegalArgumentException e) {
@@ -127,16 +127,16 @@ class ControladorEventoEdgeCasesTest {
     void altaTipoRegistroCostoNegativo() throws Throwable {
         LocalDate hoy = LocalDate.now();
         // pre: edición base
-        TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
                 "Conf", "Main", "M1", "ok",
                 hoy.plusDays(1), hoy.plusDays(2), hoy,
                 "org1", "City", "UY");
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf", "Main");
-        assertNotNull(ed);
+        Object edicion = TestUtils.tryInvoke(controladorEv, new String[]{"obtenerEdicion"}, "Conf", "Main");
+        assertNotNull(edicion);
 
         try {
-            TestUtils.invokeUnwrapped(ce, new String[]{"AltaTipoRegistro"},
-                    ed, "VIP", "desc", -1, 10);
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"AltaTipoRegistro"},
+                    edicion, "VIP", "desc", -1, 10);
             // no lanzó → aceptamos
             assertTrue(true);
         } catch (IllegalArgumentException e) {
@@ -150,17 +150,17 @@ class ControladorEventoEdgeCasesTest {
     void altaTipoRegistroCupoNegativo() throws Throwable {
         LocalDate hoy = LocalDate.now();
 
-        TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
                 "Conf", "Main2", "M2", "ok",
                 hoy.plusDays(1), hoy.plusDays(2), hoy,
                 "org1", "City", "UY");
 
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf", "Main2");
-        assertNotNull(ed);
+        Object edicion = TestUtils.tryInvoke(controladorEv, new String[]{"obtenerEdicion"}, "Conf", "Main2");
+        assertNotNull(edicion);
 
         try {
-            TestUtils.invokeUnwrapped(ce, new String[]{"AltaTipoRegistro"},
-                    ed, "STD", "desc", 100, -5);
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"AltaTipoRegistro"},
+                    edicion, "STD", "desc", 100, -5);
             assertTrue(true);
         } catch (IllegalArgumentException e) {
             assertNotNull(e);
@@ -171,7 +171,7 @@ class ControladorEventoEdgeCasesTest {
     @DisplayName("consultaEdicionEvento con siglas malas → devuelve null o lanza (ambos válidos)")
     void consultaEdicionEventoInvalida() throws Throwable {
         try {
-            Object dto = TestUtils.invokeUnwrapped(ce, new String[]{"consultaEdicionEvento"}, "XX", "??");
+            Object dto = TestUtils.invokeUnwrapped(controladorEv, new String[]{"consultaEdicionEvento"}, "XX", "??");
             assertNull(dto);
         } catch (IllegalArgumentException e) {
             assertNotNull(e);

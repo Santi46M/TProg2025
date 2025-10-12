@@ -22,8 +22,8 @@ import org.junit.jupiter.api.Test;
 class ControladorEventoTest {
 
     private Object fabrica;
-    private Object ce;
-    private Object cu;
+    private Object controladorEv;
+    private Object controladorUs;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -36,7 +36,7 @@ class ControladorEventoTest {
         this.fabrica = getter.invoke(null);
 
         // Controlador de USUARIO (por fábrica)
-        cu = TestUtils.tryInvoke(this.fabrica, new String[]{"getIUsuario", "getIControladorUsuario", "getControladorUsuario"});
+        controladorUs = TestUtils.tryInvoke(this.fabrica, new String[]{"getIUsuario", "getIControladorUsuario", "getControladorUsuario"});
 
         // Controlador de EVENTO: si la fábrica no lo tiene, instancia concreta
         Object ceMaybe = null;
@@ -44,16 +44,16 @@ class ControladorEventoTest {
 
         if (ceMaybe == null) {
             Class<?> ceClazz = Class.forName("logica.Controladores.ControladorEvento");
-            Constructor<?> k = ceClazz.getDeclaredConstructor();
-            k.setAccessible(true);
-            ce = k.newInstance();
+            Constructor<?> constructor = ceClazz.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            controladorEv = constructor.newInstance();
         } else {
-            ce = ceMaybe;
+            controladorEv = ceMaybe;
         }
 
         // Base: Institución y organizador
-        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_A", "desc", "web");
-        TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_A", "desc", "web");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
                 "org1", "Org Uno", "org1@x", "desc", "link",
                 "Ap", LocalDate.of(1990, 1, 1), "Inst_A", true);
     }
@@ -74,10 +74,10 @@ class ControladorEventoTest {
             try {
                 Method setM = TestUtils.findMethod(dto, "setCategorias", "setNombres");
                 if (setM != null && setM.getParameterCount() == 1) {
-                    Class<?> pt = setM.getParameterTypes()[0];
-                    if (java.util.Set.class.isAssignableFrom(pt)) {
+                    Class<?> parameterTypes = setM.getParameterTypes()[0];
+                    if (java.util.Set.class.isAssignableFrom(parameterTypes)) {
                         setM.invoke(dto, set);
-                    } else if (java.util.Collection.class.isAssignableFrom(pt)) {
+                    } else if (java.util.Collection.class.isAssignableFrom(parameterTypes)) {
                         setM.invoke(dto, java.util.List.copyOf(set));
                     }
                 } else {
@@ -94,23 +94,23 @@ class ControladorEventoTest {
     }
 
     private String getDTEventoNombre(Object dtevento) {
-        Method m = TestUtils.findMethod(dtevento, "getNombre", "nombre");
-        if (m == null) return String.valueOf(dtevento);
-        try { return String.valueOf(m.invoke(dtevento)); } catch (ReflectiveOperationException | IllegalArgumentException e) { return String.valueOf(dtevento); }
+        Method metodo = TestUtils.findMethod(dtevento, "getNombre", "nombre");
+        if (metodo == null) return String.valueOf(dtevento);
+        try { return String.valueOf(metodo.invoke(dtevento)); } catch (ReflectiveOperationException | IllegalArgumentException e) { return String.valueOf(dtevento); }
     }
 
     private String getDTEdicionNombre(Object dted) {
-        Method m = TestUtils.findMethod(dted, "getNombre", "nombre");
-        if (m == null) return String.valueOf(dted);
-        try { return String.valueOf(m.invoke(dted)); } catch (ReflectiveOperationException | IllegalArgumentException e) { return String.valueOf(dted); }
+        Method metodo = TestUtils.findMethod(dted, "getNombre", "nombre");
+        if (metodo == null) return String.valueOf(dted);
+        try { return String.valueOf(metodo.invoke(dted)); } catch (ReflectiveOperationException | IllegalArgumentException e) { return String.valueOf(dted); }
     }
 
-    private void altaCategoriaIdempotente(Object ce, String nombre) {
+    private void altaCategoriaIdempotente(Object evento, String nombre) {
         // tryInvoke ya evita propagar throws hacia acá
-        TestUtils.tryInvoke(ce, new String[]{"AltaCategoria"}, nombre);
+        TestUtils.tryInvoke(evento, new String[]{"AltaCategoria"}, nombre);
     }
 
-    private Object consultaEdicionFlexible(Object ce, String[] eventoKeys, String[] edicionKeys) {
+    private Object consultaEdicionFlexible(Object evento, String[] eventoKeys, String[] edicionKeys) {
         String[][] names = {
             {"consultaEdicionEvento"},
             {"ConsultaEdicionEvento"},
@@ -121,7 +121,7 @@ class ControladorEventoTest {
                 for (String ek : eventoKeys) {
                     for (String dk : edicionKeys) {
                         try {
-                            Object dto = TestUtils.tryInvoke(ce, new String[]{me}, ek, dk);
+                            Object dto = TestUtils.tryInvoke(evento, new String[]{me}, ek, dk);
                             if (dto != null) return dto;
                         } catch (AssertionError ignored) { /* método inexistente */ }
                     }
@@ -131,27 +131,27 @@ class ControladorEventoTest {
         return null;
     }
 
-    private Object resolverTipoRegistro(Object ed, String nombreDeseado) {
+    private Object resolverTipoRegistro(Object edicion, String nombreDeseado) {
         // 1) directos por nombre
         for (String mn : new String[]{"obtenerTipoRegistro", "getTipoRegistro"}) {
             try {
-                Method m = ed.getClass().getMethod(mn, String.class);
-                Object tr = m.invoke(ed, nombreDeseado);
-                if (tr != null) return tr;
+                Method metodo = edicion.getClass().getMethod(mn, String.class);
+                Object tipoReg = metodo.invoke(edicion, nombreDeseado);
+                if (tipoReg != null) return tipoReg;
             } catch (NoSuchMethodException ignored) { /* no existe */ } catch (ReflectiveOperationException | IllegalArgumentException ignored) { /* invocación fallida */ }
         }
         // 2) listados y match por nombre
         for (String mn : new String[]{"getTiposRegistro", "getTiposRegistros", "getTipos", "listarTiposRegistro"}) {
             try {
-                Method m = ed.getClass().getMethod(mn);
-                Object res = m.invoke(ed);
+                Method metodo = edicion.getClass().getMethod(mn);
+                Object res = metodo.invoke(edicion);
                 if (res instanceof java.util.Collection<?> col) {
                     for (Object tr : col) {
                         if (tr == null) continue;
                         Method mNom = TestUtils.findMethod(tr, "getNombre", "nombre");
                         if (mNom != null) {
-                            String n = String.valueOf(mNom.invoke(tr));
-                            if (nombreDeseado.equals(n)) return tr;
+                            String name = String.valueOf(mNom.invoke(tr));
+                            if (nombreDeseado.equals(name)) return tr;
                         } else {
                             return tr;
                         }
@@ -161,8 +161,8 @@ class ControladorEventoTest {
                         if (tr == null) continue;
                         Method mNom = TestUtils.findMethod(tr, "getNombre", "nombre");
                         if (mNom != null) {
-                            String n = String.valueOf(mNom.invoke(tr));
-                            if (nombreDeseado.equals(n)) return tr;
+                            String name = String.valueOf(mNom.invoke(tr));
+                            if (nombreDeseado.equals(name)) return tr;
                         } else {
                             return tr;
                         }
@@ -171,10 +171,10 @@ class ControladorEventoTest {
             } catch (NoSuchMethodException ignored) { /* no existe */ } catch (ReflectiveOperationException | IllegalArgumentException ignored) { /* invocación fallida */ }
         }
         // 3) último recurso
-        for (Method m : ed.getClass().getMethods()) {
+        for (Method m : edicion.getClass().getMethods()) {
             if (m.getParameterCount() == 0) {
                 try {
-                    Object res = m.invoke(ed);
+                    Object res = m.invoke(edicion);
                     if (res instanceof java.util.Collection<?> col) {
                         for (Object tr : col) {
                             if (tr != null && tr.getClass().getName().endsWith("TipoRegistro")) return tr;
@@ -195,50 +195,50 @@ class ControladorEventoTest {
     @Test
     @DisplayName("AltaCategoria + AltaEvento + listar/consultar")
     void altaEventoYListados() {
-        altaCategoriaIdempotente(ce, "Tecnologia");
+        altaCategoriaIdempotente(controladorEv, "Tecnologia");
         Object cats = categoriasDTO("Tecnologia");
 
         assertDoesNotThrow(() ->
-            TestUtils.invokeUnwrapped(ce, new String[]{"AltaEvento"},
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"AltaEvento"},
                 "Feria", "Desc Feria", LocalDate.now(), "FER", cats)
         );
 
         @SuppressWarnings("unchecked")
-        List<Object> lista = (List<Object>) TestUtils.tryInvoke(ce, new String[]{"listarEventos"});
+        List<Object> lista = (List<Object>) TestUtils.tryInvoke(controladorEv, new String[]{"listarEventos"});
         assertNotNull(lista);
         var nombres = lista.stream().map(this::getDTEventoNombre).collect(Collectors.toSet());
         assertTrue(nombres.contains("Feria"));
 
-        Object ev = TestUtils.tryInvoke(ce, new String[]{"consultaEvento"}, "Feria");
-        assertNotNull(ev);
-        assertEquals("logica", ev.getClass().getPackageName());
+        Object evento = TestUtils.tryInvoke(controladorEv, new String[]{"consultaEvento"}, "Feria");
+        assertNotNull(evento);
+        assertEquals("logica", evento.getClass().getPackageName());
     }
 
     @Test
     @DisplayName("altaEdicionEvento + listar/obtener/consultaEdicionEvento")
     void edicionFlujoBasico() {
         Object cats = categoriasDTO("Tecnologia");
-        TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaEvento"},
                 "Feria", "Desc Feria", LocalDate.now(), "FER", cats);
 
         LocalDate hoy = LocalDate.now();
         assertDoesNotThrow(() ->
-            TestUtils.invokeUnwrapped(ce, new String[]{"altaEdicionEvento"},
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"altaEdicionEvento"},
                 "Feria", "Ed2025", "ED25", "Edición principal",
                 hoy.plusDays(10), hoy.plusDays(12), hoy,
                 "org1", "Montevideo", "Uruguay")
         );
 
         @SuppressWarnings("unchecked")
-        List<String> eds = (List<String>) TestUtils.tryInvoke(ce, new String[]{"listarEdicionesEvento"}, "Feria");
+        List<String> eds = (List<String>) TestUtils.tryInvoke(controladorEv, new String[]{"listarEdicionesEvento"}, "Feria");
         assertNotNull(eds);
         assertTrue(eds.contains("Ed2025"));
 
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Feria", "Ed2025");
-        assertNotNull(ed);
+        Object edicion = TestUtils.tryInvoke(controladorEv, new String[]{"obtenerEdicion"}, "Feria", "Ed2025");
+        assertNotNull(edicion);
 
         Object dted = consultaEdicionFlexible(
-                ce,
+                controladorEv,
                 new String[]{"FER", "Feria"},
                 new String[]{"ED25", "Ed2025"}
         );
@@ -254,60 +254,60 @@ class ControladorEventoTest {
     @DisplayName("AltaTipoRegistro sobre una edición existente")
     void altaTipoRegistroEnEdicion() {
         Object cats = categoriasDTO("Tec");
-        TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaEvento"},
                 "Conf", "Desc", LocalDate.now(), "CONF", cats);
 
         LocalDate hoy = LocalDate.now();
-        TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
                 "Conf", "Apertura", "AP01", "Inicio",
                 hoy.plusDays(1), hoy.plusDays(2), hoy,
                 "org1", "Montevideo", "Uruguay");
 
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf", "Apertura");
-        assertNotNull(ed);
+        Object edicion = TestUtils.tryInvoke(controladorEv, new String[]{"obtenerEdicion"}, "Conf", "Apertura");
+        assertNotNull(edicion);
 
         assertDoesNotThrow(() ->
-            TestUtils.invokeUnwrapped(ce, new String[]{"AltaTipoRegistro"},
-                ed, "GENERAL", "Acceso general", 1000, 50)
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"AltaTipoRegistro"},
+                edicion, "GENERAL", "Acceso general", 1000, 50)
         );
     }
 
     @Test
     @DisplayName("altaRegistroEdicionEvento + consultaRegistro (camino feliz)")
     void registroYConsultaRegistro() throws Exception {
-        altaCategoriaIdempotente(ce, "Tec");
+        altaCategoriaIdempotente(controladorEv, "Tec");
 
         Object cats = categoriasDTO("Tec");
-        TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaEvento"},
                 "Expo", "Desc", LocalDate.now(), "EXPO", cats);
 
         LocalDate hoy = LocalDate.now();
-        TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
+        TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
                 "Expo", "Verano", "V24", "Ed verano",
                 hoy.plusDays(3), hoy.plusDays(4), hoy,
                 "org1", "Montevideo", "Uruguay");
 
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Expo", "Verano");
-        Object ev = TestUtils.tryInvoke(ce, new String[]{"consultaEvento"}, "Expo");
-        assertNotNull(ed);
-        assertNotNull(ev);
+        Object edicion = TestUtils.tryInvoke(controladorEv, new String[]{"obtenerEdicion"}, "Expo", "Verano");
+        Object evento = TestUtils.tryInvoke(controladorEv, new String[]{"consultaEvento"}, "Expo");
+        assertNotNull(edicion);
+        assertNotNull(evento);
 
-        Object usuario = TestUtils.tryInvoke(cu, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
+        Object usuario = TestUtils.tryInvoke(controladorUs, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
                 "ana", "Ana", "ana@x", "Ap", hoy.minusYears(20), DomainAccess.obtenerInstitucion("Inst_A"));
         assertNotNull(usuario);
 
-        TestUtils.tryInvoke(ce, new String[]{"AltaTipoRegistro"},
-                ed, "GENERAL", "Acceso general", 0, 50);
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaTipoRegistro"},
+                edicion, "GENERAL", "Acceso general", 0, 50);
 
-        Object tipo = resolverTipoRegistro(ed, "GENERAL");
+        Object tipo = resolverTipoRegistro(edicion, "GENERAL");
         assertNotNull(tipo, "No hay TipoRegistro disponible");
 
         assertDoesNotThrow(() ->
-            TestUtils.invokeUnwrapped(ce, new String[]{"altaRegistroEdicionEvento"},
-                "R-001", usuario, ev, ed, tipo, hoy, 0.0f, hoy.plusDays(3))
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"altaRegistroEdicionEvento"},
+                "R-001", usuario, evento, edicion, tipo, hoy, 0.0f, hoy.plusDays(3))
         );
 
-        Object dtr = TestUtils.tryInvoke(ce, new String[]{"consultaRegistro"}, usuario, "R-001");
+        Object dtr = TestUtils.tryInvoke(controladorEv, new String[]{"consultaRegistro"}, usuario, "R-001");
         assertNotNull(dtr);
     }
 
@@ -316,7 +316,7 @@ class ControladorEventoTest {
     void altaEdicionEventoFechasInvalidas() {
         LocalDate hoy = LocalDate.now();
         assertThrows(IllegalArgumentException.class, () ->
-            TestUtils.invokeUnwrapped(ce, new String[]{"altaEdicionEvento"},
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"altaEdicionEvento"},
                 "Conf", "Bad", "B01", "x",
                 hoy.plusDays(5), hoy.plusDays(4), hoy,
                 "org1", "Montevideo", "Uruguay")
@@ -328,7 +328,7 @@ class ControladorEventoTest {
     void consultaEdicionEventoInvalida() {
         // Como no tenés excepciones de dominio, validamos que falle con alguna unchecked
         assertThrows(RuntimeException.class, () ->
-            TestUtils.invokeUnwrapped(ce, new String[]{"consultaEdicionEvento"}, "XX", "??")
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"consultaEdicionEvento"}, "XX", "??")
         );
     }
 }

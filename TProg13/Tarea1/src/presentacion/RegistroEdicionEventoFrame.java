@@ -42,8 +42,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
     private JTextField txtCodigoPatrocinio;
 
     private List<DTEvento> eventos;
-    private String[][] edicionesPorEvento;
-    private String[][] tiposPorEdicion;
+
     private List<logica.clases.Asistente> asistentes;
     private ControladorEvento controladorEvento;
     private IControladorUsuario controladorUsuario;
@@ -320,9 +319,9 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
         try {
             LocalDate fechaRegistro = LocalDate.now();
             LocalDate fechaInicio = edicion.getFechaInicio();
-            StringBuilder sb = new StringBuilder();
-            sb.append(usuario.getNickname() + " "+ edicion.getNombre());
-            controladorEvento.altaRegistroEdicionEvento(sb.toString(), usuario, controladorEvento.consultaEvento(nombreEvento), edicion, tipo, fechaRegistro, costo, fechaInicio);
+            StringBuilder stringBuild = new StringBuilder();
+            stringBuild.append(usuario.getNickname() + " "+ edicion.getNombre());
+            controladorEvento.altaRegistroEdicionEvento(stringBuild.toString(), usuario, controladorEvento.consultaEvento(nombreEvento), edicion, tipo, fechaRegistro, costo, fechaInicio);
             JOptionPane.showMessageDialog(this, "Registro realizado correctamente.");
             this.dispose();
         } catch (excepciones.CupoTipoRegistroInvalidoException ex) {

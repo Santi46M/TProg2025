@@ -13,18 +13,18 @@ final class DomainAccess {
 
     static Object getManejadorUsuario() {
         try {
-            Class<?> MU = TestUtils.loadAny(
+            Class<?> manejadorUs = TestUtils.loadAny(
                 "logica.Manejadores.ManejadorUsuario",
                 "logica.Manejadores.manejadorUsuario"
             );
-            Object mu;
+            Object manejadorUsr;
             try {
-                mu = MU.getMethod("getInstancia").invoke(null);
+                manejadorUsr = manejadorUs.getMethod("getInstancia").invoke(null);
             } catch (NoSuchMethodException e) {
-                mu = MU.getMethod("getInstance").invoke(null);
+                manejadorUsr = manejadorUs.getMethod("getInstance").invoke(null);
             }
-            assertNotNull(mu, "No se pudo obtener ManejadorUsuario");
-            return mu;
+            assertNotNull(manejadorUsr, "No se pudo obtener ManejadorUsuario");
+            return manejadorUsr;
         } catch ( NoSuchMethodException
                | IllegalAccessException
                | InvocationTargetException e) {
@@ -34,17 +34,17 @@ final class DomainAccess {
 
     static Object getManejadorEvento() {
         try {
-            Class<?> ME = TestUtils.loadAny(
+            Class<?> manejadorEvn = TestUtils.loadAny(
                 "logica.Manejadores.ManejadorEvento",
                 "logica.Manejadores.manejadorEvento"
             );
-            Object me;
+            Object manejadorEv;
             try {
-                me = ME.getMethod("getInstancia").invoke(null);
+                manejadorEv = manejadorEvn.getMethod("getInstancia").invoke(null);
             } catch (NoSuchMethodException e) {
-                me = ME.getMethod("getInstance").invoke(null);
+                manejadorEv = manejadorEvn.getMethod("getInstance").invoke(null);
             }
-            return me;
+            return manejadorEv;
         } catch ( NoSuchMethodException
                | IllegalAccessException
                | InvocationTargetException e) {
@@ -55,11 +55,11 @@ final class DomainAccess {
     /* ---------- Usuario ---------- */
 
     static Object obtenerUsuario(String nick) {
-        Object mu = getManejadorUsuario();
+        Object manejadorUs = getManejadorUsuario();
         try {
             for (String m : new String[]{"obtenerUsuario", "getUsuario", "buscarUsuario"}) {
                 try {
-                    return mu.getClass().getMethod(m, String.class).invoke(mu, nick);
+                    return manejadorUs.getClass().getMethod(m, String.class).invoke(manejadorUs, nick);
                 } catch (NoSuchMethodException ignored) {
                     // probar siguiente nombre de método
                 }
@@ -68,20 +68,20 @@ final class DomainAccess {
             throw new IllegalStateException("Error accediendo a usuario", e);
         }
 
-        Object v = TestUtils.getFromPrivateMaps(mu, nick, "usuarios", "organizadores", "asistentes");
-        if (v != null) return v;
+        Object objeto = TestUtils.getFromPrivateMaps(manejadorUs, nick, "usuarios", "organizadores", "asistentes");
+        if (objeto != null) return objeto;
 
-        return buscarEnEstructuras(mu, nick, "Usuario");
+        return buscarEnEstructuras(manejadorUs, nick, "Usuario");
     }
 
     /* ---------- Institucion ---------- */
 
     static Object obtenerInstitucion(String nombre) {
-        Object mu = getManejadorUsuario();
+        Object manejadorUs = getManejadorUsuario();
 
         for (String m : new String[]{"obtenerInstitucion", "getInstitucion", "buscarInstitucion"}) {
             try {
-                return mu.getClass().getMethod(m, String.class).invoke(mu, nombre);
+                return manejadorUs.getClass().getMethod(m, String.class).invoke(manejadorUs, nombre);
             } catch (NoSuchMethodException ignored) {
                 // probar siguiente nombre
             } catch (IllegalAccessException | InvocationTargetException e) {
@@ -89,24 +89,24 @@ final class DomainAccess {
             }
         }
 
-        Object v = TestUtils.getFromPrivateMaps(mu, nombre,
+        Object objeto = TestUtils.getFromPrivateMaps(manejadorUs, nombre,
                 "instituciones", "insts", "mapaInstituciones", "mapInstituciones",
                 "institucionesMap", "mapaDeInstituciones", "institMap");
-        if (v != null) return v;
+        if (objeto != null) return objeto;
 
-        v = buscarEnEstructuras(mu, nombre, "Institucion");
-        if (v != null) return v;
+        objeto = buscarEnEstructuras(manejadorUs, nombre, "Institucion");
+        if (objeto != null) return objeto;
 
         try {
-            Class<?> c = mu.getClass();
-            while (c != null) {
-                for (Field f : c.getDeclaredFields()) {
+            Class<?> clase = manejadorUs.getClass();
+            while (clase != null) {
+                for (Field f : clase.getDeclaredFields()) {
                     f.setAccessible(true);
-                    Object obj = f.get(mu);
+                    Object obj = f.get(manejadorUs);
                     Object match = pickFromContainer(obj, nombre, "Institucion");
                     if (match != null) return match;
                 }
-                c = c.getSuperclass();
+                clase = clase.getSuperclass();
             }
         } catch (IllegalAccessException ignored) {
             // campo inaccesible → continuar
@@ -140,23 +140,23 @@ final class DomainAccess {
                 if (map.containsKey(keyOrName)) return map.get(keyOrName);
                 for (Object v : map.values()) {
                     if (v != null && v.getClass().getSimpleName().toLowerCase().contains(classNameHint.toLowerCase())) {
-                        Method g = findAny(v.getClass(), "getNombre", "getName", "nombre");
-                        if (g != null) {
-                            Object n = g.invoke(v);
-                            if (keyOrName.equals(String.valueOf(n))) return v;
+                        Method getter = findAny(v.getClass(), "getNombre", "getName", "nombre");
+                        if (getter != null) {
+                            Object name = getter.invoke(v);
+                            if (keyOrName.equals(String.valueOf(name))) return v;
                         }
                     }
                 }
             } else if (container instanceof java.util.Collection<?> col) {
                 for (Object v : col) {
                     if (v != null && v.getClass().getSimpleName().toLowerCase().contains(classNameHint.toLowerCase())) {
-                        Method g = findAny(v.getClass(), "getNombre", "getName", "nombre");
-                        if (g != null) {
-                            Object n = g.invoke(v);
-                            if (keyOrName.equals(String.valueOf(n))) return v;
+                        Method getter = findAny(v.getClass(), "getNombre", "getName", "nombre");
+                        if (getter != null) {
+                            Object name = getter.invoke(v);
+                            if (keyOrName.equals(String.valueOf(name))) return v;
                         }
-                    } else if (v instanceof java.util.Map<?, ?> m) {
-                        Object inner = pickFromContainer(m, keyOrName, classNameHint);
+                    } else if (v instanceof java.util.Map<?, ?> mapa) {
+                        Object inner = pickFromContainer(mapa, keyOrName, classNameHint);
                         if (inner != null) return inner;
                     }
                 }
@@ -168,10 +168,10 @@ final class DomainAccess {
         return null;
     }
 
-    private static Method findAny(Class<?> c, String... names) {
+    private static Method findAny(Class<?> clase, String... names) {
         for (String n : names) {
             try {
-                return c.getMethod(n);
+                return clase.getMethod(n);
             } catch (NoSuchMethodException ignored) {
             					// probar siguiente nombre
             }
