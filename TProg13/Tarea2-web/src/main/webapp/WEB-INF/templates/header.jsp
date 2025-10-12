@@ -34,11 +34,11 @@
   			</button>
 		</form>
         <%-- <a class="btn" href="<%=ctx%>/usuario/perfil"><i class='bx bxs-user'></i> Ver Perfil</a> --%>
-        <form action="<%=ctx%>/auth/login" method="post">
-  			<button type="submit" class="btn">
-    			 Cerrar sesión
-  			</button>
-		</form>
+<form action="<%=ctx%>/auth/logout" method="get">
+  <button type="submit" class="btn">
+    Cerrar sesión
+  </button>
+</form>
 <%--         <a class="btn" href="<%=ctx%>/auth/logout"><i class='bx bxs-log-out'></i> Cerrar sesión</a> --%>
         <% if (!precargado) { %>
         	<form action="<%=ctx%>/precargar" method="post" style="display:inline;">

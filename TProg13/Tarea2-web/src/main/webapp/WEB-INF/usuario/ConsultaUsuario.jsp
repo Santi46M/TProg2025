@@ -21,6 +21,7 @@
   <meta charset="UTF-8">
   <title>Consulta de Usuarios — Eventos.uy</title>
   <link rel="stylesheet" href="<%= ctx %>/css/style.css">
+<%--   <link rel="stylesheet" href="<%= ctx %>/css/index.css"> --%>
 <link rel="stylesheet" href="<%= ctx %>/css/ConsultaUsuario.css">
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
@@ -94,7 +95,8 @@
           <h2>Ediciones de eventos</h2>
           <ul class="lista-ediciones">
             <% for (DTEdicion e : usuario.getEdiciones()) { 
-                String estado = e.getEstado();
+                //ACTUALIZAR logica. jar  String estado = e.getEstado();
+                 String estado = "";
                  boolean mostrar = "Aceptada".equalsIgnoreCase(estado) || 
                                   (esSuPropioPerfil && ("Ingresada".equalsIgnoreCase(estado) || "Rechazada".equalsIgnoreCase(estado)));
                  if (mostrar) {
