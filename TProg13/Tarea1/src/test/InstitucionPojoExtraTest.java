@@ -1,58 +1,75 @@
 package test;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Institucion – creación por CU y getters básicos")
 class InstitucionPojoExtraTest {
 
-	@Test
-	@DisplayName("Institucion – creación por CU y getters básicos")
-	void institucionViaControlador() throws Exception {
-	    TestUtils.resetAll();
+    @Test
+    @DisplayName("Institucion – creación por CU y getters básicos")
+    void institucionViaControlador() throws ReflectiveOperationException {
+        TestUtils.resetAll();
 
-	    // fábrica + CU
-	    Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
-	    Method getter;
-	    try { getter = fab.getMethod("getInstance"); }
-	    catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
-	    Object fabrica = getter.invoke(null);
-	    Object cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
+        // fábrica + CU
+        Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
+        Method getter;
+        try {
+            getter = fab.getMethod("getInstance");
+        } catch (NoSuchMethodException e) {
+            getter = fab.getMethod("getInstancia");
+        }
 
-	    // Alta por CU (lado “oficial”)
-	    TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_X", "Desc X", "webX");
+        Object fabrica;
+        try {
+            fabrica = getter.invoke(null);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalStateException("No se pudo invocar el método de fábrica", e);
+        }
 
-	    // Al menos verificamos presencia por nombre (si tu CU expone esto)
-	    try {
-	        Object setObj = TestUtils.tryInvoke(cu, new String[]{"getInstituciones"});
-	        if (setObj instanceof java.util.Set<?> set) {
-	            assertTrue(set.contains("Inst_X"));
-	        }
-	    } catch (Throwable ignored) {}
+        Object cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
 
-	    // Intento acceder al dominio por manejador; si no se puede, fabrico un dummy
-	    Object inst = DomainAccess.obtenerInstitucion("Inst_X");
-	    if (inst == null) {
-	        try {
-	            inst = TestUtils.tolerantNew("logica.Clases.Institucion", "Inst_X", "Desc X", "webX");
-	        } catch (RuntimeException e) {
-	            inst = TestUtils.tolerantNew("logica.Clases.Institucion");
-	            // seteos por si existen setters
-	            try {
-	                Method m;
-	                if ((m = TestUtils.findMethod(inst, "setNombre", String.class)) != null) m.invoke(inst, "Inst_X");
-	                if ((m = TestUtils.findMethod(inst, "setDescripcion", String.class)) != null) m.invoke(inst, "Desc X");
-	                if ((m = TestUtils.findMethod(inst, "setLink", String.class)) != null) m.invoke(inst, "webX");
-	            } catch (Throwable ignored) {}
-	        }
-	    }
+        // Alta por CU (lado “oficial”)
+        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_X", "Desc X", "webX");
 
-	    assertNotNull(inst, "No se pudo obtener ni construir Institucion");
+        // Verificación de que fue registrada
+        Object setObj = TestUtils.tryInvoke(cu, new String[]{"getInstituciones"});
+        if (setObj instanceof java.util.Set<?> set) {
+            assertTrue(set.contains("Inst_X"));
+        }
 
-	    // Paseo de getters/equals/hashCode/toString
-	    ReflectionPojoSupport.exercisePojo(inst);
-	}
+        // Intento acceder al dominio por manejador; si no se puede, fabrico un dummy
+        Object inst = DomainAccess.obtenerInstitucion("Inst_X");
+        if (inst == null) {
+            try {
+                inst = TestUtils.tolerantNew("logica.Clases.Institucion", "Inst_X", "Desc X", "webX");
+            } catch (IllegalStateException e) {
+                inst = TestUtils.tolerantNew("logica.Clases.Institucion");
+
+                // Seteos manuales por si existen setters
+                try {
+                    Method m;
+                    if ((m = TestUtils.findMethod(inst, "setNombre", String.class)) != null)
+                        m.invoke(inst, "Inst_X");
+                    if ((m = TestUtils.findMethod(inst, "setDescripcion", String.class)) != null)
+                        m.invoke(inst, "Desc X");
+                    if ((m = TestUtils.findMethod(inst, "setLink", String.class)) != null)
+                        m.invoke(inst, "webX");
+                } catch (IllegalAccessException | InvocationTargetException ignored) {
+                    // setters inaccesibles → continuar
+                }
+            }
+        }
+
+        assertNotNull(inst, "No se pudo obtener ni construir Institucion");
+
+        // Ejercicio de getters/equals/hashCode/toString
+        ReflectionPojoSupport.exercisePojo(inst);
+    }
 }
