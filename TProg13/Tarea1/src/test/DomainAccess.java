@@ -1,8 +1,10 @@
 package test;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 final class DomainAccess {
     private DomainAccess() {}
@@ -11,67 +13,90 @@ final class DomainAccess {
 
     static Object getManejadorUsuario() {
         try {
-            Class<?> MU = TestUtils.loadAny("logica.Manejadores.ManejadorUsuario", "logica.Manejadores.manejadorUsuario");
+            Class<?> MU = TestUtils.loadAny(
+                "logica.Manejadores.ManejadorUsuario",
+                "logica.Manejadores.manejadorUsuario"
+            );
             Object mu;
-            try { mu = MU.getMethod("getInstancia").invoke(null); }
-            catch (NoSuchMethodException e) { mu = MU.getMethod("getInstance").invoke(null); }
+            try {
+                mu = MU.getMethod("getInstancia").invoke(null);
+            } catch (NoSuchMethodException e) {
+                mu = MU.getMethod("getInstance").invoke(null);
+            }
             assertNotNull(mu, "No se pudo obtener ManejadorUsuario");
             return mu;
-        } catch (Exception e) { throw new RuntimeException(e); }
+        } catch ( NoSuchMethodException
+               | IllegalAccessException
+               | InvocationTargetException e) {
+            throw new IllegalStateException("Error accediendo a ManejadorUsuario", e);
+        }
     }
 
     static Object getManejadorEvento() {
         try {
-            Class<?> ME = TestUtils.loadAny("logica.Manejadores.ManejadorEvento", "logica.Manejadores.manejadorEvento");
+            Class<?> ME = TestUtils.loadAny(
+                "logica.Manejadores.ManejadorEvento",
+                "logica.Manejadores.manejadorEvento"
+            );
             Object me;
-            try { me = ME.getMethod("getInstancia").invoke(null); }
-            catch (NoSuchMethodException e) { me = ME.getMethod("getInstance").invoke(null); }
+            try {
+                me = ME.getMethod("getInstancia").invoke(null);
+            } catch (NoSuchMethodException e) {
+                me = ME.getMethod("getInstance").invoke(null);
+            }
             return me;
-        } catch (Exception e) { throw new RuntimeException(e); }
+        } catch ( NoSuchMethodException
+               | IllegalAccessException
+               | InvocationTargetException e) {
+            throw new IllegalStateException("Error accediendo a ManejadorEvento", e);
+        }
     }
 
-    /* ---------- Usuario (se mantiene) ---------- */
+    /* ---------- Usuario ---------- */
 
     static Object obtenerUsuario(String nick) {
         Object mu = getManejadorUsuario();
         try {
             for (String m : new String[]{"obtenerUsuario", "getUsuario", "buscarUsuario"}) {
-                try { return mu.getClass().getMethod(m, String.class).invoke(mu, nick); }
-                catch (NoSuchMethodException ignored) {}
+                try {
+                    return mu.getClass().getMethod(m, String.class).invoke(mu, nick);
+                } catch (NoSuchMethodException ignored) {
+                    // probar siguiente nombre de método
+                }
             }
-        } catch (Exception e) { throw new RuntimeException(e); }
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalStateException("Error accediendo a usuario", e);
+        }
 
-        // Fallback a campos privados típicos
         Object v = TestUtils.getFromPrivateMaps(mu, nick, "usuarios", "organizadores", "asistentes");
         if (v != null) return v;
 
-        // Escaneo genérico de maps/collections
         return buscarEnEstructuras(mu, nick, "Usuario");
     }
 
-    /* ---------- Institucion (parche robusto) ---------- */
+    /* ---------- Institucion ---------- */
 
     static Object obtenerInstitucion(String nombre) {
         Object mu = getManejadorUsuario();
 
-        // 1) Métodos públicos habituales con (String)
         for (String m : new String[]{"obtenerInstitucion", "getInstitucion", "buscarInstitucion"}) {
-            try { return mu.getClass().getMethod(m, String.class).invoke(mu, nombre); }
-            catch (NoSuchMethodException ignored) {}
-            catch (Exception e) { throw new RuntimeException(e); }
+            try {
+                return mu.getClass().getMethod(m, String.class).invoke(mu, nombre);
+            } catch (NoSuchMethodException ignored) {
+                // probar siguiente nombre
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new IllegalStateException("Error al obtener institución", e);
+            }
         }
 
-        // 2) Campos privados más comunes
         Object v = TestUtils.getFromPrivateMaps(mu, nombre,
                 "instituciones", "insts", "mapaInstituciones", "mapInstituciones",
                 "institucionesMap", "mapaDeInstituciones", "institMap");
         if (v != null) return v;
 
-        // 3) Escaneo genérico de métodos sin parámetros que devuelven Map/Collection
         v = buscarEnEstructuras(mu, nombre, "Institucion");
         if (v != null) return v;
 
-        // 4) Último recurso: escanear TODOS los campos (incluye superclases)
         try {
             Class<?> c = mu.getClass();
             while (c != null) {
@@ -83,14 +108,15 @@ final class DomainAccess {
                 }
                 c = c.getSuperclass();
             }
-        } catch (Exception ignored) {}
+        } catch (IllegalAccessException ignored) {
+            // campo inaccesible → continuar
+        }
 
         return null;
     }
 
     /* ---------- Utilidades internas ---------- */
 
-    // Busca en cualquier Map/Collection que expongan métodos públicos sin parámetros
     private static Object buscarEnEstructuras(Object holder, String keyOrName, String classNameHint) {
         for (Method m : holder.getClass().getMethods()) {
             if (m.getParameterCount() == 0) {
@@ -98,22 +124,20 @@ final class DomainAccess {
                     Object res = m.invoke(holder);
                     Object pick = pickFromContainer(res, keyOrName, classNameHint);
                     if (pick != null) return pick;
-                } catch (Throwable ignored) {}
+                } catch (IllegalAccessException | InvocationTargetException ignored) {
+                    // método inaccesible → continuar
+                }
             }
         }
         return null;
     }
 
-    // Selecciona un objeto del contenedor según key o nombre (getNombre/getName/nombre)
-    @SuppressWarnings("unchecked")
     private static Object pickFromContainer(Object container, String keyOrName, String classNameHint) {
         if (container == null) return null;
 
         try {
             if (container instanceof java.util.Map<?, ?> map) {
-                // 1) por clave exacta
                 if (map.containsKey(keyOrName)) return map.get(keyOrName);
-                // 2) por valor que "parezca" la clase buscada y nombre
                 for (Object v : map.values()) {
                     if (v != null && v.getClass().getSimpleName().toLowerCase().contains(classNameHint.toLowerCase())) {
                         Method g = findAny(v.getClass(), "getNombre", "getName", "nombre");
@@ -137,13 +161,20 @@ final class DomainAccess {
                     }
                 }
             }
-        } catch (Throwable ignored) {}
+        } catch (IllegalAccessException | InvocationTargetException ignored) {
+            // reflexión fallida → continuar
+        }
+
         return null;
     }
 
     private static Method findAny(Class<?> c, String... names) {
         for (String n : names) {
-            try { return c.getMethod(n); } catch (NoSuchMethodException ignored) {}
+            try {
+                return c.getMethod(n);
+            } catch (NoSuchMethodException ignored) {
+            					// probar siguiente nombre
+            }
         }
         return null;
     }
