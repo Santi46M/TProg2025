@@ -3,7 +3,12 @@ package logica.Controladores;
 import java.util.List;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.*;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.LinkedHashSet;
+
 
 import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
@@ -16,19 +21,39 @@ import excepciones.FechasCruzadasException;
 import excepciones.CupoTipoRegistroInvalidoException;
 import excepciones.CostoTipoRegistroInvalidoException;
 
-import logica.Manejadores.*;
+import logica.Manejadores.ManejadorEvento;
+import logica.Manejadores.manejadorAuxiliar;
+import logica.Manejadores.manejadorUsuario;
+
 import logica.Interfaces.IControladorEvento;
-import logica.Clases.*;
-import logica.Datatypes.*;
-import logica.Enumerados.*;
+import logica.Clases.Asistente;
+import logica.Clases.Categoria;
+import logica.Clases.Ediciones;
+import logica.Clases.Eventos;
+import logica.Clases.Institucion;
+import logica.Clases.Patrocinio;
+import logica.Clases.Registro;
+import logica.Clases.TipoRegistro;
+import logica.Clases.Usuario;
+import logica.Datatypes.DTEdicion;
+import logica.Datatypes.DTEvento;
+import logica.Datatypes.DTRegistro;
+
+import logica.Enumerados.DTEstado;
+import logica.Enumerados.DTNivel;
+import logica.Datatypes.DTCategorias;
+import java.lang.reflect.InvocationTargetException;
+
+
+
 
 public class ControladorEvento implements IControladorEvento {
-    ManejadorEvento manejador = ManejadorEvento.getInstancia();
-    manejadorUsuario mUsuario = manejadorUsuario.getInstancia();
+    private ManejadorEvento manejador = ManejadorEvento.getInstancia();
+    private manejadorUsuario mUsuario = manejadorUsuario.getInstancia();
 
     private String edicionSeleccionadaSigla = null;
 
-    public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias, String imagen) throws EventoYaExisteException {
+    public void altaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias, String imagen) throws EventoYaExisteException {
         if (categorias == null || categorias.getCategorias() == null || categorias.getCategorias().isEmpty()) {
             throw new RuntimeException("Debe asociar al menos una categoría al evento");
         }
@@ -48,7 +73,7 @@ public class ControladorEvento implements IControladorEvento {
         manejador.agregarEvento(nuevoEvento);
     }
 
-    public void AltaTipoRegistro(Ediciones edicion, String nombre, String descripcion, float costo, int cupo) throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
+    public void altaTipoRegistro(Ediciones edicion, String nombre, String descripcion, float costo, int cupo) throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
         if (edicion.obtenerTipoRegistro(nombre) != null) {
             throw new TipoRegistroYaExisteException(nombre);
         }
@@ -64,7 +89,7 @@ public class ControladorEvento implements IControladorEvento {
         manejadorEvento.agregarTipoRegistro(tipo);
     }
 
-    public void AltaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException {
+    public void altaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException {
         manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
         for (Patrocinio p : manejadorAux.listarPatrocinios()) {
             if (p.getInstitucion().equals(institucion) && p.getEdicion().equals(edicion)) {
@@ -83,7 +108,7 @@ public class ControladorEvento implements IControladorEvento {
         edicion.getPatrocinios().add(pat);
     }
 
-    public void AltaCategoria(String nombre) {
+    public void altaCategoria(String nombre) {
         manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
         if (manejadorAux.existeCategoria(nombre)) {
             throw new RuntimeException("Ya existe la categoría: " + nombre);
@@ -92,7 +117,7 @@ public class ControladorEvento implements IControladorEvento {
         manejadorAux.agregarCategoria(nombre, categoria);
     }
 
-    public void AltaEdicionEvento(Eventos evento, Usuario usuario, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais, String imagen) throws EdicionYaExisteException, EventoYaExisteException, FechasCruzadasException {
+    public void altaEdicionEvento(Eventos evento, Usuario usuario, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais, String imagen) throws EdicionYaExisteException, EventoYaExisteException, FechasCruzadasException {
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
         if (fechaInicio.isAfter(fechaFin)) {
             throw new FechasCruzadasException("La fecha de inicio debe ser anterior a la fecha de fin.");
@@ -217,9 +242,10 @@ public class ControladorEvento implements IControladorEvento {
             var m = v.getClass().getMethod("getNombre");
             Object nombre = m.invoke(v);
             if (nombre instanceof String s && !s.isBlank()) out.add(s);
-        } catch (Exception ignore) {
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException ex) {
             // sin getNombre(): se omite
         }
+
     }
 
     private static String normalizar(String s) {

@@ -277,7 +277,7 @@ public class AltaEdicionEvento extends JInternalFrame {
 	                return;
 	            }
 
-	            controladorEvento.AltaEdicionEvento(
+	            controladorEvento.altaEdicionEvento(
 	                evento, organizador, nombre, sigla, "",
 	                fInicio, fFin, fAlta, ciudad, pais,
 	                imagenSeleccionada[0]  // <<--- nueva imagen o null

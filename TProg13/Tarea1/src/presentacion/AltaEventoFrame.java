@@ -221,7 +221,7 @@ public class AltaEventoFrame extends JInternalFrame {
                 ControladorEvento controlador = new ControladorEvento();
                 DTCategorias dtCategorias = new DTCategorias(categoriasSeleccionadas);
 
-                controlador.AltaEvento(nombre, descripcion, fechaAlta, sigla, dtCategorias, imagenSeleccionada[0]);
+                controlador.altaEvento(nombre, descripcion, fechaAlta, sigla, dtCategorias, imagenSeleccionada[0]);
 
                 JOptionPane.showMessageDialog(this, "Evento registrado con éxito.");
                 this.dispose();

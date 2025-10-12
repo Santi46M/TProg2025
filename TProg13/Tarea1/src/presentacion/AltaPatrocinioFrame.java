@@ -196,7 +196,7 @@ public class AltaPatrocinioFrame extends JInternalFrame {
                 logica.Clases.TipoRegistro tipoRegistro = edicion != null ? edicion.getTipoRegistro(tipoRegistroGratuito) : null;
                 logica.Enumerados.DTNivel nivelEnum = logica.Enumerados.DTNivel.valueOf(nivel.toUpperCase());
                 java.time.LocalDate fechaHoy = java.time.LocalDate.now();
-                controlador.AltaPatrocinio(
+                controlador.altaPatrocinio(
                     edicion,
                     institucion,
                     nivelEnum,
