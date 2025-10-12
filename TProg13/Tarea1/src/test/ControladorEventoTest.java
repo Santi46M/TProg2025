@@ -265,7 +265,7 @@ class ControladorEventoTest {
         // Institución: intento obtener; si no, fabrico una instancia tolerante
         Object inst = DomainAccess.obtenerInstitucion("Inst_A");
         if (inst == null) {
-            try { inst = TestUtils.tolerantNew("logica.Clases.Institucion", "Inst_A", "desc", "web"); }
+            try { inst = TestUtils.tolerantNew("logica.Clases.Institucion", "Inst_A", "desc", "web");}
             catch (RuntimeException e) { 
             	inst = TestUtils.tolerantNew("logica.Clases.Institucion"); 
             	}
