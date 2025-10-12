@@ -2,6 +2,12 @@
 <%
   String ctx = request.getContextPath();
   String rol = (String) session.getAttribute("rol");
+
+  @SuppressWarnings("unchecked")
+  java.util.List<String> categorias = (java.util.List<String>) request.getAttribute("categorias");
+  if (categorias == null) {
+      categorias = logica.Controladores.ControladorEvento.listarCategorias();
+  }
 %>
 
 <aside class="card aside-inicio">
@@ -10,29 +16,51 @@
   <% if ("ORGANIZADOR".equals(rol)) { %>
     <h4>Acciones</h4>
     <ul>
-      <li><a href="<%=ctx%>/evento/alta">Alta Evento</a></li>
-      <li><a href="<%=ctx%>/edicion/alta">Alta Edición Evento</a></li>
-      <li><a href="<%=ctx%>/registro/alta">Alta Registro</a></li>
+      <li>
+        <form action="<%=ctx%>/evento/alta" method="get" style="display:inline">
+          <button type="submit" class="linklike">Alta Evento</button>
+        </form>
+      </li>
+      <li>
+        <form action="<%=ctx%>/edicion/alta" method="get" style="display:inline">
+          <button type="submit" class="linklike">Alta Edición Evento</button>
+        </form>
+      </li>
+      <li>
+        <form action="<%=ctx%>/registro/alta" method="get" style="display:inline">
+          <button type="submit" class="linklike">Alta Registro</button>
+        </form>
+      </li>
     </ul>
   <% } else if ("ASISTENTE".equals(rol)) { %>
     <h4>Acciones</h4>
     <ul>
-      <li><a href="<%=ctx%>/registro/inscripcion">Registrarse a Edición de Evento</a></li>
+      <li>
+        <form action="<%=ctx%>/registro/inscripcion" method="get" style="display:inline">
+          <button type="submit" class="linklike">Registrarse a Edición de Evento</button>
+        </form>
+      </li>
     </ul>
   <% } %>
 
   <h4>Categorías</h4>
   <ul class="menu-categorias">
-    <li><a href="#">Tecnología</a></li>
-    <li><a href="#">Innovación</a></li>
-    <li><a href="#">Literatura</a></li>
-    <li><a href="#">Cultura</a></li>
-    <li><a href="#">Música</a></li>
-    <li><a href="#">Deporte</a></li>
-    <li><a href="#">Salud</a></li>
-    <li><a href="#">Entretenimiento</a></li>
-    <li><a href="#">Negocios</a></li>
+    <% if (categorias != null && !categorias.isEmpty()) {
+         for (String cat : categorias) { %>
+      <li>
+        <form action="<%=ctx%>/evento/filtrar" method="get">
+          <input type="hidden" name="cat" value="<%=cat%>">
+          <button type="submit" class="linklike"><%=cat%></button>
+        </form>
+      </li>
+    <% } } else { %>
+      <li><span>(Sin categorías)</span></li>
+    <% } %>
   </ul>
 
-  <h4><a href="<%=ctx%>/usuario/ConsultaUsuario">Listar Usuarios</a></h4>
+  <h4>
+    <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline">
+      <button type="submit" class="linklike">Listar Usuarios</button>
+    </form>
+  </h4>
 </aside>

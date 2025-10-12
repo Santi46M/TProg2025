@@ -128,6 +128,123 @@ public class ControladorEvento implements IControladorEvento {
             edicion.getPais()
         );
     }
+    
+ // En ControladorEvento
+
+    public List<DTEvento> listarEventosPorCategoria(String categoriaBuscada) {
+        String needle = normalizar(categoriaBuscada);
+        List<DTEvento> out = new ArrayList<>();
+
+        Collection<Eventos> eventos = ManejadorEvento.getInstancia().obtenerEventos().values();
+
+        for (Eventos ev : eventos) {
+            List<String> cats = extraerNombresCategorias(ev.getCategorias());
+            boolean match = cats.stream().anyMatch(c -> normalizar(c).equals(needle));
+            if (!match) continue;
+
+            List<String> eds = extraerNombresEdiciones(ev.getEdiciones());
+            out.add(new DTEvento(
+                    ev.getNombre(),
+                    ev.getSigla(),
+                    ev.getDescripcion(),
+                    ev.getFecha(),
+                    cats,
+                    eds,
+                    ev.getImagen()
+            ));
+        }
+        return out;
+    }
+
+    public List<String> listarCategoriasConEventos() {
+        Set<String> set = new LinkedHashSet<>();
+        Collection<logica.Clases.Eventos> eventos =
+                ManejadorEvento.getInstancia().obtenerEventos().values();
+
+        for (Eventos ev : eventos) {
+            List<String> cats = extraerNombresCategorias(ev.getCategorias());
+            for (String c : cats) {
+                if (c != null) {
+                    String t = c.trim();
+                    if (!t.isEmpty()) set.add(t);
+                }
+            }
+        }
+        return new ArrayList<>(set);
+    }
+
+    private static List<String> extraerNombresCategorias(Map<?, ?> categorias) {
+        List<String> res = new ArrayList<>();
+        if (categorias == null || categorias.isEmpty()) return res;
+
+        for (Object v : categorias.values()) {
+            addNombre(res, v);
+        }
+        return res;
+    }
+
+    private static List<String> extraerNombresEdiciones(Map<?, ?> ediciones) {
+        List<String> res = new ArrayList<>();
+        if (ediciones == null || ediciones.isEmpty()) return res;
+
+        // 1) intentar con los values (objetos con nombre)
+        for (Object v : ediciones.values()) {
+            addNombre(res, v);
+        }
+        if (!res.isEmpty()) return res;
+
+        // 2) fallback: usar las keys como nombres
+        for (Object k : ediciones.keySet()) {
+            if (k != null) res.add(String.valueOf(k));
+        }
+        return res;
+    }
+
+    /** Agrega el nombre a la lista si puede obtenerlo del objeto */
+    private static void addNombre(List<String> out, Object v) {
+        if (v == null) return;
+
+        if (v instanceof String s) {
+            if (!s.isBlank()) out.add(s);
+            return;
+        }
+        // si tus clases concretas están disponibles, probá directo:
+        // if (v instanceof Categoria c) { out.add(c.getNombre()); return; }
+        // if (v instanceof Ediciones e) { out.add(e.getNombre()); return; }
+
+        // fallback por reflexión (getNombre())
+        try {
+            var m = v.getClass().getMethod("getNombre");
+            Object nombre = m.invoke(v);
+            if (nombre instanceof String s && !s.isBlank()) out.add(s);
+        } catch (Exception ignore) {
+            // sin getNombre(): se omite
+        }
+    }
+
+    private static String normalizar(String s) {
+        if (s == null) return "";
+        String t = s.trim().toLowerCase(Locale.ROOT);
+        t = java.text.Normalizer.normalize(t, java.text.Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", ""); // quita tildes
+        return t;
+    }
+    
+ // En ControladorEvento
+    public static List<String> listarCategorias() {
+        Set<String> set = manejadorAuxiliar.getInstancia().listarCategorias();
+        List<String> res = new ArrayList<>();
+        if (set == null || set.isEmpty()) return res;
+
+        for (String s : set) {
+            if (s != null && !s.isBlank()) res.add(s);
+        }
+        return res;
+    }
+
+
+
+
 
     public Eventos consultaEvento(String nombreEvento) {
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
