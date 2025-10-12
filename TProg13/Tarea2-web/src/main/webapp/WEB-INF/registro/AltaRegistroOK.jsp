@@ -42,8 +42,8 @@
       <p><%= mensaje %></p>
 
       <div style="margin-top: 2rem;">
-        <a class="btn" href="<%=ctx%>/registro/alta"><i class='bx bx-plus-circle'></i> Crear otro</a>
-        <a class="btn ghost" href="<%=ctx%>/"><i class='bx bx-home'></i> Volver al inicio</a>
+        <a class="btn" href="<%=ctx%>/registro/inscripcion"><i class='bx bx-plus-circle'></i> Crear otro</a>
+        <a class="btn ghost" href="<%=ctx%>/inicio"><i class='bx bx-home'></i> Volver al inicio</a>
       </div>
     </section>
   </main>
