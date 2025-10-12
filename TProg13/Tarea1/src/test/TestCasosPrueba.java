@@ -10,12 +10,12 @@ import org.junit.jupiter.api.Test;
 
 import excepciones.UsuarioYaExisteException;
 import logica.fabrica;
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
-import logica.Manejadores.ManejadorEvento;
 import logica.CargaDatosPrueba;
-import logica.Manejadores.manejadorAuxiliar;
-import logica.Manejadores.manejadorUsuario;
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
+import logica.manejadores.ManejadorEvento;
+import logica.manejadores.manejadorAuxiliar;
+import logica.manejadores.manejadorUsuario;
 
 
 

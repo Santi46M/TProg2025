@@ -1,8 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
-  String ctx = request.getContextPath();
+String ctx = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
-  logica.Clases.Patrocinio patrocinio = (logica.Clases.Patrocinio) request.getAttribute("patrocinio");
+  logica.clases.Patrocinio patrocinio = (logica.clases.Patrocinio) request.getAttribute("patrocinio");
 %>
 <!DOCTYPE html>
 <html lang="es">

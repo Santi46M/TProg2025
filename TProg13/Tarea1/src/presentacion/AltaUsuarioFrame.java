@@ -15,8 +15,9 @@ import javax.swing.JTextField;
 
 
 import com.toedter.calendar.JDateChooser;
-import logica.Interfaces.IControladorUsuario;
-import logica.Interfaces.IControladorEvento;
+
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
 
 import java.util.Vector;
 import java.time.LocalDate;

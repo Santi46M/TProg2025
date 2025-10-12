@@ -9,9 +9,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import excepciones.RegistroNoExiste;
-import logica.Datatypes.DTRegistro;
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
+import logica.datatypes.DTRegistro;
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

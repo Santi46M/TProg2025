@@ -17,13 +17,13 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 
-import logica.Controladores.ControladorEvento;
-import logica.Datatypes.DTEvento;
-import logica.Clases.Ediciones;
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
+import logica.clases.Ediciones;
+import logica.clases.TipoRegistro;
+import logica.controladores.ControladorEvento;
+import logica.datatypes.DTEvento;
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
 
-import logica.Clases.TipoRegistro;
 import java.util.List;
 import java.util.ArrayList;
 

@@ -14,9 +14,10 @@ import java.awt.BorderLayout;
 import java.awt.Insets;
 
 import java.awt.FlowLayout;
-import logica.Clases.Eventos;
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
+
+import logica.clases.Eventos;
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
 import excepciones.TipoRegistroYaExisteException;
 import java.util.List;
 
@@ -104,12 +105,12 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
         cargarEventos();
     }
 
-    private java.util.List<logica.Datatypes.DTEvento> eventosDTO;
+    private java.util.List<logica.datatypes.DTEvento> eventosDTO;
     public void cargarEventos() {
         try {
             eventosDTO = controlador.listarEventos();
             comboEventos.removeAllItems();
-            for (logica.Datatypes.DTEvento ev : eventosDTO) {
+            for (logica.datatypes.DTEvento ev : eventosDTO) {
                 comboEventos.addItem(ev.getNombre());
             }
             if (comboEventos.getItemCount() > 0) {
@@ -126,7 +127,7 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
         comboEdiciones.removeAllItems();
         int idx = comboEventos.getSelectedIndex();
         if (idx >= 0 && eventosDTO != null && idx < eventosDTO.size()) {
-            logica.Datatypes.DTEvento evento = eventosDTO.get(idx);
+            logica.datatypes.DTEvento evento = eventosDTO.get(idx);
             java.util.List<String> ediciones = evento.getEdiciones();
             for (String ed : ediciones) {
                 comboEdiciones.addItem(ed);
@@ -141,9 +142,9 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
             JOptionPane.showMessageDialog(this, "Debe seleccionar un evento y una edición.");
             return;
         }
-        logica.Datatypes.DTEvento eventoDTO = eventosDTO.get(idxEvento);
+        logica.datatypes.DTEvento eventoDTO = eventosDTO.get(idxEvento);
         String nombreEdicion = (String) comboEdiciones.getSelectedItem();
-        logica.Clases.Ediciones edicion = controlador.obtenerEdicion(eventoDTO.getNombre(), nombreEdicion);
+        logica.clases.Ediciones edicion = controlador.obtenerEdicion(eventoDTO.getNombre(), nombreEdicion);
         String nombre = txtNombre.getText().trim();
         String descripcion = txtDescripcion.getText().trim();
         String costoStr = txtCosto.getText().trim();

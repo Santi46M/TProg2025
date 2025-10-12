@@ -58,13 +58,17 @@
       <aside class="editions" style="min-width:300px; flex:1; margin-left:2rem; align-self:flex-start;">
         <h3>Ediciones</h3>
         <%
-          java.util.List<logica.Datatypes.DTEdicion> ediciones = (java.util.List<logica.Datatypes.DTEdicion>) request.getAttribute("evEdiciones");
-          if (ediciones == null || ediciones.isEmpty()) {
+        java.util.List<logica.datatypes.DTEdicion> ediciones = (java.util.List<logica.datatypes.DTEdicion>) request.getAttribute("evEdiciones");
+                  if (ediciones == null || ediciones.isEmpty()) {
         %>
           <p>No hay ediciones asociadas a este evento.</p>
-        <% } else { %>
+        <%
+        } else {
+        %>
           <ul class="ediciones-list">
-          <% for (logica.Datatypes.DTEdicion ed : ediciones) { %>
+          <%
+          for (logica.datatypes.DTEdicion ed : ediciones) {
+          %>
             <li>
               <strong><%= ed.getNombre() %></strong>
               <span>(<%= ed.getFechaInicio() %> - <%= ed.getFechaFin() %>)</span>

@@ -1,12 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
-  String ctx = request.getContextPath();
+String ctx = request.getContextPath();
   String rol = (String) session.getAttribute("rol");
   String nick = (String) session.getAttribute("nick");
   boolean precargado = Boolean.TRUE.equals(application.getAttribute("datosPrecargados"));
 
-  java.util.List<logica.Datatypes.DTEvento> eventos =
-    (java.util.List<logica.Datatypes.DTEvento>) request.getAttribute("eventos");
+  java.util.List<logica.datatypes.DTEvento> eventos =
+    (java.util.List<logica.datatypes.DTEvento>) request.getAttribute("eventos");
 %>
 
 <!DOCTYPE html>
@@ -34,8 +34,8 @@
 
       <div id="eventList" class="row">
         <%
-          if (eventos != null && !eventos.isEmpty()) {
-            for (logica.Datatypes.DTEvento e : eventos) {
+        if (eventos != null && !eventos.isEmpty()) {
+                    for (logica.datatypes.DTEvento e : eventos) {
         %>
           <div class="card">
             <h2><%= e.getNombre() %></h2>

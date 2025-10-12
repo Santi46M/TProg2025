@@ -13,12 +13,12 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import logica.Clases.Ediciones;
-import logica.Clases.Eventos;
-import logica.Datatypes.DTCategorias;
-import logica.Enumerados.DTEstado;
-import logica.Enumerados.DTNivel;
-import logica.Manejadores.ManejadorEvento;
+import logica.clases.Ediciones;
+import logica.clases.Eventos;
+import logica.datatypes.DTCategorias;
+import logica.enumerados.DTEstado;
+import logica.enumerados.DTNivel;
+import logica.manejadores.ManejadorEvento;
 
 /**
  * Carga de datos hardcodeada (estilo original) usando los datos nuevos
@@ -64,7 +64,7 @@ public class CargaDatosPrueba {
     // CATEGORÍAS
     // =========================
     public static void cargarCategorias() {
-        var ce = new logica.Controladores.ControladorEvento();
+        var ce = new logica.controladores.ControladorEvento();
         ce.altaCategoria("Tecnología");
         ce.altaCategoria("Innovación");
         ce.altaCategoria("Literatura");
@@ -83,7 +83,7 @@ public class CargaDatosPrueba {
     // INSTITUCIONES
     // =========================
     public static void cargarInstitucionesEjemplo() throws InstitucionYaExisteException {
-        var cu = new logica.Controladores.ControladorUsuario();
+        var cu = new logica.controladores.ControladorUsuario();
         cu.altaInstitucion("Facultad de Ingeniería", "Facultad de Ingeniería de la Universidad de la República", "https://www.fing.edu.uy");
         cu.altaInstitucion("ORT Uruguay", "Universidad privada enfocada en tecnología y gestión", "https://ort.edu.uy");
         cu.altaInstitucion("Universidad Católica del Uruguay", "Institución de educación superior privada", "https://ucu.edu.uy");
@@ -95,7 +95,7 @@ public class CargaDatosPrueba {
     // EVENTOS
     // =========================
     public static void cargarEventosEjemplo() throws EventoYaExisteException {
-        var ce = new logica.Controladores.ControladorEvento();
+        var ce = new logica.controladores.ControladorEvento();
 
         List<String> catEv01 = Arrays.asList("Tecnología", "Innovación");
         List<String> catEv02 = Arrays.asList("Literatura", "Cultura");
@@ -180,7 +180,7 @@ public class CargaDatosPrueba {
     // USUARIOS
     // =========================
     public static void cargarUsuariosEjemplo() throws UsuarioYaExisteException {
-        var cu = new logica.Controladores.ControladorUsuario();
+        var cu = new logica.controladores.ControladorUsuario();
 
         // Asistentes
         cu.altaUsuario("atorres", "Ana", "atorres@gmail.com", null, null, "Torres",
@@ -234,9 +234,9 @@ public class CargaDatosPrueba {
     // EDICIONES (con ESTADO)
     // =========================
     public static void cargarEdicionesEjemplo() throws EdicionYaExisteException {
-        var ce = new logica.Controladores.ControladorEvento();
+        var ce = new logica.controladores.ControladorEvento();
         var mEv = ManejadorEvento.getInstancia();
-        var mUs = logica.Manejadores.manejadorUsuario.getInstancia();
+        var mUs = logica.manejadores.manejadorUsuario.getInstancia();
 
         // Helper: crea la edición y le setea estado (si tu Controlador no recibe estado)
         java.util.function.BiConsumer<String, DTEstado> setEstadoEdicion = (sigla, estado) -> {
@@ -398,7 +398,7 @@ public class CargaDatosPrueba {
     // TIPOS DE REGISTRO
     // =========================
     public static void cargarTipoRegistroEjemplo() throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
-        var ce = new logica.Controladores.ControladorEvento();
+        var ce = new logica.controladores.ControladorEvento();
         var mEv = ManejadorEvento.getInstancia();
 
         ce.altaTipoRegistro(mEv.obtenerEdicion("MONROCK25"), "General", "Acceso general a Montevideo Rock (2 días)", 1500, 2000);
@@ -441,9 +441,9 @@ public class CargaDatosPrueba {
     // REGISTROS
     // =========================
     public static void cargarRegistrosEjemplo() {
-        var ce = new logica.Controladores.ControladorEvento();
+        var ce = new logica.controladores.ControladorEvento();
         var mEv = ManejadorEvento.getInstancia();
-        var mUs = logica.Manejadores.manejadorUsuario.getInstancia();
+        var mUs = logica.manejadores.manejadorUsuario.getInstancia();
 
         ce.altaRegistroEdicionEvento("atorres MONROCK25",
             mUs.getUsuarios().get("atorres"),
@@ -513,13 +513,13 @@ public class CargaDatosPrueba {
     // PATROCINIOS
     // =========================
     public static void cargarPatrociniosEjemplo() throws ValorPatrocinioExcedidoException {
-        var ce = new logica.Controladores.ControladorEvento();
+        var ce = new logica.controladores.ControladorEvento();
         var mEv = ManejadorEvento.getInstancia();
         
 
         ce.altaPatrocinio(
             mEv.obtenerEdicion("CONFTECH26"),
-            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Facultad de Ingeniería"),
+            logica.manejadores.manejadorUsuario.getInstancia().findInstitucion("Facultad de Ingeniería"),
             DTNivel.ORO,
             mEv.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("Estudiante"),
             20000,
@@ -530,7 +530,7 @@ public class CargaDatosPrueba {
 
         ce.altaPatrocinio(
             mEv.obtenerEdicion("CONFTECH26"),
-            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Agencia Nacional de Investigación e Innovación (ANII)"),
+            logica.manejadores.manejadorUsuario.getInstancia().findInstitucion("Agencia Nacional de Investigación e Innovación (ANII)"),
             DTNivel.PLATA,
             mEv.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("General"),
             10000,
@@ -541,7 +541,7 @@ public class CargaDatosPrueba {
 
         ce.altaPatrocinio(
             mEv.obtenerEdicion("MARATON25"),
-            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Antel"),
+            logica.manejadores.manejadorUsuario.getInstancia().findInstitucion("Antel"),
             DTNivel.PLATINO,
             mEv.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 10K"),
             25000,
@@ -552,7 +552,7 @@ public class CargaDatosPrueba {
 
         ce.altaPatrocinio(
             mEv.obtenerEdicion("EXPOAGRO25"),
-            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Universidad Católica del Uruguay"),
+            logica.manejadores.manejadorUsuario.getInstancia().findInstitucion("Universidad Católica del Uruguay"),
             DTNivel.BRONCE,
             mEv.obtenerEdicion("EXPOAGRO25").obtenerTipoRegistro("General"),
             15000,

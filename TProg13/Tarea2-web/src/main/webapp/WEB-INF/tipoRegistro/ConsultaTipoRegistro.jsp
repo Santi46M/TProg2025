@@ -1,8 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
-  String ctx = request.getContextPath();
+String ctx = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
-  logica.Clases.TipoRegistro tipoRegistro = (logica.Clases.TipoRegistro) request.getAttribute("tipoRegistro");
+  logica.clases.TipoRegistro tipoRegistro = (logica.clases.TipoRegistro) request.getAttribute("tipoRegistro");
 %>
 <!DOCTYPE html>
 <html lang="es">

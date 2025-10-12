@@ -7,12 +7,11 @@ import javax.swing.JTextField;
 
 import excepciones.UsuarioNoExisteException;
 import excepciones.UsuarioTipoIncorrectoException;
+import logica.interfaces.IControladorUsuario;
 
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-
-import logica.Interfaces.IControladorUsuario;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -104,7 +103,7 @@ public class ModificarDatosUsuarioFrame extends JInternalFrame {
         gbc.gridy++;
 
         JLabel lblInstitucion = new JLabel("Institución:");
-        String[] instituciones = logica.Manejadores.manejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
+        String[] instituciones = logica.manejadores.manejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
         JComboBox<String> comboInstitucion = new JComboBox<>(instituciones);
         panelDatos.add(lblInstitucion, gbc);
         gbc.gridx = 1;

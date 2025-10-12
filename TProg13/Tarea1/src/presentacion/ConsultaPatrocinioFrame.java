@@ -6,8 +6,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -117,23 +117,23 @@ public class ConsultaPatrocinioFrame extends JInternalFrame {
     }
 
     public void cargarDatos() {
-        logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
-        java.util.List<logica.Datatypes.DTEvento> listaEventos = controlador.listarEventos();
+        logica.controladores.ControladorEvento controlador = new logica.controladores.ControladorEvento();
+        java.util.List<logica.datatypes.DTEvento> listaEventos = controlador.listarEventos();
         eventos = new String[listaEventos.size()];
         edicionesPorEvento = new String[listaEventos.size()][];
         java.util.List<String[]> patsList = new java.util.ArrayList<>();
         java.util.List<String[]> datosList = new java.util.ArrayList<>();
         for (int i = 0; i < listaEventos.size(); i++) {
-            logica.Datatypes.DTEvento ev = listaEventos.get(i);
+            logica.datatypes.DTEvento ev = listaEventos.get(i);
             eventos[i] = ev.getNombre();
             java.util.List<String> eds = controlador.listarEdicionesEvento(ev.getNombre());
             edicionesPorEvento[i] = eds.toArray(new String[0]);
             for (String ed : eds) {
-                logica.Clases.Ediciones edi = controlador.obtenerEdicion(ev.getNombre(), ed);
+                logica.clases.Ediciones edi = controlador.obtenerEdicion(ev.getNombre(), ed);
                 java.util.List<String> pats = new java.util.ArrayList<>();
                 java.util.List<String> datosPat = new java.util.ArrayList<>();
                 if (edi != null) {
-                    for (logica.Clases.Patrocinio p : edi.getPatrocinios()) {
+                    for (logica.clases.Patrocinio p : edi.getPatrocinios()) {
                         pats.add(p.getCodigoPatrocinio());
                         String datos = "Institución: " + (p.getInstitucion() != null ? p.getInstitucion().getNombre() : "") +
                                 "\nNivel: " + (p.getNivel() != null ? p.getNivel().toString() : "") +

@@ -1,5 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.*, logica.Datatypes.DTEvento, logica.Clases.Ediciones" %>
+<%@ page import="java.util.*,logica.datatypes.DTEvento,logica.clases.Ediciones" %>
 <%
   String ctx = request.getContextPath();
   List<DTEvento> eventos = (List<DTEvento>) request.getAttribute("eventos");

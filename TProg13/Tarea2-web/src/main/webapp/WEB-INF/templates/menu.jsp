@@ -3,13 +3,13 @@
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/layoutMenu.css"><!-- <= acá -->
 
 <%
-  String ctx = request.getContextPath();
+String ctx = request.getContextPath();
   String rol = (String) session.getAttribute("rol");
 
   @SuppressWarnings("unchecked")
   java.util.List<String> categorias = (java.util.List<String>) request.getAttribute("categorias");
   if (categorias == null) {
-      categorias = logica.Controladores.ControladorEvento.listarCategorias();
+      categorias = logica.controladores.ControladorEvento.listarCategorias();
   }
 %>
 <aside class="card aside-inicio">

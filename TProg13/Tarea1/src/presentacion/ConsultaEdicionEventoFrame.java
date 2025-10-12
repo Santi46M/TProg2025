@@ -25,12 +25,13 @@ import java.awt.GridLayout;
 
 import java.awt.FlowLayout;
 import java.util.List;
-import logica.Clases.Ediciones;
-import logica.Clases.Patrocinio;
-import logica.Clases.TipoRegistro;
-import logica.Datatypes.DTEvento;
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
+
+import logica.clases.Ediciones;
+import logica.clases.Patrocinio;
+import logica.clases.TipoRegistro;
+import logica.datatypes.DTEvento;
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
 
 public class ConsultaEdicionEventoFrame extends JInternalFrame {
 
@@ -254,7 +255,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         panelGridRegistros.add(new JLabel("Asistente", SwingConstants.CENTER));
         panelGridRegistros.add(new JLabel("Tipo de registro", SwingConstants.CENTER));
         panelGridRegistros.add(new JLabel("Costo", SwingConstants.CENTER));
-        for (logica.Clases.Registro reg : ed.getRegistros().values()) {
+        for (logica.clases.Registro reg : ed.getRegistros().values()) {
             panelGridRegistros.add(new JLabel(reg.getUsuario().getNickname()));
             panelGridRegistros.add(new JLabel(reg.getTipoRegistro().getNombre()));
             panelGridRegistros.add(new JLabel(String.valueOf(reg.getCosto())));

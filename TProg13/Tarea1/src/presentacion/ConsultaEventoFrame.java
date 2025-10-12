@@ -24,9 +24,9 @@ import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Insets;
 
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
-import logica.Datatypes.DTEvento;
+import logica.datatypes.DTEvento;
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
 
 public class ConsultaEventoFrame extends JInternalFrame {
     private IControladorEvento controladorEvento;
@@ -311,7 +311,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
         String nombreEvento  = comboEventos.getItemAt(idxEvento);
         String nombreEdicion = edicionesEventos[idxEvento][idxEd];
 
-        logica.Clases.Ediciones ed = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
+        logica.clases.Ediciones ed = controladorEvento.obtenerEdicion(nombreEvento, nombreEdicion);
         if (ed == null) {
             JOptionPane.showMessageDialog(this, "No se encontró la edición seleccionada.");
             return;

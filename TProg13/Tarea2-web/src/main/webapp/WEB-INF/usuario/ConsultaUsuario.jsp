@@ -1,11 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="logica.Clases.Usuario" %>
-<%@ page import="logica.Datatypes.*" %>
+<%@ page import="logica.clases.Usuario" %>
+<%@ page import="logica.datatypes.*" %>
 
 <%
-  String ctx = request.getContextPath();
+String ctx = request.getContextPath();
   String nickSesion = (String) session.getAttribute("nick");
   String rolSesion  = (String) session.getAttribute("rol");
 
@@ -20,8 +20,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Consulta de Usuarios — Eventos.uy</title>
-  <link rel="stylesheet" href="<%= ctx %>/css/style.css">
-  <link rel="stylesheet" href="<%= ctx %>/css/ConsultaUsuario.css">
+  <link rel="stylesheet" href="<%=ctx%>/css/style.css">
+  <link rel="stylesheet" href="<%=ctx%>/css/ConsultaUsuario.css">
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 </head>
@@ -37,19 +37,30 @@
 
     <!-- Main -->
     <main class="main-inicio">
-      <% if (error != null) { %>
-        <p class="error"><%= error %></p>
-      <% } %>
+      <%
+      if (error != null) {
+      %>
+        <p class="error"><%=error%></p>
+      <%
+      }
+      %>
 
-      <% if (usuario == null) { %>
+      <%
+      if (usuario == null) {
+      %>
         <h1>Usuarios registrados</h1>
         <div class="usuarios-grid">
-          <% if (usuarios == null || usuarios.isEmpty()) { %>
+          <%
+          if (usuarios == null || usuarios.isEmpty()) {
+          %>
             <p>No hay usuarios registrados.</p>
-          <% } else { %>
-            <% for (Usuario u : usuarios) { 
-                 boolean esOrg = (u instanceof logica.Clases.Organizador);
-                 boolean esAsist = (u instanceof logica.Clases.Asistente);
+          <%
+          } else {
+          %>
+            <%
+            for (Usuario u : usuarios) { 
+                             boolean esOrg = (u instanceof logica.clases.Organizador);
+                             boolean esAsist = (u instanceof logica.clases.Asistente);
             %>
               <div class="card usuario-card">
                 <h3>

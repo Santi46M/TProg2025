@@ -30,12 +30,12 @@ import java.util.Map;
 import java.util.Vector;
 
 import excepciones.UsuarioNoExisteException;
-import logica.Clases.Usuario;
-import logica.Datatypes.DTDatosUsuario;
-import logica.Datatypes.DTEdicion;
-import logica.Datatypes.DTRegistro;
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
+import logica.clases.Usuario;
+import logica.datatypes.DTDatosUsuario;
+import logica.datatypes.DTEdicion;
+import logica.datatypes.DTRegistro;
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
 
 public class ConsultaUsuario extends JInternalFrame {
 

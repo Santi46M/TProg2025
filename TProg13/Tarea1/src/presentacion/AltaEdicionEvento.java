@@ -19,13 +19,13 @@ import java.awt.Rectangle;
 import java.time.LocalDate;
 import com.toedter.calendar.JDateChooser;
 
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
 
 public class AltaEdicionEvento extends JInternalFrame {
 	private JComboBox<String> comboEvento;
 	private JComboBox<String> comboOrganizador;
-	private logica.Interfaces.IControladorUsuario controladorUsuario;
+	private logica.interfaces.IControladorUsuario controladorUsuario;
 	private JDateChooser dateChooserInicio;
 	private JDateChooser dateChooserFin;
 	private JDateChooser dateChooserAlta;
@@ -267,10 +267,10 @@ public class AltaEdicionEvento extends JInternalFrame {
 	            LocalDate fFin = ff.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 	            LocalDate fAlta = fa.toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
 
-	            logica.Controladores.ControladorEvento controladorEvento = new logica.Controladores.ControladorEvento();
-	            logica.Manejadores.ManejadorEvento manejadorEvento = logica.Manejadores.ManejadorEvento.getInstancia();
-	            logica.Clases.Eventos evento = manejadorEvento.obtenerEvento(eventoNombre);
-	            logica.Clases.Organizador organizador = controladorUsuario.listarOrganizadores().get(organizadorNick);
+	            logica.controladores.ControladorEvento controladorEvento = new logica.controladores.ControladorEvento();
+	            logica.manejadores.ManejadorEvento manejadorEvento = logica.manejadores.ManejadorEvento.getInstancia();
+	            logica.clases.Eventos evento = manejadorEvento.obtenerEvento(eventoNombre);
+	            logica.clases.Organizador organizador = controladorUsuario.listarOrganizadores().get(organizadorNick);
 
 	            if (evento == null || organizador == null) {
 	                JOptionPane.showMessageDialog(this, "No se pudo encontrar el evento u organizador seleccionado.");
@@ -301,8 +301,8 @@ public class AltaEdicionEvento extends JInternalFrame {
 	}
 
 	public void cargarEventos() {
-	    logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();
-	    java.util.List<logica.Datatypes.DTEvento> eventos;
+	    logica.controladores.ControladorEvento controlador = new logica.controladores.ControladorEvento();
+	    java.util.List<logica.datatypes.DTEvento> eventos;
 	    try {
 	        eventos = controlador.listarEventos();
 	    } catch (IllegalStateException | NullPointerException ex) {
@@ -315,7 +315,7 @@ public class AltaEdicionEvento extends JInternalFrame {
 	        return;
 	    }
 
-	    for (logica.Datatypes.DTEvento ev : eventos) {
+	    for (logica.datatypes.DTEvento ev : eventos) {
 	        comboEvento.addItem(ev.getNombre());
 	    }
 	    comboEvento.setSelectedIndex(0);
@@ -330,7 +330,7 @@ public class AltaEdicionEvento extends JInternalFrame {
 	        return;
 	    }
 
-	    java.util.Map<String, logica.Clases.Organizador> organizadores =
+	    java.util.Map<String, logica.clases.Organizador> organizadores =
 	            java.util.Collections.emptyMap();
 
 	    // Intentamos listar sin capturar Exception genérico (Checkstyle-safe)

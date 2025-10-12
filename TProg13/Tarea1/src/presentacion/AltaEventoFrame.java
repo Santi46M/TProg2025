@@ -19,10 +19,11 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import excepciones.EventoYaExisteException;
-import logica.Controladores.ControladorEvento;
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
-import logica.Datatypes.DTCategorias;
+import logica.controladores.ControladorEvento;
+import logica.datatypes.DTCategorias;
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
+
 import com.toedter.calendar.JDateChooser;
 
 public class AltaEventoFrame extends JInternalFrame {
@@ -36,7 +37,7 @@ public class AltaEventoFrame extends JInternalFrame {
         listModelCategorias.clear();
         categoriasSeleccionadasFlags = new java.util.ArrayList<>();
         try {
-            java.util.List<String> categorias = new java.util.ArrayList<>(logica.Manejadores.manejadorAuxiliar.getInstancia().listarCategorias());
+            java.util.List<String> categorias = new java.util.ArrayList<>(logica.manejadores.manejadorAuxiliar.getInstancia().listarCategorias());
             for (String cat : categorias) {
                 listModelCategorias.addElement(cat);
                 categoriasSeleccionadasFlags.add(false);

@@ -6,13 +6,15 @@ import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
+import logica.interfaces.IControladorEvento;
+
 import javax.swing.BorderFactory;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 
 import java.util.List;
-import logica.Interfaces.IControladorEvento;
 
 public class AceptarEdicionEventoFrame extends JInternalFrame {
     private IControladorEvento ice;

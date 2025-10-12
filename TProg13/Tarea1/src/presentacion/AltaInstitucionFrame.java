@@ -11,14 +11,13 @@ import javax.swing.JPanel;
 
 import javax.swing.JTextField;
 
+import logica.interfaces.IControladorEvento;
+import logica.interfaces.IControladorUsuario;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.BorderLayout;
 import java.awt.Insets;
-
-import logica.Interfaces.IControladorEvento;
-import logica.Interfaces.IControladorUsuario;
-
 import java.util.HashSet;
 import java.util.Set;
 

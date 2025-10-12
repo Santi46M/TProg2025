@@ -1,10 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.net.URLEncoder, java.nio.charset.StandardCharsets" %>
 <%
-  String ctx = request.getContextPath();
+String ctx = request.getContextPath();
 
-  java.util.List<logica.Datatypes.DTEvento> lista =
-      (java.util.List<logica.Datatypes.DTEvento>) request.getAttribute("lista");
+  java.util.List<logica.datatypes.DTEvento> lista =
+      (java.util.List<logica.datatypes.DTEvento>) request.getAttribute("lista");
 
   java.util.List<String> categorias =
       (java.util.List<String>) request.getAttribute("categorias");
