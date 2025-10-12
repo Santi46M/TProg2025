@@ -30,15 +30,13 @@ String ctx  = request.getContextPath();
         <h1 class="event-title"><%=(edicion != null ? edicion.getNombre() : "Edición")%></h1>
         <%
         if (edicion != null && edicion.getEvento() != null) {
-        %>
-          <div class="event-meta"><strong>Evento:</strong> <%=edicion.getEvento().getNombre()%></div>
-        <%
         }
         %>
       </div>
       <div class="event-info">
         <h3>Datos de la Edición</h3>
         <% if (edicion != null) { %>
+          <div class="event-meta"><strong>Evento:</strong> <%=edicion.getEvento().getNombre()%></div>
           <div class="event-meta"><strong>Sigla:</strong> <%=edicion.getSigla()%></div>
           <div class="event-meta"><strong>Fecha inicio:</strong> <%=edicion.getFechaInicio()%></div>
           <div class="event-meta"><strong>Fecha fin:</strong> <%=edicion.getFechaFin()%></div>
