@@ -22,7 +22,7 @@ import java.awt.EventQueue;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-public class main {
+public class Main {
 
     private static final Color P_BG_APP   = new Color(240, 248, 255);
     private static final Color P_MENU_BG  = new Color(230, 236, 246);
@@ -47,6 +47,7 @@ public class main {
     private ModificarDatosUsuarioFrame modificarDatosUsuarioFrame;
     private AceptarEdicionEventoFrame aceptarEdicionEventoFrame;
 
+    
     public static void main(String[] args) {
     	try {
     	    boolean puesto = false;
@@ -70,7 +71,7 @@ public class main {
 
         EventQueue.invokeLater(() -> {
             try {
-                main window = new main();
+                Main window = new Main();
                 window.frame.setVisible(true);
             } catch (IllegalStateException | NullPointerException ex) {
                 ex.printStackTrace();
@@ -78,7 +79,7 @@ public class main {
         });
     }
 
-    public main() {
+    public Main() {
         initialize();
         icu = fabrica.getInstance().getIControladorUsuario();
         ice = fabrica.getInstance().getIControladorEvento();
