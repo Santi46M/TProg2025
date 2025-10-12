@@ -1,23 +1,32 @@
 package test;
-import org.junit.jupiter.api.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;            // ← ESTA es la clave
 
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 
 @DisplayName("ControladorUsuario – ConsultaUsuario/obtenerDatos/updates encadenados")
 class ControladorUsuarioConsultaPlusTest {
 
-    Object cu;
+    private Object cu;
 
     @BeforeEach
     void setUp() throws Exception {
         TestUtils.resetAll();
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         Method getter;
-        try { getter = fab.getMethod("getInstance"); }
-        catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
+        try { 
+        	getter = fab.getMethod("getInstance"); 
+        } catch (NoSuchMethodException e) { 
+        	getter = fab.getMethod("getInstancia"); 
+        }
         Object fabrica = getter.invoke(null);
         cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_CUP", "d", "w");
@@ -36,22 +45,26 @@ class ControladorUsuarioConsultaPlusTest {
                 "cupi", "Ap1", LocalDate.of(2001, 1, 1));
 
         // llamada a ConsultaUsuario (sea lo que sea que haga, no debería romper)
-        try { TestUtils.invokeUnwrapped(cu, new String[]{"ConsultaUsuario"}, "cupi"); }
-        catch (Throwable ignored) {}
+        assertDoesNotThrow(() ->
+        TestUtils.invokeUnwrapped(cu, new String[]{"ConsultaUsuario"}, "cupi")
+        		);
 
-        // obtener datos y verificar cambios
+     // obtener datos y verificar cambios
         Object dto = TestUtils.tryInvoke(cu, new String[]{"obtenerDatosUsuario"}, "cupi");
         assertNotNull(dto);
+
         var mAp = TestUtils.findMethod(dto, "getApellido", "apellido");
         var mFn = TestUtils.findMethod(dto, "getFechaNacimiento", "getNacimiento", "fechaNacimiento");
-        try {
-            if (mAp != null) assertEquals("Ap1", String.valueOf(mAp.invoke(dto)));
-            if (mFn != null) assertEquals(LocalDate.of(2001, 1, 1), mFn.invoke(dto));
-        } catch (Exception e) {
-            fail(e);
+
+        if (mAp != null) {
+            var ap = assertDoesNotThrow(() -> String.valueOf(mAp.invoke(dto)));
+            assertEquals("Ap1", ap);
+        }
+        if (mFn != null) {
+            var fn = assertDoesNotThrow(() -> (LocalDate) mFn.invoke(dto));
+            assertEquals(LocalDate.of(2001, 1, 1), fn);
         }
     }
-
     @Test
     @DisplayName("Cambiar a organizador y actualizarOrganizador")
     void cambioYUpdateOrganizador() {
@@ -66,13 +79,17 @@ class ControladorUsuarioConsultaPlusTest {
 
         Object dto = TestUtils.tryInvoke(cu, new String[]{"obtenerDatosUsuario"}, "orgx");
         assertNotNull(dto);
+
         var mDesc = TestUtils.findMethod(dto, "getDescripcion", "descripcion");
         var mLink = TestUtils.findMethod(dto, "getLink", "link", "getWeb");
-        try {
-            if (mDesc != null) assertEquals("d1", String.valueOf(mDesc.invoke(dto)));
-            if (mLink != null) assertEquals("l1", String.valueOf(mLink.invoke(dto)));
-        } catch (Exception e) {
-            fail(e);
+
+        if (mDesc != null) {
+            var desc = assertDoesNotThrow(() -> String.valueOf(mDesc.invoke(dto)));
+            assertEquals("d1", desc);
+        }
+        if (mLink != null) {
+            var link = assertDoesNotThrow(() -> String.valueOf(mLink.invoke(dto)));
+            assertEquals("l1", link);
         }
     }
 }

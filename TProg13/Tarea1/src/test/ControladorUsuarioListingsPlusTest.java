@@ -1,24 +1,32 @@
 package test;
-import org.junit.jupiter.api.*;
+
 
 import java.lang.reflect.Method;
 import java.time.LocalDate;
-import java.util.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("ControladorUsuario – listados y ediciones por organizador")
 class ControladorUsuarioListingsPlusTest {
 
-    Object cu, ce;
+    private Object cu, ce;
 
     @BeforeEach
     void setUp() throws Exception {
         TestUtils.resetAll();
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         Method getter;
-        try { getter = fab.getMethod("getInstance"); }
-        catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
+        try { getter = fab.getMethod("getInstance"); 
+        } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
         cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
@@ -68,7 +76,7 @@ class ControladorUsuarioListingsPlusTest {
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                 "o1", "O Uno", "o1@x", "d", "l", "Ap",
                 LocalDate.of(1990, 1, 1), "Inst_LPU", true);
-        try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "LP-Cat"); } catch (Throwable ignored) {}
+        TestUtils.tryInvoke(ce, new String[]{"AltaCategoria"}, "LP-Cat");
         Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("LP-Cat"));
         TestUtils.tryInvoke(ce, new String[]{"AltaEvento"},
                 "LP-Ev", "d", LocalDate.now(), "LPEV", cats);

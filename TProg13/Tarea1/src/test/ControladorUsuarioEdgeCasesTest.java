@@ -18,7 +18,7 @@ import java.time.LocalDate;
 @DisplayName("ControladorUsuario – Edge cases (errores comunes)")
 class ControladorUsuarioEdgeCasesTest {
 
-    Object fabrica, cu;
+    private Object fabrica, cu;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -33,7 +33,7 @@ class ControladorUsuarioEdgeCasesTest {
 
     @Test
     @DisplayName("actualizarAsistente sobre nick inexistente → lanza")
-    void actualizarAsistente_inexistente() {
+    void actualizarAsistenteInexistente() {
         assertThrows(Throwable.class, () ->
             TestUtils.invokeUnwrapped(cu, new String[]{"actualizarAsistente"},
                 "noexiste", "Ap", LocalDate.of(2000, 1, 1)));
@@ -41,7 +41,7 @@ class ControladorUsuarioEdgeCasesTest {
 
     @Test
     @DisplayName("actualizarOrganizador sobre nick inexistente → lanza")
-    void actualizarOrganizador_inexistente() {
+    void actualizarOrganizadorInexistente() {
         assertThrows(Throwable.class, () ->
             TestUtils.invokeUnwrapped(cu, new String[]{"actualizarOrganizador"},
                 "noexiste", "desc", "link"));
@@ -49,7 +49,7 @@ class ControladorUsuarioEdgeCasesTest {
 
     @Test
     @DisplayName("obtenerDatosUsuario de nick inexistente → null o lanza (aceptamos ambos)")
-    void obtenerDatosUsuario_inexistente() throws Throwable {
+    void obtenerDatosUsuarioInexistente() throws Throwable {
         try {
             Object dto = TestUtils.invokeUnwrapped(cu, new String[]{"obtenerDatosUsuario"}, "noexiste");
             assertNull(dto); // si tu implementación devuelve null
@@ -61,7 +61,7 @@ class ControladorUsuarioEdgeCasesTest {
 
     @Test
     @DisplayName("AltaInstitucion duplicada → idempotente o lanza (aceptamos ambos)")
-    void altaInstitucion_duplicada() throws Throwable {
+    void altaInstitucionDuplicada() throws Throwable {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_X", "d", "w");
         try {
             TestUtils.invokeUnwrapped(cu, new String[]{"AltaInstitucion"}, "Inst_X", "d2", "w2");
@@ -73,7 +73,7 @@ class ControladorUsuarioEdgeCasesTest {
 
     @Test
     @DisplayName("ingresarAsistente con Institución null → lanza o NO crea nada")
-    void ingresarAsistente_institucionNull() throws Throwable {
+    void ingresarAsistenteInstitucionNull() throws Throwable {
         // 1) Intento invocar y CAPTURO si lanza
         boolean lanzo = false;
         try {
