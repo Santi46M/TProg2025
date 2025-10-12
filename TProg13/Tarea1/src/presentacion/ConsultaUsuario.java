@@ -1,7 +1,30 @@
 package presentacion;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+
+
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Image;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Vector;
@@ -389,7 +412,7 @@ public class ConsultaUsuario extends JInternalFrame {
             }
             Image scaled = base.getScaledInstance(w, h, Image.SCALE_SMOOTH);
             return new ImageIcon(scaled);
-        } catch (Exception e) {
+        } catch (IllegalStateException | NullPointerException ex) {
             return null;
         }
     }

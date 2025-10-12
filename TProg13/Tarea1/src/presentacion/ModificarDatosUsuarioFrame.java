@@ -1,16 +1,30 @@
 package presentacion;
 
-import javax.swing.*;
+import javax.swing.JPanel;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JTextField;
+
+import excepciones.UsuarioNoExisteException;
+import excepciones.UsuarioTipoIncorrectoException;
+
+import javax.swing.JComboBox;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 import logica.Interfaces.IControladorUsuario;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 public class ModificarDatosUsuarioFrame extends JInternalFrame {
-    private IControladorUsuario ICU;
+    private IControladorUsuario icu;
     public ModificarDatosUsuarioFrame(IControladorUsuario ICU, String[] usuarios, String[][] datosUsuarios) {
         super("Modificar Datos de Usuario", true, true, true, true);
-        this.ICU = ICU;
+        this.icu = ICU;
         setBounds(80, 80, 500, 450);
         setVisible(true);
         setLayout(new BorderLayout());
@@ -162,7 +176,7 @@ public class ModificarDatosUsuarioFrame extends JInternalFrame {
             if (txtFechaNac.isEnabled() && !fechaNacStr.isEmpty()) {
                 try {
                     fechaNac = java.time.LocalDate.parse(fechaNacStr);
-                } catch (Exception ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(this, "Fecha de nacimiento inválida. Use formato YYYY-MM-DD.");
                     return;
                 }
@@ -171,9 +185,15 @@ public class ModificarDatosUsuarioFrame extends JInternalFrame {
                 ICU.modificarDatosUsuario(nickname, nombre, descripcion, sitioWeb, apellido, fechaNac, institucion);
                 JOptionPane.showMessageDialog(this, "Datos actualizados correctamente para " + nickname);
                 this.dispose();
-            } catch (Exception ex) {
+            } catch (IllegalStateException | NullPointerException ex) {
                 JOptionPane.showMessageDialog(this, "Error al actualizar: " + ex.getMessage());
-            }
+            } catch (UsuarioNoExisteException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (UsuarioTipoIncorrectoException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
         });
     }
 }

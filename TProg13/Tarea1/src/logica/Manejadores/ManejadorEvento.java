@@ -6,7 +6,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import logica.Clases.*;
+import logica.Clases.Ediciones;
+import logica.Clases.Eventos;
+import logica.Clases.Registro;
+import logica.Clases.TipoRegistro;
+
 
 public class ManejadorEvento {
     private static ManejadorEvento instancia = null;
@@ -55,7 +59,7 @@ public class ManejadorEvento {
 		for (Map.Entry<String, Ediciones> i : ediciones.entrySet()){
 			Ediciones e = i.getValue();
 			//System.out.println(u.getEmail());
-			if(e.getNombre().equals(nombre)) {
+			if (e.getNombre().equals(nombre)) {
 				return true;				
 			}
 		}
@@ -105,7 +109,7 @@ public class ManejadorEvento {
         return registros.get(id);
     }
     public boolean existeRegistro(String id) {
-    		if(obtenerRegistro(id) != null) {
+    		if (obtenerRegistro(id) != null) {
     			return true;
     		}
     		

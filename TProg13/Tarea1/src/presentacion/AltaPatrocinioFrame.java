@@ -1,11 +1,24 @@
 package presentacion;
 
-import javax.swing.*;
+import javax.swing.JButton;
+
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
 
 import logica.Interfaces.IControladorEvento;
 import logica.Interfaces.IControladorUsuario;
 
-import java.awt.*;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.BorderLayout;
+import java.awt.Insets;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
@@ -139,7 +152,7 @@ public class AltaPatrocinioFrame extends JInternalFrame {
             try {
                 aporte = Double.parseDouble(aporteStr);
                 cantidadGratuitos = Integer.parseInt(cantidadGratuitosStr);
-            } catch (Exception ex) {
+            } catch (IllegalStateException | NullPointerException ex) {
                 JOptionPane.showMessageDialog(this, "Aporte y cantidad deben ser numéricos.");
                 return;
             }
@@ -150,7 +163,7 @@ public class AltaPatrocinioFrame extends JInternalFrame {
                     throw new NumberFormatException("La cantidad de gratuitos no puede ser negativa");
                 }
             	
-            } catch (Exception ex) {
+            } catch (IllegalStateException | NullPointerException ex) {
             	JOptionPane.showMessageDialog(this, ex.getMessage());
                 return;
             }
@@ -193,9 +206,15 @@ public class AltaPatrocinioFrame extends JInternalFrame {
                     cantidadGratuitos,
                     codigo
                 );
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error al dar de alta el patrocinio: " + ex.getMessage());
-                return;
+            } catch (excepciones.ValorPatrocinioExcedidoException ex) {
+                JOptionPane.showMessageDialog(this,
+                    "El valor del patrocinio excede el permitido: " + ex.getMessage(),
+                    "Error de validación", JOptionPane.ERROR_MESSAGE);
+
+            } catch (IllegalStateException | NullPointerException ex) {
+                JOptionPane.showMessageDialog(this,
+                    "Error al dar de alta el patrocinio: " + ex.getMessage(),
+                    "Error interno", JOptionPane.ERROR_MESSAGE);
             }
             codigosPatrocinio.add(codigo.toLowerCase());
             patrociniosInstitucionEdicion.add(clavePatrocinio);

@@ -1,8 +1,31 @@
 package presentacion;
 
-import javax.swing.*;
-import java.awt.*;
-import logica.Interfaces.*;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
+import javax.swing.JDesktopPane;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
+import javax.swing.SwingConstants;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Insets;
+
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
 import logica.Datatypes.DTEvento;
 
 public class ConsultaEventoFrame extends JInternalFrame {
@@ -193,9 +216,11 @@ public class ConsultaEventoFrame extends JInternalFrame {
                 // imagen
                 try {
                     imagenesEventos[i] = (String) DTEvento.class.getMethod("getImagen").invoke(ev);
-                } catch (Exception ignore) {
+                } catch (NoSuchMethodException | IllegalAccessException | java.lang.reflect.InvocationTargetException
+                        | IllegalStateException | NullPointerException ex) {
                     imagenesEventos[i] = null;
                 }
+
             }
             comboEventos.setModel(new DefaultComboBoxModel<>(eventosArr));
             comboEventos.revalidate();
@@ -213,7 +238,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
                 lblImagenEvento.setIcon(null);
                 lblImagenEvento.setText("Sin imagen");
             }
-        } catch (Exception ex) {
+        } catch (IllegalStateException | NullPointerException ex) {
             comboEventos.setModel(new DefaultComboBoxModel<>(new String[]{"No hay eventos"}));
             comboEventos.revalidate();
             comboEventos.repaint();
@@ -258,7 +283,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
             if (idx < eventos.size()) {
                 sigla = eventos.get(idx).getSigla();
             }
-        } catch (Exception ex) {
+        } catch (IllegalStateException | NullPointerException ex) {
             sigla = "";
         }
         txtSigla.setText(sigla);
@@ -325,7 +350,7 @@ public class ConsultaEventoFrame extends JInternalFrame {
             }
             Image scaled = base.getScaledInstance(w, h, Image.SCALE_SMOOTH);
             return new ImageIcon(scaled);
-        } catch (Exception e) {
+        } catch (IllegalStateException | NullPointerException ex) {
             return null;
         }
     }

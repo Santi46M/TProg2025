@@ -1,10 +1,22 @@
 package presentacion;
 
-import javax.swing.*;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+
 import excepciones.RegistroNoExiste;
 import logica.Datatypes.DTRegistro;
-import logica.Interfaces.*;
-import java.awt.*;
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+
 import java.util.Set;
 import java.util.Vector;
 

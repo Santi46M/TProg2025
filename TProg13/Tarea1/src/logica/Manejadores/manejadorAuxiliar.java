@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.HashSet;
 import java.util.Set;
-import logica.Clases.*;
+import logica.Clases.Categoria;
+import logica.Clases.Patrocinio;
 
 public class manejadorAuxiliar {
 	private static manejadorAuxiliar instancia; //singleton

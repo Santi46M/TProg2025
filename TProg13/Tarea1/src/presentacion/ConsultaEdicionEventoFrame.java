@@ -1,7 +1,29 @@
 package presentacion;
 
-import javax.swing.*;
-import java.awt.*;
+
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+
+import java.awt.BorderLayout;
+
+import javax.swing.JDesktopPane;
+import javax.swing.BorderFactory;
+
+import javax.swing.JScrollPane;
+
+import javax.swing.ImageIcon;
+import javax.swing.SwingConstants;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.GridLayout;
+
+
+import java.awt.FlowLayout;
 import java.util.List;
 import logica.Clases.Ediciones;
 import logica.Clases.Patrocinio;
@@ -12,8 +34,8 @@ import logica.Interfaces.IControladorUsuario;
 
 public class ConsultaEdicionEventoFrame extends JInternalFrame {
 
-    private final IControladorUsuario iCU;
-    private final IControladorEvento  ICE;
+    private final IControladorUsuario icu;
+    private final IControladorEvento  ice;
 
     private JComboBox<String> comboEventos;
     private JComboBox<String> comboEdiciones;
@@ -43,8 +65,8 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
      */
     public ConsultaEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento ICE) {
         super("Consulta Edición de Evento", true, true, true, true);
-        this.iCU = iCU;
-        this.ICE = ICE;
+        this.icu = iCU;
+        this.ice = ICE;
 
         comboTiposRegistro = new JComboBox<>();
         comboPatrocinios = new JComboBox<>();
@@ -167,7 +189,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
     }
 
     public void cargarEventos() {
-        List<DTEvento> eventos = ICE.listarEventos();
+        List<DTEvento> eventos = ice.listarEventos();
         String[] arr = new String[eventos.size()];
         edicionesEventos = new String[eventos.size()][];
 
@@ -210,7 +232,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         String nombreEvento  = comboEventos.getItemAt(idxEvento);
         String nombreEdicion = comboEdiciones.getItemAt(idxEd);
 
-        Ediciones ed = ICE.obtenerEdicion(nombreEvento, nombreEdicion);
+        Ediciones ed = ice.obtenerEdicion(nombreEvento, nombreEdicion);
         if (ed == null) return;
 
         txtNombreEdicion.setText(ed.getNombre());
@@ -319,7 +341,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
             }
             Image scaled = base.getScaledInstance(w, h, Image.SCALE_SMOOTH);
             return new ImageIcon(scaled);
-        } catch (Exception e) {
+        } catch (IllegalStateException | NullPointerException ex) {
             return null;
         }
     }

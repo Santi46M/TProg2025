@@ -7,7 +7,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-import logica.Clases.*;
+import logica.Clases.Asistente;
+import logica.Clases.Institucion;
+import logica.Clases.Organizador;
+import logica.Clases.Usuario;
+
 public class manejadorUsuario {
 	private static manejadorUsuario instancia; //singleton
 	private Map<String, Usuario> usuarios = new HashMap<String, Usuario>();
@@ -97,7 +101,7 @@ public class manejadorUsuario {
 	public Boolean findCorreo(String correo) {
 		for (Map.Entry<String, Usuario> i : usuarios.entrySet()){
 			Usuario u = i.getValue();
-			if(u.getEmail().equals(correo)) {
+			if (u.getEmail().equals(correo)) {
 				return true;
 				
 			}
@@ -121,7 +125,7 @@ public class manejadorUsuario {
         }
         instancia = null;
     }
-    public static void _test_reset() { doReset(); }
+    public static void testReset() { doReset(); }
     public static void reset()       { doReset(); }
     public static void clear()       { doReset(); }
 	

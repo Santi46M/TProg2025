@@ -1,8 +1,18 @@
 package presentacion;
 
-import javax.swing.*;
-import logica.Interfaces.*;
-import java.awt.*;
+import javax.swing.JComboBox;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+
 
 public class ConsultaPatrocinioFrame extends JInternalFrame {
     private JComboBox<String> comboEventos;

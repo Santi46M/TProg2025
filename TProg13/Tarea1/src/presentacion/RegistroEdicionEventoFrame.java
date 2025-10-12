@@ -1,12 +1,30 @@
 package presentacion;
 
-import javax.swing.*;
-import java.awt.*;
+
+import javax.swing.JButton;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.BoxLayout;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import logica.*;
-import logica.Clases.*;
+import logica.fabrica;
+import logica.Clases.Asistente;
+import logica.Clases.Ediciones;
+import logica.Clases.Patrocinio;
+import logica.Clases.Registro;
+import logica.Clases.TipoRegistro;
+
 import logica.Controladores.ControladorEvento;
 import logica.Datatypes.DTEvento;
 import logica.Interfaces.IControladorEvento;
@@ -310,7 +328,7 @@ public class RegistroEdicionEventoFrame extends JInternalFrame {
             this.dispose();
         } catch (excepciones.CupoTipoRegistroInvalidoException ex) {
             JOptionPane.showMessageDialog(this, "No quedan cupos disponibles para este tipo de registro.", "Sin cupo", JOptionPane.WARNING_MESSAGE);
-        } catch (Exception ex) {
+        } catch (IllegalStateException | NullPointerException ex) {
             JOptionPane.showMessageDialog(this, "Error al registrar: " + ex.getMessage());
         }
     }

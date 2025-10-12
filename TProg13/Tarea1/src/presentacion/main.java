@@ -70,8 +70,8 @@ public class main {
             try {
                 main window = new main();
                 window.frame.setVisible(true);
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IllegalStateException | NullPointerException ex) {
+                ex.printStackTrace();
             }
         });
     }
@@ -156,16 +156,17 @@ public class main {
         itemCargaDatos.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	try {
-            	    CargaDatosPrueba.cargar();
-            	} catch (Throwable ex) {
-            	    ex.printStackTrace();
-            	    JOptionPane.showMessageDialog(frame,
-            	            "Se produjo un error inesperado:\n" + ex.getMessage(),
-            	            "Error", JOptionPane.ERROR_MESSAGE);
-            	}
-
+                try {
+                    CargaDatosPrueba.cargar();
+                } catch (IllegalStateException | NullPointerException ex) {
+                    ex.printStackTrace();
+                    System.err.println("Error en la carga de datos de prueba: " + ex.getMessage());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    System.err.println("Error controlado en la carga de datos: " + ex.getMessage());
+                }
             }
+
         });
 
         JMenu menuUsuario = new JMenu("Usuario");
@@ -188,7 +189,7 @@ public class main {
                     creUsrInternalFrame.cargarInstituciones();
                     creUsrInternalFrame.setVisible(true);
                     creUsrInternalFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -209,7 +210,7 @@ public class main {
             	    conUsrInternalFrame.cargarUsuarios();
             	    conUsrInternalFrame.setVisible(true);
             	    conUsrInternalFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -229,7 +230,7 @@ public class main {
                     }
                     altaInstitucionFrame.setVisible(true);
                     altaInstitucionFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -276,7 +277,7 @@ public class main {
                     }
                     modificarDatosUsuarioFrame.setVisible(true);
                     modificarDatosUsuarioFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -297,7 +298,7 @@ public class main {
                     consultaEventoFrame.cargarEventos();
                     consultaEventoFrame.setVisible(true);
                     consultaEventoFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -319,7 +320,7 @@ public class main {
              consultaEdicionEventoFrame.cargarEventos();
              consultaEdicionEventoFrame.setVisible(true);
              consultaEdicionEventoFrame.toFront();
-         } catch (RuntimeException ex) {
+         } catch (IllegalStateException | NullPointerException ex) {
              JOptionPane.showMessageDialog(frame,
                      "Error al cargar los datos: " + ex.getMessage(),
                      "Error", JOptionPane.ERROR_MESSAGE);
@@ -339,7 +340,7 @@ public class main {
                     consultaTipoRegistroFrame.cargarEventos();
                     consultaTipoRegistroFrame.setVisible(true);
                     consultaTipoRegistroFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -360,7 +361,7 @@ public class main {
                     consultaRegistroFrame.cargarAsistentes(); 
                     consultaRegistroFrame.setVisible(true);
                     consultaRegistroFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -381,7 +382,7 @@ public class main {
                     consultaPatrocinioFrame.cargarDatos();
                     consultaPatrocinioFrame.setVisible(true);
                     consultaPatrocinioFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -402,7 +403,7 @@ public class main {
                     altaEventoFrame.cargarCategorias();
                     altaEventoFrame.setVisible(true);
                     altaEventoFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -423,7 +424,7 @@ public class main {
                     altaTipoRegistroFrame.cargarEventos();
                     altaTipoRegistroFrame.setVisible(true);
                     altaTipoRegistroFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -444,7 +445,7 @@ public class main {
                     altaPatrocinioFrame.cargarDatos();
                     altaPatrocinioFrame.setVisible(true);
                     altaPatrocinioFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -466,7 +467,7 @@ public class main {
                     altaEdicionEventoFrame.cargarOrganizadores();
                     altaEdicionEventoFrame.setVisible(true);
                     altaEdicionEventoFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -487,7 +488,7 @@ public class main {
                     registroEdicionEventoFrame.cargarDatos(); 
                     registroEdicionEventoFrame.setVisible(true);
                     registroEdicionEventoFrame.toFront();
-                } catch (RuntimeException ex) {
+                } catch (IllegalStateException | NullPointerException ex) {
                     JOptionPane.showMessageDialog(frame,
                             "Error al cargar los datos: " + ex.getMessage(),
                             "Error", JOptionPane.ERROR_MESSAGE);
@@ -507,7 +508,7 @@ public class main {
                 aceptarEdicionEventoFrame.cargarEventos();
                 aceptarEdicionEventoFrame.setVisible(true);
                 aceptarEdicionEventoFrame.toFront();
-            } catch (RuntimeException ex) {
+            } catch (IllegalStateException | NullPointerException ex) {
                 JOptionPane.showMessageDialog(frame,
                         "Error al cargar los datos: " + ex.getMessage(),
                         "Error", JOptionPane.ERROR_MESSAGE);

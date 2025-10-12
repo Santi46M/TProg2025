@@ -228,7 +228,7 @@ public class AltaUsuarioFrame extends JInternalFrame {
                 String imagen = imagenSeleccionada; // puede ser null
 
                 if (rdbtnOrganizador.isSelected()) {
-                    controlUsr.AltaUsuario(
+                    controlUsr.altaUsuario(
                         nickname, nombre, correo,
                         txtDescripcion.getText(), txtWeb.getText(),
                         null, null, null,
@@ -242,7 +242,7 @@ public class AltaUsuarioFrame extends JInternalFrame {
                     String institucion = comboInstitucion.getSelectedItem().toString();
                     if (institucion.equals("Ninguna")) institucion = null;
 
-                    controlUsr.AltaUsuario(
+                    controlUsr.altaUsuario(
                         nickname, nombre, correo,
                         "", "", txtApellido.getText(),
                         fechaNac, institucion,
@@ -254,8 +254,14 @@ public class AltaUsuarioFrame extends JInternalFrame {
                         "Registrar Usuario", JOptionPane.INFORMATION_MESSAGE);
                 limpiarFormulario();
                 setVisible(false);
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage(),
+            } catch (excepciones.UsuarioYaExisteException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "Ya existe un usuario con el nickname o correo ingresado.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+
+            } catch (IllegalStateException | NullPointerException ex) {
+                JOptionPane.showMessageDialog(this,
+                        "Error interno: " + ex.getMessage(),
                         "Registrar Usuario", JOptionPane.ERROR_MESSAGE);
             }
         }

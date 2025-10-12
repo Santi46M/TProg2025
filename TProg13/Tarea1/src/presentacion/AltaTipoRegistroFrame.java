@@ -1,9 +1,22 @@
 package presentacion;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.BorderLayout;
+import java.awt.Insets;
+
+import java.awt.FlowLayout;
 import logica.Clases.Eventos;
-import logica.Interfaces.*;
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
 import excepciones.TipoRegistroYaExisteException;
 import java.util.List;
 
@@ -103,7 +116,7 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
                 comboEventos.setSelectedIndex(0);
                 cargarEdiciones();
             }
-        } catch (Exception ex) {
+        } catch (IllegalStateException | NullPointerException ex) {
             comboEventos.setModel(new DefaultComboBoxModel<>(new String[]{"No hay eventos"}));
             comboEdiciones.setModel(new DefaultComboBoxModel<>(new String[]{}));
         }
@@ -158,7 +171,7 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
             JOptionPane.showMessageDialog(this, "Cupo inválido: debe ser mayor a 0");
         } catch (excepciones.CostoTipoRegistroInvalidoException ex) {
             JOptionPane.showMessageDialog(this, "Costo inválido: debe ser mayor o igual a 0");
-        } catch (Exception ex) {
+        } catch (IllegalStateException | NullPointerException ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
         }
     }

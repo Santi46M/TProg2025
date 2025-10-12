@@ -25,16 +25,24 @@ import logica.Manejadores.ManejadorEvento;
  */
 public class CargaDatosPrueba {
 
-    public static void cargar() throws Exception {
-        cargarCategorias();
-        cargarInstitucionesEjemplo();
-        cargarEventosEjemplo();
-        cargarUsuariosEjemplo();
-        cargarEdicionesEjemplo();       // ← ahora setea estado
-        cargarTipoRegistroEjemplo();
-        cargarRegistrosEjemplo();
-        cargarPatrociniosEjemplo();
-        logResumenDatos();
+    public static void cargar() {
+        try {
+        	cargarCategorias();
+            cargarInstitucionesEjemplo();
+            cargarEventosEjemplo();
+            cargarUsuariosEjemplo();
+            cargarEdicionesEjemplo();       // ← ahora setea estado
+            cargarTipoRegistroEjemplo();
+            cargarRegistrosEjemplo();
+            cargarPatrociniosEjemplo();
+            logResumenDatos();	
+        } catch (IllegalStateException | NullPointerException ex) {
+            ex.printStackTrace();
+            System.err.println("Error en la carga de datos de prueba: " + ex.getMessage());
+        } catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("Error inesperado en la carga de datos de prueba: " + ex.getMessage());
+		}
     }
 
     public static void logResumenDatos() { }
@@ -69,11 +77,11 @@ public class CargaDatosPrueba {
     // =========================
     public static void cargarInstitucionesEjemplo() throws InstitucionYaExisteException {
         var cu = new logica.Controladores.ControladorUsuario();
-        cu.AltaInstitucion("Facultad de Ingeniería", "Facultad de Ingeniería de la Universidad de la República", "https://www.fing.edu.uy");
-        cu.AltaInstitucion("ORT Uruguay", "Universidad privada enfocada en tecnología y gestión", "https://ort.edu.uy");
-        cu.AltaInstitucion("Universidad Católica del Uruguay", "Institución de educación superior privada", "https://ucu.edu.uy");
-        cu.AltaInstitucion("Antel", "Empresa estatal de telecomunicaciones", "https://antel.com.uy");
-        cu.AltaInstitucion("Agencia Nacional de Investigación e Innovación (ANII)", "Fomenta la investigación y la innovación en Uruguay", "https://anii.org.uy");
+        cu.altaInstitucion("Facultad de Ingeniería", "Facultad de Ingeniería de la Universidad de la República", "https://www.fing.edu.uy");
+        cu.altaInstitucion("ORT Uruguay", "Universidad privada enfocada en tecnología y gestión", "https://ort.edu.uy");
+        cu.altaInstitucion("Universidad Católica del Uruguay", "Institución de educación superior privada", "https://ucu.edu.uy");
+        cu.altaInstitucion("Antel", "Empresa estatal de telecomunicaciones", "https://antel.com.uy");
+        cu.altaInstitucion("Agencia Nacional de Investigación e Innovación (ANII)", "Fomenta la investigación y la innovación en Uruguay", "https://anii.org.uy");
     }
 
     // =========================
@@ -168,50 +176,50 @@ public class CargaDatosPrueba {
         var cu = new logica.Controladores.ControladorUsuario();
 
         // Asistentes
-        cu.AltaUsuario("atorres", "Ana", "atorres@gmail.com", null, null, "Torres",
+        cu.altaUsuario("atorres", "Ana", "atorres@gmail.com", null, null, "Torres",
             LocalDate.of(1990, 5, 12), "Facultad de Ingeniería", false, "123.torres", "IMG-US01.jpg");
 
-        cu.AltaUsuario("msilva", "Martin", "martin.silva@fing.edu.uy", null, null, "Silva",
+        cu.altaUsuario("msilva", "Martin", "martin.silva@fing.edu.uy", null, null, "Silva",
             LocalDate.of(1987, 8, 21), "Facultad de Ingeniería", false, "msilva2025", "IMG-US02.jpg");
 
-        cu.AltaUsuario("sofirod", "Sofia", "srodriguez@outlook.com", null, null, "Rodriguez",
+        cu.altaUsuario("sofirod", "Sofia", "srodriguez@outlook.com", null, null, "Rodriguez",
             LocalDate.of(1995, 2, 3), "Universidad Católica del Uruguay", false, "srod.abc1", "IMG-US03.jpeg");
 
-        cu.AltaUsuario("vale23", "Valentina", "valentina.costa@mail.com", null, null, "Costa",
+        cu.altaUsuario("vale23", "Valentina", "valentina.costa@mail.com", null, null, "Costa",
             LocalDate.of(1992, 12, 1), null, false, "valen11c", "IMG-US07.jpeg");
 
-        cu.AltaUsuario("luciag", "Lucía", "lucia.garcia@mail.com", null, null, "García",
+        cu.altaUsuario("luciag", "Lucía", "lucia.garcia@mail.com", null, null, "García",
             LocalDate.of(1993, 11, 9), null, false, "garcia.22l", "IMG-US08.jpeg");
 
-        cu.AltaUsuario("andrearod", "Andrea", "andrea.rod@mail.com", null, null, "Rodríguez",
+        cu.altaUsuario("andrearod", "Andrea", "andrea.rod@mail.com", null, null, "Rodríguez",
             LocalDate.of(2000, 6, 10), "Agencia Nacional de Investigación e Innovación (ANII)", false, "rod77and", "IMG-US09.jpeg");
 
-        cu.AltaUsuario("AnaG", "Ana", "ana.gomez@hotmail.com", null, null, "Gómez",
+        cu.altaUsuario("AnaG", "Ana", "ana.gomez@hotmail.com", null, null, "Gómez",
             LocalDate.of(1998, 3, 15), null, false, "gomez88a", "IMG-US12.png");
 
-        cu.AltaUsuario("JaviL", "Javier", "javier.lopez@outlook.com", null, null, "López",
+        cu.altaUsuario("JaviL", "Javier", "javier.lopez@outlook.com", null, null, "López",
             LocalDate.of(1995, 7, 22), null, false, "jl99lopez", "IMG-US13.jpeg");
 
-        cu.AltaUsuario("MariR", "María", "maria.rodriguez@gmail.com", null, null, "Rodríguez",
+        cu.altaUsuario("MariR", "María", "maria.rodriguez@gmail.com", null, null, "Rodríguez",
             LocalDate.of(2000, 11, 10), null, false, "maria55r", "IMG-US14.jpeg");
 
-        cu.AltaUsuario("SofiM", "Sofía", "sofia.martinez@yahoo.com", null, null, "Martínez",
+        cu.altaUsuario("SofiM", "Sofía", "sofia.martinez@yahoo.com", null, null, "Martínez",
             LocalDate.of(1997, 2, 5), null, false, "smarti99z", "IMG-US15.jpeg");
 
         // Organizadores
-        cu.AltaUsuario("miseventos", "MisEventos", "contacto@miseventos.com",
+        cu.altaUsuario("miseventos", "MisEventos", "contacto@miseventos.com",
             "Empresa de organización de eventos.", "https://miseventos.com", null, null, null, true, "22miseventos", "IMG-US04.jpeg");
 
-        cu.AltaUsuario("techcorp", "Corporación Tecnológica", "info@techcorp.com",
+        cu.altaUsuario("techcorp", "Corporación Tecnológica", "info@techcorp.com",
             "Empresa líder en tecnologías de la información.", null, null, null, null, true, "tech25corp", "IMG-US05.jpeg");
 
-        cu.AltaUsuario("imm", "Intendencia de Montevideo", "contacto@imm.gub.uy",
+        cu.altaUsuario("imm", "Intendencia de Montevideo", "contacto@imm.gub.uy",
             "Gobierno departamental de Montevideo.", "https://montevideo.gub.uy", null, null, null, true, "imm2025", "IMG-US06.png");
 
-        cu.AltaUsuario("udelar", "Universidad de la República", "contacto@udelar.edu.uy",
+        cu.altaUsuario("udelar", "Universidad de la República", "contacto@udelar.edu.uy",
             "Universidad pública de Uruguay.", "https://udelar.edu.uy", null, null, null, true, "25udelar", "IMG-US10.jpeg");
 
-        cu.AltaUsuario("mec", "Ministerio de Educación y Cultura", "mec@mec.gub.uy",
+        cu.altaUsuario("mec", "Ministerio de Educación y Cultura", "mec@mec.gub.uy",
             "Institución pública promotora de cultura.", "https://mec.gub.uy", null, null, null, true, "mec2025ok", "IMG-US11.png");
     }
 

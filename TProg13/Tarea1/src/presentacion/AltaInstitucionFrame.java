@@ -1,8 +1,24 @@
 package presentacion;
 
-import javax.swing.*;
-import logica.Interfaces.*;
-import java.awt.*;
+
+import javax.swing.JButton;
+
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import javax.swing.JTextField;
+
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.BorderLayout;
+import java.awt.Insets;
+
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -72,11 +88,11 @@ public class AltaInstitucionFrame extends JInternalFrame {
             }
             // Alta real de la institución
             try {
-                ICU.AltaInstitucion(nombre, descripcion, sitioWeb);
+                ICU.altaInstitucion(nombre, descripcion, sitioWeb);
             } catch (excepciones.InstitucionYaExisteException ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage());
                 return;
-            } catch (Exception ex) {
+            } catch (IllegalStateException | NullPointerException ex) {
                 JOptionPane.showMessageDialog(this, "Error al crear la institución: " + ex.getMessage());
                 return;
             }

@@ -1,11 +1,28 @@
 package presentacion;
 
-import javax.swing.*;
-import java.awt.*;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JScrollPane;
+import javax.swing.BoxLayout;
+
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+
 import logica.Controladores.ControladorEvento;
 import logica.Datatypes.DTEvento;
 import logica.Clases.Ediciones;
-import logica.Interfaces.*;
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
+
 import logica.Clases.TipoRegistro;
 import java.util.List;
 import java.util.ArrayList;
@@ -174,7 +191,7 @@ public class ConsultaTipoRegistroFrame extends JInternalFrame {
                 txtCupo.setText("");
                 txtCosto.setText("");
             }
-        } catch (Exception ex) {
+        } catch (IllegalStateException | NullPointerException ex) {
             comboEventos.setModel(new DefaultComboBoxModel<>(new String[]{"No hay eventos"}));
             comboEdiciones.removeAllItems();
             comboTipos.removeAllItems();
