@@ -129,7 +129,7 @@ public class ManejadorEvento {
             instancia.tiposRegistro.clear();
         }
     }
-            public static void _test_reset() { doReset(); }
+            public static void testReset() { doReset(); }
             public static void reset()       { doReset(); }
             public static void clear()       { doReset(); }
 

@@ -2,6 +2,7 @@ package logica;
 
 import excepciones.CostoTipoRegistroInvalidoException;
 import excepciones.CupoTipoRegistroInvalidoException;
+import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.InstitucionYaExisteException;
 import excepciones.TipoRegistroYaExisteException;
@@ -25,27 +26,33 @@ import logica.Manejadores.ManejadorEvento;
  */
 public class CargaDatosPrueba {
 
-    public static void cargar() {
-        try {
-        	cargarCategorias();
-            cargarInstitucionesEjemplo();
-            cargarEventosEjemplo();
-            cargarUsuariosEjemplo();
-            cargarEdicionesEjemplo();       // ← ahora setea estado
-            cargarTipoRegistroEjemplo();
-            cargarRegistrosEjemplo();
-            cargarPatrociniosEjemplo();
-            logResumenDatos();	
-        } catch (IllegalStateException | NullPointerException ex) {
-            ex.printStackTrace();
-            System.err.println("Error en la carga de datos de prueba: " + ex.getMessage());
-        } catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("Error inesperado en la carga de datos de prueba: " + ex.getMessage());
-		}
-    }
+	public static void cargar() {
+	    try {
+	        cargarCategorias();
+	        cargarInstitucionesEjemplo();
+	        cargarEventosEjemplo();
+	        cargarUsuariosEjemplo();
+	        cargarEdicionesEjemplo();
+	        cargarTipoRegistroEjemplo();
+	        cargarRegistrosEjemplo();
+	        cargarPatrociniosEjemplo();
+	        logResumenDatos();
+	    } catch (InstitucionYaExisteException
+	           | excepciones.EventoYaExisteException
+	           | excepciones.UsuarioYaExisteException
+	           | excepciones.TipoRegistroYaExisteException
+	           | excepciones.CupoTipoRegistroInvalidoException
+	           | excepciones.CostoTipoRegistroInvalidoException
+	           | excepciones.ValorPatrocinioExcedidoException | EdicionYaExisteException ex) {
+	        throw new IllegalStateException("Error al cargar datos de prueba: " + ex.getMessage(), ex);
+	    }
+	}
 
-    public static void logResumenDatos() { }
+
+	public static void logResumenDatos() { }
+	
+
+    
 
     // --- Utilidades ---
     private static LocalDate parseFecha(String f) {
@@ -226,7 +233,7 @@ public class CargaDatosPrueba {
     // =========================
     // EDICIONES (con ESTADO)
     // =========================
-    public static void cargarEdicionesEjemplo() throws Exception {
+    public static void cargarEdicionesEjemplo() throws EdicionYaExisteException {
         var ce = new logica.Controladores.ControladorEvento();
         var mEv = ManejadorEvento.getInstancia();
         var mUs = logica.Manejadores.manejadorUsuario.getInstancia();
@@ -241,20 +248,25 @@ public class CargaDatosPrueba {
         {
             Eventos ev = mEv.obtenerEvento("Montevideo Rock");
             if (ev != null) {
-                ce.altaEdicionEvento(
-                    ev,
-                    mUs.getUsuarios().get("imm"),
-                    "Montevideo Rock 2025",
-                    "MONROCK25",
-                    "",
-                    parseFecha("20/11/2025"),
-                    parseFecha("22/11/2025"),
-                    parseFecha("12/03/2025"),
-                    "Montevideo",
-                    "Uruguay",
-                    "IMG-EDEV01.jpeg"
-                );
-                setEstadoEdicion.accept("MONROCK25", DTEstado.Aceptada);
+                try {
+                	ce.altaEdicionEvento(
+                            ev,
+                            mUs.getUsuarios().get("imm"),
+                            "Montevideo Rock 2025",
+                            "MONROCK25",
+                            "",
+                            parseFecha("20/11/2025"),
+                            parseFecha("22/11/2025"),
+                            parseFecha("12/03/2025"),
+                            "Montevideo",
+                            "Uruguay",
+                            "IMG-EDEV01.jpeg"
+                        );
+                        setEstadoEdicion.accept("MONROCK25", DTEstado.Aceptada);
+                }catch (excepciones.EventoYaExisteException | excepciones.FechasCruzadasException ex) {
+                    System.err.println("No se pudo crear la edición 'Montevideo Rock 2025': " + ex.getMessage());
+                }
+            	
             }
         }
 
@@ -262,6 +274,7 @@ public class CargaDatosPrueba {
         {
             Eventos ev = mEv.obtenerEvento("Maratón de Montevideo");
             if (ev != null) {
+                try {
                 // 2025 — Aceptada
                 ce.altaEdicionEvento(
                     ev, mUs.getUsuarios().get("imm"),
@@ -288,6 +301,9 @@ public class CargaDatosPrueba {
                     "Montevideo", "Uruguay", "IMG-EDEV04.jpeg"
                 );
                 setEstadoEdicion.accept("MARATON22", DTEstado.Ingresada);
+                }catch (excepciones.EventoYaExisteException | excepciones.FechasCruzadasException ex) {
+                    System.err.println("No se pudo crear la edición 'Montevideo Rock 2025': " + ex.getMessage());
+                }
             }
         }
 
@@ -295,7 +311,9 @@ public class CargaDatosPrueba {
         {
             Eventos ev = mEv.obtenerEvento("Montevideo Comics");
             if (ev != null) {
-                // 2024 — Aceptada
+                try {
+                	// 2024 — Aceptada
+                
                 ce.altaEdicionEvento(
                     ev, mUs.getUsuarios().get("miseventos"),
                     "Montevideo Comics 2024", "COMICS24", "",
@@ -312,20 +330,28 @@ public class CargaDatosPrueba {
                     "Montevideo", "Uruguay", "IMG-EDEV06.jpeg"
                 );
                 setEstadoEdicion.accept("COMICS25", DTEstado.Ingresada);
+            }catch (excepciones.EventoYaExisteException | excepciones.FechasCruzadasException ex) {
+                System.err.println("No se pudo crear la edición 'Montevideo Rock 2025': " + ex.getMessage());
             }
+            }      
         }
 
         // 4) Expointer Uruguay 2025 — Aceptada
         {
             Eventos ev = mEv.obtenerEvento("Expointer Uruguay");
             if (ev != null) {
-                ce.altaEdicionEvento(
-                    ev, mUs.getUsuarios().get("miseventos"),
-                    "Expointer Uruguay 2025", "EXPOAGRO25", "",
-                    parseFecha("11/09/2025"), parseFecha("17/09/2025"), parseFecha("01/02/2025"),
-                    "Durazno", "Uruguay", "IMG-EDEV07.jpeg"
-                );
-                setEstadoEdicion.accept("EXPOAGRO25", DTEstado.Aceptada);
+                try {
+                	ce.altaEdicionEvento(
+                            ev, mUs.getUsuarios().get("miseventos"),
+                            "Expointer Uruguay 2025", "EXPOAGRO25", "",
+                            parseFecha("11/09/2025"), parseFecha("17/09/2025"), parseFecha("01/02/2025"),
+                            "Durazno", "Uruguay", "IMG-EDEV07.jpeg"
+                        );
+                        setEstadoEdicion.accept("EXPOAGRO25", DTEstado.Aceptada);
+                }catch (excepciones.EventoYaExisteException | excepciones.FechasCruzadasException ex) {
+                    System.err.println("No se pudo crear la edición 'Montevideo Rock 2025': " + ex.getMessage());
+                }
+
             }
         }
 
@@ -333,32 +359,37 @@ public class CargaDatosPrueba {
         {
             Eventos ev = mEv.obtenerEvento("Conferencia de Tecnología");
             if (ev != null) {
-                // CONFTECH26 — Aceptada
-                ce.altaEdicionEvento(
-                    ev, mUs.getUsuarios().get("udelar"),
-                    "Tecnología Punta del Este 2026", "CONFTECH26", "",
-                    parseFecha("06/04/2026"), parseFecha("10/04/2026"), parseFecha("01/08/2025"),
-                    "Punta del Este", "Uruguay", "IMG-EDEV08.jpeg"
-                );
-                setEstadoEdicion.accept("CONFTECH26", DTEstado.Aceptada);
+                try {
+                	// CONFTECH26 — Aceptada
+                    ce.altaEdicionEvento(
+                        ev, mUs.getUsuarios().get("udelar"),
+                        "Tecnología Punta del Este 2026", "CONFTECH26", "",
+                        parseFecha("06/04/2026"), parseFecha("10/04/2026"), parseFecha("01/08/2025"),
+                        "Punta del Este", "Uruguay", "IMG-EDEV08.jpeg"
+                    );
+                    setEstadoEdicion.accept("CONFTECH26", DTEstado.Aceptada);
 
-                // MWC — Ingresada
-                ce.altaEdicionEvento(
-                    ev, mUs.getUsuarios().get("techcorp"),
-                    "Mobile World Congress 2025", "MWC", "",
-                    parseFecha("12/12/2025"), parseFecha("15/12/2025"), parseFecha("21/08/2025"),
-                    "Barcelona", "España", null
-                );
-                setEstadoEdicion.accept("MWC", DTEstado.Ingresada);
+                    // MWC — Ingresada
+                    ce.altaEdicionEvento(
+                        ev, mUs.getUsuarios().get("techcorp"),
+                        "Mobile World Congress 2025", "MWC", "",
+                        parseFecha("12/12/2025"), parseFecha("15/12/2025"), parseFecha("21/08/2025"),
+                        "Barcelona", "España", null
+                    );
+                    setEstadoEdicion.accept("MWC", DTEstado.Ingresada);
 
-                // WS26 — Ingresada
-                ce.altaEdicionEvento(
-                    ev, mUs.getUsuarios().get("techcorp"),
-                    "Web Summit 2026", "WS26", "",
-                    parseFecha("13/01/2026"), parseFecha("01/02/2026"), parseFecha("04/06/2025"),
-                    "Lisboa", "Portugal", null
-                );
-                setEstadoEdicion.accept("WS26", DTEstado.Ingresada);
+                    // WS26 — Ingresada
+                    ce.altaEdicionEvento(
+                        ev, mUs.getUsuarios().get("techcorp"),
+                        "Web Summit 2026", "WS26", "",
+                        parseFecha("13/01/2026"), parseFecha("01/02/2026"), parseFecha("04/06/2025"),
+                        "Lisboa", "Portugal", null
+                    );
+                    setEstadoEdicion.accept("WS26", DTEstado.Ingresada);
+                }catch (excepciones.EventoYaExisteException | excepciones.FechasCruzadasException ex) {
+                    System.err.println("No se pudo crear la edición 'Montevideo Rock 2025': " + ex.getMessage());
+                }
+
             }
         }
     }
