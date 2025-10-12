@@ -1,8 +1,10 @@
 package web;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -14,6 +16,11 @@ import excepciones.UsuarioNoExisteException;
 import excepciones.UsuarioTipoIncorrectoException;
 
 @WebServlet(urlPatterns = {"/usuario/AltaUsuario", "/usuario/modificar"})
+@MultipartConfig(                       // 🔹 Necesario para procesar archivos (multipart/form-data)
+    fileSizeThreshold = 1024 * 1024,    // 1MB antes de escribir en disco
+    maxFileSize = 10 * 1024 * 1024,     // Máximo 10MB por archivo
+    maxRequestSize = 20 * 1024 * 1024   // Máximo 20MB en total
+)
 public class UsuarioServlet extends HttpServlet {
 
   private static final String JSP_LOGIN    = "/WEB-INF/auth/login.jsp";
@@ -31,7 +38,6 @@ public class UsuarioServlet extends HttpServlet {
   }
 
   private void cargarInstituciones(HttpServletRequest req) {
-    // Carga las instituciones directamente desde la lógica, no desde la sesión
     java.util.Collection<String> instituciones = cu.getInstituciones();
     req.setAttribute("instituciones", instituciones);
   }
@@ -40,9 +46,7 @@ public class UsuarioServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-//    String path = req.getPathInfo();
-	  String path = req.getServletPath();
-    
+    String path = req.getServletPath();
     if (path == null || "/".equals(path)) {
       resp.sendRedirect(ctx(req) + "/");
       return;
@@ -51,10 +55,7 @@ public class UsuarioServlet extends HttpServlet {
     switch (path) {
       case "/usuario/AltaUsuario":
         cargarInstituciones(req);
-
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-        
-
         return;
 
       case "/usuario/ConsultaUsuario": {
@@ -90,7 +91,6 @@ public class UsuarioServlet extends HttpServlet {
 
       default:
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-        return;
     }
   }
 
@@ -98,185 +98,115 @@ public class UsuarioServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-	  String path = req.getServletPath();  // ← cambio clave
-	  System.out.println("path post: " + path);
-      req.setAttribute("error", null);
-      System.out.println("valor de error en servelt: " + req.getAttribute("error"));
+    String path = req.getServletPath();
+    System.out.println("POST en: " + path);
 
-	  if ("/usuario/AltaUsuario".equals(path)) {
+    if ("/usuario/AltaUsuario".equals(path)) {
 
-		    String rol         = req.getParameter("rol");
-		    String nick        = req.getParameter("nick");
-		    String nombre      = req.getParameter("nombreA");
-		    String pass1      = req.getParameter("pass");
-		    String pass2      = req.getParameter("pass2");
-		    String organizacion = req.getParameter("nombreO");
-		    String apellido    = req.getParameter("apellidoA");
-		    String correo      = req.getParameter("email");
-		    String descripcion = req.getParameter("descO");
-		    String link        = req.getParameter("webO");
-		    String institucion = req.getParameter("instIdA");
-		    String nacStr      = req.getParameter("nacA");
-		   
-		    
-		    // CHEQUEAMOS CONTRASEÑAS
-		    if (pass1 == null || pass2 == null || pass1.isBlank() || pass2.isBlank() || !pass1.equals(pass2)) {
-		        req.setAttribute("error", "Las contraseñas no coinciden o están vacías.");
-		        cargarInstituciones(req);
-		        
-		        req.setAttribute("rol", rol);
-		        req.setAttribute("nick", nick);
-		        req.setAttribute("nombreA", nombre);
-			    req.setAttribute("nombreO", organizacion);
-		        req.setAttribute("apellidoA", apellido);
-		        req.setAttribute("email", correo);
-		        req.setAttribute("descripcion", descripcion);
-		        req.setAttribute("link", link);
-		        req.setAttribute("instIdA", institucion);
-		        req.setAttribute("nacA", nacStr);
-		        
-		        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-		        return;
-		    }
-		    
-		    // Datos obligatorios para ambos roles
-		    if (nick == null || correo == null || rol == null ||
-		        nick.isBlank() || correo.isBlank()) {
-		        req.setAttribute("error", "Faltan datos obligatorios.");
-		        
-		        req.setAttribute("rol", rol);
-		        req.setAttribute("nick", nick);
-		        req.setAttribute("nombreA", nombre);
-		        req.setAttribute("pass", pass1);
-		        req.setAttribute("pass2", pass2);
-		        req.setAttribute("apellidoA", apellido);
-		        req.setAttribute("nombreO", organizacion);
-		        req.setAttribute("email", correo);
-		        req.setAttribute("descripcion", descripcion);
-		        req.setAttribute("link", link);
-		        req.setAttribute("instIdA", institucion);
-		        req.setAttribute("nacA", nacStr);
+      // === Procesar imagen (opcional) ===
+      Part imagenPart = req.getPart("imagen");
+      String nombreArchivo = null;
 
-		        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-		        return;
-		    }
+      if (imagenPart != null && imagenPart.getSize() > 0) {
+        nombreArchivo = imagenPart.getSubmittedFileName();
+        String rutaUploads = getServletContext().getRealPath("/uploads");
+        File uploadsDir = new File(rutaUploads);
+        if (!uploadsDir.exists()) uploadsDir.mkdir();
 
-		    
-		    if ("ASISTENTE".equalsIgnoreCase(rol)) {
-		    	
-		    	// ✅ Validación de fecha de nacimiento
-			    LocalDate fechaNac = null;
-			    // En este caso es asistente
-			    if (nacStr != null && !nacStr.isBlank()) {
-			        try {
-			            fechaNac = LocalDate.parse(nacStr);
-			            LocalDate hoy = LocalDate.now();
+        File destino = new File(uploadsDir, nombreArchivo);
+        imagenPart.write(destino.getAbsolutePath());
+        System.out.println("✅ Imagen guardada en: " + destino.getAbsolutePath());
+      }
 
-			            if (fechaNac.isAfter(hoy)) {
-			                throw new IllegalArgumentException("La fecha de nacimiento no puede ser futura.");
-			            }
+      // === Leer parámetros normales ===
+      String rol         = req.getParameter("rol");
+      String nick        = req.getParameter("nick");
+      String nombre      = req.getParameter("nombreA");
+      String pass1       = req.getParameter("pass");
+      String pass2       = req.getParameter("pass2");
+      String organizacion= req.getParameter("nombreO");
+      String apellido    = req.getParameter("apellidoA");
+      String correo      = req.getParameter("email");
+      String descripcion = req.getParameter("descO");
+      String link        = req.getParameter("webO");
+      String institucion = req.getParameter("instIdA");
+      String nacStr      = req.getParameter("nacA");
 
-			            int edad = hoy.getYear() - fechaNac.getYear();
-			            if (fechaNac.plusYears(edad).isAfter(hoy)) {
-			                edad--; // ajustar si aún no cumplió años este año
-			            }
+      // === Validaciones ===
+      if (pass1 == null || pass2 == null || pass1.isBlank() || pass2.isBlank() || !pass1.equals(pass2)) {
+        req.setAttribute("error", "Las contraseñas no coinciden o están vacías.");
+        cargarInstituciones(req);
+        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+        return;
+      }
 
-			        } catch (IllegalArgumentException e) {
-			            req.setAttribute("error", e.getMessage());
-			            cargarInstituciones(req);
-			            
-			            req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-			            return;
-			        } catch (Exception e) {
-			            req.setAttribute("error", "Formato de fecha inválido. Use un formato correcto (dd-MM-yyyy).");
-			            cargarInstituciones(req);
-				        req.setAttribute("rol", rol);
-				        req.setAttribute("nick", nick);
-				        req.setAttribute("nombreA", nombre);
-				        req.setAttribute("pass", pass1);
-				        req.setAttribute("pass2", pass2);
-				        req.setAttribute("apellidoA", apellido);
-				        req.setAttribute("email", correo);
-				        req.setAttribute("instIdA", institucion);
-			            req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-			            return;
-			        }
-			    } else {
-			        req.setAttribute("error", "Debe ingresar una fecha de nacimiento.");
-			        cargarInstituciones(req);
-			        req.setAttribute("error", "Faltan datos obligatorios.");
-			        req.setAttribute("rol", rol);
-			        req.setAttribute("nick", nick);
-			        req.setAttribute("nombreA", nombre);
-			        req.setAttribute("pass", pass1);
-			        req.setAttribute("pass2", pass2);
-			        req.setAttribute("apellidoA", apellido);
-			        req.setAttribute("email", correo);
-			        req.setAttribute("instIdA", institucion);
-			        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-			        return;
-			    }
-			}else {
-		    	
-		    	//En este caso es organizador
-		    	if (organizacion == null || organizacion.isBlank() || descripcion == null || descripcion.isBlank()) {
-			        req.setAttribute("error", "Faltan datos obligatorios.");
-			        cargarInstituciones(req);
-			        
-			        req.setAttribute("rol", rol);
-			        req.setAttribute("nick", nick);
-			        req.setAttribute("nombreA", nombre);
-			        req.setAttribute("pass", pass1);
-			        req.setAttribute("pass2", pass2);
-			        req.setAttribute("apellidoA", apellido);
-			        req.setAttribute("nombreO", organizacion);
-			        req.setAttribute("email", correo);
-			        req.setAttribute("descripcion", descripcion);
-			        req.setAttribute("link", link);
-			        req.setAttribute("instIdA", institucion);
-			        req.setAttribute("nacA", nacStr);
-			        
-			        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-			        return;
-			    }
-		    }
+      if (nick == null || correo == null || rol == null || nick.isBlank() || correo.isBlank()) {
+        req.setAttribute("error", "Faltan datos obligatorios.");
+        cargarInstituciones(req);
+        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+        return;
+      }
 
-		    boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rol);
-		    LocalDate fechaNac = "ASISTENTE".equalsIgnoreCase(rol) ? LocalDate.parse(nacStr) : null;
-		    try {
-		        cu.AltaUsuario(
-		            nick,
-		            nombre,
-		            correo,
-		            descripcion,     // puede ser null
-		            link,            // puede ser nullLo
-		            apellido,        // para asistente
-		            fechaNac,        // para asistente
-		            institucion,     // para asistente
-		            esOrganizador,
-		            pass1,
-		            null
-		        );
+      // === Validación por rol ===
+      LocalDate fechaNac = null;
+      if ("ASISTENTE".equalsIgnoreCase(rol)) {
+        if (nacStr == null || nacStr.isBlank()) {
+          req.setAttribute("error", "Debe ingresar una fecha de nacimiento.");
+          cargarInstituciones(req);
+          forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+          return;
+        }
+        try {
+          fechaNac = LocalDate.parse(nacStr);
+          if (fechaNac.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("La fecha de nacimiento no puede ser futura.");
+          }
+        } catch (Exception e) {
+          req.setAttribute("error", "Formato de fecha inválido o futura.");
+          cargarInstituciones(req);
+          forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+          return;
+        }
+      } else {
+        if (organizacion == null || organizacion.isBlank() || descripcion == null || descripcion.isBlank()) {
+          req.setAttribute("error", "Debe completar los campos obligatorios del organizador.");
+          cargarInstituciones(req);
+          forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+          return;
+        }
+      }
 
-		        // ✅ Dejar logueado al recién creado
-		        HttpSession s = req.getSession(true);
-		        s.setAttribute("nick", nick);
-		        s.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
-		        resp.sendRedirect(ctx(req) + "/inicio");
-		        return;
+      // === Crear usuario ===
+      boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rol);
+      try {
+        cu.AltaUsuario(
+            nick,
+            nombre,
+            correo,
+            descripcion,
+            link,
+            apellido,
+            fechaNac,
+            institucion,
+            esOrganizador,
+            pass1,
+            nombreArchivo  // 🔹 Guardamos nombre de la imagen si hay
+        );
 
-		    } catch (UsuarioYaExisteException e) {
-		        req.setAttribute("error", e.getMessage());
-		        cargarInstituciones(req);
+        HttpSession s = req.getSession(true);
+        s.setAttribute("nick", nick);
+        s.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
+        resp.sendRedirect(ctx(req) + "/inicio");
+      } catch (UsuarioYaExisteException e) {
+        req.setAttribute("error", e.getMessage());
+        cargarInstituciones(req);
+        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+      }
 
+      return;
+    }
 
-		        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-		    }
-
-		    return;
-		}
-
-
+    // === Modificar usuario ===
     if ("/modificar".equals(path)) {
       String nick = nickEnSesion(req);
       if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
@@ -299,9 +229,26 @@ public class UsuarioServlet extends HttpServlet {
         req.setAttribute("error", e.getMessage());
         req.getRequestDispatcher(JSP_MODIF).forward(req, resp);
       }
-      return;
+    } else {
+      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
+  }
 
-    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+  // === Método auxiliar para mantener datos del formulario ===
+  private void forwardConDatos(HttpServletRequest req, HttpServletResponse resp,
+                               String rol, String nick, String nombre, String apellido,
+                               String correo, String descripcion, String link,
+                               String institucion, String nacStr)
+      throws ServletException, IOException {
+    req.setAttribute("rol", rol);
+    req.setAttribute("nick", nick);
+    req.setAttribute("nombreA", nombre);
+    req.setAttribute("apellidoA", apellido);
+    req.setAttribute("email", correo);
+    req.setAttribute("descripcion", descripcion);
+    req.setAttribute("link", link);
+    req.setAttribute("instIdA", institucion);
+    req.setAttribute("nacA", nacStr);
+    req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
   }
 }
