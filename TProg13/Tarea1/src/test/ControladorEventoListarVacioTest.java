@@ -43,9 +43,8 @@ class ControladorEventoListarVacioTest {
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                 "orgLE", "Org LE", "org@x", "d", "l", "Ap",
                 LocalDate.of(1990, 1, 1), "Inst_LE", true);
-        try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "LE-Cat"); } catch (Throwable ignored) {
-        	//hay que arreglar esto
-        }
+        TestUtils.tryInvoke(ce, new String[]{"AltaCategoria"}, "LE-Cat");
+
         
     }
 

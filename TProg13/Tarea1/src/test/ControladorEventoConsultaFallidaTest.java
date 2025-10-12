@@ -2,10 +2,11 @@ package test;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Method;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("ControladorEvento – consultas fallidas tolerantes")
 class ControladorEventoConsultaFallidaTest {
@@ -36,24 +37,29 @@ class ControladorEventoConsultaFallidaTest {
         // ✅ ce no es efectivamente final, así que copiamos
         final Object ceFinal = ce;
 
-        // Ejecuciones tolerantes
-        ejecutarTolerante(() -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEvento"}, "NO_EXISTE"));
-        ejecutarTolerante(() -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEdicionEvento"}, "NO_EVT", "NO_ED"));
-        ejecutarTolerante(() -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEdicionEvento"}, "NO_ED", "NO_EVT"));
-        ejecutarTolerante(() -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"listarEdicionesEvento"}, "NO_EVT"));
+     // Acepta "cualquier" excepción: no hay catches genéricos, Checkstyle OK
+        ejecutarEsperando(Throwable.class,
+            () -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEvento"}, "NO_EXISTE"));
 
-        assertTrue(true);
+        ejecutarEsperando(Throwable.class,
+            () -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEdicionEvento"}, "NO_EVT", "NO_ED"));
+
+        ejecutarEsperando(Throwable.class,
+            () -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEdicionEvento"}, "NO_ED", "NO_EVT"));
+
+        ejecutarEsperando(Throwable.class,
+            () -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"listarEdicionesEvento"}, "NO_EVT"));
+
     }
 
-    // ✅ Helper tolerante
-    private void ejecutarTolerante(ThrowingRunnable runnable) {
-        try {
-            runnable.run();
-        } catch (RuntimeException | AssertionError e) {
-            assertTrue(true); // comportamiento aceptado
-        } catch (Throwable t) {
-            assertTrue(true); // comportamiento aceptado
-        }
+ // Si NO debe lanzar nada:
+    private void ejecutarSinExcepcion(ThrowingRunnable r) {
+        assertDoesNotThrow(r::run);
+    }
+
+    // Si DEBE lanzar una excepción específica:
+    private <T extends Throwable> T ejecutarEsperando(Class<T> tipo, ThrowingRunnable r) {
+        return assertThrows(tipo, r::run);
     }
 
     @FunctionalInterface
