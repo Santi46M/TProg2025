@@ -46,4 +46,5 @@ public interface IControladorEvento {
     public void cambiarEstadoEdicion(String evento, String edicion, boolean aceptar);
     public List<DTEvento> listarEventosPorCategoria(String nombreCategoria);
     public List<String> listarCategoriasConEventos();
+    public void actualizarImagenEvento(String nombreEvento, String imagenPath) throws IllegalArgumentException;
 }

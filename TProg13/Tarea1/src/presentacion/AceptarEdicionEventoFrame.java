@@ -13,11 +13,14 @@ import javax.swing.BorderFactory;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-
 import java.util.List;
 
+// NUEVO
+import javax.swing.event.InternalFrameAdapter;
+import javax.swing.event.InternalFrameEvent;
+
 public class AceptarEdicionEventoFrame extends JInternalFrame {
-    private IControladorEvento ice;
+    private final IControladorEvento ice;
 
     private JComboBox<String> comboEventos;
     private JComboBox<String> comboEdiciones;
@@ -52,25 +55,67 @@ public class AceptarEdicionEventoFrame extends JInternalFrame {
 
         btnAceptar.addActionListener(e -> cambiarEstado(true));
         btnRechazar.addActionListener(e -> cambiarEstado(false));
+
+        // NUEVO: cargar datos al abrir y cuando la ventana se reactive
+        addInternalFrameListener(new InternalFrameAdapter() {
+            @Override public void internalFrameOpened(InternalFrameEvent e) {
+                cargarEventos(); // primera carga
+            }
+            @Override public void internalFrameActivated(InternalFrameEvent e) {
+                // refresco "barato": recarga eventos y posiciona en el actual si existía
+                String seleccionado = (String) comboEventos.getSelectedItem();
+                cargarEventos();
+                if (seleccionado != null) comboEventos.setSelectedItem(seleccionado);
+                cargarEdiciones();
+            }
+        });
+
+        // Estado inicial
+        setBotonesHabilitados(false);
     }
 
     public void cargarEventos() {
         comboEventos.removeAllItems();
-        List<String> eventos = ice.listarEventosConEdicionesIngresadas();
-        for (String nombre : eventos) {
-            comboEventos.addItem(nombre);
+        try {
+            List<String> eventos = ice.listarEventosConEdicionesIngresadas();
+            if (eventos == null || eventos.isEmpty()) {
+                setBotonesHabilitados(false);
+                comboEdiciones.removeAllItems();
+                return;
+            }
+            for (String nombre : eventos) comboEventos.addItem(nombre);
+            // Seleccionar el primero si hay
+            if (comboEventos.getItemCount() > 0 && comboEventos.getSelectedItem() == null) {
+                comboEventos.setSelectedIndex(0);
+            }
+        } catch (Exception ex) {
+            mostrarError("No se pudieron cargar los eventos", ex);
         }
-        comboEdiciones.removeAllItems();
+        // después de cargar eventos, cargar sus ediciones
+        cargarEdiciones();
     }
 
     private void cargarEdiciones() {
         comboEdiciones.removeAllItems();
         String evento = (String) comboEventos.getSelectedItem();
-        if (evento != null) {
+        if (evento == null) {
+            setBotonesHabilitados(false);
+            return;
+        }
+        try {
             List<String> ediciones = ice.listarEdicionesIngresadasDeEvento(evento);
-            for (String ed : ediciones) {
-                comboEdiciones.addItem(ed);
+            if (ediciones == null || ediciones.isEmpty()) {
+                setBotonesHabilitados(false);
+                return;
             }
+            for (String ed : ediciones) comboEdiciones.addItem(ed);
+            if (comboEdiciones.getItemCount() > 0 && comboEdiciones.getSelectedItem() == null) {
+                comboEdiciones.setSelectedIndex(0);
+            }
+            setBotonesHabilitados(true);
+        } catch (Exception ex) {
+            setBotonesHabilitados(false);
+            mostrarError("No se pudieron cargar las ediciones del evento seleccionado", ex);
         }
     }
 
@@ -81,9 +126,33 @@ public class AceptarEdicionEventoFrame extends JInternalFrame {
             JOptionPane.showMessageDialog(this, "Debes seleccionar un evento y una edición", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        ice.cambiarEstadoEdicion(evento, edicion, aceptar);
-        JOptionPane.showMessageDialog(this, "Edición " + (aceptar ? "confirmada" : "rechazada") + " correctamente.");
-        cargarEdiciones(); // recarga ediciones en caso de que ya no haya más ingresadas
-        
+        try {
+            ice.cambiarEstadoEdicion(evento, edicion, aceptar);
+            JOptionPane.showMessageDialog(this, "Edición " + (aceptar ? "confirmada" : "rechazada") + " correctamente.");
+        } catch (Exception ex) {
+            mostrarError("No se pudo cambiar el estado de la edición", ex);
+        }
+
+        // Refrescar combos luego del cambio (la edición ya no debería estar "Ingresada")
+        cargarEdiciones();
+
+        // Si ya no quedan ediciones "Ingresadas" para ese evento, deshabilitar y quizá recargar eventos
+        if (comboEdiciones.getItemCount() == 0) {
+            setBotonesHabilitados(false);
+            // Opcional: si ya no hay eventos con ediciones ingresadas, volver a cargar la lista de eventos
+            cargarEventos();
+        }
+    }
+
+    // Helpers
+    private void setBotonesHabilitados(boolean enabled) {
+        btnAceptar.setEnabled(enabled);
+        btnRechazar.setEnabled(enabled);
+    }
+
+    private void mostrarError(String titulo, Exception ex) {
+        JOptionPane.showMessageDialog(this,
+                titulo + (ex.getMessage() != null ? (": " + ex.getMessage()) : ""),
+                "Error", JOptionPane.ERROR_MESSAGE);
     }
 }

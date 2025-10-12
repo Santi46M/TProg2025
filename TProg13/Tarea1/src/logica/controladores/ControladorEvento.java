@@ -139,7 +139,7 @@ public class ControladorEvento implements IControladorEvento {
         Eventos evento = manejador.obtenerEvento(siglaEvento);
         if (evento == null) return null;
         Ediciones edicion = evento.obtenerEdicion(siglaEdicion);
-        if (edicion == null) return null;
+        if (edicion == null || edicion.getEstado() == DTEstado.Ingresada || edicion.getEstado() == DTEstado.Rechazada) return null;
         return new DTEdicion(
             edicion.getNombre(),
             edicion.getSigla(),
@@ -443,5 +443,17 @@ public class ControladorEvento implements IControladorEvento {
 				edicionIter.setEstado(aceptar ? DTEstado.Aceptada : DTEstado.Rechazada);
 			}
 		}
+    }
+    
+    public void actualizarImagenEvento(String nombreEvento, String imagenPath) throws IllegalArgumentException {
+        if (nombreEvento == null || nombreEvento.isBlank()) {
+            throw new IllegalArgumentException("Nombre de evento inválido");
+        }
+        Eventos ev = manejador.obtenerEvento(nombreEvento); // ajustá si tu manejador busca por sigla/ID
+        if (ev == null) {
+            throw new IllegalArgumentException("Evento no encontrado: " + nombreEvento);
+        }
+        ev.setImagen(imagenPath); // asegurate de haber agregado get/setImagenPath en la entidad
+        // Si tu Manejador requiere persistir/cerrar transacción, hacelo aquí (p.ej., me().guardar(ev);)
     }
 }

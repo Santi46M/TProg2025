@@ -28,11 +28,10 @@
       <!-- Usuario logueado -->
       <nav class="user-nav" id="userNav">
         <span class="user-name">Hola, <strong><%= nick %></strong></span>
-        <form action="<%=ctx%>/usuario/perfil" method="get">
-  			<button type="submit" class="btn">
-    			 Ver Perfil
-  			</button>
-		</form>
+        <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get">
+          <input type="hidden" name="nick" value="<%= nick %>">
+          <button type="submit" class="btn">Ver Perfil</button>
+        </form>
         <%-- <a class="btn" href="<%=ctx%>/usuario/perfil"><i class='bx bxs-user'></i> Ver Perfil</a> --%>
 <form action="<%=ctx%>/auth/logout" method="get">
   <button type="submit" class="btn">

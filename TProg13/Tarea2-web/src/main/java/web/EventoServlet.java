@@ -1,11 +1,15 @@
 package web;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,14 +24,17 @@ import excepciones.EventoYaExisteException;
 import logica.controladores.ControladorEvento;
 
 @WebServlet("/evento/*")
+@MultipartConfig(
+    maxFileSize = 2 * 1024 * 1024,     // 2 MB por archivo
+    maxRequestSize = 4 * 1024 * 1024   // 4 MB por request
+)
 public class EventoServlet extends HttpServlet {
 
   // ===== JSPs =====
   private static final String JSP_ALTA     = "/WEB-INF/evento/alta.jsp";
   private static final String JSP_CONSULTA = "/WEB-INF/evento/ConsultaEvento.jsp";
   private static final String JSP_REGISTRO = "/WEB-INF/evento/RegistrarseEvento.jsp";
-  private static final String JSP_LISTAR = "/WEB-INF/evento/listado.jsp";
-
+  private static final String JSP_LISTAR   = "/WEB-INF/evento/listado.jsp";
 
   // ===== Lógica =====
   private final IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
@@ -59,10 +66,11 @@ public class EventoServlet extends HttpServlet {
       req.setAttribute("evDesc",   safe(() -> e.getDescripcion()));
       req.setAttribute("evFecha",  formatFecha(safeObj(() -> e.getFecha())));
       req.setAttribute("evCategorias", categoriasALista(safeObj(() -> e.getCategorias())));
+      req.setAttribute("evImagen", safe(() -> e.getImagen())); // NUEVO: imagen asociada
 
       // Obtener ediciones asociadas al evento
-      java.util.List<String> nombresEdiciones = ce.listarEdicionesEvento(nombre);
-      java.util.List<DTEdicion> ediciones = new ArrayList<>();
+      List<String> nombresEdiciones = ce.listarEdicionesEvento(nombre);
+      List<DTEdicion> ediciones = new ArrayList<>();
       if (nombresEdiciones != null) {
         for (String nombreEd : nombresEdiciones) {
           DTEdicion ed = ce.consultaEdicionEvento(nombre, nombreEd);
@@ -87,32 +95,27 @@ public class EventoServlet extends HttpServlet {
         return;
       }
       case "/listado": {
-    	  // ?categoria=... (opcional). Si no viene, lista todo.
-    	  String cat = trim(req.getParameter("categoria"));
+        String cat = trim(req.getParameter("categoria"));
 
-    	  java.util.List<DTEvento> lista;
-    	  if (!isBlank(cat)) {
-    	    // estático, lo hicimos en ControladorEvento
-    	    lista = ce.listarEventosPorCategoria(cat);
-    	    req.setAttribute("categoriaSeleccionada", cat);
-    	  } else {
-    	    lista = ce.listarEventos();
-    	  }
+        List<DTEvento> lista;
+        if (!isBlank(cat)) {
+          lista = ce.listarEventosPorCategoria(cat);
+          req.setAttribute("categoriaSeleccionada", cat);
+        } else {
+          lista = ce.listarEventos();
+        }
 
-    	  // Para pintar el menú de categorías en la vista de listado
-    	  java.util.List<String> categorias = ControladorEvento.listarCategorias();
-    	  req.setAttribute("categorias", categorias);
+        List<String> categorias = ControladorEvento.listarCategorias();
+        req.setAttribute("categorias", categorias);
 
-    	  req.setAttribute("lista", lista);
-    	  req.getRequestDispatcher(JSP_LISTAR).forward(req, resp);
-    	  return;
-    	}
-
+        req.setAttribute("lista", lista);
+        req.getRequestDispatcher(JSP_LISTAR).forward(req, resp);
+        return;
+      }
       default:
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
   }
-
 
   // ===== POST =====
   @Override
@@ -124,10 +127,12 @@ public class EventoServlet extends HttpServlet {
     if ("/alta".equals(path)) {
       if (!requiereOrganizador(req, resp)) return;
 
+      // Con @MultipartConfig, getParameter funciona en multipart
       String nombre = trim(req.getParameter("nombre"));
       String desc   = trim(req.getParameter("desc"));
       String sigla  = trim(req.getParameter("sigla"));
-      String cats = trim(req.getParameter("categorias"));
+      String cats   = trim(req.getParameter("categorias"));
+
       List<String> categoriasList = new ArrayList<>();
       if (!isBlank(cats)) {
         for (String c : cats.split(",")) {
@@ -140,15 +145,68 @@ public class EventoServlet extends HttpServlet {
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
         return;
       }
-      // Crear DTCategorias a partir de la lista
-      DTCategorias dtCategorias = new DTCategorias(categoriasList);
+
+      // Manejo de la imagen (opcional)
+      String imagenRelPath = null; // p.ej. "/uploads/eventos/MISIGLA.jpg"
       try {
+        Part imgPart = null;
+        try { imgPart = req.getPart("imagen"); } catch (IllegalStateException ise) { imgPart = null; }
+
+        if (imgPart != null && imgPart.getSize() > 0) {
+          String ctype = imgPart.getContentType();
+          if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
+            req.setAttribute("error", "El archivo subido no es una imagen válida.");
+            req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+            return;
+          }
+
+          // Carpeta física dentro de la webapp: /uploads/eventos
+          String baseUploads = getServletContext().getRealPath("/uploads/eventos");
+          if (baseUploads == null) {
+            System.err.println("WARN: getRealPath('/uploads/eventos') es null; no se guardará imagen en webapp.");
+          } else {
+            Files.createDirectories(Path.of(baseUploads));
+
+            String original = getSafeFilename(imgPart);
+            String ext = getExtension(original);
+            if (isBlank(ext)) ext = guessExtensionFromContentType(ctype);
+            if (isBlank(ext)) ext = ".bin";
+
+            String finalName = (isBlank(sigla) ? "evento" : sigla) + ext;
+            Path destino = Path.of(baseUploads, finalName);
+
+            imgPart.write(destino.toAbsolutePath().toString());
+
+            imagenRelPath = "/uploads/eventos/" + finalName; // usable desde el JSP
+          }
+        }
+      } catch (Exception fileEx) {
+        req.setAttribute("error", "Error al procesar la imagen: " + fileEx.getMessage());
+        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+        return;
+      }
+
+      // Crear DTCategorias
+      DTCategorias dtCategorias = new DTCategorias(categoriasList);
+
+      try {
+        // Alta del evento
         ce.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
+
+        // Asociar imagen al evento (si se subió y se pudo guardar)
+        if (imagenRelPath != null) {
+          try {
+            ce.actualizarImagenEvento(nombre, imagenRelPath);
+          } catch (IllegalArgumentException ex) {
+            System.err.println("No se pudo asociar imagen al evento: " + ex.getMessage());
+          }
+        }
+
         String nombreEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8.name());
         resp.sendRedirect(ctx(req) + "/evento/ConsultaEvento?nombre=" + nombreEnc);
       } catch (EventoYaExisteException e) {
         req.setAttribute("error", "duplicado");
-        req.setAttribute("nombreEventoDuplicado", nombre); // nombre es el ingresado por el usuario
+        req.setAttribute("nombreEventoDuplicado", nombre);
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
       }
       return;
@@ -213,7 +271,7 @@ public class EventoServlet extends HttpServlet {
       var m = o.getClass().getMethod("getNombre");
       Object v = m.invoke(o);
       return v == null ? "—" : v.toString();
-    } catch (Exception ignore) { /* caemos al toString */ }
+    } catch (Exception ignore) { }
     return o.toString();
   }
 
@@ -223,7 +281,6 @@ public class EventoServlet extends HttpServlet {
 
     try {
       if (cobj instanceof java.util.Map<?,?> m) {
-        // intento con keys primero
         for (Object k : m.keySet()) if (k != null) out.add(k.toString());
         if (out.isEmpty()) for (Object v : m.values()) out.add(extractNombre(v));
         return out;
@@ -244,7 +301,6 @@ public class EventoServlet extends HttpServlet {
         return out;
       }
     } catch (Exception ignore) {}
-    // fallback
     out.add(cobj.toString());
     return out;
   }
@@ -263,5 +319,32 @@ public class EventoServlet extends HttpServlet {
       }
     } catch (Exception ignore) {}
     return f.toString();
+  }
+
+  // ====== helpers de archivo ======
+  private static String getSafeFilename(Part p) {
+    String name = p.getSubmittedFileName();
+    if (name == null) return "archivo";
+    name = name.replace("\\", "/");
+    int slash = name.lastIndexOf('/');
+    return (slash >= 0) ? name.substring(slash + 1) : name;
+  }
+
+  private static String getExtension(String filename) {
+    if (filename == null) return null;
+    int dot = filename.lastIndexOf('.');
+    if (dot < 0 || dot == filename.length() - 1) return null;
+    return filename.substring(dot).toLowerCase();
+  }
+
+  private static String guessExtensionFromContentType(String ctype) {
+    if (ctype == null) return null;
+    ctype = ctype.toLowerCase();
+    if (ctype.contains("jpeg")) return ".jpg";
+    if (ctype.contains("jpg"))  return ".jpg";
+    if (ctype.contains("png"))  return ".png";
+    if (ctype.contains("gif"))  return ".gif";
+    if (ctype.contains("webp")) return ".webp";
+    return null;
   }
 }

@@ -1,9 +1,7 @@
 package presentacion;
 
-
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
-
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -22,8 +20,8 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.GridLayout;
 
-
 import java.awt.FlowLayout;
+import java.util.ArrayList;
 import java.util.List;
 
 import logica.clases.Ediciones;
@@ -35,7 +33,7 @@ import logica.interfaces.IControladorUsuario;
 
 public class ConsultaEdicionEventoFrame extends JInternalFrame {
 
-   // private final IControladorUsuario icu;
+    // private final IControladorUsuario icu;
     private final IControladorEvento  ice;
 
     private JComboBox<String> comboEventos;
@@ -66,7 +64,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
      */
     public ConsultaEdicionEventoFrame(IControladorUsuario iCU, IControladorEvento ICE) {
         super("Consulta Edición de Evento", true, true, true, true);
-      //  this.icu = iCU;
+        // this.icu = iCU;
         this.ice = ICE;
 
         comboTiposRegistro = new JComboBox<>();
@@ -101,7 +99,7 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         panelDatos.add(labelR("Organizador:"));     txtOrganizador   = roField(panelDatos);
 
         panelDatos.add(labelR("Tipos de Registro:")); panelDatos.add(comboTiposRegistro);
-        panelDatos.add(labelR("Patrocinios:")); panelDatos.add(comboPatrocinios);
+        panelDatos.add(labelR("Patrocinios:"));       panelDatos.add(comboPatrocinios);
 
         JLabel lblRegistros = new JLabel("Registros de la edición:");
         panelDatos.add(lblRegistros);
@@ -121,7 +119,6 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         derecha.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
         lblImagenEdicion = new JLabel("Sin imagen", SwingConstants.CENTER);
         lblImagenEdicion.setPreferredSize(new Dimension(280, 210));
-        lblImagenEdicion.setBorder(BorderFactory.createTitledBorder("Imagen de la edición"));
         derecha.add(lblImagenEdicion, BorderLayout.NORTH);
         center.add(derecha, BorderLayout.EAST);
 
@@ -177,9 +174,9 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         if (siglaEdicion == null || siglaEdicion.isEmpty()) return;
 
         Ediciones edicion = ICE.obtenerEdicionPorSigla(siglaEdicion);
-        if (edicion == null) return;
-        String nombreEdicion = edicion.getNombre();
+        if (edicion == null || !esAceptada(edicion)) return; // solo aceptadas
 
+        String nombreEdicion = edicion.getNombre();
         String nombreEvento = ICE.encontrarEventoPorSigla(siglaEdicion);
         if (nombreEvento == null || nombreEvento.isEmpty()) return;
 
@@ -191,14 +188,30 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
 
     public void cargarEventos() {
         List<DTEvento> eventos = ice.listarEventos();
-        String[] arr = new String[eventos.size()];
-        edicionesEventos = new String[eventos.size()][];
 
-        for (int i = 0; i < eventos.size(); i++) {
-            DTEvento evento = eventos.get(i);
-            arr[i] = evento.getNombre();
-            edicionesEventos[i] = evento.getEdiciones().toArray(new String[0]);
+        // Vamos a construir SOLO eventos que tengan al menos una edición ACEPTADA,
+        // y precargar para cada evento el arreglo de ediciones ACEPTADAS.
+        List<String> nombresEventosAceptados = new ArrayList<>();
+        List<String[]> edsAceptadasPorEvento = new ArrayList<>();
+
+        for (DTEvento dto : eventos) {
+            String nombreEv = dto.getNombre();
+            List<String> aceptadas = new ArrayList<>();
+            // dto.getEdiciones() trae nombres; validamos estado uno por uno
+            for (String edName : dto.getEdiciones()) {
+                Ediciones ed = ice.obtenerEdicion(nombreEv, edName);
+                if (esAceptada(ed)) {
+                    aceptadas.add(edName);
+                }
+            }
+            if (!aceptadas.isEmpty()) {
+                nombresEventosAceptados.add(nombreEv);
+                edsAceptadasPorEvento.add(aceptadas.toArray(new String[0]));
+            }
         }
+
+        String[] arr = nombresEventosAceptados.toArray(new String[0]);
+        edicionesEventos = edsAceptadasPorEvento.toArray(new String[0][]);
 
         cambiando = true;
         comboEventos.setModel(new DefaultComboBoxModel<>(arr));
@@ -236,6 +249,11 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         Ediciones edicion = ice.obtenerEdicion(nombreEvento, nombreEdicion);
         if (edicion == null) return;
 
+        // SEGURIDAD: si por alguna razón llega una no aceptada, no la mostramos
+        if (!esAceptada(edicion)) {
+            return;
+        }
+
         txtNombreEdicion.setText(edicion.getNombre());
         txtSigla.setText(edicion.getSigla());
         txtFechaInicio.setText(String.valueOf(edicion.getFechaInicio()));
@@ -269,7 +287,21 @@ public class ConsultaEdicionEventoFrame extends JInternalFrame {
         lblImagenEdicion.setText(icon == null ? "Sin imagen" : null);
     }
 
-    // helpers
+    // ====== Helpers ======
+
+    // Aceptada si getEstado() existe y es "ACEPTADA"/"Aceptada" (String) o enum Aceptada
+    private static boolean esAceptada(Ediciones ed) {
+        if (ed == null) return false;
+        try {
+            Object estado = ed.getEstado(); // soporta String o Enum
+            if (estado == null) return false;
+            String s = String.valueOf(estado);
+            return "ACEPTADA".equalsIgnoreCase(s) || "Aceptada".equalsIgnoreCase(s);
+        } catch (Throwable t) {
+            // Si la clase no tiene estado, por seguridad no la mostramos
+            return false;
+        }
+    }
 
     private void limpiarCampos() {
         txtNombreEdicion.setText("");

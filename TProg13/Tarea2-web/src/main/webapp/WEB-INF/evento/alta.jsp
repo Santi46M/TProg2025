@@ -11,6 +11,12 @@
   <link rel="stylesheet" href="<%=ctx%>/css/AltaEvento.css">
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+  <style>
+    /* Centrado del contenido principal sin romper el aside */
+    main.container { display: flex; justify-content: center; }
+    .form-card-altaEvento.form-card--wide { max-width: 880px; width: 100%; margin: 0 auto; }
+    .helper-note { color:#555; font-size:.9rem; }
+  </style>
 </head>
 <body>
 
@@ -38,7 +44,8 @@
         </div>
         <p id="error-categorias" class="helper-error hidden" aria-live="polite"></p>
 
-        <form id="form-alta-evento" method="post" action="<%=ctx%>/evento/alta" novalidate>
+        <!-- enctype para permitir subir archivo -->
+        <form id="form-alta-evento" method="post" action="<%=ctx%>/evento/alta" enctype="multipart/form-data" novalidate>
           <div class="grid-2">
             <div class="form-group-altaEvento">
               <label for="nombre">Nombre del evento <span class="req">*</span></label>
@@ -56,6 +63,13 @@
           <div class="form-group-altaEvento">
             <label for="desc">Descripción <span class="req">*</span></label>
             <textarea id="desc" name="desc" rows="4"></textarea>
+          </div>
+
+          <!-- Imagen del evento (opcional) — SIN vista previa -->
+          <div class="form-group-altaEvento">
+            <label for="imagen">Imagen del evento (opcional)</label>
+            <input type="file" id="imagen" name="imagen" accept="image/*">
+            <small class="helper-note">Formatos sugeridos: JPG/PNG. Tamaño máx. 2&nbsp;MB.</small>
           </div>
 
           <fieldset class="form-group-altaEvento" id="fs-categorias">
@@ -97,6 +111,8 @@
   <script>
     (function () {
       const form = document.getElementById('form-alta-evento');
+
+      // Validación de categorías + serialización
       form.addEventListener('submit', function (e) {
         const checks = Array.from(document.querySelectorAll('.cat'));
         const sel = checks.filter(c => c.checked).map(c => c.value);
@@ -110,6 +126,17 @@
         }
         document.getElementById('error-categorias').classList.add('hidden');
         document.getElementById('categorias').value = sel.join(',');
+      });
+
+      // Verificación básica de tamaño de imagen (sin vista previa)
+      const inputImg = document.getElementById('imagen');
+      const MAX_BYTES = 2 * 1024 * 1024; // 2MB
+      inputImg.addEventListener('change', function () {
+        const file = this.files && this.files[0];
+        if (file && file.size > MAX_BYTES) {
+          alert('La imagen supera 2 MB. Elegí un archivo más liviano.');
+          this.value = '';
+        }
       });
     })();
   </script>
