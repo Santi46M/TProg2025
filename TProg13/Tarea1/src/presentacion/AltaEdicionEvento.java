@@ -1,13 +1,26 @@
 package presentacion;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFileChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Rectangle;
+
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import com.toedter.calendar.JDateChooser;
 
-import logica.Interfaces.*;
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
 
 public class AltaEdicionEvento extends JInternalFrame {
 	private JComboBox<String> comboEvento;

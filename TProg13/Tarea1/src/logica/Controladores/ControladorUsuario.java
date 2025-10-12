@@ -62,7 +62,8 @@ public class ControladorUsuario implements IControladorUsuario {
 
     public void AltaInstitucion(String nombre, String descripcion, String link) throws InstitucionYaExisteException {
         if (manejador.findInstitucion(nombre) != null) {
-            throw new InstitucionYaExisteException ("La institución " + nombre + " ya existe");        }
+            throw new InstitucionYaExisteException("La institución " + nombre + " ya existe");        
+            }
 
         Institucion nuevaInstitucion = new Institucion(nombre, descripcion, link);
         manejador.addInstitucion(nuevaInstitucion);
@@ -198,7 +199,7 @@ public class ControladorUsuario implements IControladorUsuario {
     }
 
     public boolean esAsistente(String nickname) {
-        return (listarAsistentes() != null) && (listarAsistentes().containsKey(nickname));
+        return listarAsistentes() != null && listarAsistentes().containsKey(nickname);
     }
 
     // --- manejo de selección de Registro ---

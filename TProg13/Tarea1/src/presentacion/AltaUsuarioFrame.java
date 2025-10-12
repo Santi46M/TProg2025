@@ -1,13 +1,28 @@
 package presentacion;
 
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JFileChooser;
+import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+
+
 import com.toedter.calendar.JDateChooser;
-import logica.Interfaces.*;
+import logica.Interfaces.IControladorUsuario;
+import logica.Interfaces.IControladorEvento;
+
 import java.util.Vector;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
 import java.io.File;
 
 public class AltaUsuarioFrame extends JInternalFrame {
@@ -17,8 +32,8 @@ public class AltaUsuarioFrame extends JInternalFrame {
     private Vector<String> instituciones;
     private JComboBox<String> comboInstitucion;    
     private JTextField textField;
-    private JTextField textField_1;
-    private JTextField textField_2;
+    private JTextField textField1;
+    private JTextField textField2;
     private JRadioButton rdbtnAsistente;
     private JRadioButton rdbtnOrganizador;
     private ButtonGroup grupoRol;
@@ -55,18 +70,18 @@ public class AltaUsuarioFrame extends JInternalFrame {
         lblNombre.setBounds(34, 40, 120, 14);
         getContentPane().add(lblNombre);
 
-        textField_1 = new JTextField();
-        textField_1.setBounds(160, 37, 206, 20);
-        getContentPane().add(textField_1);
+        textField1 = new JTextField();
+        textField1.setBounds(160, 37, 206, 20);
+        getContentPane().add(textField1);
 
         // Campo correo
         JLabel lblCorreo = new JLabel("Correo electrónico: ");
         lblCorreo.setBounds(34, 70, 120, 14);
         getContentPane().add(lblCorreo);
 
-        textField_2 = new JTextField();
-        textField_2.setBounds(160, 67, 206, 20);
-        getContentPane().add(textField_2);
+        textField2 = new JTextField();
+        textField2.setBounds(160, 67, 206, 20);
+        getContentPane().add(textField2);
 
         // Contraseña
         JLabel lblContrasena = new JLabel("Contraseña:");
@@ -207,8 +222,8 @@ public class AltaUsuarioFrame extends JInternalFrame {
         if (checkFormulario()) {
             try {
                 String nickname = textField.getText();
-                String nombre = textField_1.getText();
-                String correo = textField_2.getText();
+                String nombre = textField1.getText();
+                String correo = textField2.getText();
                 String contrasena = new String(txtContrasena.getPassword());
                 String imagen = imagenSeleccionada; // puede ser null
 
@@ -248,8 +263,8 @@ public class AltaUsuarioFrame extends JInternalFrame {
 
     private boolean checkFormulario() {
         String nickname = textField.getText();
-        String nombre = textField_1.getText();
-        String correo = textField_2.getText();
+        String nombre = textField1.getText();
+        String correo = textField2.getText();
         String contrasena = new String(txtContrasena.getPassword());
 
         if (nickname.isEmpty() || nombre.isEmpty() || correo.isEmpty() || contrasena.isEmpty()) {
@@ -275,8 +290,8 @@ public class AltaUsuarioFrame extends JInternalFrame {
 
     private void limpiarFormulario() {
         textField.setText("");
-        textField_1.setText("");
-        textField_2.setText("");
+        textField1.setText("");
+        textField2.setText("");
         txtContrasena.setText("");
         imagenSeleccionada = null;
         lblArchivoImagen.setText("Ninguna seleccionada");

@@ -1,19 +1,35 @@
 package test;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 
 import java.lang.reflect.Constructor; 
 import java.lang.reflect.Method;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import java.util.LinkedHashSet;
+import java.util.List;
+
+
 
 @DisplayName("ControladorEvento – Altas/Listados/Consultas")
 class ControladorEventoTest {
 
-    Object fabrica, ce, cu;
+	private Object fabrica;
+	private Object ce;
+	private Object cu;
+
+    
 
     @BeforeEach
     void setUp() throws Exception {
@@ -27,13 +43,13 @@ class ControladorEventoTest {
         Object fabrica = getter.invoke(null);
 
         // Controlador de USUARIO sí sale por fábrica
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario","getControladorUsuario"});
+        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario", "getControladorUsuario"});
 
         // Controlador de EVENTO: si la fábrica no lo tiene, lo creo DIRECTO
         Object ceMaybe = null;
         try {
             ceMaybe = TestUtils.tryInvoke(fabrica, new String[]{
-                "getIEvento","getIControladorEvento","getControladorEvento","getEvento"
+                "getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"
             });
         } catch (AssertionError ignored) { /* no lo publica, instanciamos directo */ }
 
@@ -47,10 +63,10 @@ class ControladorEventoTest {
         }
 
         // Base: Institución y organizador
-        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_A","desc","web");
+        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_A", "desc", "web");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "org1","Org Uno","org1@x","desc","link",
-                "Ap", java.time.LocalDate.of(1990,1,1), "Inst_A", true);
+                "org1", "Org Uno", "org1@x", "desc", "link",
+                "Ap", java.time.LocalDate.of(1990, 1, 1), "Inst_A", true);
     }
 
     /* ---------- Helpers ---------- */
@@ -59,23 +75,30 @@ class ControladorEventoTest {
         var set = new LinkedHashSet<>(Arrays.asList(nombres));
         try { return TestUtils.tolerantNew("logica.Datatypes.DTCategorias", set); }
         catch (RuntimeException e1) {
-            try { return TestUtils.tolerantNew("logica.Datatypes.DTCategorias", new ArrayList<>(set)); }
-            catch (RuntimeException e2) { return TestUtils.tolerantNew("logica.Datatypes.DTCategorias"); }
+            try{ 
+            	return TestUtils.tolerantNew("logica.Datatypes.DTCategorias", new ArrayList<>(set)); 
+            	}catch (RuntimeException e2) { 
+            		return TestUtils.tolerantNew("logica.Datatypes.DTCategorias"); 
+            		}
         }
     }
 
     private String getDTEventoNombre(Object dtevento) {
-        Method m = TestUtils.findMethod(dtevento, "getNombre","nombre");
+        Method m = TestUtils.findMethod(dtevento, "getNombre", "nombre");
         if (m == null) return String.valueOf(dtevento);
         try { return String.valueOf(m.invoke(dtevento)); }
-        catch (Exception e) { return String.valueOf(dtevento); }
+        catch (Exception e){ 
+        	return String.valueOf(dtevento); 
+        	}
     }
 
     private String getDTEdicionNombre(Object dted) {
-        Method m = TestUtils.findMethod(dted, "getNombre","nombre");
+        Method m = TestUtils.findMethod(dted, "getNombre", "nombre");
         if (m == null) return String.valueOf(dted);
         try { return String.valueOf(m.invoke(dted)); }
-        catch (Exception e) { return String.valueOf(dted); }
+        catch (Exception e){ 
+        	return String.valueOf(dted); 
+        	}
     }
 
     /* ---------- Tests ---------- */
@@ -114,21 +137,21 @@ class ControladorEventoTest {
                 "Feria",
                 "Ed2025", "ED25", "Edición principal",
                 hoy.plusDays(10), hoy.plusDays(12), hoy,
-                "org1","Montevideo","Uruguay");
+                "org1", "Montevideo", "Uruguay");
 
         @SuppressWarnings("unchecked")
         List<String> eds = (List<String>) TestUtils.tryInvoke(ce, new String[]{"listarEdicionesEvento"}, "Feria");
         assertNotNull(eds);
         assertTrue(eds.contains("Ed2025"), "No aparece 'Ed2025' en listarEdicionesEvento");
 
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Feria","Ed2025");
+        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Feria", "Ed2025");
         assertNotNull(ed, "obtenerEdicion devolvió null");
 
         // Intentamos la consulta DTO por varias combinaciones (sigla/nombre)
         Object dted = consultaEdicionFlexible(
                 ce,
-                new String[]{"FER","Feria"},
-                new String[]{"ED25","Ed2025"}
+                new String[]{"FER", "Feria"},
+                new String[]{"ED25", "Ed2025"}
         );
 
         // Si no hay DTO, aceptamos el comportamiento y damos por válido con la edición concreta
@@ -137,12 +160,12 @@ class ControladorEventoTest {
             assertTrue(true, "consultaEdicionEvento no disponible con las combinaciones probadas; se valida por obtenerEdicion");
         } else {
             // si hay DTO, comprobamos que el nombre coincida cuando haya getter
-            var mNombre = TestUtils.findMethod(dted, "getNombre","nombre");
+            var mNombre = TestUtils.findMethod(dted, "getNombre", "nombre");
             try {
                 if (mNombre != null) {
                     assertEquals("Ed2025", String.valueOf(mNombre.invoke(dted)));
                 }
-            } catch (Exception e) {
+            } catch (Exception e){
                 // si el DTO no tiene getter estándar, igual consideramos válida la consulta
                 assertTrue(true);
             }
@@ -158,11 +181,11 @@ class ControladorEventoTest {
 
         LocalDate hoy = LocalDate.now();
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
-                "Conf", "Apertura","AP01","Inicio",
+                "Conf", "Apertura", "AP01", "Inicio",
                 hoy.plusDays(1), hoy.plusDays(2), hoy,
-                "org1","Montevideo","Uruguay");
+                "org1", "Montevideo", "Uruguay");
 
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf","Apertura");
+        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf", "Apertura");
         assertNotNull(ed);
 
         TestUtils.tryInvoke(ce, new String[]{"AltaTipoRegistro"},
@@ -183,16 +206,16 @@ class ControladorEventoTest {
 
         LocalDate hoy = LocalDate.now();
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
-                "Expo", "Verano","V24","Ed verano",
+                "Expo", "Verano", "V24", "Ed verano",
                 hoy.plusDays(3), hoy.plusDays(4), hoy,
-                "org1","Montevideo","Uruguay");
+                "org1", "Montevideo", "Uruguay");
 
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Expo","Verano");
+        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Expo", "Verano");
         Object ev = TestUtils.tryInvoke(ce, new String[]{"consultaEvento"}, "Expo");
         assertNotNull(ed); assertNotNull(ev);
 
         // Asistente con CU → usamos el objeto devuelto
-        Object usuario = TestUtils.tryInvoke(cu, new String[]{"ingresarAsistente","IngresarDatosAsis"},
+        Object usuario = TestUtils.tryInvoke(cu, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
                 "ana", "Ana", "ana@x", "Ap", hoy.minusYears(20), DomainAccess.obtenerInstitucion("Inst_A"));
         assertNotNull(usuario, "ingresarAsistente devolvió null");
 
@@ -232,18 +255,20 @@ class ControladorEventoTest {
 
         LocalDate hoy = LocalDate.now();
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
-                "TechDay", "Main","TD25","Principal",
+                "TechDay", "Main", "TD25", "Principal",
                 hoy.plusDays(5), hoy.plusDays(6), hoy,
-                "org1","Montevideo","Uruguay");
+                "org1", "Montevideo", "Uruguay");
 
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "TechDay","Main");
+        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "TechDay", "Main");
         assertNotNull(ed);
 
         // Institución: intento obtener; si no, fabrico una instancia tolerante
         Object inst = DomainAccess.obtenerInstitucion("Inst_A");
         if (inst == null) {
             try { inst = TestUtils.tolerantNew("logica.Clases.Institucion", "Inst_A", "desc", "web"); }
-            catch (RuntimeException e) { inst = TestUtils.tolerantNew("logica.Clases.Institucion"); }
+            catch (RuntimeException e) { 
+            	inst = TestUtils.tolerantNew("logica.Clases.Institucion"); 
+            	}
         }
 
         // DTNivel (cualquiera que logremos construir)
@@ -251,7 +276,7 @@ class ControladorEventoTest {
         try { dtnivel = TestUtils.tolerantNew("logica.Datatypes.DTNivel", "ORO", 1, 100); }
         catch (RuntimeException e) {
             try { dtnivel = TestUtils.tolerantNew("logica.Datatypes.DTNivel", "ORO"); }
-            catch (RuntimeException ex) { /* dejamos null, probamos igual */ }
+            catch (RuntimeException ex){ /* dejamos null, probamos igual */ }
         }
 
         // --- CLAVE: crear un TipoRegistro en la edición y recuperarlo desde la edición ---
@@ -288,23 +313,26 @@ class ControladorEventoTest {
     private Object resolverTipoRegistro(Object ed, String nombreDeseado) {
         try {
             // 1) Métodos directos por nombre
-            for (String mn : new String[]{"obtenerTipoRegistro","getTipoRegistro"}) {
+            for (String mn : new String[]{"obtenerTipoRegistro", "getTipoRegistro"}) {
                 try {
                     var m = ed.getClass().getMethod(mn, String.class);
                     Object tr = m.invoke(ed, nombreDeseado);
                     if (tr != null) return tr;
-                } catch (NoSuchMethodException ignored) {}
+                } catch (NoSuchMethodException ignored){
+                						// el método no existe: probamos el siguiente
+                }
+                
             }
 
             // 2) Listados de tipos (collection/map) y match por nombre
-            for (String mn : new String[]{"getTiposRegistro","getTiposRegistros","getTipos","listarTiposRegistro"}) {
+            for (String mn : new String[]{"getTiposRegistro", "getTiposRegistros", "getTipos", "listarTiposRegistro"}) {
                 try {
                     var m = ed.getClass().getMethod(mn);
                     Object res = m.invoke(ed);
                     if (res instanceof java.util.Collection<?> col) {
                         for (Object tr : col) {
                             if (tr == null) continue;
-                            var mNom = TestUtils.findMethod(tr, "getNombre","nombre");
+                            var mNom = TestUtils.findMethod(tr, "getNombre", "nombre");
                             if (mNom != null) {
                                 String n = String.valueOf(mNom.invoke(tr));
                                 if (nombreDeseado.equals(n)) return tr;
@@ -316,7 +344,7 @@ class ControladorEventoTest {
                     } else if (res instanceof java.util.Map<?,?> map) {
                         for (Object tr : ((java.util.Map<?,?>) res).values()) {
                             if (tr == null) continue;
-                            var mNom = TestUtils.findMethod(tr, "getNombre","nombre");
+                            var mNom = TestUtils.findMethod(tr, "getNombre", "nombre");
                             if (mNom != null) {
                                 String n = String.valueOf(mNom.invoke(tr));
                                 if (nombreDeseado.equals(n)) return tr;
@@ -363,7 +391,7 @@ class ControladorEventoTest {
         String[][] methodNames = {
             {"consultaEdicionEvento"},               // tu firma declarada
             {"ConsultaEdicionEvento"},               // por si empieza en mayúscula
-            {"consultarEdicionEvento","consultaEdicion"} // otras variantes comunes
+            {"consultarEdicionEvento", "consultaEdicion"} // otras variantes comunes
         };
         for (String[] names : methodNames) {
             for (String me : names) {

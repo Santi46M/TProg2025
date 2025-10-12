@@ -1,13 +1,20 @@
 package test;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Method;
+
+
 import java.time.LocalDate;
 
 @DisplayName("ControladorEvento – Edge cases (errores comunes)")
@@ -27,12 +34,12 @@ class ControladorEventoEdgeCasesTest {
         Object fabrica = getter.invoke(null);
 
         // 2) Controlador de USUARIO por fábrica (existe en tu caso)
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario","getControladorUsuario"});
+        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario", "getControladorUsuario"});
 
         // 3) Controlador de EVENTO: por fábrica si existe; si no, instancio la impl concreta
         try {
             ce = TestUtils.tryInvoke(fabrica, new String[]{
-                "getIEvento","getIControladorEvento","getControladorEvento","getEvento"
+                "getIEvento","getIControladorEvento", "getControladorEvento", "getEvento"
             });
         } catch (AssertionError ignored) {
             Class<?> ceClazz = Class.forName("logica.ControladorEvento");
@@ -50,8 +57,8 @@ class ControladorEventoEdgeCasesTest {
                     if (t.isPrimitive()) {
                         if (t == boolean.class) args[i] = false;
                         else if (t == char.class) args[i] = '\0';
-                        else if (t == byte.class) args[i] = (byte)0;
-                        else if (t == short.class) args[i] = (short)0;
+                        else if (t == byte.class) args[i] = (byte) 0;
+                        else if (t == short.class) args[i] = (short) 0;
                         else if (t == int.class) args[i] = 0;
                         else if (t == long.class) args[i] = 0L;
                         else if (t == float.class) args[i] = 0f;
@@ -65,10 +72,10 @@ class ControladorEventoEdgeCasesTest {
         }
 
      // 4) Base: Institución + ORG persistido (usá AltaUsuario para que aparezca en los mapas)
-        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_A","d","w");
+        TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_A", "d", "w");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "org1","Org Uno","org1@x","desc","link",
-                "Ap", java.time.LocalDate.of(1990,1,1), "Inst_A", true);
+                "org1","Org Uno","org1@x", "desc", "link",
+                "Ap", java.time.LocalDate.of(1990, 1, 1), "Inst_A", true);
 
         // 5) Dar de alta la categoría que usará el evento ("Tec")
      // DESPUÉS (idempotente)
@@ -102,8 +109,8 @@ class ControladorEventoEdgeCasesTest {
             Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf", nombre);
             assertNotNull(ed, "La edición debería existir si no lanzó excepción");
 
-            var mIni = TestUtils.findMethod(ed, "getFechaInicio","fechaInicio");
-            var mFin = TestUtils.findMethod(ed, "getFechaFin","fechaFin");
+            var mIni = TestUtils.findMethod(ed, "getFechaInicio", "fechaInicio");
+            var mFin = TestUtils.findMethod(ed, "getFechaFin", "fechaFin");
             if (mIni != null && mFin != null) {
                 LocalDate ini = (LocalDate) mIni.invoke(ed);
                 LocalDate fin = (LocalDate) mFin.invoke(ed);
@@ -123,8 +130,8 @@ class ControladorEventoEdgeCasesTest {
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
                 "Conf", "Main", "M1", "ok",
                 hoy.plusDays(1), hoy.plusDays(2), hoy,
-                "org1","City","UY");
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf","Main");
+                "org1", "City", "UY");
+        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf", "Main");
         assertNotNull(ed);
 
         try {
@@ -151,9 +158,9 @@ class ControladorEventoEdgeCasesTest {
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
                 "Conf", "Main2", "M2", "ok",
                 hoy.plusDays(1), hoy.plusDays(2), hoy,
-                "org1","City","UY");
+                "org1","City", "UY");
 
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf","Main2");
+        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "Conf", "Main2");
         assertNotNull(ed);
 
         // Intento con cupo negativo: si lanza → OK; si no lanza → aceptamos normalización

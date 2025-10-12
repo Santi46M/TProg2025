@@ -1,10 +1,23 @@
 package presentacion;
 
-import javax.swing.*;
+import javax.swing.JFrame;
+import javax.swing.JDesktopPane;
+import javax.swing.JMenuBar;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.MenuElement;
+import javax.swing.UIManager;
+
 import logica.CargaDatosPrueba;
-import logica.Interfaces.*;
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
 import logica.fabrica;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.EventQueue;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 public class main {
@@ -14,8 +27,8 @@ public class main {
     private static final Color P_MENU_FG  = new Color(25, 25, 25);
     private JFrame frame;
     private JDesktopPane desktopPane;
-    private IControladorUsuario ICU;
-    private IControladorEvento ICE;
+    private IControladorUsuario icu;
+    private IControladorEvento ice;
     private AltaUsuarioFrame creUsrInternalFrame;
     private ConsultaUsuario conUsrInternalFrame;
     private ConsultaEventoFrame consultaEventoFrame;
@@ -33,17 +46,25 @@ public class main {
     private AceptarEdicionEventoFrame aceptarEdicionEventoFrame;
 
     public static void main(String[] args) {
-        try {
-            boolean puesto = false;
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Metal".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    puesto = true;
-                    break;
-                }
-            }
-            if (!puesto) UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ignore) {}
+    	try {
+    	    boolean puesto = false;
+    	    for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+    	        if ("Metal".equals(info.getName())) {
+    	            UIManager.setLookAndFeel(info.getClassName());
+    	            puesto = true;
+    	            break;
+    	        }
+    	    }
+    	    if (!puesto) {
+    	        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+    	    }
+    	} catch (ClassNotFoundException
+    	       | InstantiationException
+    	       | IllegalAccessException
+    	       | javax.swing.UnsupportedLookAndFeelException e) {
+    		// errores
+    	}
+
 
         EventQueue.invokeLater(() -> {
             try {
@@ -57,35 +78,35 @@ public class main {
 
     public main() {
         initialize();
-        ICU = fabrica.getInstance().getIControladorUsuario();
-        ICE = fabrica.getInstance().getIControladorEvento();
-        creUsrInternalFrame = new AltaUsuarioFrame(ICU, ICE);
+        icu = fabrica.getInstance().getIControladorUsuario();
+        ice = fabrica.getInstance().getIControladorEvento();
+        creUsrInternalFrame = new AltaUsuarioFrame(icu, ice);
         creUsrInternalFrame.setVisible(false);
-        conUsrInternalFrame = new ConsultaUsuario(ICU, ICE);
+        conUsrInternalFrame = new ConsultaUsuario(icu, ice);
         conUsrInternalFrame.setVisible(false);
-        consultaEventoFrame = new ConsultaEventoFrame(ICU, ICE);
+        consultaEventoFrame = new ConsultaEventoFrame(icu, ice);
         consultaEventoFrame.setVisible(false);
-        consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame(ICU, ICE);
+        consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame(icu, ice);
         consultaEdicionEventoFrame.setVisible(false);
-        consultaTipoRegistroFrame = new ConsultaTipoRegistroFrame(ICU, ICE);
+        consultaTipoRegistroFrame = new ConsultaTipoRegistroFrame(icu, ice);
         consultaTipoRegistroFrame.setVisible(false);
-        consultaRegistroFrame = new ConsultaRegistroFrame(ICU, ICE);
+        consultaRegistroFrame = new ConsultaRegistroFrame(icu, ice);
         consultaRegistroFrame.setVisible(false);
-        consultaPatrocinioFrame = new ConsultaPatrocinioFrame(ICU, ICE);
+        consultaPatrocinioFrame = new ConsultaPatrocinioFrame(icu, ice);
         consultaPatrocinioFrame.setVisible(false);
-        altaEventoFrame = new AltaEventoFrame(ICU, ICE);
+        altaEventoFrame = new AltaEventoFrame(icu, ice);
         altaEventoFrame.setVisible(false);
-        altaTipoRegistroFrame = new AltaTipoRegistroFrame(ICU, ICE);
+        altaTipoRegistroFrame = new AltaTipoRegistroFrame(icu, ice);
         altaTipoRegistroFrame.setVisible(false);
-        altaPatrocinioFrame = new AltaPatrocinioFrame(ICU, ICE);
+        altaPatrocinioFrame = new AltaPatrocinioFrame(icu, ice);
         altaPatrocinioFrame.setVisible(false);
-        altaInstitucionFrame = new AltaInstitucionFrame(ICU, ICE);
+        altaInstitucionFrame = new AltaInstitucionFrame(icu, ice);
         altaInstitucionFrame.setVisible(false);
-        registroEdicionEventoFrame = new RegistroEdicionEventoFrame(ICU, ICE);
+        registroEdicionEventoFrame = new RegistroEdicionEventoFrame(icu, ice);
         registroEdicionEventoFrame.setVisible(false);
-        altaEdicionEventoFrame = new AltaEdicionEvento(ICU, ICE);
+        altaEdicionEventoFrame = new AltaEdicionEvento(icu, ice);
         altaEdicionEventoFrame.setVisible(false);
-        aceptarEdicionEventoFrame = new AceptarEdicionEventoFrame(ICE);
+        aceptarEdicionEventoFrame = new AceptarEdicionEventoFrame(ice);
         aceptarEdicionEventoFrame.setVisible(false);
 
 
@@ -135,10 +156,15 @@ public class main {
         itemCargaDatos.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    CargaDatosPrueba.cargar();
-                } catch (Exception ex) {
-                }
+            	try {
+            	    CargaDatosPrueba.cargar();
+            	} catch (Throwable ex) {
+            	    ex.printStackTrace();
+            	    JOptionPane.showMessageDialog(frame,
+            	            "Se produjo un error inesperado:\n" + ex.getMessage(),
+            	            "Error", JOptionPane.ERROR_MESSAGE);
+            	}
+
             }
         });
 
@@ -156,14 +182,16 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (creUsrInternalFrame == null || creUsrInternalFrame.isClosed()) {
-                        creUsrInternalFrame = new AltaUsuarioFrame(ICU, ICE);
+                        creUsrInternalFrame = new AltaUsuarioFrame(icu, ice);
                         desktopPane.add(creUsrInternalFrame);
                     }
                     creUsrInternalFrame.cargarInstituciones();
                     creUsrInternalFrame.setVisible(true);
                     creUsrInternalFrame.toFront();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -175,15 +203,17 @@ public class main {
             public void actionPerformed(ActionEvent e) {
             	try {
             	    if (conUsrInternalFrame == null || conUsrInternalFrame.isClosed()) {
-            	        conUsrInternalFrame = new ConsultaUsuario(ICU, ICE);
+            	        conUsrInternalFrame = new ConsultaUsuario(icu, ice);
             	        desktopPane.add(conUsrInternalFrame);
             	    }
             	    conUsrInternalFrame.cargarUsuarios();
             	    conUsrInternalFrame.setVisible(true);
             	    conUsrInternalFrame.toFront();
-            	} catch (Exception ex) {
-            	    ex.printStackTrace();
-            	}
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         });
 
@@ -194,13 +224,15 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (altaInstitucionFrame == null || altaInstitucionFrame.isClosed()) {
-                        altaInstitucionFrame = new AltaInstitucionFrame(ICU, ICE);
+                        altaInstitucionFrame = new AltaInstitucionFrame(icu, ice);
                         desktopPane.add(altaInstitucionFrame);
                     }
                     altaInstitucionFrame.setVisible(true);
                     altaInstitucionFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -211,7 +243,7 @@ public class main {
         itemModificarUsuario.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    java.util.Map<String, logica.Clases.Usuario> usuariosMap = ICU.listarUsuarios();
+                    java.util.Map<String, logica.Clases.Usuario> usuariosMap = icu.listarUsuarios();
                     String[] usuarios = usuariosMap.keySet().toArray(new String[0]);
                     String[][] datosUsuarios = new String[usuarios.length][7];
                     for (int i = 0; i < usuarios.length; i++) {
@@ -239,13 +271,15 @@ public class main {
                         }
                     }
                     if (modificarDatosUsuarioFrame == null || modificarDatosUsuarioFrame.isClosed()) {
-                        modificarDatosUsuarioFrame = new ModificarDatosUsuarioFrame(ICU, usuarios, datosUsuarios);
+                        modificarDatosUsuarioFrame = new ModificarDatosUsuarioFrame(icu, usuarios, datosUsuarios);
                         desktopPane.add(modificarDatosUsuarioFrame);
                     }
                     modificarDatosUsuarioFrame.setVisible(true);
                     modificarDatosUsuarioFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -257,14 +291,16 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (consultaEventoFrame == null || consultaEventoFrame.isClosed()) {
-                        consultaEventoFrame = new ConsultaEventoFrame(ICU, ICE);
+                        consultaEventoFrame = new ConsultaEventoFrame(icu, ice);
                         desktopPane.add(consultaEventoFrame);
                     }
                     consultaEventoFrame.cargarEventos();
                     consultaEventoFrame.setVisible(true);
                     consultaEventoFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -277,14 +313,16 @@ public class main {
      itemConsultaEdicion.addActionListener(e -> {
          try {
              if (consultaEdicionEventoFrame == null || consultaEdicionEventoFrame.isClosed()) {
-                 consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame(ICU, ICE);
+                 consultaEdicionEventoFrame = new ConsultaEdicionEventoFrame(icu, ice);
                  desktopPane.add(consultaEdicionEventoFrame);
              }
              consultaEdicionEventoFrame.cargarEventos();
              consultaEdicionEventoFrame.setVisible(true);
              consultaEdicionEventoFrame.toFront();
-         } catch (Exception ex) {
-             ex.printStackTrace();
+         } catch (RuntimeException ex) {
+             JOptionPane.showMessageDialog(frame,
+                     "Error al cargar los datos: " + ex.getMessage(),
+                     "Error", JOptionPane.ERROR_MESSAGE);
          }
      });
 
@@ -295,14 +333,16 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (consultaTipoRegistroFrame == null || consultaTipoRegistroFrame.isClosed()) {
-                        consultaTipoRegistroFrame = new ConsultaTipoRegistroFrame(ICU, ICE);
+                        consultaTipoRegistroFrame = new ConsultaTipoRegistroFrame(icu, ice);
                         desktopPane.add(consultaTipoRegistroFrame);
                     }
                     consultaTipoRegistroFrame.cargarEventos();
                     consultaTipoRegistroFrame.setVisible(true);
                     consultaTipoRegistroFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -314,14 +354,16 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (consultaRegistroFrame == null || consultaRegistroFrame.isClosed()) {
-                        consultaRegistroFrame = new ConsultaRegistroFrame(ICU, ICE);
+                        consultaRegistroFrame = new ConsultaRegistroFrame(icu, ice);
                         desktopPane.add(consultaRegistroFrame);
                     }
                     consultaRegistroFrame.cargarAsistentes(); 
                     consultaRegistroFrame.setVisible(true);
                     consultaRegistroFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -333,14 +375,16 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (consultaPatrocinioFrame == null || consultaPatrocinioFrame.isClosed()) {
-                        consultaPatrocinioFrame = new ConsultaPatrocinioFrame(ICU, ICE);
+                        consultaPatrocinioFrame = new ConsultaPatrocinioFrame(icu, ice);
                         desktopPane.add(consultaPatrocinioFrame);
                     }
                     consultaPatrocinioFrame.cargarDatos();
                     consultaPatrocinioFrame.setVisible(true);
                     consultaPatrocinioFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -352,14 +396,16 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (altaEventoFrame == null || altaEventoFrame.isClosed()) {
-                        altaEventoFrame = new AltaEventoFrame(ICU, ICE);
+                        altaEventoFrame = new AltaEventoFrame(icu, ice);
                         desktopPane.add(altaEventoFrame);
                     }
                     altaEventoFrame.cargarCategorias();
                     altaEventoFrame.setVisible(true);
                     altaEventoFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -371,14 +417,16 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (altaTipoRegistroFrame == null || altaTipoRegistroFrame.isClosed()) {
-                        altaTipoRegistroFrame = new AltaTipoRegistroFrame(ICU, ICE);
+                        altaTipoRegistroFrame = new AltaTipoRegistroFrame(icu, ice);
                         desktopPane.add(altaTipoRegistroFrame);
                     }
                     altaTipoRegistroFrame.cargarEventos();
                     altaTipoRegistroFrame.setVisible(true);
                     altaTipoRegistroFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -390,14 +438,16 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (altaPatrocinioFrame == null || altaPatrocinioFrame.isClosed()) {
-                        altaPatrocinioFrame = new AltaPatrocinioFrame(ICU, ICE);
+                        altaPatrocinioFrame = new AltaPatrocinioFrame(icu, ice);
                         desktopPane.add(altaPatrocinioFrame);
                     }
                     altaPatrocinioFrame.cargarDatos();
                     altaPatrocinioFrame.setVisible(true);
                     altaPatrocinioFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -409,15 +459,17 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (altaEdicionEventoFrame == null || altaEdicionEventoFrame.isClosed()) {
-                        altaEdicionEventoFrame = new AltaEdicionEvento(ICU, ICE);
+                        altaEdicionEventoFrame = new AltaEdicionEvento(icu, ice);
                         desktopPane.add(altaEdicionEventoFrame);
                     }
                     altaEdicionEventoFrame.cargarEventos();
                     altaEdicionEventoFrame.cargarOrganizadores();
                     altaEdicionEventoFrame.setVisible(true);
                     altaEdicionEventoFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -429,14 +481,16 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     if (registroEdicionEventoFrame == null || registroEdicionEventoFrame.isClosed()) {
-                        registroEdicionEventoFrame = new RegistroEdicionEventoFrame(ICU, ICE);
+                        registroEdicionEventoFrame = new RegistroEdicionEventoFrame(icu, ice);
                         desktopPane.add(registroEdicionEventoFrame);
                     }
                     registroEdicionEventoFrame.cargarDatos(); 
                     registroEdicionEventoFrame.setVisible(true);
                     registroEdicionEventoFrame.toFront();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Error al cargar los datos: " + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -448,14 +502,15 @@ public class main {
         itemAceptarEdicion.addActionListener(e -> {
             try {
                 if (aceptarEdicionEventoFrame == null || aceptarEdicionEventoFrame.isClosed()) {
-                    aceptarEdicionEventoFrame = new AceptarEdicionEventoFrame(ICE);
                     desktopPane.add(aceptarEdicionEventoFrame);
                 }
                 aceptarEdicionEventoFrame.cargarEventos();
                 aceptarEdicionEventoFrame.setVisible(true);
                 aceptarEdicionEventoFrame.toFront();
-            } catch (Exception ex) {
-                ex.printStackTrace();
+            } catch (RuntimeException ex) {
+                JOptionPane.showMessageDialog(frame,
+                        "Error al cargar los datos: " + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
@@ -484,12 +539,14 @@ public class main {
                     }
                 }
             }
+
             if (clase == null) {
                 JOptionPane.showMessageDialog(frame,
-                    "El Look&Feel \"" + nombre + "\" no está disponible en este sistema.",
-                    "Apariencia", JOptionPane.INFORMATION_MESSAGE);
+                        "El Look&Feel \"" + nombre + "\" no está disponible en este sistema.",
+                        "Apariencia", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
+
             UIManager.setLookAndFeel(clase);
             SwingUtilities.updateComponentTreeUI(frame);
 
@@ -498,21 +555,31 @@ public class main {
                 frame.getJMenuBar().setBackground(P_MENU_BG);
                 frame.getJMenuBar().setForeground(P_MENU_FG);
                 for (MenuElement e : frame.getJMenuBar().getSubElements()) {
-                    if (e.getComponent() instanceof JMenu m) styleMenu(m);
-                    if (e.getComponent() instanceof JMenuItem mi) styleMenuItem(mi);
+                    if (e.getComponent() instanceof JMenu m) {
+                        styleMenu(m);
+                    }
+                    if (e.getComponent() instanceof JMenuItem mi) {
+                        styleMenuItem(mi);
+                    }
                 }
             }
+
             desktopPane.setBackground(P_BG_APP);
-            frame.pack();            
-            frame.setSize(800, 660); 
+            frame.pack();
+            frame.setSize(800, 660);
             frame.repaint();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(frame, "No se pudo aplicar el Look&Feel.\n" + ex.getMessage(),
+
+        } catch (ClassNotFoundException
+                | InstantiationException
+                | IllegalAccessException
+                | javax.swing.UnsupportedLookAndFeelException ex) {
+
+            JOptionPane.showMessageDialog(frame,
+                    "Error al aplicar el Look&Feel:\n" + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-    // =========================================
+
 
     private String[] getEventos() {
         logica.Controladores.ControladorEvento controlador = new logica.Controladores.ControladorEvento();

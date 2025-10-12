@@ -1,30 +1,39 @@
 package test;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 
 @DisplayName("ControladorEvento – listarEdicionesEvento vacío")
 class ControladorEventoListarVacioTest {
 
-    Object ce, cu;
+	private Object ce;
+	private Object cu;
 
     @BeforeEach
     void setUp() throws Exception {
         TestUtils.resetAll();
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         Method getter;
-        try { getter = fab.getMethod("getInstance"); }
-        catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
+        try { 
+        	getter = fab.getMethod("getInstance"); 
+        }catch (NoSuchMethodException e) { 
+        	getter = fab.getMethod("getInstancia"); 
+        	}
         Object fabrica = getter.invoke(null);
 
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario"});
+        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento","getIControladorEvento","getControladorEvento","getEvento"});
+            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError ignored) {
             ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
         }
@@ -32,9 +41,12 @@ class ControladorEventoListarVacioTest {
         // base: org persistido + categoría
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_LE", "d", "w");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "orgLE","Org LE","org@x","d","l","Ap",
-                LocalDate.of(1990,1,1),"Inst_LE", true);
-        try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "LE-Cat"); } catch (Throwable ignored) {}
+                "orgLE", "Org LE", "org@x", "d", "l", "Ap",
+                LocalDate.of(1990, 1, 1), "Inst_LE", true);
+        try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "LE-Cat"); } catch (Throwable ignored) {
+        	//hay que arreglar esto
+        }
+        
     }
 
     @Test

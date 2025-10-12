@@ -11,33 +11,53 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ControladorEventoConsultaFallidaTest {
 
     @Test
-    void consultasInexistentes() throws Exception {
+    void consultasInexistentes() throws Throwable {  // ✅ permite que TestUtils lance Throwable
         TestUtils.resetAll();
 
         // CE desde fábrica si existe; si no, por implementación concreta
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         Method getter;
-        try { getter = fab.getMethod("getInstance"); }
-        catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
+        try {
+            getter = fab.getMethod("getInstance");
+        } catch (NoSuchMethodException e) {
+            getter = fab.getMethod("getInstancia");
+        }
         Object fabrica = getter.invoke(null);
 
         Object ce;
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento","getIControladorEvento","getControladorEvento","getEvento"});
-        } catch (AssertionError ignored) {
-            ce = Class.forName("logica.Controladores.ControladorEvento").getDeclaredConstructor().newInstance();
+            ce = TestUtils.tryInvoke(fabrica, new String[]{
+                    "getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
+        } catch (AssertionError e) {
+            ce = Class.forName("logica.Controladores.ControladorEvento")
+                    .getDeclaredConstructor().newInstance();
         }
 
-        // 1) consultaEvento inexistente
-        try { TestUtils.invokeUnwrapped(ce, new String[]{"consultaEvento"}, "NO_EXISTE"); } catch (Throwable ignored) {}
+        // ✅ ce no es efectivamente final, así que copiamos
+        final Object ceFinal = ce;
 
-        // 2) consultaEdicionEvento por claves inexistentes (probamos nombre/sigla intercambiadas)
-        try { TestUtils.invokeUnwrapped(ce, new String[]{"consultaEdicionEvento"}, "NO_EVT", "NO_ED"); } catch (Throwable ignored) {}
-        try { TestUtils.invokeUnwrapped(ce, new String[]{"consultaEdicionEvento"}, "NO_ED", "NO_EVT"); } catch (Throwable ignored) {}
-
-        // 3) listarEdicionesEvento de evento inexistente
-        try { TestUtils.invokeUnwrapped(ce, new String[]{"listarEdicionesEvento"}, "NO_EVT"); } catch (Throwable ignored) {}
+        // Ejecuciones tolerantes
+        ejecutarTolerante(() -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEvento"}, "NO_EXISTE"));
+        ejecutarTolerante(() -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEdicionEvento"}, "NO_EVT", "NO_ED"));
+        ejecutarTolerante(() -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEdicionEvento"}, "NO_ED", "NO_EVT"));
+        ejecutarTolerante(() -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"listarEdicionesEvento"}, "NO_EVT"));
 
         assertTrue(true);
+    }
+
+    // ✅ Helper tolerante
+    private void ejecutarTolerante(ThrowingRunnable runnable) {
+        try {
+            runnable.run();
+        } catch (RuntimeException | AssertionError e) {
+            assertTrue(true); // comportamiento aceptado
+        } catch (Throwable t) {
+            assertTrue(true); // comportamiento aceptado
+        }
+    }
+
+    @FunctionalInterface
+    private interface ThrowingRunnable {
+        void run() throws Throwable;
     }
 }

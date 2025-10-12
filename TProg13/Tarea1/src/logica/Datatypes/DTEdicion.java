@@ -1,5 +1,4 @@
 package logica.Datatypes;
-import logica.Enumerados.*;
 import java.time.LocalDate;
 
 import logica.Enumerados.DTEstado;

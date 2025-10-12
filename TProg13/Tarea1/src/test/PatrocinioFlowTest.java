@@ -1,13 +1,16 @@
 package test;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 
 import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Flujo de Patrocinio – tolerante")
 class PatrocinioFlowTest {
@@ -23,9 +26,9 @@ class PatrocinioFlowTest {
         catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
 
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario"});
+        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento","getIControladorEvento","getControladorEvento","getEvento"});
+            ce = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento","getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError ignored) {
             ce = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
         }
@@ -33,8 +36,8 @@ class PatrocinioFlowTest {
         // base: org persistido + categoría
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_P", "d", "w");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
-                "orgP","Org P","org@x","d","l","Ap",
-                LocalDate.of(1990,1,1),"Inst_P", true);
+                "orgP", "Org P", "org@x", "d", "l", "Ap",
+                LocalDate.of(1990, 1, 1), "Inst_P", true);
         try { TestUtils.invokeUnwrapped(ce, new String[]{"AltaCategoria"}, "Pat-Cat"); } catch (Throwable ignored) {}
     }
 
@@ -64,11 +67,11 @@ class PatrocinioFlowTest {
 
         LocalDate hoy = LocalDate.now();
         TestUtils.tryInvoke(ce, new String[]{"altaEdicionEvento"},
-                "TechDayP", "Main","TDP25","Principal",
+                "TechDayP", "Main", "TDP25", "Principal",
                 hoy.plusDays(3), hoy.plusDays(4), hoy,
-                "orgP","City","UY");
+                "orgP", "City", "UY");
 
-        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "TechDayP","Main");
+        Object ed = TestUtils.tryInvoke(ce, new String[]{"obtenerEdicion"}, "TechDayP", "Main");
         assertNotNull(ed);
 
         // Crear TipoRegistro en la edición y resolverlo desde la propia edición
@@ -126,7 +129,7 @@ class PatrocinioFlowTest {
     private Object resolverTipoRegistro(Object ed, String nombreDeseado) {
         try {
             // 1) Métodos directos por nombre
-            for (String mn : new String[]{"obtenerTipoRegistro","getTipoRegistro"}) {
+            for (String mn : new String[]{"obtenerTipoRegistro", "getTipoRegistro"}) {
                 try {
                     var m = ed.getClass().getMethod(mn, String.class);
                     Object tr = m.invoke(ed, nombreDeseado);
@@ -135,7 +138,7 @@ class PatrocinioFlowTest {
             }
 
             // 2) Listados de tipos (Collection/Map) y match por nombre
-            for (String mn : new String[]{"getTiposRegistro","getTiposRegistros","getTipos","listarTiposRegistro"}) {
+            for (String mn : new String[]{"getTiposRegistro", "getTiposRegistros", "getTipos", "listarTiposRegistro"}) {
                 try {
                     var m = ed.getClass().getMethod(mn);
                     Object res = m.invoke(ed);
@@ -143,7 +146,7 @@ class PatrocinioFlowTest {
                     if (res instanceof java.util.Collection<?> col) {
                         for (Object tr : col) {
                             if (tr == null) continue;
-                            var mNom = TestUtils.findMethod(tr, "getNombre","nombre");
+                            var mNom = TestUtils.findMethod(tr, "getNombre", "nombre");
                             if (mNom != null) {
                                 String n = String.valueOf(mNom.invoke(tr));
                                 if (nombreDeseado.equals(n)) return tr;
@@ -155,7 +158,7 @@ class PatrocinioFlowTest {
                     } else if (res instanceof java.util.Map<?,?> map) {
                         for (Object tr : map.values()) {
                             if (tr == null) continue;
-                            var mNom = TestUtils.findMethod(tr, "getNombre","nombre");
+                            var mNom = TestUtils.findMethod(tr, "getNombre", "nombre");
                             if (mNom != null) {
                                 String n = String.valueOf(mNom.invoke(tr));
                                 if (nombreDeseado.equals(n)) return tr;

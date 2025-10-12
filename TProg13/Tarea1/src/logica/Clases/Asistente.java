@@ -12,7 +12,7 @@ public class Asistente extends Usuario {
     
     public Asistente(String nickname, String nombre, String email, String contraseña, String imagen, String apellido, LocalDate fechaDeNacimiento, Institucion institucion) {
     	
-    	super(nickname,nombre,email,contraseña);
+    	super(nickname, nombre, email, contraseña);
     	this.apellido = apellido;
     	this.fechaDeNacimiento = fechaDeNacimiento;
     	this.institucion = institucion;
