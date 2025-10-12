@@ -1,4 +1,5 @@
 package test;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -8,39 +9,45 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
-
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @DisplayName("Fábrica – cargarUsuariosDesdeCSV (tolerante)")
 class FabricaCsvSmokeTest {
 
-    Object fabrica, cu;
+    private Object fabrica;
+    private Object cu;
+
+    public Object getFabrica() { return fabrica; }
+    public Object getCu() { return cu; }
 
     @BeforeEach
     void setUp() throws Exception {
         TestUtils.resetAll();
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         Method getter;
-        try { getter = fab.getMethod("getInstance"); }
-        catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
-        fabrica = getter.invoke(null);
-        cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario","getIControladorUsuario"});
+        try { getter = fab.getMethod("getInstance"); } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
+        this.fabrica = getter.invoke(null);
+
+        this.cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         assertNotNull(cu);
+
         // Institución base por si el CSV la requiere
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_CSV", "desc", "web");
     }
 
     private Method findCsvMethod(Object fab) {
         for (Method m : fab.getClass().getMethods()) {
-            if (m.getName().equals("cargarUsuariosDesdeCSV") && m.getParameterCount() == 1) return m;
+            if (m.getName().equals("cargarUsuariosDesdeCSV") && m.getParameterCount() == 1) {
+                return m;
+            }
         }
         return null;
     }
@@ -56,7 +63,7 @@ class FabricaCsvSmokeTest {
         }
 
         String csvData =
-                // intentamos un formato razonable; si tu parser difiere y lanza, igual sumamos cobertura
+                // formato razonable; si tu parser difiere y lanza, igual sumamos cobertura
                 "nick;nombre;email;desc;link;apellido;fecha;inst;esOrg\n" +
                 "ana;Ana;ana@x;d;l;Ap;1999-01-01;Inst_CSV;false\n" +
                 "orgcsv;Org CSV;org@x;d;l;Ap;1998-02-02;Inst_CSV;true\n";
@@ -81,21 +88,20 @@ class FabricaCsvSmokeTest {
             Files.writeString(tmp, csvData, StandardCharsets.UTF_8);
             arg = tmp;
         } else {
-            // parámetro desconocido: dejamos el test como "no aplica"
+            // parámetro desconocido: test “no aplica”
             assumeTrue(false, "Tipo de parámetro no soportado: " + p);
             return;
         }
 
         boolean ok = true;
-        try { csv.invoke(fabrica, arg); }
-        catch (Throwable t) { ok = false; }
+        try { csv.invoke(fabrica, arg); } catch (ReflectiveOperationException | IllegalArgumentException e) { ok = false; }
 
         @SuppressWarnings("unchecked")
         Map<String, Object> users = (Map<String, Object>) TestUtils.tryInvoke(cu, new String[]{"listarUsuarios"});
         assertNotNull(users);
 
         if (ok) {
-            // si tu CSV se cargó, debería aparecer alguno de estos nicks
+            // si el CSV se cargó, debería aparecer alguno de estos nicks
             assertTrue(users.containsKey("ana") || users.containsKey("orgcsv"));
         } else {
             // si no se pudo cargar (formato distinto), al menos llegamos hasta aquí

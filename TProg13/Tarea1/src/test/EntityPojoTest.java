@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @DisplayName("Entidades básicas – constructores/getters")
@@ -18,8 +18,9 @@ class EntityPojoTest {
         // Fábrica y CU
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         java.lang.reflect.Method get;
-        try { get = fab.getMethod("getInstance"); }
-        catch (NoSuchMethodException e) { get = fab.getMethod("getInstancia"); }
+        try { 
+        	get = fab.getMethod("getInstance"); 
+        	} catch (NoSuchMethodException e) { get = fab.getMethod("getInstancia"); }
         Object fabrica = get.invoke(null);
         Object cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
  
@@ -42,8 +43,10 @@ class EntityPojoTest {
 
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         java.lang.reflect.Method get;
-        try { get = fab.getMethod("getInstance"); }
-        catch (NoSuchMethodException e) { get = fab.getMethod("getInstancia"); }
+        try { 
+        	get = fab.getMethod("getInstance"); 
+        	} catch (NoSuchMethodException e) { get = fab.getMethod("getInstancia"); }
+        
         Object fabrica = get.invoke(null);
         Object cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
 
@@ -62,8 +65,9 @@ class EntityPojoTest {
 
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         java.lang.reflect.Method get;
-        try { get = fab.getMethod("getInstance"); }
-        catch (NoSuchMethodException e) { get = fab.getMethod("getInstancia"); }
+        try { 
+        	get = fab.getMethod("getInstance"); 
+        	} catch (NoSuchMethodException e) { get = fab.getMethod("getInstancia"); }
         Object fabrica = get.invoke(null);
         Object cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
 
