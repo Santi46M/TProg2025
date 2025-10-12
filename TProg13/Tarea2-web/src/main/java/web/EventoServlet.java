@@ -24,7 +24,7 @@ public class EventoServlet extends HttpServlet {
   private static final String JSP_ALTA     = "/WEB-INF/evento/alta.jsp";
   private static final String JSP_CONSULTA = "/WEB-INF/evento/ConsultaEvento.jsp";
   private static final String JSP_REGISTRO = "/WEB-INF/evento/RegistrarseEvento.jsp";
-  private static final String JSP_LISTAR = "/WEB-INF/evento/listar.jsp";
+  private static final String JSP_LISTAR = "/WEB-INF/evento/listado.jsp";
 
 
   // ===== Lógica =====
@@ -84,7 +84,7 @@ public class EventoServlet extends HttpServlet {
         req.getRequestDispatcher(JSP_REGISTRO).forward(req, resp);
         return;
       }
-      case "/listar": {
+      case "/listado": {
     	  // ?categoria=... (opcional). Si no viene, lista todo.
     	  String cat = trim(req.getParameter("categoria"));
 
