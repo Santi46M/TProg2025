@@ -14,8 +14,6 @@ import java.util.List;
 
 import logica.Clases.Ediciones;
 import logica.Clases.Eventos;
-import logica.Clases.TipoRegistro;
-import logica.Clases.Usuario;
 import logica.Datatypes.DTCategorias;
 import logica.Enumerados.DTEstado;
 import logica.Enumerados.DTNivel;
@@ -482,7 +480,7 @@ public class CargaDatosPrueba {
 
         ce.AltaPatrocinio(
             mEv.obtenerEdicion("CONFTECH26"),
-            mu.getInstancia().findInstitucion("Facultad de Ingeniería"),
+            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Facultad de Ingeniería"),
             DTNivel.ORO,
             mEv.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("Estudiante"),
             20000,
@@ -493,7 +491,7 @@ public class CargaDatosPrueba {
 
         ce.AltaPatrocinio(
             mEv.obtenerEdicion("CONFTECH26"),
-            mu.getInstancia().findInstitucion("Agencia Nacional de Investigación e Innovación (ANII)"),
+            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Agencia Nacional de Investigación e Innovación (ANII)"),
             DTNivel.PLATA,
             mEv.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("General"),
             10000,
@@ -504,7 +502,7 @@ public class CargaDatosPrueba {
 
         ce.AltaPatrocinio(
             mEv.obtenerEdicion("MARATON25"),
-            mu.getInstancia().findInstitucion("Antel"),
+            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Antel"),
             DTNivel.PLATINO,
             mEv.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 10K"),
             25000,
@@ -515,7 +513,7 @@ public class CargaDatosPrueba {
 
         ce.AltaPatrocinio(
             mEv.obtenerEdicion("EXPOAGRO25"),
-            mu.getInstancia().findInstitucion("Universidad Católica del Uruguay"),
+            logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Universidad Católica del Uruguay"),
             DTNivel.BRONCE,
             mEv.obtenerEdicion("EXPOAGRO25").obtenerTipoRegistro("General"),
             15000,

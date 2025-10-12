@@ -11,6 +11,7 @@
   <title>Crear Evento — Eventos.uy</title>
   <link rel="stylesheet" href="<%=ctx%>/css/style.css">
   <link rel="stylesheet" href="<%=ctx%>/css/altaEvento.css"><!-- nuevo CSS -->
+  <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 </head>
 <body>
