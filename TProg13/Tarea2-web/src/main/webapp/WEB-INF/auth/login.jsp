@@ -43,7 +43,7 @@
         <a class="btn ghost btn-cancelar-iniciar-sesion" href="<%=ctx%>/">Cancelar</a>
       </div>
 
-      <p id="error" class="error-iniciar-sesion" style="<%= (error==null)? "display:none;" : "" %>">
+      <p id="msg" style="display:<%= (error==null)? "none" : "block" %>; color:red; font-weight:bold; margin-top:.5rem;">
         <%= (error==null)? "" : error %>
       </p>
     </form>
