@@ -17,6 +17,13 @@ import logica.fabrica;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
+import excepciones.CupoTipoRegistroInvalidoException;
+import excepciones.CostoTipoRegistroInvalidoException;
+import excepciones.EventoYaExisteException;
+import excepciones.InstitucionYaExisteException;
+import excepciones.TipoRegistroYaExisteException;
+import excepciones.ValorPatrocinioExcedidoException;
+	
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -158,14 +165,19 @@ public class main {
             public void actionPerformed(ActionEvent e) {
                 try {
                     CargaDatosPrueba.cargar();
+                    JOptionPane.showMessageDialog(frame,
+                            "Datos de prueba cargados correctamente.",
+                            "Carga completa",
+                            JOptionPane.INFORMATION_MESSAGE);
                 } catch (IllegalStateException | NullPointerException ex) {
-                    ex.printStackTrace();
-                    System.err.println("Error en la carga de datos de prueba: " + ex.getMessage());
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    System.err.println("Error controlado en la carga de datos: " + ex.getMessage());
+                    JOptionPane.showMessageDialog(frame,
+                            "Ocurrió un error interno: " + ex.getMessage(),
+                            "Error inesperado",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
+
+
 
         });
 
