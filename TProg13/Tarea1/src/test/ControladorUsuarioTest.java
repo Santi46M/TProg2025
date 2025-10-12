@@ -13,7 +13,7 @@ import java.util.Set;
 @DisplayName("ControladorUsuario – Altas, actualizaciones, listados y consultas")
 class ControladorUsuarioTest {
 
-    Object fabrica, cu;
+    private Object fabrica, cu;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -29,7 +29,7 @@ class ControladorUsuarioTest {
 
     @Test
     @DisplayName("AltaInstitucion y getInstituciones incluyen la institución creada")
-    void altaInstitucion_y_listado() {
+    void altaInstitucionYListado() {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_A", "desc", "web");
         Set<String> insts = (Set<String>) TestUtils.tryInvoke(cu, new String[]{"getInstituciones"});
         assertTrue(insts.contains("Inst_A"));
@@ -39,7 +39,7 @@ class ControladorUsuarioTest {
 
     @Test
     @DisplayName("ingresarOrganizador crea dominio; aparece en listarOrganizadores (por key o por valor)")
-    void ingresarOrganizador_y_listarOrganizadores() {
+    void ingresarOrganizadorYListarOrganizadores() {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_A", "d", "w");
 
         // Crea el dominio (pero puede no persistirse en los mapas)
@@ -76,7 +76,7 @@ class ControladorUsuarioTest {
 
     @Test
     @DisplayName("ingresarAsistente o AltaUsuario → aparece en listarAsistentes")
-    void ingresarAsistente_y_listarAsistentes() {
+    void ingresarAsistenteYListarAsistentes() {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_A", "d", "w");
 
         Object inst = DomainAccess.obtenerInstitucion("Inst_A");
@@ -97,7 +97,7 @@ class ControladorUsuarioTest {
     }
     @Test
     @DisplayName("AltaUsuario crea Asistente y Organizador según flag")
-    void altaUsuario_asistente_y_organizador() {
+    void altaUsuarioAsistenteYOrganizador() {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_A", "d", "w");
 
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
@@ -119,7 +119,7 @@ class ControladorUsuarioTest {
 
     @Test
     @DisplayName("AltaUsuario duplicado → UsuarioYaExisteException")
-    void altaUsuario_duplicado() throws Exception {
+    void altaUsuarioDuplicado() throws Exception {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_B", "d", "w");
 
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
@@ -135,7 +135,7 @@ class ControladorUsuarioTest {
     }
     @Test
     @DisplayName("actualizarAsistente modifica apellido y fecha (sin depender de DomainAccess)")
-    void actualizarAsistente_modifica_campos() {
+    void actualizarAsistenteModificaCampos() {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_C", "d", "w");
 
         // Alta de asistente con AltaUsuario (queda persistido en los mapas)
@@ -163,7 +163,7 @@ class ControladorUsuarioTest {
 
     @Test
     @DisplayName("actualizarOrganizador modifica desc y link")
-    void actualizarOrganizador_modifica_campos() {
+    void actualizarOrganizadorModificaCampos() {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_D", "d", "w");
 
         // Alta correcta del organizador en los mapas del sistema:
@@ -188,7 +188,7 @@ class ControladorUsuarioTest {
 
     @Test
     @DisplayName("obtenerDatosUsuario devuelve DTDatosUsuario para nick existente")
-    void obtenerDatosUsuario_ok() {
+    void obtenerDatosUsuarioOk() {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_E", "d", "w");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                 "luz", "Luz", "l@x", "d", "l",
@@ -201,7 +201,7 @@ class ControladorUsuarioTest {
 
     @Test
     @DisplayName("listarEdicionesAPartirDeOrganizador(org) no rompe (puede ser vacío)")
-    void listarEdicionesAPartirDeOrganizador_ok() throws Exception {
+    void listarEdicionesAPartirDeOrganizadorOk() throws Exception {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_F", "d", "w");
         Object org = TestUtils.tryInvoke(cu, new String[]{"ingresarOrganizador"},
                 "orga", "Or Ga", "oga@x", "d", "l");
@@ -223,7 +223,7 @@ class ControladorUsuarioTest {
 
     @Test
     @DisplayName("ConsultaUsuario(nick) no lanza excepción")
-    void consultaUsuario_noRompe() {
+    void consultaUsuarioNoRompe() {
         TestUtils.tryInvoke(cu, new String[]{"AltaInstitucion"}, "Inst_G", "d", "w");
         TestUtils.tryInvoke(cu, new String[]{"AltaUsuario"},
                 "cata", "Cata", "c@x", "d", "l",
@@ -235,7 +235,7 @@ class ControladorUsuarioTest {
 
     @Test
     @DisplayName("AltaCategoriaSinGUI no rompe y permite agregar categorías base")
-    void altaCategoriaSinGUI_ok() {
+    void altaCategoriaSinGUIOk() {
         TestUtils.tryInvoke(cu, new String[]{"AltaCategoriaSinGUI"}, "Deportes");
         TestUtils.tryInvoke(cu, new String[]{"AltaCategoriaSinGUI"}, "Tecnologia");
         assertTrue(true);

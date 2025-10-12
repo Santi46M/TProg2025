@@ -14,16 +14,12 @@ class ControladorUsuarioAltaCategoriaSinGUITest {
         TestUtils.resetAll();
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         Method getter;
-        try { getter = fab.getMethod("getInstance"); }
-        catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
+        try { getter = fab.getMethod("getInstance"); 
+        } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
         Object cu = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
 
-        try {
-            TestUtils.invokeUnwrapped(cu, new String[]{"AltaCategoriaSinGUI"}, "SweepCat");
-        } catch (Throwable ignored) {
-            // si tu versión no lo tiene o valida distinto, igual sumamos líneas
-        }
+        TestUtils.tryInvoke(cu, new String[]{"AltaCategoriaSinGUI"}, "SweepCat");
         assertTrue(true);
     }
 }
