@@ -7,19 +7,22 @@ import jakarta.servlet.http.*;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.Enumeration;
+import java.util.Map;
 
 import logica.fabrica;
 import logica.interfaces.IControladorUsuario;
+import logica.clases.Usuario;
 import logica.datatypes.DTDatosUsuario;
 import excepciones.UsuarioYaExisteException;
 import excepciones.UsuarioNoExisteException;
 import excepciones.UsuarioTipoIncorrectoException;
 
 @WebServlet(urlPatterns = {"/usuario/AltaUsuario", "/usuario/modificar"})
-@MultipartConfig(                       // 🔹 Necesario para procesar archivos (multipart/form-data)
-    fileSizeThreshold = 1024 * 1024,    // 1MB antes de escribir en disco
-    maxFileSize = 10 * 1024 * 1024,     // Máximo 10MB por archivo
-    maxRequestSize = 20 * 1024 * 1024   // Máximo 20MB en total
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,  // 1 MB antes de escribir en disco
+    maxFileSize = 10 * 1024 * 1024,   // Máximo 10 MB por archivo
+    maxRequestSize = 20 * 1024 * 1024 // Máximo 20 MB por request
 )
 public class UsuarioServlet extends HttpServlet {
 
@@ -118,7 +121,7 @@ public class UsuarioServlet extends HttpServlet {
         System.out.println("✅ Imagen guardada en: " + destino.getAbsolutePath());
       }
 
-      // === Leer parámetros normales ===
+      // === Leer parámetros ===
       String rol         = req.getParameter("rol");
       String nick        = req.getParameter("nick");
       String nombre      = req.getParameter("nombreA");
@@ -132,7 +135,7 @@ public class UsuarioServlet extends HttpServlet {
       String institucion = req.getParameter("instIdA");
       String nacStr      = req.getParameter("nacA");
 
-      // === Validaciones ===
+      // === Validaciones básicas ===
       if (pass1 == null || pass2 == null || pass1.isBlank() || pass2.isBlank() || !pass1.equals(pass2)) {
         req.setAttribute("error", "Las contraseñas no coinciden o están vacías.");
         cargarInstituciones(req);
@@ -147,7 +150,7 @@ public class UsuarioServlet extends HttpServlet {
         return;
       }
 
-      // === Validación por rol ===
+      // === Validación específica por rol ===
       LocalDate fechaNac = null;
       if ("ASISTENTE".equalsIgnoreCase(rol)) {
         if (nacStr == null || nacStr.isBlank()) {
@@ -190,13 +193,38 @@ public class UsuarioServlet extends HttpServlet {
             institucion,
             esOrganizador,
             pass1,
-            nombreArchivo  // 🔹 Guardamos nombre de la imagen si hay
+            nombreArchivo
         );
 
+        // ✅ Crear sesión como en login
         HttpSession s = req.getSession(true);
+        Map<String, Usuario> usuarios = cu.listarUsuarios();
+        Usuario usr = usuarios.get(nick);
+
+        if (usr == null) {
+          for (Usuario u : usuarios.values()) {
+            if (u.getEmail().equalsIgnoreCase(correo)) {
+              usr = u;
+              break;
+            }
+          }
+        }
+
+        s.setAttribute("usuario_logueado", usr);
         s.setAttribute("nick", nick);
         s.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
+        s.setAttribute("estado_sesion", "LOGIN_CORRECTO");
+
+
+        Enumeration<String> names = s.getAttributeNames();
+        while (names.hasMoreElements()) {
+          String n = names.nextElement();
+          Object v = s.getAttribute(n);
+          System.out.println("   * " + n + " = " + v);
+        }
+
         resp.sendRedirect(ctx(req) + "/inicio");
+
       } catch (UsuarioYaExisteException e) {
         req.setAttribute("error", e.getMessage());
         cargarInstituciones(req);
@@ -234,7 +262,6 @@ public class UsuarioServlet extends HttpServlet {
     }
   }
 
-  // === Método auxiliar para mantener datos del formulario ===
   private void forwardConDatos(HttpServletRequest req, HttpServletResponse resp,
                                String rol, String nick, String nombre, String apellido,
                                String correo, String descripcion, String link,

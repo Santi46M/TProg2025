@@ -167,12 +167,19 @@ public class EdicionServlet extends HttpServlet {
 
       try {
         // Obtener el organizador desde la sesión
-        Usuario org = getUsuario(req);
-        if (org == null) {
-          req.setAttribute("error", "Debe iniciar sesión como organizador para crear una edición.");
-          req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-          return;
-        }
+
+
+		 // Verificar que el usuario sea organizador
+    	  Usuario org = getUsuario(req);
+
+
+    	  if (org == null || !"ORGANIZADOR".equals(getRol(req))) {
+    	      
+    	      req.setAttribute("error", "Debés iniciar sesión como organizador.");
+    	      req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+    	      return;
+    	  }
+
 
         // Guardado en capa lógica. Ajustá firma: quizá pases bytes de imagen, stream, o null.
         // byte[] imgBytes = null; // imagen no se usa en la lógica real

@@ -110,7 +110,7 @@ String ctx  = request.getContextPath();
     <%
     if (organizador != null) {
     %>
-      <p><strong>Nombre:</strong> <%=organizador.getNombre()%></p>
+      <p><strong>Nickname:</strong> <%=organizador.getNickname()%></p>
     <%
     } else {
     %>

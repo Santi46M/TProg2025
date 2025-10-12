@@ -66,8 +66,8 @@ public class LoginServlet extends HttpServlet {
 
         String nick = nickOrEmail.trim();
 
-        // ✅ Nueva validación con la lógica
-        boolean valido = cu.validarLogin(nick, pass); 
+        // ✅ Validación con la lógica
+        boolean valido = cu.validarLogin(nick, pass);
 
         if (!valido) {
             req.setAttribute("estado_sesion", "LOGIN_INCORRECTO");
@@ -76,16 +76,16 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // ✅ Si llegó acá, el login fue correcto
+        // ✅ Login correcto
         Map<String, Usuario> usuarios = cu.listarUsuarios();
         Usuario usr = usuarios.get(nick);
 
-        // Por si el login fue por correo, intentamos buscar el nick real
+        // Buscar por correo si no se encontró
         if (usr == null) {
             for (Usuario u : usuarios.values()) {
                 if (u.getEmail().equalsIgnoreCase(nickOrEmail)) {
                     usr = u;
-                    nick = u.getNickname(); // si tu clase se llama así
+                    nick = u.getNickname();
                     break;
                 }
             }
@@ -104,6 +104,16 @@ public class LoginServlet extends HttpServlet {
         s.setAttribute("nick", nick);
         s.setAttribute("rol", rol);
         s.setAttribute("estado_sesion", "LOGIN_CORRECTO");
+
+        // 🧩 --- DEBUG DE SESIÓN ---
+
+        java.util.Enumeration<String> names = s.getAttributeNames();
+        while (names.hasMoreElements()) {
+            String name = names.nextElement();
+            Object val = s.getAttribute(name);
+            
+        }
+        // ----------------------------
 
         resp.sendRedirect(ctx(req) + "/inicio");
     }
