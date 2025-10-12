@@ -145,7 +145,8 @@ public class EventoServlet extends HttpServlet {
         String nombreEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8.name());
         resp.sendRedirect(ctx(req) + "/evento/ConsultaEvento?nombre=" + nombreEnc);
       } catch (EventoYaExisteException e) {
-        req.setAttribute("error", e.getMessage());
+        req.setAttribute("error", "duplicado");
+        req.setAttribute("nombreEventoDuplicado", nombre); // nombre es el ingresado por el usuario
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
       }
       return;

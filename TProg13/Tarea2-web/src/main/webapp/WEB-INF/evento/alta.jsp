@@ -29,9 +29,9 @@
     <section class="form-card-altaEvento">
       <h2>Crear Evento</h2>
 
-      <% if (request.getAttribute("error") != null) { %>
-        <p class="error-msg"><%= request.getAttribute("error") %></p>
-      <% } %>
+      <p id="msg" style="display:<%= (request.getAttribute("error")==null)? "none" : "block" %>; color:red; font-weight:bold; margin-top:.5rem;">
+        <%= (request.getAttribute("error")==null)? "" : "Ya existe un evento con el nombre " + request.getAttribute("nombreEventoDuplicado") %>
+      </p>
       <p id="error-categorias" class="error-msg" style="display:none;color:#c00;margin-bottom:1em;"></p>
 
       <form id="form-alta-evento" method="post" action="<%=ctx%>/evento/alta">
