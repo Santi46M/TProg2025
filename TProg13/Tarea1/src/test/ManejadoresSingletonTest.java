@@ -1,8 +1,13 @@
 package test;
-import static org.junit.jupiter.api.Assertions.*;
-import org.junit.jupiter.api.*;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.lang.reflect.Method;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 @DisplayName("Manejadores – Singletons consistentes (tolerante mayúsc./minúsc.)")
 class ManejadoresSingletonTest {
@@ -11,8 +16,7 @@ class ManejadoresSingletonTest {
     void reset() { TestUtils.resetAll(); }
 
     private static Method getGetter(Class<?> clazz) throws NoSuchMethodException {
-        try { return clazz.getMethod("getInstancia"); }
-        catch (NoSuchMethodException e) { return clazz.getMethod("getInstance"); }
+        try { return clazz.getMethod("getInstancia"); } catch (NoSuchMethodException e) { return clazz.getMethod("getInstance"); }
     }
 
     @Test

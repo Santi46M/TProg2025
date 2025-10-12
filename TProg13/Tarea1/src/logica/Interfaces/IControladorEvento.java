@@ -10,16 +10,25 @@ import excepciones.EventoYaExisteException;
 import excepciones.FechasCruzadasException;
 import excepciones.TipoRegistroYaExisteException;
 import excepciones.ValorPatrocinioExcedidoException;
-import logica.Clases.*;
-import logica.Datatypes.*;
-import logica.Enumerados.*;
+import logica.Clases.Ediciones;
+import logica.Clases.Eventos;
+import logica.Clases.Institucion;
+import logica.Clases.Usuario;
+
+import logica.Datatypes.DTCategorias;
+import logica.Datatypes.DTEdicion;
+import logica.Datatypes.DTEvento;
+
+import logica.Enumerados.DTNivel;
+import logica.Clases.TipoRegistro;
+
 
 public interface IControladorEvento {
-	public void AltaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias, String imagen) throws EventoYaExisteException;
-	public void AltaTipoRegistro(Ediciones edicion, String nombre, String descripcion, float costo, int cupo) throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException;
-	public void AltaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException;
-	public void AltaCategoria(String nombre);
-    public void AltaEdicionEvento(Eventos evento, Usuario organizador, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais, String imagen)throws EdicionYaExisteException, EventoYaExisteException, FechasCruzadasException;
+	public void altaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias, String imagen) throws EventoYaExisteException;
+	public void altaTipoRegistro(Ediciones edicion, String nombre, String descripcion, float costo, int cupo) throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException;
+	public void altaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException;
+	public void altaCategoria(String nombre);
+    public void altaEdicionEvento(Eventos evento, Usuario organizador, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais, String imagen)throws EdicionYaExisteException, EventoYaExisteException, FechasCruzadasException;
     public DTEdicion consultaEdicionEvento(String siglaEvento, String siglaEdicion);
     public Eventos consultaEvento(String nombreEvento);
     public void altaRegistroEdicionEvento(String idRegistro, Usuario usuario, Eventos evento, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio);

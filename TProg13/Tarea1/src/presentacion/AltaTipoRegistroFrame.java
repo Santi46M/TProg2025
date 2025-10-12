@@ -162,7 +162,7 @@ public class AltaTipoRegistroFrame extends JInternalFrame {
             return;
         }
         try {
-            controlador.AltaTipoRegistro(edicion, nombre, descripcion, costo, cupo);
+            controlador.altaTipoRegistro(edicion, nombre, descripcion, costo, cupo);
             JOptionPane.showMessageDialog(this, "Tipo de registro creado exitosamente.");
             dispose();
         } catch (TipoRegistroYaExisteException ex) {

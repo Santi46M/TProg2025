@@ -1,20 +1,21 @@
 package test;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-import java.time.LocalDate;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import excepciones.*;
+import excepciones.UsuarioYaExisteException;
 import logica.fabrica;
-import logica.Interfaces.*;
+import logica.Interfaces.IControladorEvento;
+import logica.Interfaces.IControladorUsuario;
 import logica.Manejadores.ManejadorEvento;
 import logica.CargaDatosPrueba;
-import logica.Manejadores.*;
+import logica.Manejadores.manejadorAuxiliar;
+import logica.Manejadores.manejadorUsuario;
 
 
 
@@ -49,7 +50,7 @@ public class TestCasosPrueba {
     @Test
    	void testUsuarioYaExisteNickname() { 
           Assertions.assertThrows(
-       		   UsuarioYaExisteException.class, () -> {cUsuario.AltaUsuario(
+       		   UsuarioYaExisteException.class, () -> {cUsuario.altaUsuario(
        				   "atorres",
        				   "Ana",
        				   "atorres@gmail.com",
@@ -58,15 +59,17 @@ public class TestCasosPrueba {
        				   "Torres",
        				   java.time.LocalDate.of(1990, 5, 12),
        				   "Facultad de Ingeniería",
-       				   false
-       			  );}
+       				   false,
+       				   "contrasena123",
+       				   "imagen.jpg"
+       			  ); }
        		);
    	}
     
     @Test
    	void testUsuarioYaExisteEmail() { 
     	UsuarioYaExisteException ex = Assertions.assertThrows(
-       		   UsuarioYaExisteException.class, () -> {cUsuario.AltaUsuario(
+       		   UsuarioYaExisteException.class, () -> {cUsuario.altaUsuario(
        				   "paniTorres",
        				   "pani",
        				   "atorres@gmail.com",
@@ -75,8 +78,10 @@ public class TestCasosPrueba {
        				   "Torres",
        				   java.time.LocalDate.of(1990, 5, 12),
        				   "Facultad de Ingeniería",
-       				   false
-       			  );}
+       				   false,
+       				 "contrasena123",
+     				   "imagen.jpg"
+       			  ); }
        		);
           Assertions.assertEquals("Ya existe un usuario con ese email", ex.getMessage());
    	}

@@ -58,18 +58,18 @@ public class CargaDatosPrueba {
     // =========================
     public static void cargarCategorias() {
         var ce = new logica.Controladores.ControladorEvento();
-        ce.AltaCategoria("Tecnología");
-        ce.AltaCategoria("Innovación");
-        ce.AltaCategoria("Literatura");
-        ce.AltaCategoria("Cultura");
-        ce.AltaCategoria("Música");
-        ce.AltaCategoria("Deporte");
-        ce.AltaCategoria("Salud");
-        ce.AltaCategoria("Entretenimiento");
-        ce.AltaCategoria("Agro");
-        ce.AltaCategoria("Negocios");
-        ce.AltaCategoria("Moda");
-        ce.AltaCategoria("Investigación");
+        ce.altaCategoria("Tecnología");
+        ce.altaCategoria("Innovación");
+        ce.altaCategoria("Literatura");
+        ce.altaCategoria("Cultura");
+        ce.altaCategoria("Música");
+        ce.altaCategoria("Deporte");
+        ce.altaCategoria("Salud");
+        ce.altaCategoria("Entretenimiento");
+        ce.altaCategoria("Agro");
+        ce.altaCategoria("Negocios");
+        ce.altaCategoria("Moda");
+        ce.altaCategoria("Investigación");
     }
 
     // =========================
@@ -99,7 +99,7 @@ public class CargaDatosPrueba {
         List<String> catEv07 = Arrays.asList("Moda", "Investigación");
 
         // Ref 2025 — Conferencia de Tecnología
-        ce.AltaEvento(
+        ce.altaEvento(
             "Conferencia de Tecnología",
             "Evento sobre innovación tecnológica",
             LocalDate.of(2025, 1, 10),
@@ -109,7 +109,7 @@ public class CargaDatosPrueba {
         );
 
         // Ref 2024 — Feria del Libro
-        ce.AltaEvento(
+        ce.altaEvento(
             "Feria del Libro",
             "Encuentro anual de literatura",
             LocalDate.of(2025, 2, 1),
@@ -119,7 +119,7 @@ public class CargaDatosPrueba {
         );
 
         // Ref 2023 — Montevideo Rock
-        ce.AltaEvento(
+        ce.altaEvento(
             "Montevideo Rock",
             "Festival de rock con artistas nacionales e internacionales",
             LocalDate.of(2023, 3, 15),
@@ -129,7 +129,7 @@ public class CargaDatosPrueba {
         );
 
         // Ref 2022 — Maratón de Montevideo
-        ce.AltaEvento(
+        ce.altaEvento(
             "Maratón de Montevideo",
             "Competencia deportiva anual en la capital",
             LocalDate.of(2022, 1, 1),
@@ -139,7 +139,7 @@ public class CargaDatosPrueba {
         );
 
         // Ref 2024b — Montevideo Comics
-        ce.AltaEvento(
+        ce.altaEvento(
             "Montevideo Comics",
             "Convención de historietas, cine y cultura geek",
             LocalDate.of(2024, 4, 10),
@@ -149,7 +149,7 @@ public class CargaDatosPrueba {
         );
 
         // Ref 2024c — Expointer Uruguay
-        ce.AltaEvento(
+        ce.altaEvento(
             "Expointer Uruguay",
             "Exposición internacional agropecuaria y ganadera",
             LocalDate.of(2024, 12, 12),
@@ -159,7 +159,7 @@ public class CargaDatosPrueba {
         );
 
         // Ref 2025b — Montevideo Fashion Week
-        ce.AltaEvento(
+        ce.altaEvento(
             "Montevideo Fashion Week",
             "Pasarela de moda uruguaya e internacional",
             LocalDate.of(2025, 7, 20),
@@ -241,7 +241,7 @@ public class CargaDatosPrueba {
         {
             Eventos ev = mEv.obtenerEvento("Montevideo Rock");
             if (ev != null) {
-                ce.AltaEdicionEvento(
+                ce.altaEdicionEvento(
                     ev,
                     mUs.getUsuarios().get("imm"),
                     "Montevideo Rock 2025",
@@ -263,7 +263,7 @@ public class CargaDatosPrueba {
             Eventos ev = mEv.obtenerEvento("Maratón de Montevideo");
             if (ev != null) {
                 // 2025 — Aceptada
-                ce.AltaEdicionEvento(
+                ce.altaEdicionEvento(
                     ev, mUs.getUsuarios().get("imm"),
                     "Maratón de Montevideo 2025", "MARATON25", "",
                     parseFecha("14/09/2025"), parseFecha("14/09/2025"), parseFecha("05/02/2025"),
@@ -272,7 +272,7 @@ public class CargaDatosPrueba {
                 setEstadoEdicion.accept("MARATON25", DTEstado.Aceptada);
 
                 // 2024 — Rechazada
-                ce.AltaEdicionEvento(
+                ce.altaEdicionEvento(
                     ev, mUs.getUsuarios().get("imm"),
                     "Maratón de Montevideo 2024", "MARATON24", "",
                     parseFecha("14/09/2024"), parseFecha("14/09/2024"), parseFecha("21/04/2024"),
@@ -281,7 +281,7 @@ public class CargaDatosPrueba {
                 setEstadoEdicion.accept("MARATON24", DTEstado.Rechazada);
 
                 // 2022 — Ingresada
-                ce.AltaEdicionEvento(
+                ce.altaEdicionEvento(
                     ev, mUs.getUsuarios().get("imm"),
                     "Maratón de Montevideo 2022", "MARATON22", "",
                     parseFecha("14/09/2022"), parseFecha("14/09/2022"), parseFecha("21/05/2022"),
@@ -296,7 +296,7 @@ public class CargaDatosPrueba {
             Eventos ev = mEv.obtenerEvento("Montevideo Comics");
             if (ev != null) {
                 // 2024 — Aceptada
-                ce.AltaEdicionEvento(
+                ce.altaEdicionEvento(
                     ev, mUs.getUsuarios().get("miseventos"),
                     "Montevideo Comics 2024", "COMICS24", "",
                     parseFecha("18/07/2024"), parseFecha("21/07/2024"), parseFecha("20/06/2024"),
@@ -305,7 +305,7 @@ public class CargaDatosPrueba {
                 setEstadoEdicion.accept("COMICS24", DTEstado.Aceptada);
 
                 // 2025 — Ingresada
-                ce.AltaEdicionEvento(
+                ce.altaEdicionEvento(
                     ev, mUs.getUsuarios().get("miseventos"),
                     "Montevideo Comics 2025", "COMICS25", "",
                     parseFecha("04/08/2025"), parseFecha("06/08/2025"), parseFecha("04/07/2025"),
@@ -319,7 +319,7 @@ public class CargaDatosPrueba {
         {
             Eventos ev = mEv.obtenerEvento("Expointer Uruguay");
             if (ev != null) {
-                ce.AltaEdicionEvento(
+                ce.altaEdicionEvento(
                     ev, mUs.getUsuarios().get("miseventos"),
                     "Expointer Uruguay 2025", "EXPOAGRO25", "",
                     parseFecha("11/09/2025"), parseFecha("17/09/2025"), parseFecha("01/02/2025"),
@@ -334,7 +334,7 @@ public class CargaDatosPrueba {
             Eventos ev = mEv.obtenerEvento("Conferencia de Tecnología");
             if (ev != null) {
                 // CONFTECH26 — Aceptada
-                ce.AltaEdicionEvento(
+                ce.altaEdicionEvento(
                     ev, mUs.getUsuarios().get("udelar"),
                     "Tecnología Punta del Este 2026", "CONFTECH26", "",
                     parseFecha("06/04/2026"), parseFecha("10/04/2026"), parseFecha("01/08/2025"),
@@ -343,7 +343,7 @@ public class CargaDatosPrueba {
                 setEstadoEdicion.accept("CONFTECH26", DTEstado.Aceptada);
 
                 // MWC — Ingresada
-                ce.AltaEdicionEvento(
+                ce.altaEdicionEvento(
                     ev, mUs.getUsuarios().get("techcorp"),
                     "Mobile World Congress 2025", "MWC", "",
                     parseFecha("12/12/2025"), parseFecha("15/12/2025"), parseFecha("21/08/2025"),
@@ -352,7 +352,7 @@ public class CargaDatosPrueba {
                 setEstadoEdicion.accept("MWC", DTEstado.Ingresada);
 
                 // WS26 — Ingresada
-                ce.AltaEdicionEvento(
+                ce.altaEdicionEvento(
                     ev, mUs.getUsuarios().get("techcorp"),
                     "Web Summit 2026", "WS26", "",
                     parseFecha("13/01/2026"), parseFecha("01/02/2026"), parseFecha("04/06/2025"),
@@ -370,40 +370,40 @@ public class CargaDatosPrueba {
         var ce = new logica.Controladores.ControladorEvento();
         var mEv = ManejadorEvento.getInstancia();
 
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MONROCK25"), "General", "Acceso general a Montevideo Rock (2 días)", 1500, 2000);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MONROCK25"), "VIP", "Incluye backstage + acceso preferencial", 4000, 200);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MONROCK25"), "General", "Acceso general a Montevideo Rock (2 días)", 1500, 2000);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MONROCK25"), "VIP", "Incluye backstage + acceso preferencial", 4000, 200);
 
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MARATON25"), "Corredor 42K", "Inscripción a la maratón completa", 1200, 499);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MARATON25"), "Corredor 21K", "Inscripción a la media maratón", 800, 700);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MARATON25"), "Corredor 10K", "Inscripción a la carrera 10K", 500, 1000);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MARATON25"), "Corredor 42K", "Inscripción a la maratón completa", 1200, 499);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MARATON25"), "Corredor 21K", "Inscripción a la media maratón", 800, 700);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MARATON25"), "Corredor 10K", "Inscripción a la carrera 10K", 500, 1000);
 
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MARATON24"), "Corredor 42K", "Inscripción a la maratón completa", 1000, 300);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MARATON24"), "Corredor 21K", "Inscripción a la media maratón", 500, 500);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MARATON24"), "Corredor 42K", "Inscripción a la maratón completa", 1000, 300);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MARATON24"), "Corredor 21K", "Inscripción a la media maratón", 500, 500);
 
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MARATON22"), "Corredor 42K", "Inscripción a la maratón completa", 1100, 450);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MARATON22"), "Corredor 21K", "Inscripción a la media maratón", 900, 750);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MARATON22"), "Corredor 10K", "Inscripción a la carrera 10K", 650, 1400);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MARATON22"), "Corredor 42K", "Inscripción a la maratón completa", 1100, 450);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MARATON22"), "Corredor 21K", "Inscripción a la media maratón", 900, 750);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MARATON22"), "Corredor 10K", "Inscripción a la carrera 10K", 650, 1400);
 
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("COMICS24"), "General", "Entrada para los 4 días de Montevideo Comics", 600, 1500);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("COMICS24"), "Cosplayer", "Entrada especial con acreditación para concurso cosplay", 300, 50);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("COMICS24"), "General", "Entrada para los 4 días de Montevideo Comics", 600, 1500);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("COMICS24"), "Cosplayer", "Entrada especial con acreditación para concurso cosplay", 300, 50);
 
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("COMICS25"), "General", "Entrada para los 4 días de Montevideo Comics", 800, 1000);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("COMICS25"), "Cosplayer", "Entrada especial con acreditación para concurso cosplay", 500, 100);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("COMICS25"), "General", "Entrada para los 4 días de Montevideo Comics", 800, 1000);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("COMICS25"), "Cosplayer", "Entrada especial con acreditación para concurso cosplay", 500, 100);
 
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("EXPOAGRO25"), "General", "Acceso a la exposición agropecuaria", 300, 5000);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("EXPOAGRO25"), "Empresarial", "Acceso para empresas + networking", 2000, 5);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("EXPOAGRO25"), "General", "Acceso a la exposición agropecuaria", 300, 5000);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("EXPOAGRO25"), "Empresarial", "Acceso para empresas + networking", 2000, 5);
 
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("CONFTECH26"), "Full", "Acceso ilimitado + Cena de gala", 1800, 300);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("CONFTECH26"), "General", "Acceso general", 1500, 500);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("CONFTECH26"), "Estudiante", "Acceso para estudiantes", 1000, 50);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("CONFTECH26"), "Full", "Acceso ilimitado + Cena de gala", 1800, 300);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("CONFTECH26"), "General", "Acceso general", 1500, 500);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("CONFTECH26"), "Estudiante", "Acceso para estudiantes", 1000, 50);
 
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MWC"), "Full", "Acceso ilimitado + Cena de gala", 750, 550);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MWC"), "General", "Acceso general", 500, 400);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("MWC"), "Estudiante", "Acceso para estudiantes", 250, 400);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MWC"), "Full", "Acceso ilimitado + Cena de gala", 750, 550);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MWC"), "General", "Acceso general", 500, 400);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("MWC"), "Estudiante", "Acceso para estudiantes", 250, 400);
 
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("WS26"), "Full", "Acceso ilimitado + Cena de gala", 900, 30);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("WS26"), "General", "Acceso general", 650, 5);
-        ce.AltaTipoRegistro(mEv.obtenerEdicion("WS26"), "Estudiante", "Acceso para estudiantes", 300, 1);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("WS26"), "Full", "Acceso ilimitado + Cena de gala", 900, 30);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("WS26"), "General", "Acceso general", 650, 5);
+        ce.altaTipoRegistro(mEv.obtenerEdicion("WS26"), "Estudiante", "Acceso para estudiantes", 300, 1);
     }
 
     // =========================
@@ -484,9 +484,9 @@ public class CargaDatosPrueba {
     public static void cargarPatrociniosEjemplo() throws ValorPatrocinioExcedidoException {
         var ce = new logica.Controladores.ControladorEvento();
         var mEv = ManejadorEvento.getInstancia();
-        var mu = logica.Manejadores.manejadorUsuario.getInstancia();
+        
 
-        ce.AltaPatrocinio(
+        ce.altaPatrocinio(
             mEv.obtenerEdicion("CONFTECH26"),
             logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Facultad de Ingeniería"),
             DTNivel.ORO,
@@ -497,7 +497,7 @@ public class CargaDatosPrueba {
             "TECHFING"
         );
 
-        ce.AltaPatrocinio(
+        ce.altaPatrocinio(
             mEv.obtenerEdicion("CONFTECH26"),
             logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Agencia Nacional de Investigación e Innovación (ANII)"),
             DTNivel.PLATA,
@@ -508,7 +508,7 @@ public class CargaDatosPrueba {
             "TECHANII"
         );
 
-        ce.AltaPatrocinio(
+        ce.altaPatrocinio(
             mEv.obtenerEdicion("MARATON25"),
             logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Antel"),
             DTNivel.PLATINO,
@@ -519,7 +519,7 @@ public class CargaDatosPrueba {
             "CORREANTEL"
         );
 
-        ce.AltaPatrocinio(
+        ce.altaPatrocinio(
             mEv.obtenerEdicion("EXPOAGRO25"),
             logica.Manejadores.manejadorUsuario.getInstancia().findInstitucion("Universidad Católica del Uruguay"),
             DTNivel.BRONCE,
