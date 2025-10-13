@@ -19,6 +19,7 @@ import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
 import logica.clases.Eventos;
+import logica.clases.Ediciones;
 import excepciones.EventoYaExisteException;
 import logica.controladores.ControladorEvento;
 
@@ -58,6 +59,7 @@ public class EventoServlet extends HttpServlet {
         return;
       }
 
+      // Atributos base para JSP
       req.setAttribute("evNombre", safe(() -> e.getNombre()));
       req.setAttribute("evSigla",  safe(() -> e.getSigla()));
       req.setAttribute("evDesc",   safe(() -> e.getDescripcion()));
@@ -65,8 +67,8 @@ public class EventoServlet extends HttpServlet {
       req.setAttribute("evCategorias", categoriasALista(safeObj(() -> e.getCategorias())));
 
       // === Imagen: resolver URL final igual que en Inicio ===
-      String raw = e.getImagen(); // puede ser "archivo.jpg" o "/img/archivo.jpg" o "/eventos/archivo.jpg"
-      req.setAttribute("evImagen", raw); // por si lo necesitás
+      String raw = e.getImagen(); // puede ser "archivo.jpg" o "/img/archivo.jpg" o "/eventos/archivo.jpg" o URL absoluta
+      req.setAttribute("evImagen", raw); // compat por si alguna JSP lo usa así
 
       String imgUrl = null;
       String ctxPath = ctx(req);
@@ -75,9 +77,9 @@ public class EventoServlet extends HttpServlet {
         if (raw.startsWith("http://") || raw.startsWith("https://")) {
           imgUrl = raw;                       // absoluta
         } else if (raw.startsWith("/")) {
-          imgUrl = ctxPath + raw;             // ya viene con ruta (/img/..., /eventos/...)
+          imgUrl = ctxPath + raw;             // relativa ya formada (/img/..., /eventos/...)
         } else {
-          // Solo nombre de archivo: intentamos /img/, /img/eventos/ y /eventos/
+          // Solo nombre de archivo: intentamos rutas conocidas
           String[] candidates = new String[] {
             "/img/" + raw,
             "/img/eventos/" + raw,
@@ -89,7 +91,7 @@ public class EventoServlet extends HttpServlet {
             if (abs != null) {
               exists = java.nio.file.Files.exists(java.nio.file.Path.of(abs));
             } else {
-              // En algunos runtimes getRealPath puede ser null; asumimos true para no bloquear visualización
+              // Si getRealPath es null (exploded false), no bloqueamos la visualización
               exists = true;
             }
             if (exists) { imgUrl = ctxPath + rel; break; }
@@ -101,15 +103,40 @@ public class EventoServlet extends HttpServlet {
       }
       // === fin imagen ===
 
-      List<String> nombresEdiciones = ce.listarEdicionesEvento(nombre);
-      List<DTEdicion> ediciones = new ArrayList<>();
-      if (nombresEdiciones != null) {
-        for (String nombreEd : nombresEdiciones) {
-          DTEdicion ed = ce.consultaEdicionEvento(nombre, nombreEd);
-          if (ed != null) ediciones.add(ed);
+      // 🟢 Obtener ediciones asociadas al evento directamente del objeto real
+      try {
+        List<DTEdicion> ediciones = new ArrayList<>();
+
+        if (e.getEdiciones() != null && !e.getEdiciones().isEmpty()) {
+          for (Ediciones ed : e.getEdiciones().values()) {
+            String organizadorNick = null;
+            if (ed.getOrganizador() != null) {
+              organizadorNick = ed.getOrganizador().getNickname();
+            }
+            String ciudad = ed.getCiudad() != null ? ed.getCiudad() : "(sin ciudad)";
+            String pais   = ed.getPais() != null ? ed.getPais() : "(sin país)";
+            DTEdicion dte = new DTEdicion(
+              ed.getNombre(),
+              ed.getSigla(),
+              ed.getFechaInicio(),
+              ed.getFechaFin(),
+              ed.getFechaAlta(),
+              organizadorNick,
+              ciudad,
+              pais
+            );
+            ediciones.add(dte);
+            System.out.println("[EventoServlet] Edición cargada desde evento: " + ed.getNombre());
+          }
+        } else {
+          System.out.println("[EventoServlet] No hay ediciones en el evento: " + nombre);
         }
+
+        req.setAttribute("evEdiciones", ediciones);
+      } catch (Exception ex) {
+        System.err.println("[EventoServlet] Error al obtener ediciones del evento " + nombre + ": " + ex.getMessage());
+        req.setAttribute("evEdiciones", java.util.Collections.emptyList());
       }
-      req.setAttribute("evEdiciones", ediciones);
 
       req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
       return;
@@ -154,6 +181,13 @@ public class EventoServlet extends HttpServlet {
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
     String path = req.getPathInfo();
+
+    // Cancelar: redirige a inicio sin validaciones (mantener botón sin <a href>)
+    String accion = req.getParameter("accion");
+    if ("cancelar".equalsIgnoreCase(accion)) {
+      resp.sendRedirect(ctx(req) + "/inicio");
+      return;
+    }
 
     if ("/alta".equals(path)) {
       if (!requiereOrganizador(req, resp)) return;
@@ -350,6 +384,7 @@ public class EventoServlet extends HttpServlet {
     return f.toString();
   }
 
+  // ====== helpers de archivo ======
   private static String getSafeFilename(Part p) {
     String name = p.getSubmittedFileName();
     if (name == null) return "archivo";

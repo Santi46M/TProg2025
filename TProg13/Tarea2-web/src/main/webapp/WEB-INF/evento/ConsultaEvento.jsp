@@ -30,6 +30,10 @@
     .event-hero__placeholder { color:#6b7280; font-size:.95rem; }
     .chips { display:flex; flex-wrap:wrap; gap:.4rem; }
     .chip { background:#eef2ff; color:#3730a3; padding:.2rem .5rem; border-radius:999px; font-size:.9rem; }
+    .ediciones-list { list-style:none; padding:0; margin:0; display:grid; gap:.6rem; }
+    .ediciones-list li { display:flex; align-items:center; gap:.5rem; justify-content:space-between; border:1px solid var(--line); border-radius:10px; padding:.5rem .75rem; background:#fff; }
+    .btn { border:none; padding:.35rem .7rem; border-radius:8px; cursor:pointer; }
+    .btn-ver-detalles { background:#111827; color:#fff; }
   </style>
 </head>
 <body>
@@ -65,7 +69,7 @@
                 <span class="categorias-label" style="margin-right:.3rem;"><strong>Categorías:</strong></span>
                 <% if (evCategorias.isEmpty()) { %>
                   <span class="chip">—</span>
-                <% } else { 
+                <% } else {
                      for (String c : evCategorias) { %>
                        <span class="chip"><%= c %></span>
                 <%   }
@@ -95,9 +99,16 @@
           for (logica.datatypes.DTEdicion ed : ediciones) {
         %>
           <li>
-            <strong><%= ed.getNombre() %></strong>
-            <span>(<%= ed.getFechaInicio() %> - <%= ed.getFechaFin() %>)</span>
-            <a class="btn" href="<%= ctx %>/edicion/ConsultaEdicion?evento=<%= java.net.URLEncoder.encode(evNombre, "UTF-8") %>&edicion=<%= java.net.URLEncoder.encode(ed.getNombre(), "UTF-8") %>">Ver detalles</a>
+            <div>
+              <strong><%= ed.getNombre() %></strong>
+              <span>(<%= ed.getFechaInicio() %> - <%= ed.getFechaFin() %>)</span>
+            </div>
+            <!-- Navegación con botón (sin href): GET a ConsultaEdicion -->
+            <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
+              <input type="hidden" name="evento" value="<%= evNombre %>" />
+              <input type="hidden" name="edicion" value="<%= ed.getNombre() %>" />
+              <button type="submit" class="btn btn-ver-detalles">Ver detalles</button>
+            </form>
           </li>
         <% } %>
         </ul>
