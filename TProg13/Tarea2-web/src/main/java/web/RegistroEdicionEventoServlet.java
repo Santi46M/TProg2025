@@ -30,11 +30,9 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         if (!requiereAsistente(req, resp)) return;
 
-        // 1) Traigo todos los eventos
         List<DTEvento> eventos = ce().listarEventos();
         req.setAttribute("eventos", eventos);
 
-        // 2) Para cada evento, traigo sus ediciones y filtro Aceptadas
         List<Ediciones> edicionesAceptadas = new ArrayList<>();
         Map<String, List<Ediciones>> edicionesPorEvento = new LinkedHashMap<>();
 
@@ -56,7 +54,6 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
 
         req.setAttribute("ediciones", edicionesAceptadas);
         req.setAttribute("edicionesPorEvento", edicionesPorEvento);
-
         req.getRequestDispatcher(JSP_INSCRIPCION).forward(req, resp);
     }
 
@@ -109,14 +106,27 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
                 return;
             }
 
-            String idRegistro = java.util.UUID.randomUUID().toString();
+            // Crear registro a través de la lógica
+            String idRegistro = UUID.randomUUID().toString();
             LocalDate fechaRegistro = LocalDate.now();
             float costo = tipoRegistro.getCosto();
             LocalDate fechaInicio = ed.getFechaInicio();
 
             ce().altaRegistroEdicionEvento(
-                    idRegistro, usuario, evento, ed, tipoRegistro, fechaRegistro, costo, fechaInicio
+                idRegistro, usuario, evento, ed, tipoRegistro, fechaRegistro, costo, fechaInicio
             );
+
+            // ===================== 🔧 BLOQUE AÑADIDO 🔧 =====================
+            // Crear el registro en las estructuras locales también
+            Registro nuevo = new Registro(idRegistro, usuario, ed, tipoRegistro, fechaRegistro, costo, fechaInicio);
+            ed.agregarRegistro(idRegistro, nuevo);
+
+            if (usuario instanceof Asistente asistente) {
+                asistente.addRegistro(idRegistro, nuevo);
+            }
+
+            System.out.println("✅ Registro agregado: " + usuario.getNickname() + " en edición " + ed.getNombre());
+            // ================================================================
 
             req.setAttribute("mensaje", "Inscripción realizada correctamente.");
             req.getRequestDispatcher(JSP_OK).forward(req, resp);
