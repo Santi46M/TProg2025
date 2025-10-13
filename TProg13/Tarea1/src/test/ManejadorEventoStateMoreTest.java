@@ -1,8 +1,6 @@
 package test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Method;
 import java.time.LocalDate;
@@ -19,6 +17,9 @@ class ManejadorEventoStateMoreTest {
 
     private Object controladorEv;
     private Object controladorUs;
+    private String INST;       // institución única por ejecución
+    private String ORG_NICK;   // nick organizador único
+    private String ORG_MAIL;   // email organizador único
 
     public Object getCe() { return controladorEv; }
     public Object getCu() { return controladorUs; }
@@ -28,37 +29,71 @@ class ManejadorEventoStateMoreTest {
         TestUtils.resetAll();
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         Method getter;
-        try { getter = fab.getMethod("getInstance"); } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
+        try { getter = fab.getMethod("getInstance"); } 
+        catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
 
         controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            controladorEv = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
+            controladorEv = TestUtils.tryInvoke(fabrica, new String[]{
+                "getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"
+            });
         } catch (AssertionError ignored) {
-            controladorEv = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
+            controladorEv = Class.forName("logica.controladores.ControladorEvento")
+                                 .getDeclaredConstructor().newInstance();
         }
 
-        // base: org + categoría
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_ME2", "d", "w");
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
-                "orgME2", "Org ME2", "o@x", "d", "l", "Ap",
-                LocalDate.of(1990, 1, 1), "Inst_ME2", true);
+        // base: Inst + org únicos
+        long nonce = System.nanoTime();
+        INST = "Inst_ME2_" + nonce;
+        ORG_NICK = "orgME2_" + nonce;
+        ORG_MAIL = ORG_NICK + "@x";
+
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
+                ORG_NICK, "Org ME2", ORG_MAIL, "d", "l", "Ap",
+                LocalDate.of(1990, 1, 1), INST, true, null, null);
 
         // categoría sin catch(Throwable)
-        TestUtils.tryInvoke(controladorEv, new String[]{"AltaCategoria"}, "ME2-Cat");
+        TestUtils.tryInvoke(controladorEv, new String[]{"altaCategoria"}, "ME2-Cat");
     }
 
     @Test
     @DisplayName("getEventos/obtenerEvento/colecciones no vacías tras altas")
     void manejadorTieneCosas() throws Exception {
-        Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("ME2-Cat"));
-        TestUtils.tryInvoke(controladorEv, new String[]{"AltaEvento"},
-                "ME2-Ev", "d", LocalDate.now(), "ME2", cats);
+        // Alta evento (firma común: String, String, LocalDate, String, DTCategorias, String)
+        Object cats = TestUtils.tolerantNew("logica.datatypes.DTCategorias", List.of("ME2-Cat"));
+        TestUtils.tryInvoke(controladorEv, new String[]{"altaEvento"},
+                "ME2-Ev", "d", LocalDate.now(), "ME2", cats, INST);
 
-        TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
-                "ME2-Ev", "ED1", "ED1S", "x",
-                LocalDate.now().plusDays(1), LocalDate.now().plusDays(2), LocalDate.now(),
-                "orgME2", "City", "UY");
+        // ---- altaEdicionEvento: detectar firma y llamar acorde ----
+        Method altaEd = null;
+        for (Method m : controladorEv.getClass().getMethods()) {
+            if (m.getName().equals("altaEdicionEvento")) { altaEd = m; break; }
+        }
+        if (altaEd != null) {
+            Class<?>[] pt = altaEd.getParameterTypes();
+
+            if (pt.length >= 2 && pt[0] == String.class && pt[1] == String.class) {
+                // Firma (String evento, String nombreEdicion, ... organizadorNick, ...)
+                TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
+                        "ME2-Ev", "ED1", "ED1S", "x",
+                        LocalDate.now().plusDays(1), LocalDate.now().plusDays(2), LocalDate.now(),
+                        ORG_NICK, "City", "UY", null);
+            } else {
+                // Firma (Eventos evento, Usuario usuario, ...)
+                Object eventoObj = null, usuarioObj = null;
+                try { eventoObj  = DomainAccess.obtenerEvento("ME2-Ev"); } catch (RuntimeException ignored) {}
+                try { usuarioObj = DomainAccess.obtenerUsuario(ORG_NICK); } catch (RuntimeException ignored) {}
+                if (eventoObj != null && usuarioObj != null) {
+                    TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
+                            eventoObj, usuarioObj,
+                            "ED1", "ED1S", "x",
+                            LocalDate.now().plusDays(1), LocalDate.now().plusDays(2), LocalDate.now(),
+                            "City", "UY", null);
+                }
+            }
+        }
 
         Object manejadorEv = DomainAccess.getManejadorEvento();
         assertNotNull(manejadorEv);
@@ -80,10 +115,7 @@ class ManejadorEventoStateMoreTest {
             Method metodo = TestUtils.findMethod(manejadorEv, name, String.class);
             if (metodo != null) {
                 Object evento = metodo.invoke(manejadorEv, "ME2-Ev");
-                if (evento != null) {
-                    found = true;
-                    break;
-                }
+                if (evento != null) { found = true; break; }
             }
         }
         // tolerante: si no hay buscadores públicos, igual no falla

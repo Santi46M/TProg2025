@@ -13,10 +13,10 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @DisplayName("Fábrica – cargarUsuariosDesdeCSV (tolerante)")
@@ -24,6 +24,8 @@ class FabricaCsvSmokeTest {
 
     private Object fabrica;
     private Object controladorUs;
+
+    private String INST; // institución única por ejecución
 
     public Object getFabrica() { return fabrica; }
     public Object getCu() { return controladorUs; }
@@ -33,14 +35,16 @@ class FabricaCsvSmokeTest {
         TestUtils.resetAll();
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         Method getter;
-        try { getter = fab.getMethod("getInstance"); } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
+        try { getter = fab.getMethod("getInstance"); }
+        catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         this.fabrica = getter.invoke(null);
 
         this.controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         assertNotNull(controladorUs);
 
-        // Institución base por si el CSV la requiere
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_CSV", "desc", "web");
+        // Institución base (única) por si el CSV la requiere
+        INST = "Inst_CSV_" + System.nanoTime();
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "desc", "web");
     }
 
     private Method findCsvMethod(Object fab) {
@@ -62,11 +66,11 @@ class FabricaCsvSmokeTest {
             return;
         }
 
+        // CSV simple; si tu parser difiere y lanza, igual sumamos cobertura
         String csvData =
-                // formato razonable; si tu parser difiere y lanza, igual sumamos cobertura
                 "nick;nombre;email;desc;link;apellido;fecha;inst;esOrg\n" +
-                "ana;Ana;ana@x;d;l;Ap;1999-01-01;Inst_CSV;false\n" +
-                "orgcsv;Org CSV;org@x;d;l;Ap;1998-02-02;Inst_CSV;true\n";
+                "ana;Ana;ana@x;d;l;Ap;1999-01-01;" + INST + ";false\n" +
+                "orgcsv;Org CSV;org@x;d;l;Ap;1998-02-02;" + INST + ";true\n";
 
         Class<?> parametro = csv.getParameterTypes()[0];
         Object arg;
@@ -94,10 +98,15 @@ class FabricaCsvSmokeTest {
         }
 
         boolean bandera = true;
-        try { csv.invoke(fabrica, arg); } catch (ReflectiveOperationException | IllegalArgumentException e) { bandera = false; }
+        try {
+            csv.invoke(fabrica, arg);
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            bandera = false;
+        }
 
         @SuppressWarnings("unchecked")
-        Map<String, Object> users = (Map<String, Object>) TestUtils.tryInvoke(controladorUs, new String[]{"listarUsuarios"});
+        Map<String, Object> users =
+                (Map<String, Object>) TestUtils.tryInvoke(controladorUs, new String[]{"listarUsuarios"});
         assertNotNull(users);
 
         if (bandera) {

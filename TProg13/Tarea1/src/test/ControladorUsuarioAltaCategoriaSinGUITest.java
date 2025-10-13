@@ -19,7 +19,7 @@ class ControladorUsuarioAltaCategoriaSinGUITest {
         Object fabrica = getter.invoke(null);
         Object controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaCategoriaSinGUI"}, "SweepCat");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaCategoriaSinGUI"}, "SweepCat");
         assertTrue(true);
     }
 }
