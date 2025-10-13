@@ -67,6 +67,13 @@ public class AltaRegistroServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         String path = req.getPathInfo();
 
+        // Cancelar: redirige a inicio sin validaciones
+        String accion = req.getParameter("accion");
+        if ("cancelar".equalsIgnoreCase(accion)) {
+            resp.sendRedirect(ctx(req) + "/inicio");
+            return;
+        }
+
         if ("/alta".equals(path)) {
             if (!requiereOrganizador(req, resp)) return;
 

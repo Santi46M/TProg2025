@@ -104,6 +104,13 @@ public class UsuarioServlet extends HttpServlet {
     String path = req.getServletPath();
     System.out.println("POST en: " + path);
 
+    // Manejar cancelación
+    String accion = req.getParameter("accion");
+    if ("cancelar".equalsIgnoreCase(accion)) {
+      resp.sendRedirect(ctx(req) + "/inicio");
+      return;
+    }
+
     if ("/usuario/AltaUsuario".equals(path)) {
 
       // === Procesar imagen (opcional) ===

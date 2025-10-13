@@ -94,11 +94,17 @@
 
         <div class="form-actions-altaEvento">
           <button type="submit" class="btn-guardar-altaEvento" <%= (request.getAttribute("sinEventos") != null && (Boolean)request.getAttribute("sinEventos")) ? "disabled" : "" %>>Guardar</button>
-          <form action="<%=ctx%>/" method="get" style="display:inline;">
-            <button type="submit" class="btn-cancelar-altaEvento btn">Cancelar</button>
-          </form>
+          <button type="submit" class="btn-cancelar-altaEvento btn" name="accion" value="cancelar">Cancelar</button>
         </div>
       </form>
+      <script>
+        document.querySelector('.btn-cancelar-altaEvento').addEventListener('click', function(e) {
+          var form = document.getElementById('form-alta-edicion');
+          Array.from(form.querySelectorAll('[required]')).forEach(function(input) {
+            input.removeAttribute('required');
+          });
+        });
+      </script>
     </section>
   </main>
 </div>

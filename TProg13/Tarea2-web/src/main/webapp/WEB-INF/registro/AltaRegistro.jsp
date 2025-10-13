@@ -71,11 +71,17 @@
 
         <div class="form-actions-altaEvento">
           <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
-          <form action="<%=ctx%>/registro/alta" method="get" style="display:inline;">
-            <button type="submit" class="btn-cancelar-altaEvento">Cancelar</button>
-          </form>
+          <button type="submit" class="btn-cancelar-altaEvento" name="accion" value="cancelar">Cancelar</button>
         </div>
       </form>
+      <script>
+        document.querySelector('.btn-cancelar-altaEvento').addEventListener('click', function(e) {
+          var form = document.getElementById('form-alta-tipo');
+          Array.from(form.querySelectorAll('[required]')).forEach(function(input) {
+            input.removeAttribute('required');
+          });
+        });
+      </script>
     </section>
   </main>
 </div>

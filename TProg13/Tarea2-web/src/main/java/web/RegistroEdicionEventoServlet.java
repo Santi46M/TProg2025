@@ -61,6 +61,11 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
+        String accion = req.getParameter("accion");
+        if ("cancelar".equalsIgnoreCase(accion)) {
+            resp.sendRedirect(ctx(req) + "/inicio");
+            return;
+        }
         if (!requiereAsistente(req, resp)) return;
 
         String siglaEdicion = trim(req.getParameter("edicion"));

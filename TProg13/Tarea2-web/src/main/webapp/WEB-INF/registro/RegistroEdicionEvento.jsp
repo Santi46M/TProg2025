@@ -47,11 +47,17 @@
         </div>
         <div class="form-actions-registroEdicionEvento">
           <button type="submit" class="btn-guardar-registroEdicionEvento">Registrarse</button>
-          <form action="<%=ctx%>/registro/inscripcion" method="get" style="display:inline;">
-            <button type="submit" class="btn-cancelar-registroEdicionEvento">Cancelar</button>
-          </form>
+          <button type="submit" class="btn-cancelar-registroEdicionEvento" name="accion" value="cancelar">Cancelar</button>
         </div>
       </form>
+      <script>
+        document.querySelector('.btn-cancelar-registroEdicionEvento').addEventListener('click', function(e) {
+          var form = document.getElementById('form-registro-edicion');
+          Array.from(form.querySelectorAll('[required]')).forEach(function(input) {
+            input.removeAttribute('required');
+          });
+        });
+      </script>
     </section>
   </main>
 </div>

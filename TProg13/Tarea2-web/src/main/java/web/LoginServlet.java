@@ -58,6 +58,12 @@ public class LoginServlet extends HttpServlet {
         String nickOrEmail = req.getParameter("email");
         String pass = req.getParameter("pass");
 
+        String accion = req.getParameter("accion");
+        if ("cancelar".equalsIgnoreCase(accion)) {
+            resp.sendRedirect(ctx(req) + "/inicio");
+            return;
+        }
+
         if (nickOrEmail == null || nickOrEmail.isBlank() || pass == null || pass.isBlank()) {
             req.setAttribute("error", "Ingresá usuario y contraseña.");
             req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
