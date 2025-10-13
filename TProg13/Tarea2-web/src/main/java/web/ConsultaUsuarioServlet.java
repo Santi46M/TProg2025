@@ -1,9 +1,11 @@
 package web;
 
 import java.io.IOException;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
-import jakarta.servlet.*;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
@@ -24,59 +26,82 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
     request.setCharacterEncoding("UTF-8");
 
+    // Forzar listado: ?listar=1 / true / on / yes  o  ?view=list
     final boolean forzarListado = isTrue(request.getParameter("listar"))
         || "list".equalsIgnoreCase(trim(request.getParameter("view")));
 
     String nick = trim(request.getParameter("nick"));
 
+    // Si no se fuerza listado y no vino nick, usar el de sesión (si hay)
     if (!forzarListado && isBlank(nick)) {
       HttpSession sAux = request.getSession(false);
-      if (sAux != null) nick = (String) sAux.getAttribute("nick");
+      if (sAux != null) {
+        Object obj = sAux.getAttribute("nick");
+        if (obj instanceof String) nick = (String) obj;
+      }
     }
 
     final IControladorUsuario ctrlUsuario = fabrica.getInstance().getIControladorUsuario();
 
     if (forzarListado || isBlank(nick)) {
-      // === LISTA ===
-      Map<String, Usuario> usuarios = ctrlUsuario.listarUsuarios();
-      Collection<Usuario> values = usuarios == null ? List.of() : usuarios.values();
+      // ============ LISTA DE USUARIOS ============
+      Map<String, Usuario> mapa = ctrlUsuario.listarUsuarios();
+      Collection<Usuario> values = (mapa == null) ? List.of() : mapa.values();
       request.setAttribute("usuarios", values);
 
-      // Resolver URLs de fotos para el listado (clave = nick)
-      Map<String,String> fotos = new HashMap<>();
-      String ctx = request.getContextPath();
-      ServletContext sc = getServletContext();
+      // Fotos y nombres seguros para el listado
+      final Map<String, String> fotos   = new HashMap<>();
+      final Map<String, String> nombres = new HashMap<>();
+
+      final String ctx = request.getContextPath();
+      final ServletContext sc = getServletContext();
 
       for (Usuario u : values) {
-        String raw = null;
-        try { raw = u.getImagen(); } catch (Exception ignore) {}
-        String url = resolveUserImageUrl(raw, ctx, sc);
-        if (url != null) fotos.put(u.getNickname(), url);
+        if (u == null) continue;
+
+        // nombre seguro: si nombre está vacío → usar nickname
+        final String nombreSeguro = nvl(u.getNombre(), u.getNickname());
+        nombres.put(u.getNickname(), nombreSeguro);
+
+        // foto (puede ser null)
+        final String url = resolveUserImageUrl(u.getImagen(), ctx, sc);
+        if (url != null) {
+          fotos.put(u.getNickname(), url);
+        }
       }
+
       request.setAttribute("fotos", fotos);
+      request.setAttribute("nombres", nombres);
 
     } else {
-      // === PERFIL ===
+      // ============ PERFIL INDIVIDUAL ============
       try {
         DTDatosUsuario usuario = ctrlUsuario.obtenerDatosUsuario(nick);
         request.setAttribute("usuario", usuario);
 
-        String raw = null;
-        try { raw = usuario.getImagen(); } catch (Exception ignore) {}
-        String url = resolveUserImageUrl(raw, request.getContextPath(), getServletContext());
-        if (url != null) request.setAttribute("usrImagenUrl", url);
+        // Nombre seguro también para el perfil (por si viene null)
+        request.setAttribute("usuarioNombreSeguro",
+            nvl(usuario.getNombre(), usuario.getNickname()));
 
-        // Mapa edicion -> evento para armar links
+        // Foto
+        final String url = resolveUserImageUrl(usuario.getImagen(),
+                                               request.getContextPath(),
+                                               getServletContext());
+        if (url != null) {
+          request.setAttribute("usrImagenUrl", url);
+        }
+
+        // Mapa edicion -> evento (para construir links)
         final IControladorEvento controladorEv = fabrica.getInstance().getIControladorEvento();
         final List<DTEvento> eventos = controladorEv.listarEventos();
         final Map<String, String> edicionToEvento = new HashMap<>();
+
         if (eventos != null) {
           for (DTEvento ev : eventos) {
-            if (ev != null && ev.getEdiciones() != null) {
-              for (String edNombre : ev.getEdiciones()) {
-                if (edNombre != null && !edNombre.isBlank()) {
-                  edicionToEvento.put(edNombre, ev.getNombre());
-                }
+            if (ev == null || ev.getEdiciones() == null) continue;
+            for (String edNombre : ev.getEdiciones()) {
+              if (edNombre != null && !edNombre.isBlank()) {
+                edicionToEvento.put(edNombre, ev.getNombre());
               }
             }
           }
@@ -84,10 +109,12 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         request.setAttribute("edicionToEvento", edicionToEvento);
 
       } catch (UsuarioNoExisteException unee) {
+        // Usuario no encontrado: 404 + mensaje, y mostramos listado para navegar
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         request.setAttribute("error", "El usuario \"" + nick + "\" no existe.");
-        Map<String, Usuario> usuarios = ctrlUsuario.listarUsuarios();
-        request.setAttribute("usuarios", usuarios == null ? List.of() : usuarios.values());
+
+        Map<String, Usuario> mapa = ctrlUsuario.listarUsuarios();
+        request.setAttribute("usuarios", (mapa == null) ? List.of() : mapa.values());
       }
     }
 
@@ -102,8 +129,11 @@ public class ConsultaUsuarioServlet extends HttpServlet {
   }
 
   // ===== Helpers =====
-  private static String trim(String s) { return s == null ? null : s.trim(); }
+  private static String trim(String s) { return (s == null) ? null : s.trim(); }
   private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
+  private static String nvl(String s, String alt) {
+    return (s == null || s.trim().isEmpty()) ? alt : s;
+  }
   private static boolean isTrue(String v) {
     if (v == null) return false;
     String s = v.trim().toLowerCase(java.util.Locale.ROOT);
@@ -116,52 +146,49 @@ public class ConsultaUsuarioServlet extends HttpServlet {
    * - http/https → tal cual.
    * - Empieza con "/" → ctx + raw.
    * - Si no empieza con "/", normaliza:
-   *    * Acepta "img/..." o "img/usuarios/..." → ctx + "/" + esa ruta.
-   *    * Acepta "usuarios/..."                 → ctx + "/img/" + esa ruta.
-   *    * Si es solo nombre → intenta, en orden verificado:
-   *        /img/<archivo>  (estáticos)
-   *        /img/usuarios/<archivo> (subidos)
-   *      Si no se puede verificar (getRealPath null), prefiero /img/<archivo>.
+   *    * "img/..." o "img/usuarios/..." → ctx + "/" + esa ruta.
+   *    * "usuarios/..."                 → ctx + "/img/" + esa ruta.
+   *    * Solo nombre → intenta, en orden verificado:
+   *        /img/<archivo>
+   *        /img/usuarios/<archivo>
+   *      Si no se puede verificar (getRealPath null), por defecto /img/<archivo>.
    */
   private static String resolveUserImageUrl(String raw, String ctx, ServletContext sc) {
     if (raw == null || raw.isBlank()) return null;
 
-    String v = raw.trim().replace("\\", "/");
-    String low = v.toLowerCase(Locale.ROOT);
+    final String v = raw.trim().replace("\\", "/");
+    final String low = v.toLowerCase(Locale.ROOT);
 
-    // Absolutas
     if (low.startsWith("http://") || low.startsWith("https://")) return v;
-    // Ya relativas al contexto
     if (v.startsWith("/")) return ctx + v;
 
-    // Rutas parciales comunes (evitar duplicar /usuarios/)
     if (low.startsWith("img/")) {
-      return ctx + "/" + v; // ej: "img/IMG-US01.jpg" o "img/usuarios/IMG..."
+      return ctx + "/" + v;
     }
     if (low.startsWith("usuarios/")) {
-      return ctx + "/img/" + v; // ej: "usuarios/IMG..." → "/img/usuarios/IMG..."
+      return ctx + "/img/" + v;
     }
 
-    // Solo nombre de archivo → probar en disco
-    String relImg = "/img/" + v;
-    String relUsr = "/img/usuarios/" + v;
+    // Solo nombre de archivo → probar posibles ubicaciones
+    final String relImg = "/img/" + v;
+    final String relUsr = "/img/usuarios/" + v;
 
-    Boolean exImg = exists(sc, relImg);
-    Boolean exUsr = exists(sc, relUsr);
+    final Boolean exImg = exists(sc, relImg);
+    final Boolean exUsr = exists(sc, relUsr);
 
     if (exImg != null || exUsr != null) {
       if (isTrue(exImg)) return ctx + relImg;
       if (isTrue(exUsr)) return ctx + relUsr;
-      return null; // ninguno existe físicamente
+      return null;
     }
 
-    // No podemos verificar (WAR no explotado): prefiero estáticos por defecto
+    // No se pudo verificar (WAR no explotado) → fallback a /img/
     return ctx + relImg;
   }
 
   /** TRUE/FALSE si se pudo verificar, o null si no se puede (getRealPath == null). */
   private static Boolean exists(ServletContext sc, String rel) {
-    String abs = sc.getRealPath(rel);
+    final String abs = sc.getRealPath(rel);
     if (abs == null) return null;
     return Files.exists(Path.of(abs));
   }

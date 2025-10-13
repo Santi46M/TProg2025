@@ -217,20 +217,26 @@ public class UsuarioServlet extends HttpServlet {
 
       // === Crear usuario ===
       boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rol);
-      try {
-        controladorUs.altaUsuario(
-            nick,
-            nombre,
-            correo,
-            descripcion,
-            link,
-            apellido,
-            fechaNac,
-            institucion,
-            esOrganizador,
-            pass1,
-            nombreArchivo  // ← SOLO nombre (p.ej. "vale23.jpg")
-        );
+
+   // nombre final según el rol:
+   // - Asistente: nombreA
+   // - Organizador: nombreO (organizacion)
+   String nombreFinal = esOrganizador ? organizacion : nombre;
+
+   try {
+     controladorUs.altaUsuario(
+         nick,
+         nombreFinal,   // <-- acá va el correcto
+         correo,
+         descripcion,
+         link,
+         apellido,
+         fechaNac,
+         institucion,
+         esOrganizador,
+         pass1,
+         nombreArchivo
+     );
 
         // ✅ Crear sesión como en login
         HttpSession sAux = req.getSession(true);
