@@ -125,7 +125,7 @@ public class EdicionServlet extends HttpServlet {
         java.util.Map<String, logica.clases.Registro> registrosMap = edicionObj.getRegistros();
         registrosList = new java.util.ArrayList<>(registrosMap.values());
       } else if (nickSesion != null) {
-        logica.clases.Usuario usuarioLogueado = logica.manejadores.manejadorUsuario.getInstancia().findUsuario(nickSesion);
+        logica.clases.Usuario usuarioLogueado = logica.manejadores.ManejadorUsuario.getInstancia().findUsuario(nickSesion);
         if (usuarioLogueado instanceof logica.clases.Asistente asistente) {
           registrosList = new java.util.ArrayList<>();
           java.util.Map<String, logica.clases.Registro> registrosAsist = asistente.getRegistros();
