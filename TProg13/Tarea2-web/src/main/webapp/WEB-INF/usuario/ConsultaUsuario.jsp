@@ -64,9 +64,12 @@ String ctx = request.getContextPath();
             %>
               <div class="card usuario-card">
                 <h3>
-                  <a href="<%=ctx%>/usuario/ConsultaUsuario?nick=<%=u.getNickname()%>">
-                    <i class='bx <%= esOrg ? "bxs-microphone" : "bxs-id-card" %>'></i> <%=u.getNickname()%>
-                  </a>
+                  <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
+                    <input type="hidden" name="nick" value="<%=u.getNickname()%>" />
+                    <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;display:flex;align-items:center;font-size:1.1em;font-weight:600;">
+                      <i class='bx <%= esOrg ? "bxs-microphone" : "bxs-id-card" %>' style="font-size:1.2em;margin-right:0.3em;"></i> <span><%=u.getNickname()%></span>
+                    </button>
+                  </form>
                 </h3>
                 <p><strong>Nombre:</strong> <%=u.getNombre()%></p>
                 <p><strong>Email:</strong> <%=u.getEmail()%></p>

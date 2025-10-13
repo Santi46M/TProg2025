@@ -47,7 +47,9 @@
         </div>
         <div class="form-actions-registroEdicionEvento">
           <button type="submit" class="btn-guardar-registroEdicionEvento">Registrarse</button>
-          <a href="<%=ctx%>/index.jsp" class="btn-cancelar-registroEdicionEvento">Cancelar</a>
+          <form action="<%=ctx%>/registro/inscripcion" method="get" style="display:inline;">
+            <button type="submit" class="btn-cancelar-registroEdicionEvento">Cancelar</button>
+          </form>
         </div>
       </form>
     </section>
@@ -55,7 +57,6 @@
 </div>
 
 <script>
-  // data: { "Evento": [ {sigla:"...", nombre:"..."}, ... ], ... }
   const data = {
   <% if (mapa != null && !mapa.isEmpty()) {
        int ecount = 0;

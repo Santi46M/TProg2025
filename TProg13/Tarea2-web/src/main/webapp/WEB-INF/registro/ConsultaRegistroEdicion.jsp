@@ -27,7 +27,15 @@ logica.clases.Registro registro = (logica.clases.Registro) request.getAttribute(
           <% if (registro.getUsuario() instanceof logica.clases.Asistente) { %>
             <div class="event-meta"><strong>Usuario:</strong> <%= registro.getUsuario().getNickname() %></div>
           <% } %>
-          <div class="event-meta"><strong>Edición:</strong> <%= registro.getEdicion().getNombre() %></div>
+          <div class="event-meta"><strong>Edición:</strong>
+            <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
+              <input type="hidden" name="evento" value="<%= registro.getEdicion().getEvento().getNombre() %>" />
+              <input type="hidden" name="edicion" value="<%= registro.getEdicion().getNombre() %>" />
+              <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;">
+                <%= registro.getEdicion().getNombre() %>
+              </button>
+            </form>
+          </div>
           <div class="event-meta"><strong>Tipo de registro:</strong> <%= registro.getTipoRegistro().getNombre() %></div>
           <div class="event-meta"><strong>Fecha de registro:</strong> <%= registro.getFechaRegistro() %></div>
           <div class="event-meta"><strong>Costo:</strong> <%= registro.getCosto() %></div>

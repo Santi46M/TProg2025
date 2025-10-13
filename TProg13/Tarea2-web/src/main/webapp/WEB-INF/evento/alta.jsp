@@ -96,7 +96,6 @@
               <i class='bx bx-save'></i> Guardar
             </button>
 
-            <!-- Cancelar sin href -->
             <form action="<%=ctx%>/inicio" method="get" style="display:inline">
               <button type="submit" class="btn btn-cancelar-altaEvento">
                 <i class='bx bx-x-circle'></i> Cancelar

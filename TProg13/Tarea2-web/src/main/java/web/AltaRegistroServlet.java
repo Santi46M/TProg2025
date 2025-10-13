@@ -39,9 +39,10 @@ public class AltaRegistroServlet extends HttpServlet {
             String nick = s == null ? null : (String) s.getAttribute("nick");
             List<Ediciones> ediciones = new ArrayList<>();
             if (nick != null) {
-                // Solo ediciones organizadas por el usuario logueado
-                List<String> eventosConEdiciones = ce().listarEventosConEdicionesIngresadas();
-                for (String nombreEvento : eventosConEdiciones) {
+                // Mostrar todas las ediciones organizadas por el usuario logueado, sin importar estado
+                List<DTEvento> eventos = ce().listarEventos();
+                for (DTEvento evento : eventos) {
+                    String nombreEvento = evento.getNombre();
                     List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
                     for (String nomEd : nombresEd) {
                         Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);
@@ -117,8 +118,9 @@ public class AltaRegistroServlet extends HttpServlet {
         String nick = s == null ? null : (String) s.getAttribute("nick");
         List<Ediciones> ediciones = new ArrayList<>();
         if (nick != null) {
-            List<String> eventosConEdiciones = ce().listarEventosConEdicionesIngresadas();
-            for (String nombreEvento : eventosConEdiciones) {
+            List<DTEvento> eventos = ce().listarEventos();
+            for (DTEvento evento : eventos) {
+                String nombreEvento = evento.getNombre();
                 List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
                 for (String nomEd : nombresEd) {
                     Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);

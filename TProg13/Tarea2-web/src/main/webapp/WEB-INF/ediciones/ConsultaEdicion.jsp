@@ -171,9 +171,12 @@
         %>
           <li>
             <strong><%= tr.getNombre() %></strong>
-            <a class="btn" href="<%=ctx%>/registro/ConsultaTipoRegistro?evento=<%=edicion.getEvento().getNombre()%>&edicion=<%=edicion.getNombre()%>&tipoRegistro=<%=tr.getNombre()%>">
-              Ver detalles
-            </a>
+            <form action="<%=ctx%>/registro/ConsultaTipoRegistro" method="get" style="display:inline;">
+              <input type="hidden" name="evento" value="<%=edicion.getEvento().getNombre()%>" />
+              <input type="hidden" name="edicion" value="<%=edicion.getNombre()%>" />
+              <input type="hidden" name="tipoRegistro" value="<%=tr.getNombre()%>" />
+              <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
+            </form>
           </li>
         <% } %>
       </ul>
@@ -189,9 +192,12 @@
         %>
           <li>
             <strong><%= p.getInstitucion().getNombre() %></strong>
-            <a class="btn" href="<%=ctx%>/edicion/ConsultaPatrocinio?evento=<%=edicion.getEvento().getNombre()%>&edicion=<%=edicion.getNombre()%>&codigoPatrocinio=<%=p.getCodigoPatrocinio()%>">
-              Ver detalles
-            </a>
+            <form action="<%=ctx%>/edicion/ConsultaPatrocinio" method="get" style="display:inline;">
+              <input type="hidden" name="evento" value="<%=edicion.getEvento().getNombre()%>" />
+              <input type="hidden" name="edicion" value="<%=edicion.getNombre()%>" />
+              <input type="hidden" name="codigoPatrocinio" value="<%=p.getCodigoPatrocinio()%>" />
+              <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
+            </form>
           </li>
         <% } %>
       </ul>

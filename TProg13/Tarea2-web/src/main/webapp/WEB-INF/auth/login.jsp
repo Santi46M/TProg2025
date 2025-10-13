@@ -40,7 +40,9 @@
 
       <div class="acciones-iniciar-sesion">
         <button type="submit" class="btn btn-iniciar-sesion">Ingresar</button>
-        <a class="btn ghost btn-cancelar-iniciar-sesion" href="<%=ctx%>/">Cancelar</a>
+        <form action="<%=ctx%>/auth/login" method="get" style="display:inline;">
+          <button type="submit" class="btn ghost btn-cancelar-iniciar-sesion" style="margin-left:1rem;">Cancelar</button>
+        </form>
       </div>
 
       <p id="msg" style="display:<%= (error==null)? "none" : "block" %>; color:red; font-weight:bold; margin-top:.5rem;">

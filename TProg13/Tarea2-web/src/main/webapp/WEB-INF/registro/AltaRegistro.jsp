@@ -71,7 +71,9 @@
 
         <div class="form-actions-altaEvento">
           <button type="submit" class="btn-guardar-altaEvento">Guardar</button>
-          <a href="<%=ctx%>/index-organizador.jsp" class="btn-cancelar-altaEvento">Cancelar</a>
+          <form action="<%=ctx%>/registro/alta" method="get" style="display:inline;">
+            <button type="submit" class="btn-cancelar-altaEvento">Cancelar</button>
+          </form>
         </div>
       </form>
     </section>
