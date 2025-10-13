@@ -99,11 +99,11 @@ public class CargaDatosPrueba {
 
         List<String> catEv01 = Arrays.asList("Tecnología", "Innovación");
         List<String> catEv02 = Arrays.asList("Literatura", "Cultura");
-        List<String> catEv03 = Arrays.asList("Música");
+        List<String> catEv03 = Arrays.asList("Cultura", "Música");
         List<String> catEv04 = Arrays.asList("Deporte", "Salud");
-        List<String> catEv05 = Arrays.asList("Entretenimiento");
+        List<String> catEv05 = Arrays.asList("Cultura", "Entretenimiento");
         List<String> catEv06 = Arrays.asList("Agro", "Negocios");
-        List<String> catEv07 = Arrays.asList("Moda", "Investigación");
+        List<String> catEv07 = Arrays.asList("Cultura","Moda");
 
         // Ref 2025 — Conferencia de Tecnología
         controladorEve.altaEvento(
@@ -460,6 +460,22 @@ public class CargaDatosPrueba {
         controladorEve.altaTipoRegistro(manejadorEve.obtenerEdicion("WS26"), "Full", "Acceso ilimitado + Cena de gala", 900, 30);
         controladorEve.altaTipoRegistro(manejadorEve.obtenerEdicion("WS26"), "General", "Acceso general", 650, 5);
         controladorEve.altaTipoRegistro(manejadorEve.obtenerEdicion("WS26"), "Estudiante", "Acceso para estudiantes", 300, 1);
+        controladorEve.altaTipoRegistro(
+        	    manejadorEve.obtenerEdicion("MFW26"),
+        	    "Full",
+        	    "Acceso a todos los eventos de la semana",
+        	    450,
+        	    50
+        	);
+
+        	controladorEve.altaTipoRegistro(
+        	    manejadorEve.obtenerEdicion("MFW26"),
+        	    "Visitante",
+        	    "Acceso parcial a los eventos de la semana",
+        	    150,
+        	    25
+        	);
+        
     }
 
     // =========================
@@ -467,71 +483,95 @@ public class CargaDatosPrueba {
     // =========================
     public static void cargarRegistrosEjemplo() {
         var controladorEve = new logica.controladores.ControladorEvento();
-        var manejadorEve = ManejadorEvento.getInstancia();
+        var manejadorEve = logica.manejadores.ManejadorEvento.getInstancia();
         var manejadorUsu = logica.manejadores.ManejadorUsuario.getInstancia();
 
-        controladorEve.altaRegistroEdicionEvento("atorres MONROCK25",
-            manejadorUsu.getUsuarios().get("atorres"),
+        // --- Todos los registros válidos con asistentes (A) ---
+        controladorEve.altaRegistroEdicionEvento("RE01",
+            manejadorUsu.getUsuarios().get("sofirod"), // US03
             manejadorEve.obtenerEvento("Montevideo Rock"),
-            manejadorEve.obtenerEdicion("MONROCK25"),
-            manejadorEve.obtenerEdicion("MONROCK25").obtenerTipoRegistro("VIP"),
+            manejadorEve.obtenerEdicion("MONROCK25"),  // EDEV01
+            manejadorEve.obtenerEdicion("MONROCK25").obtenerTipoRegistro("VIP"), // TR02
             LocalDate.of(2025, 5, 14), 4000, LocalDate.of(2025, 11, 20));
 
-        controladorEve.altaRegistroEdicionEvento("atorres MARATON24",
-            manejadorUsu.getUsuarios().get("atorres"),
+        controladorEve.altaRegistroEdicionEvento("RE02",
+            manejadorUsu.getUsuarios().get("sofirod"),
             manejadorEve.obtenerEvento("Maratón de Montevideo"),
             manejadorEve.obtenerEdicion("MARATON24"),
             manejadorEve.obtenerEdicion("MARATON24").obtenerTipoRegistro("Corredor 21K"),
             LocalDate.of(2024, 7, 30), 500, LocalDate.of(2024, 9, 14));
 
-        controladorEve.altaRegistroEdicionEvento("sofirod WS26",
-            manejadorUsu.getUsuarios().get("sofirod"),
+        controladorEve.altaRegistroEdicionEvento("RE03",
+            manejadorUsu.getUsuarios().get("andrearod"),
             manejadorEve.obtenerEvento("Conferencia de Tecnología"),
             manejadorEve.obtenerEdicion("WS26"),
             manejadorEve.obtenerEdicion("WS26").obtenerTipoRegistro("Estudiante"),
             LocalDate.of(2025, 8, 21), 300, LocalDate.of(2026, 1, 13));
 
-        controladorEve.altaRegistroEdicionEvento("atorres MARATON25",
-            manejadorUsu.getUsuarios().get("atorres"),
+        controladorEve.altaRegistroEdicionEvento("RE04",
+            manejadorUsu.getUsuarios().get("sofirod"),
             manejadorEve.obtenerEvento("Maratón de Montevideo"),
             manejadorEve.obtenerEdicion("MARATON25"),
             manejadorEve.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 42K"),
             LocalDate.of(2025, 3, 3), 1200, LocalDate.of(2025, 9, 14));
 
-        controladorEve.altaRegistroEdicionEvento("msilva MWC",
-            manejadorUsu.getUsuarios().get("msilva"),
+        controladorEve.altaRegistroEdicionEvento("RE05",
+            manejadorUsu.getUsuarios().get("vale23"),
             manejadorEve.obtenerEvento("Conferencia de Tecnología"),
             manejadorEve.obtenerEdicion("MWC"),
             manejadorEve.obtenerEdicion("MWC").obtenerTipoRegistro("Full"),
             LocalDate.of(2025, 8, 22), 750, LocalDate.of(2025, 12, 12));
 
-        controladorEve.altaRegistroEdicionEvento("udelar MARATON25",
-            manejadorUsu.getUsuarios().get("udelar"),
+        controladorEve.altaRegistroEdicionEvento("RE06",
+            manejadorUsu.getUsuarios().get("AnaG"),
             manejadorEve.obtenerEvento("Maratón de Montevideo"),
             manejadorEve.obtenerEdicion("MARATON25"),
             manejadorEve.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 10K"),
             LocalDate.of(2025, 4, 9), 500, LocalDate.of(2025, 9, 14));
 
-        controladorEve.altaRegistroEdicionEvento("mec MARATON25",
-            manejadorUsu.getUsuarios().get("mec"),
+        controladorEve.altaRegistroEdicionEvento("RE07",
+            manejadorUsu.getUsuarios().get("JaviL"),
             manejadorEve.obtenerEvento("Maratón de Montevideo"),
             manejadorEve.obtenerEdicion("MARATON25"),
             manejadorEve.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 21K"),
             LocalDate.of(2025, 4, 10), 800, LocalDate.of(2025, 9, 14));
 
-        controladorEve.altaRegistroEdicionEvento("miseventos COMICS25",
-            manejadorUsu.getUsuarios().get("miseventos"),
+        controladorEve.altaRegistroEdicionEvento("RE08",
+            manejadorUsu.getUsuarios().get("MariR"),
             manejadorEve.obtenerEvento("Montevideo Comics"),
             manejadorEve.obtenerEdicion("COMICS25"),
             manejadorEve.obtenerEdicion("COMICS25").obtenerTipoRegistro("Cosplayer"),
             LocalDate.of(2025, 8, 3), 500, LocalDate.of(2025, 8, 4));
 
-        controladorEve.altaRegistroEdicionEvento("techcorp COMICS24",
-            manejadorUsu.getUsuarios().get("techcorp"),
+        controladorEve.altaRegistroEdicionEvento("RE09",
+            manejadorUsu.getUsuarios().get("SofiM"),
             manejadorEve.obtenerEvento("Montevideo Comics"),
             manejadorEve.obtenerEdicion("COMICS24"),
             manejadorEve.obtenerEdicion("COMICS24").obtenerTipoRegistro("General"),
             LocalDate.of(2024, 7, 16), 600, LocalDate.of(2024, 7, 18));
+
+        controladorEve.altaRegistroEdicionEvento("RE10",
+            manejadorUsu.getUsuarios().get("msilva"),
+            manejadorEve.obtenerEvento("Conferencia de Tecnología"),
+            manejadorEve.obtenerEdicion("CONFTECH26"),
+            manejadorEve.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("Full"),
+            LocalDate.of(2025, 10, 1), 0, LocalDate.of(2026, 4, 6));
+
+        controladorEve.altaRegistroEdicionEvento("RE11",
+            manejadorUsu.getUsuarios().get("andrearod"),
+            manejadorEve.obtenerEvento("Conferencia de Tecnología"),
+            manejadorEve.obtenerEdicion("CONFTECH26"),
+            manejadorEve.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("General"),
+            LocalDate.of(2025, 10, 6), 0, LocalDate.of(2026, 4, 6));
+
+        controladorEve.altaRegistroEdicionEvento("RE12",
+            manejadorUsu.getUsuarios().get("MariR"),
+            manejadorEve.obtenerEvento("Conferencia de Tecnología"),
+            manejadorEve.obtenerEdicion("CONFTECH26"),
+            manejadorEve.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("Estudiante"),
+            LocalDate.of(2025, 10, 10), 1500, LocalDate.of(2026, 4, 6));
+
+
     }
 
     // =========================
