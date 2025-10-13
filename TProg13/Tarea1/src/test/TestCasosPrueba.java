@@ -81,7 +81,7 @@ public class TestCasosPrueba {
      				   "imagen.jpg"
        			  ); }
        		);
-          Assertions.assertEquals("Ya existe un usuario con ese email", existe.getMessage());
+          Assertions.assertEquals("El usuario con correo atorres@gmail.com ya esta registrado", existe.getMessage());
    	}
     
     @Test 

@@ -14,8 +14,8 @@ final class DomainAccess {
     static Object getManejadorUsuario() {
         try {
             Class<?> manejadorUs = TestUtils.loadAny(
-                "logica.Manejadores.ManejadorUsuario",
-                "logica.Manejadores.manejadorUsuario"
+                "logica.manejadores.ManejadorUsuario",
+                "logica.manejadores.manejadorUsuario"
             );
             Object manejadorUsr;
             try {
@@ -35,8 +35,8 @@ final class DomainAccess {
     static Object getManejadorEvento() {
         try {
             Class<?> manejadorEvn = TestUtils.loadAny(
-                "logica.Manejadores.ManejadorEvento",
-                "logica.Manejadores.manejadorEvento"
+                "logica.manejadores.ManejadorEvento",
+                "logica.manejadores.manejadorEvento"
             );
             Object manejadorEv;
             try {
@@ -112,6 +112,59 @@ final class DomainAccess {
             // campo inaccesible → continuar
         }
 
+        return null;
+    }
+
+    
+    /* ---------- Evento ---------- */
+
+    static Object obtenerEvento(String nombre) {
+        Object manejadorEv = getManejadorEvento();
+        if (manejadorEv == null) return null;
+
+        // 1) Intentos directos por método
+        try {
+            for (String m : new String[]{"obtenerEvento", "getEvento", "buscarEvento", "findEvento"}) {
+                try {
+                    return manejadorEv.getClass().getMethod(m, String.class).invoke(manejadorEv, nombre);
+                } catch (NoSuchMethodException ignored) {
+                    // probar siguiente nombre de método
+                }
+            }
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalStateException("Error accediendo a evento", e);
+        }
+
+        // 2) Intentar lectura directa de mapas/caches privados típicos
+        Object obj = TestUtils.getFromPrivateMaps(manejadorEv, nombre,
+                "eventos", "mapEventos", "eventosMap", "mapaEventos",
+                "eventosPorNombre", "mapaDeEventos", "eventosCache");
+        if (obj != null) return obj;
+
+        // 3) Escanear getters sin parámetros que devuelvan colecciones/mapas
+        obj = buscarEnEstructuras(manejadorEv, nombre, "Evento");
+        if (obj != null) return obj;
+
+        // 4) Escanear campos privados (por si no exponen getters)
+        try {
+            Class<?> clase = manejadorEv.getClass();
+            while (clase != null) {
+                for (Field f : clase.getDeclaredFields()) {
+                    f.setAccessible(true);
+                    Object cont = f.get(manejadorEv);
+                    Object pick = pickFromContainer(cont, nombre, "Evento");
+                    if (pick != null) return pick;
+                    // por si la clase se llama "Eventos"
+                    pick = pickFromContainer(cont, nombre, "Eventos");
+                    if (pick != null) return pick;
+                }
+                clase = clase.getSuperclass();
+            }
+        } catch (IllegalAccessException ignored) {
+            // campo inaccesible → continuar
+        }
+
+        // 5) No encontrado
         return null;
     }
 

@@ -17,16 +17,16 @@ class DTOsCoverageSweepTest {
     @Test
     void dtos() {
         // Intentamos construir y pasear varios DTOs comunes
-        tryConstructAndExercise("logica.Datatypes.DTDatosUsuario");
-        tryConstructAndExercise("logica.Datatypes.DTEdicion");
-        tryConstructAndExercise("logica.Datatypes.DTEvento");
-        tryConstructAndExercise("logica.Datatypes.DTRegistro");
-        tryConstructAndExercise("logica.Datatypes.DTNivel");
+        tryConstructAndExercise("logica.datatypes.DTDatosUsuario");
+        tryConstructAndExercise("logica.datatypes.DTEdicion");
+        tryConstructAndExercise("logica.datatypes.DTEvento");
+        tryConstructAndExercise("logica.datatypes.DTRegistro");
+        tryConstructAndExercise("logica.datatypes.DTNivel");
 
         // DTCategorias: primero con colección, si no, sin args
-        Object dataCategorias = tryNew("logica.Datatypes.DTCategorias", new Class<?>[]{Collection.class}, List.of("Tec", "Datos"));
+        Object dataCategorias = tryNew("logica.datatypes.DTCategorias", new Class<?>[]{Collection.class}, List.of("Tec", "Datos"));
         if (dataCategorias == null) {
-            dataCategorias = tryNewNoArgs("logica.Datatypes.DTCategorias");
+            dataCategorias = tryNewNoArgs("logica.datatypes.DTCategorias");
         }
         if (dataCategorias != null) {
             ReflectionPojoSupport.exercisePojo(dataCategorias);
