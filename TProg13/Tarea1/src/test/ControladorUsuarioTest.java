@@ -37,7 +37,7 @@ class ControladorUsuarioTest {
     @Test
     @DisplayName("AltaInstitucion y getInstituciones incluyen la institución creada")
     void altaInstitucionYListado() {
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_A", "desc", "web");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_A", "desc", "web");
         Set<String> insts = (Set<String>) TestUtils.tryInvoke(controladorUs, new String[]{"getInstituciones"});
         assertTrue(insts.contains("Inst_A"));
     }
@@ -45,10 +45,13 @@ class ControladorUsuarioTest {
     @Test
     @DisplayName("ingresarOrganizador crea dominio; aparece en listarOrganizadores (por key o por valor)")
     void ingresarOrganizadorYListarOrganizadores() {
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_A", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_A", "d", "w");
 
         Object org = TestUtils.tryInvoke(controladorUs, new String[]{"ingresarOrganizador"},
-                "org1", "Org Uno", "org1@x", "desc", "link");
+        	    "org1", "Org Uno", "org1@x",
+        	    null, null,
+        	    "desc", "link"
+        	);
         assertNotNull(org);
 
         Map<String, Object> orgs = (Map<String, Object>) TestUtils.tryInvoke(controladorUs, new String[]{"listarOrganizadores"});
@@ -67,9 +70,9 @@ class ControladorUsuarioTest {
         }
 
         if (!bandera) {
-            TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
+            TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                     "org1", "Org Uno", "org1@x", "desc", "link",
-                    "Ap", LocalDate.of(1990, 1, 1),  "Inst_A", true);
+                    "Ap", LocalDate.of(1990, 1, 1),  "Inst_A", true, null, null);
 
             orgs = (Map<String, Object>) TestUtils.tryInvoke(controladorUs, new String[]{"listarOrganizadores"});
             bandera = orgs.containsKey("org1");
@@ -81,7 +84,7 @@ class ControladorUsuarioTest {
     @Test
     @DisplayName("ingresarAsistente o AltaUsuario → aparece en listarAsistentes")
     void ingresarAsistenteYListarAsistentes() {
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_A", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_A", "d", "w");
 
         Object inst = DomainAccess.obtenerInstitucion("Inst_A");
         if (inst != null) {
@@ -89,7 +92,7 @@ class ControladorUsuarioTest {
                     "ana", "Ana", "ana@x", "Ap", LocalDate.of(2000, 1, 1), inst);
             assertNotNull(asis);
         } else {
-            TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
+            TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                     "ana", "Ana", "ana@x", "desc", "link",
                     "Ap", LocalDate.of(2000, 1, 1), "Inst_A", false);
         }
@@ -101,15 +104,15 @@ class ControladorUsuarioTest {
     @Test
     @DisplayName("AltaUsuario crea Asistente y Organizador según flag")
     void altaUsuarioAsistenteYOrganizador() {
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_A", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_A", "d", "w");
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "nickA", "Nombre A", "a@x", "descA", "linkA",
                 "ApA", LocalDate.of(1999, 1, 1), "Inst_A", false);
         Map<String, Object> asisMap = (Map<String, Object>) TestUtils.tryInvoke(controladorUs, new String[]{"listarAsistentes"});
         assertTrue(asisMap.containsKey("nickA"));
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "nickO", "Nombre O", "o@x", "descO", "linkO",
                 "ApO", LocalDate.of(1998, 2, 2), "Inst_A", true);
         Map<String, Object> orgs = (Map<String, Object>) TestUtils.tryInvoke(controladorUs, new String[]{"listarOrganizadores"});
@@ -123,16 +126,16 @@ class ControladorUsuarioTest {
     @Test
     @DisplayName("AltaUsuario duplicado → UsuarioYaExisteException")
     void altaUsuarioDuplicado() throws Exception {
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_B", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_B", "d", "w");
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "dup", "Dup", "dup@x", "d", "l",
                 "Ap", LocalDate.of(1997, 3, 3), "Inst_B", false);
 
         Class<? extends Throwable> UYE =
                 (Class<? extends Throwable>) Class.forName("excepciones.UsuarioYaExisteException");
 
-        assertThrows(UYE, () -> TestUtils.invokeUnwrapped(controladorUs, new String[]{"AltaUsuario"},
+        assertThrows(UYE, () -> TestUtils.invokeUnwrapped(controladorUs, new String[]{"altaUsuario"},
                 "dup", "Dup", "dup@x", "d", "l",
                 "Ap", LocalDate.of(1997, 3, 3), "Inst_B", true));
     }
@@ -140,9 +143,9 @@ class ControladorUsuarioTest {
     @Test
     @DisplayName("actualizarAsistente modifica apellido y fecha (sin depender de DomainAccess)")
     void actualizarAsistenteModificaCampos() {
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_C", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_C", "d", "w");
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "beto", "Beto", "b@x", "desc", "link",
                 "Viejo", LocalDate.of(1990, 1, 1), "Inst_C", false);
 
@@ -168,11 +171,11 @@ class ControladorUsuarioTest {
     @Test
     @DisplayName("actualizarOrganizador modifica desc y link")
     void actualizarOrganizadorModificaCampos() {
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_D", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_D", "d", "w");
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "maria", "Maria", "m@x", "desc0", "link0",
-                "Apellido", LocalDate.of(1990, 1, 1), "Inst_D", true);
+                "Apellido", LocalDate.of(1990, 1, 1), "Inst_D", true, null, null);
 
         TestUtils.tryInvoke(controladorUs, new String[]{"actualizarOrganizador"},
                 "maria", "desc1", "link1");
@@ -195,8 +198,8 @@ class ControladorUsuarioTest {
     @Test
     @DisplayName("obtenerDatosUsuario devuelve DTDatosUsuario para nick existente")
     void obtenerDatosUsuarioOk() {
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_E", "d", "w");
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_E", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "luz", "Luz", "l@x", "d", "l",
                 "Ap", LocalDate.of(2001, 7, 7), "Inst_E", false);
 
@@ -208,7 +211,7 @@ class ControladorUsuarioTest {
     @Test
     @DisplayName("listarEdicionesAPartirDeOrganizador(org) no rompe (puede ser vacío)")
     void listarEdicionesAPartirDeOrganizadorOk() throws Exception {
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_F", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_F", "d", "w");
         Object org = TestUtils.tryInvoke(controladorUs, new String[]{"ingresarOrganizador"},
                 "orga", "Or Ga", "oga@x", "d", "l");
 
@@ -216,7 +219,7 @@ class ControladorUsuarioTest {
         try { metodo = controladorUs.getClass().getDeclaredMethod("listarEdicionesAPartirDeOrganizador", org.getClass());
         } catch (NoSuchMethodException ignored) {
             try {
-                Class<?> CUclass = Class.forName("logica.Controladores.ControladorUsuario");
+                Class<?> CUclass = Class.forName("logica.controladores.ControladorUsuario");
                 metodo = CUclass.getDeclaredMethod("listarEdicionesAPartirDeOrganizador", org.getClass());
             } catch (NoSuchMethodException ignored2) { /* nada */ }
         }
@@ -230,20 +233,20 @@ class ControladorUsuarioTest {
     @Test
     @DisplayName("ConsultaUsuario(nick) no lanza excepción")
     void consultaUsuarioNoRompe() {
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_G", "d", "w");
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_G", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "cata", "Cata", "c@x", "d", "l",
                 "Ap", LocalDate.of(2002, 2, 2), "Inst_G", false);
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"ConsultaUsuario"}, "cata");
+        TestUtils.tryInvoke(controladorUs, new String[]{"consultaUsuario"}, "cata");
         assertTrue(true);
     }
 
     @Test
-    @DisplayName("AltaCategoriaSinGUI no rompe y permite agregar categorías base")
+    @DisplayName("altaCategoriaSinGUI no rompe y permite agregar categorías base")
     void altaCategoriaSinGUIOk() {
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaCategoriaSinGUI"}, "Deportes");
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaCategoriaSinGUI"}, "Tecnologia");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaCategoriaSinGUI"}, "Deportes");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaCategoriaSinGUI"}, "Tecnologia");
         assertTrue(true);
     }
 }

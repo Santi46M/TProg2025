@@ -42,7 +42,7 @@ class FabricaSmokeTest {
         // Usuario: debe existir
         Object controladorUs = TestUtils.tryInvoke(fabrica, new String[] { "getIUsuario", "getIControladorUsuario" });
         assertNotNull(controladorUs);
-        Class<?> ICU = Class.forName("logica.Interfaces.IControladorUsuario");
+        Class<?> ICU = Class.forName("logica.interfaces.IControladorUsuario");
         assertTrue(ICU.isAssignableFrom(controladorUs.getClass()), "Debe devolver IControladorUsuario");
 
         // Evento: si no existe en fábrica, NO falla el test
@@ -57,7 +57,7 @@ class FabricaSmokeTest {
         if (controladorEv != null) {
             // Permitimos dos ubicaciones comunes del tipo
             Class<?> ICE;
-            try { ICE = Class.forName("logica.IControladorEvento"); } catch (ClassNotFoundException e) { ICE = Class.forName("logica.Interfaces.IControladorEvento"); }
+            try { ICE = Class.forName("logica.interfaces.IControladorEvento"); } catch (ClassNotFoundException e) { ICE = Class.forName("logica.interfaces.IControladorEvento"); }
             assertTrue(ICE.isAssignableFrom(controladorEv.getClass()), "Debe devolver IControladorEvento");
         }
     }

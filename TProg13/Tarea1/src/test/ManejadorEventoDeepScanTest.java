@@ -1,4 +1,5 @@
 package test;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,9 +11,9 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 @DisplayName("ManejadorEvento – deep scan de estructuras (Map/Collection)")
 class ManejadorEventoDeepScanTest {
@@ -27,30 +28,90 @@ class ManejadorEventoDeepScanTest {
         try { getter = fab.getMethod("getInstance");
         } catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
         Object fabrica = getter.invoke(null);
+
         controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
         try {
-            controladorEv = TestUtils.tryInvoke(fabrica, new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
+            controladorEv = TestUtils.tryInvoke(fabrica, new String[]{
+                    "getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"
+            });
         } catch (AssertionError ignored) {
-            controladorEv = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
+            controladorEv = Class.forName("logica.controladores.ControladorEvento")
+                    .getDeclaredConstructor().newInstance();
         }
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_DS", "d", "w");
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
-                "orgDS", "Org DS", "o@x", "d", "l", " Ap",
-                LocalDate.of(1990, 1, 1), "Inst_DS", true);
+        // Datos base
+        final String INST = "Inst_DS";
+        final String ORG  = "orgDS";
+        final String EVENTO = "DS-Event";
+
+        // Institución + Organizador
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
+                ORG, "Org DS", "o@x", "d", "l", " Ap",
+                LocalDate.of(1990, 1, 1), INST, true, null, null);
+
+        // Categoría (si existe el CU, bien; si no, seguimos)
         try {
-            TestUtils.invokeUnwrapped(controladorEv, new String[]{"AltaCategoria"}, "DS-Cat");
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"altaCategoria"}, "DS-Cat");
         } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException ignored) {
             // método no invocable / falló al ejecutar: seguimos
         }
 
-        Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("DS-Cat"));
-        TestUtils.tryInvoke(controladorEv, new String[]{"AltaEvento"},
-                "DS-Event", "d", LocalDate.now(), "DSEV", cats);
+        // Alta evento (firma típica: String, String, LocalDate, String, DTCategorias, String)
+        Object cats = TestUtils.tolerantNew("logica.datatypes.DTCategorias", List.of("DS-Cat"));
+        TestUtils.tryInvoke(controladorEv, new String[]{"altaEvento"},
+                EVENTO, "d", LocalDate.now(), "DSEV", cats, INST);
+
+        // ----- Preparar OBJETOS para altaEdicionEvento (no Strings) -----
+        Object eventoObj = null, usuarioObj = null;
+
+        // Intento obtener desde el dominio (si tenés helpers)
+        try { eventoObj  = DomainAccess.obtenerEvento(EVENTO); } catch (RuntimeException ignored) {}
+        try { usuarioObj = DomainAccess.obtenerUsuario(ORG);   } catch (RuntimeException ignored) {}
+
+        // Fallback: crear dummies tolerantes SOLO si no se pudieron obtener
+        if (eventoObj == null) {
+            // Constructor real de Eventos:
+            // (String nombre, String sigla, String descripcion, LocalDate fecha,
+            //  Map<String, Categoria> categorias, String imagen)
+            eventoObj = TestUtils.tolerantNew(
+                    "logica.clases.Eventos",
+                    EVENTO,                 // nombre
+                    "DSEV",                 // sigla
+                    "d",                    // descripción
+                    LocalDate.now(),        // fecha
+                    new java.util.HashMap<>(), // categorías vacías
+                    null                    // imagen
+            );
+        } else if (eventoObj == null) {
+            // segundo intento con variante de clase (solo si la anterior no funcionó)
+            eventoObj = TestUtils.tolerantNew(
+                    "logica.clases.Evento", EVENTO, "d", LocalDate.now(), "DSEV"
+            );
+        }
+
+        if (usuarioObj == null) {
+            // como el creado fue organizador, intentamos crear un Organizador que herede de Usuario
+            usuarioObj = TestUtils.tolerantNew(
+                    "logica.clases.Organizador", ORG, "Org DS", "o@x", INST, "d", "l"
+            );
+            if (usuarioObj == null) {
+                // último recurso: Usuario genérico
+                usuarioObj = TestUtils.tolerantNew(
+                        "logica.clases.Usuario", ORG, "Org DS", "o@x"
+                );
+            }
+        }
+
+        // Alta edición: firma real: (Eventos, Usuario, String nombre, String sigla, String desc,
+        // LocalDate inicio, LocalDate fin, LocalDate alta, String ciudad, String pais, String imagen)
         TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
-                "DS-Event", "ED-A", "EDAS", "x",
-                LocalDate.now().plusDays(1), LocalDate.now().plusDays(2), LocalDate.now(),
-                "orgDS", "City", "UY");
+                eventoObj, usuarioObj,
+                "ED-A", "EDAS", "x",
+                LocalDate.now().plusDays(1),
+                LocalDate.now().plusDays(2),
+                LocalDate.now(),
+                "City", "UY", null);
     }
 
     @Test
@@ -72,7 +133,7 @@ class ManejadorEventoDeepScanTest {
                         if (!col.isEmpty()) { sawSomething = true; break; }
                     }
                 } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException ignored) {
-                	 // método no invocable / falló al ejecutar: seguimos con el siguiente
+                    // método no invocable / falló al ejecutar: seguimos con el siguiente
                 }
             }
         }
