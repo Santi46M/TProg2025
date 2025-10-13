@@ -29,14 +29,14 @@ class ControladorUsuarioConsultaPlusTest {
         }
         Object fabrica = getter.invoke(null);
         controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_CUP", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_CUP", "d", "w");
     }
 
     @Test
     @DisplayName("ConsultaUsuario + obtenerDatosUsuario tras varias actualizaciones")
     void consultaYDatos() {
         // alta asistente
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "cupi", "Cu Pi", "cupi@x", "d", "l", "Ap0",
                 LocalDate.of(2000, 1, 1), "Inst_CUP", false);
 
@@ -46,7 +46,7 @@ class ControladorUsuarioConsultaPlusTest {
 
         // llamada a ConsultaUsuario (sea lo que sea que haga, no debería romper)
         assertDoesNotThrow(() ->
-        TestUtils.invokeUnwrapped(controladorUs, new String[]{"ConsultaUsuario"}, "cupi")
+        TestUtils.invokeUnwrapped(controladorUs, new String[]{"consultaUsuario"}, "cupi")
         		);
 
      // obtener datos y verificar cambios
@@ -69,7 +69,7 @@ class ControladorUsuarioConsultaPlusTest {
     @DisplayName("Cambiar a organizador y actualizarOrganizador")
     void cambioYUpdateOrganizador() {
         // alta como organizador
-        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "orgx", "Org X" , "orgx@x", "d0", "l0", "Ap",
                 LocalDate.of(1990, 1, 1), "Inst_CUP", true);
 
