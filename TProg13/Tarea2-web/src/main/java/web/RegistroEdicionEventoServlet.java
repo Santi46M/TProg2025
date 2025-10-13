@@ -128,11 +128,13 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
 
             if (patrocinios != null) {
                 for (Patrocinio p : patrocinios) {
-                    if (p != null && p.getCodigoPatrocinio() != null &&
-                        p.getCodigoPatrocinio().equalsIgnoreCase(codigoPatrocinio)) {
-                        valido = true;
-                        break;
-                    }
+                	if (p != null && p.getCodigoPatrocinio() != null &&
+                		    p.getCodigoPatrocinio().equalsIgnoreCase(codigoPatrocinio) &&
+                		    p.getTipoRegistro() != null &&
+                		    p.getTipoRegistro().getNombre().equalsIgnoreCase(tipoNom)) {
+                		    valido = true;
+                		    break;
+                		}
                 }
             }
 
@@ -162,8 +164,7 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             ed.agregarRegistro(idRegistro, nuevo);
             asistente.addRegistro(idRegistro, nuevo);
 
-            req.setAttribute("mensaje", "Inscripción realizada correctamente.");
-            req.getRequestDispatcher(JSP_OK).forward(req, resp);
+            resp.sendRedirect(req.getContextPath() + "/inicio");
 
         } catch (Exception e) {
             e.printStackTrace();

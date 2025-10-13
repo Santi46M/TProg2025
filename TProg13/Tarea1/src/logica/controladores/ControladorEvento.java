@@ -300,7 +300,7 @@ public class ControladorEvento implements IControladorEvento {
             if (yaRegistrado) {
                 throw new RuntimeException("El usuario ya está registrado a esta edición.");
             }
-            if (cantidadRegistrados >= tipoRegistro.getCupo()) {
+            if (cantidadRegistrados > tipoRegistro.getCupo()) {
                 throw new excepciones.CupoTipoRegistroInvalidoException(tipoRegistro.getCupo());
             }
             Registro nuevoRegistro = new Registro(idRegistro, usuario, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio);
