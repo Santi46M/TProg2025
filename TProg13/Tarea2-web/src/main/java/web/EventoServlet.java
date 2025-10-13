@@ -35,8 +35,8 @@ public class EventoServlet extends HttpServlet {
   private static final String JSP_REGISTRO = "/WEB-INF/evento/RegistrarseEvento.jsp";
   private static final String JSP_LISTAR   = "/WEB-INF/evento/listado.jsp";
 
-  // Guardaremos en /img/eventos
-  private static final String IMG_REL_BASE = "/eventos";
+  // Carpeta pública donde se guardan las imágenes NUEVAS (URL pública: <ctx>/eventos/archivo.ext)
+  private static final String IMG_REL_BASE_EVENTO = "/eventos";
 
   // ===== Lógica =====
   private final IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
@@ -49,8 +49,8 @@ public class EventoServlet extends HttpServlet {
     req.setCharacterEncoding("UTF-8");
     String path = req.getPathInfo(); // puede ser null
 
+    // Consulta de evento (?nombre=...)
     if (path == null || "/".equals(path) || "/ConsultaEvento".equals(path)) {
-      // Consulta por NOMBRE (query param ?nombre=...)
       String nombre = trim(req.getParameter("nombre"));
       if (isBlank(nombre)) {
         resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Falta parámetro 'nombre'");
@@ -62,15 +62,46 @@ public class EventoServlet extends HttpServlet {
         return;
       }
 
-      // ---- preparar atributos planos para el JSP ----
+      // Datos básicos
       req.setAttribute("evNombre", safe(() -> e.getNombre()));
       req.setAttribute("evSigla",  safe(() -> e.getSigla()));
       req.setAttribute("evDesc",   safe(() -> e.getDescripcion()));
       req.setAttribute("evFecha",  formatFecha(safeObj(() -> e.getFecha())));
       req.setAttribute("evCategorias", categoriasALista(safeObj(() -> e.getCategorias())));
-      req.setAttribute("evImagen", safe(() -> e.getImagen())); // campo imagen en tu entidad
 
-      // Obtener ediciones asociadas al evento
+      // ===== IMAGEN (misma estrategia que en Edición) =====
+      // La entidad guarda SOLO el nombre de archivo (p.ej. "myevento.jpg")
+      String imgName = null;
+      try { imgName = e.getImagen(); } catch (Exception ignore) {}
+
+      String imgUrl = null;
+      String ctxPath = ctx(req);
+
+      if (imgName != null && !imgName.isBlank()) {
+        // Candidatos en orden: estático primero (/img/<archivo>), luego subidas (/eventos/<archivo>)
+        String[] candidates = new String[] {
+          "/img/" + imgName,
+          IMG_REL_BASE_EVENTO + "/" + imgName
+        };
+        for (String rel : candidates) {
+          String abs = getServletContext().getRealPath(rel);
+          boolean exists;
+          if (abs != null) {
+            exists = java.nio.file.Files.exists(java.nio.file.Path.of(abs));
+          } else {
+            // En algunos runtimes getRealPath() puede dar null (exploded=false). No bloqueamos.
+            exists = true;
+          }
+          if (exists) { imgUrl = ctxPath + rel; break; }
+        }
+      }
+
+      if (imgUrl != null) {
+        req.setAttribute("evImagenUrl", imgUrl);       // URL ya resuelta para <img src=...>
+      }
+      req.setAttribute("evImagenNombre", imgName);     // por si lo querés mostrar en algún lado
+
+      // Ediciones del evento
       List<String> nombresEdiciones = ce.listarEdicionesEvento(nombre);
       List<DTEdicion> ediciones = new ArrayList<>();
       if (nombresEdiciones != null) {
@@ -85,6 +116,7 @@ public class EventoServlet extends HttpServlet {
       return;
     }
 
+    // Rutas específicas
     switch (path) {
       case "/alta": {
         if (!requiereOrganizador(req, resp)) return;
@@ -126,10 +158,10 @@ public class EventoServlet extends HttpServlet {
     req.setCharacterEncoding("UTF-8");
     String path = req.getPathInfo();
 
+    // Alta de evento (con imagen opcional)
     if ("/alta".equals(path)) {
       if (!requiereOrganizador(req, resp)) return;
 
-      // Con @MultipartConfig, getParameter funciona en multipart
       String nombre = trim(req.getParameter("nombre"));
       String desc   = trim(req.getParameter("desc"));
       String sigla  = trim(req.getParameter("sigla"));
@@ -148,8 +180,8 @@ public class EventoServlet extends HttpServlet {
         return;
       }
 
-      // Manejo de la imagen (opcional) — ahora guardamos en /img/eventos
-      String imagenRelPath = null; // p.ej. "/img/eventos/MISIGLA.jpg"
+      // Subida de imagen: guardamos físicamente en /eventos y persistimos SOLO el nombre
+      String imagenFileName = null;
       try {
         Part imgPart = null;
         try { imgPart = req.getPart("imagen"); } catch (IllegalStateException ise) { imgPart = null; }
@@ -162,27 +194,28 @@ public class EventoServlet extends HttpServlet {
             return;
           }
 
-          // Carpeta física de /img/eventos dentro de la webapp
-          String baseImg = getServletContext().getRealPath(IMG_REL_BASE);
+          // Ruta física de /eventos dentro de la webapp
+          String baseImg = getServletContext().getRealPath(IMG_REL_BASE_EVENTO);
           if (baseImg == null) {
-            System.err.println("WARN: getRealPath('" + IMG_REL_BASE + "') es null; no se guardará la imagen en la webapp.");
-          } else {
+            String root = getServletContext().getRealPath("/");
+            if (root != null) baseImg = Path.of(root, "eventos").toString();
+          }
+
+          if (baseImg != null) {
             Files.createDirectories(Path.of(baseImg));
 
             String original = getSafeFilename(imgPart);
             String ext = getExtension(original);
-            if (isBlank(ext)) ext = guessExtensionFromContentType(ctype);
-            if (isBlank(ext)) ext = ".bin";
+            if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
+            if (ext == null || ext.isBlank()) ext = ".jpg"; // fallback
 
-            // Si querés reemplazar siempre por sigla: mismo nombre; si querés evitar colisiones, agregá timestamp.
             String finalName = (isBlank(sigla) ? "evento" : sigla) + ext;
-            // Alternativa para evitar choque: 
-            // String finalName = (isBlank(sigla) ? "evento" : sigla) + "-" + System.currentTimeMillis() + ext;
-
             Path destino = Path.of(baseImg, finalName);
             imgPart.write(destino.toAbsolutePath().toString());
 
-            imagenRelPath = IMG_REL_BASE + "/" + finalName; // usable desde el JSP: <img src="${ctx}${evImagen}">
+            imagenFileName = finalName; // persistimos solo el NOMBRE
+          } else {
+            System.err.println("WARN: No se pudo resolver ruta física para " + IMG_REL_BASE_EVENTO);
           }
         }
       } catch (Exception fileEx) {
@@ -191,17 +224,16 @@ public class EventoServlet extends HttpServlet {
         return;
       }
 
-      // Crear DTCategorias
+      // Crear DTCategorias y dar de alta
       DTCategorias dtCategorias = new DTCategorias(categoriasList);
 
       try {
-        // Alta del evento
         ce.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
 
-        // Asociar imagen al evento (si se subió y se pudo guardar)
-        if (imagenRelPath != null) {
+        // Asociar imagen (si se subió)
+        if (imagenFileName != null) {
           try {
-            ce.actualizarImagenEvento(nombre, imagenRelPath);
+            ce.actualizarImagenEvento(nombre, imagenFileName); // contrato: guardamos SOLO nombre
           } catch (IllegalArgumentException ex) {
             System.err.println("No se pudo asociar imagen al evento: " + ex.getMessage());
           }
@@ -217,6 +249,7 @@ public class EventoServlet extends HttpServlet {
       return;
     }
 
+    // Redirección desde "RegistrarseEvento" (usa consulta)
     if ("/RegistrarseEvento".equals(path)) {
       if (!requiereLogin(req, resp)) return;
 
