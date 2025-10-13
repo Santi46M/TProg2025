@@ -45,7 +45,7 @@
     <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
     <!-- Contenido principal -->
-    <main class="container consulta-evento-main" style="flex:2; min-width:0;">
+    <main class="container consulta-evento-main" style="flex:2; min-width:0; padding: 15px; line-height: 2 ">
       <section class="event-card">
         <div class="event-hero">
           <div class="event-hero__img">

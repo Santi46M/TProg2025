@@ -16,12 +16,12 @@ String ctx = request.getContextPath();
 <jsp:include page="/WEB-INF/templates/header.jsp" />
 <div class="container row" style="margin-top:1rem; display: flex; align-items: flex-start;">
   <jsp:include page="/WEB-INF/templates/menu.jsp" />
-  <main class="container consulta-layout" style="flex:2; min-width:0;">
+  <main class="container consulta-layout" style="flex:2; min-width:0;display :flow">
     <section class="event-card">
       <div class="event-header">
         <h1 class="event-title">Tipo de Registro: <%= (tipoRegistro != null ? tipoRegistro.getNombre() : "Tipo de Registro") %></h1>
       </div>
-      <div class="event-info">
+      <div class="event-info" style="padding:15px;">
         <% if (tipoRegistro != null) { %>
           <div class="event-meta"><strong>Descripción:</strong> <%= tipoRegistro.getDescripcion() %></div>
           <div class="event-meta"><strong>Costo:</strong> <%= tipoRegistro.getCosto() %></div>

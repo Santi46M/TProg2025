@@ -105,7 +105,7 @@
         </div>
 
         <!-- INFO -->
-        <div class="event-info event-text">
+        <div class="event-info event-text" style="padding: 15px; line-height: 2 ">
           <h3>Datos de la Edición</h3>
           <% if (edicion != null) { %>
             <div class="event-meta"><strong>Evento:</strong> <%= edicion.getEvento().getNombre() %></div>
