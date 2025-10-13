@@ -590,7 +590,7 @@ public class CargaDatosPrueba {
             20000,
             LocalDate.of(2025, 8, 21),
             4,
-            "TECHFING"
+            "TECHUDELAR"
         );
 
         controladorEve.altaPatrocinio(
