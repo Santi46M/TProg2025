@@ -13,27 +13,10 @@ String ctx = request.getContextPath();
   <link rel="stylesheet" href="<%=ctx%>/css/ConsultaPatrocinio.css">
 </head>
 <body>
-<header class="site-header">
-  <div class="container">
-    <a class="brand" href="<%=ctx%>/inicio">Eventos.uy</a>
-    <nav class="main-nav">
-      <form class="search" action="<%=ctx%>/buscar" method="get" role="search" aria-label="Buscar">
-        <input class="search-input" type="search" name="q" placeholder="Eventos, Ediciones">
-        <button class="btn" type="submit">Buscar</button>
-      </form>
-    </nav>
-    <nav class="user-nav" id="userNav">
-      <% if (nick == null) { %>
-        <a class="btn ghost" href="<%=ctx%>/auth/login"><i class='bx bxs-user'></i> Iniciar sesión</a>
-      <% } else { %>
-        <span class="user-chip"><i class='bx bxs-user'></i> <%= nick %></span>
-        <a class="btn ghost" href="<%=ctx%>/auth/logout"><i class='bx bx-log-out'></i> Cerrar sesión</a>
-      <% } %>
-    </nav>
-  </div>
-</header>
-<div class="container row" style="margin-top:1rem;">
-  <main class="container consulta-layout">
+<jsp:include page="/WEB-INF/templates/header.jsp" />
+<div class="container row layout-inicio">
+  <jsp:include page="/WEB-INF/templates/menu.jsp" />
+  <main class="main-inicio">
     <section class="event-card">
       <div class="event-header">
         <h1 class="event-title">Patrocinio: <%= (patrocinio != null ? patrocinio.getCodigoPatrocinio() : "Patrocinio") %></h1>

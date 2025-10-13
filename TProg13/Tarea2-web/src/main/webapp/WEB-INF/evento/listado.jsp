@@ -73,11 +73,11 @@ String ctx = request.getContextPath();
             <% } %>
 
             <div class="event-footer">
-              <span class="event-meta"><!-- espacio para fecha/meta si querés --></span>
-              <a class="btn"
-                 href="<%=ctx%>/evento/ConsultaEvento?nombre=<%= URLEncoder.encode(nombre, StandardCharsets.UTF_8.name()) %>">
-                Ver detalle
-              </a>
+              <span class="event-meta"></span>
+              <form action="<%=ctx%>/evento/ConsultaEvento" method="get" style="display:inline;">
+                <input type="hidden" name="nombre" value="<%= nombre %>" />
+                <button type="submit" class="btn">Ver detalle</button>
+              </form>
             </div>
           </article>
         <% } %>
