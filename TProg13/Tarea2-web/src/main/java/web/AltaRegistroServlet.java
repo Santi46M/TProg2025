@@ -35,8 +35,8 @@ public class AltaRegistroServlet extends HttpServlet {
 
         if (path == null || "/".equals(path) || "/alta".equals(path)) {
             if (!requiereOrganizador(req, resp)) return;
-            HttpSession s = req.getSession(false);
-            String nick = s == null ? null : (String) s.getAttribute("nick");
+            HttpSession sAux = req.getSession(false);
+            String nick = sAux == null ? null : (String) sAux.getAttribute("nick");
             List<Ediciones> ediciones = new ArrayList<>();
             if (nick != null) {
                 // Solo ediciones organizadas por el usuario logueado
@@ -44,9 +44,9 @@ public class AltaRegistroServlet extends HttpServlet {
                 for (String nombreEvento : eventosConEdiciones) {
                     List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
                     for (String nomEd : nombresEd) {
-                        Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);
-                        if (ed != null && ed.getOrganizador() != null && ed.getOrganizador().getNickname().equals(nick)) {
-                            ediciones.add(ed);
+                        Ediciones edicionIter = ce().obtenerEdicion(nombreEvento, nomEd);
+                        if (edicionIter != null && edicionIter.getOrganizador() != null && edicionIter.getOrganizador().getNickname().equals(nick)) {
+                            ediciones.add(edicionIter);
                         }
                     }
                 }
@@ -93,18 +93,18 @@ public class AltaRegistroServlet extends HttpServlet {
             try {
                 float costo = Float.parseFloat(costoStr);
                 int cupo = Integer.parseInt(cupoStr);
-                Ediciones ed = ce().obtenerEdicionPorSigla(siglaEdicion);
-                if (ed == null) {
+                Ediciones edicionIter = ce().obtenerEdicionPorSigla(siglaEdicion);
+                if (edicionIter == null) {
                     req.setAttribute("error", "No se encontró la edición seleccionada.");
                     recargarDatos(req);
                     req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                     return;
                 }
-                ce().altaTipoRegistro(ed, nombre, descripcion, costo, cupo);
+                ce().altaTipoRegistro(edicionIter, nombre, descripcion, costo, cupo);
                 // Redirección igual que en alta evento
-                String evento = ed.getEvento().getNombre();
+                String evento = edicionIter.getEvento().getNombre();
                 String eventoEnc = java.net.URLEncoder.encode(evento, java.nio.charset.StandardCharsets.UTF_8.name());
-                String edicionEnc = java.net.URLEncoder.encode(ed.getNombre(), java.nio.charset.StandardCharsets.UTF_8.name());
+                String edicionEnc = java.net.URLEncoder.encode(edicionIter.getNombre(), java.nio.charset.StandardCharsets.UTF_8.name());
                 String tipoEnc = java.net.URLEncoder.encode(nombre, java.nio.charset.StandardCharsets.UTF_8.name());
                 resp.sendRedirect(ctx(req) + "/registro/ConsultaTipoRegistro?evento=" + eventoEnc + "&edicion=" + edicionEnc + "&tipoRegistro=" + tipoEnc);
                 return;
@@ -120,8 +120,8 @@ public class AltaRegistroServlet extends HttpServlet {
     }
 
     private void recargarDatos(HttpServletRequest req) {
-        HttpSession s = req.getSession(false);
-        String nick = s == null ? null : (String) s.getAttribute("nick");
+        HttpSession sAux = req.getSession(false);
+        String nick = sAux == null ? null : (String) sAux.getAttribute("nick");
         List<Ediciones> ediciones = new ArrayList<>();
         if (nick != null) {
             List<DTEvento> eventos = ce().listarEventos();
@@ -129,9 +129,9 @@ public class AltaRegistroServlet extends HttpServlet {
                 String nombreEvento = evento.getNombre();
                 List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
                 for (String nomEd : nombresEd) {
-                    Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);
-                    if (ed != null && ed.getOrganizador() != null && ed.getOrganizador().getNickname().equals(nick)) {
-                        ediciones.add(ed);
+                    Ediciones edicionIter = ce().obtenerEdicion(nombreEvento, nomEd);
+                    if (edicionIter != null && edicionIter.getOrganizador() != null && edicionIter.getOrganizador().getNickname().equals(nick)) {
+                        ediciones.add(edicionIter);
                     }
                 }
             }
@@ -140,8 +140,8 @@ public class AltaRegistroServlet extends HttpServlet {
     }
 
     private boolean requiereOrganizador(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        HttpSession s = req.getSession(false);
-        String rol = s == null ? null : (String) s.getAttribute("rol");
+        HttpSession sAux = req.getSession(false);
+        String rol = sAux == null ? null : (String) sAux.getAttribute("rol");
         if (!"ORGANIZADOR".equals(rol)) {
             resp.sendRedirect(ctx(req) + "/auth/login");
             return false;
@@ -149,11 +149,11 @@ public class AltaRegistroServlet extends HttpServlet {
         return true;
     }
 
-    private static String trim(String s) {
-        return s == null ? null : s.trim();
+    private static String trim(String sAux) {
+        return sAux == null ? null : sAux.trim();
     }
 
-    private static boolean isBlank(String s) {
-        return s == null || s.trim().isEmpty();
+    private static boolean isBlank(String sAux) {
+        return sAux == null || sAux.trim().isEmpty();
     }
 }

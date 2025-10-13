@@ -14,15 +14,15 @@ import logica.clases.Usuario;
 public class LoginServlet extends HttpServlet {
 
     private static final String JSP_LOGIN = "/WEB-INF/auth/login.jsp";
-    private final IControladorUsuario cu = fabrica.getInstance().getIControladorUsuario();
+    private final IControladorUsuario controladorUser = fabrica.getInstance().getIControladorUsuario();
 
     private String ctx(HttpServletRequest req) {
         return req.getContextPath();
     }
 
     private void cargarInstituciones(HttpServletRequest req) {
-        IControladorUsuario cu = fabrica.getInstance().getIControladorUsuario();
-        Collection<String> instituciones = cu.getInstituciones();
+        IControladorUsuario controladorUs = fabrica.getInstance().getIControladorUsuario();
+        Collection<String> instituciones = controladorUs.getInstituciones();
         req.setAttribute("instituciones", instituciones);
     }
 
@@ -37,8 +37,8 @@ public class LoginServlet extends HttpServlet {
         }
 
         if ("/auth/logout".equals(path)) {
-            HttpSession s = req.getSession(false);
-            if (s != null) s.invalidate();
+            HttpSession sAux = req.getSession(false);
+            if (sAux != null) sAux.invalidate();
             resp.sendRedirect(ctx(req) + "/inicio");
             return;
         }
@@ -67,7 +67,7 @@ public class LoginServlet extends HttpServlet {
         String nick = nickOrEmail.trim();
 
         // ✅ Validación con la lógica
-        boolean valido = cu.validarLogin(nick, pass);
+        boolean valido = controladorUser.validarLogin(nick, pass);
 
         if (!valido) {
             req.setAttribute("estado_sesion", "LOGIN_INCORRECTO");
@@ -77,7 +77,7 @@ public class LoginServlet extends HttpServlet {
         }
 
         // ✅ Login correcto
-        Map<String, Usuario> usuarios = cu.listarUsuarios();
+        Map<String, Usuario> usuarios = controladorUser.listarUsuarios();
         Usuario usr = usuarios.get(nick);
 
         // Buscar por correo si no se encontró
@@ -97,20 +97,20 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        String rol = cu.esAsistente(nick) ? "ASISTENTE" : "ORGANIZADOR";
+        String rol = controladorUser.esAsistente(nick) ? "ASISTENTE" : "ORGANIZADOR";
 
-        HttpSession s = req.getSession(true);
-        s.setAttribute("usuario_logueado", usr);
-        s.setAttribute("nick", nick);
-        s.setAttribute("rol", rol);
-        s.setAttribute("estado_sesion", "LOGIN_CORRECTO");
+        HttpSession sAux = req.getSession(true);
+        sAux.setAttribute("usuario_logueado", usr);
+        sAux.setAttribute("nick", nick);
+        sAux.setAttribute("rol", rol);
+        sAux.setAttribute("estado_sesion", "LOGIN_CORRECTO");
 
         // 🧩 --- DEBUG DE SESIÓN ---
 
-        java.util.Enumeration<String> names = s.getAttributeNames();
+        java.util.Enumeration<String> names = sAux.getAttributeNames();
         while (names.hasMoreElements()) {
             String name = names.nextElement();
-            Object val = s.getAttribute(name);
+            Object val = sAux.getAttribute(name);
             
         }
         // ----------------------------

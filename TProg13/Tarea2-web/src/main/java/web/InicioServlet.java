@@ -24,8 +24,8 @@ public class InicioServlet extends HttpServlet {
       throws ServletException, IOException {
 
     System.out.println("✅ Entró al InicioServlet");
-    IControladorEvento ce = ce();
-    List<DTEvento> eventos = ce.listarEventos();
+    IControladorEvento controladorEv = ce();
+    List<DTEvento> eventos = controladorEv.listarEventos();
     System.out.println("Eventos listados: " + (eventos != null ? eventos.size() : "null"));
 
     if (eventos == null || eventos.isEmpty()) {
@@ -48,8 +48,8 @@ public class InicioServlet extends HttpServlet {
         // 2) si no vino en el DTO, consultar el evento completo
         if (raw == null || raw.isBlank()) {
           try {
-            Eventos ev = ce.consultaEvento(nombre);
-            if (ev != null) raw = ev.getImagen();
+            Eventos eventIter = controladorEv.consultaEvento(nombre);
+            if (eventIter != null) raw = eventIter.getImagen();
           } catch (Exception ex) { /* noop */ }
         }
 

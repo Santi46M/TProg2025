@@ -38,7 +38,7 @@ public class EventoServlet extends HttpServlet {
   // Carpeta pública para imágenes (URL: <ctx>/eventos/archivo.ext)
   private static final String IMG_REL_BASE = "/eventos";
 
-  private final IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
+  private final IControladorEvento controladorEv = fabrica.getInstance().getIControladorEvento();
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
   @Override
@@ -53,21 +53,21 @@ public class EventoServlet extends HttpServlet {
         resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Falta parámetro 'nombre'");
         return;
       }
-      Eventos e = ce.consultaEvento(nombre);
-      if (e == null) {
+      Eventos eventIter = controladorEv.consultaEvento(nombre);
+      if (eventIter == null) {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Evento no encontrado: " + nombre);
         return;
       }
 
       // Atributos base para JSP
-      req.setAttribute("evNombre", safe(() -> e.getNombre()));
-      req.setAttribute("evSigla",  safe(() -> e.getSigla()));
-      req.setAttribute("evDesc",   safe(() -> e.getDescripcion()));
-      req.setAttribute("evFecha",  formatFecha(safeObj(() -> e.getFecha())));
-      req.setAttribute("evCategorias", categoriasALista(safeObj(() -> e.getCategorias())));
+      req.setAttribute("evNombre", safe(() -> eventIter.getNombre()));
+      req.setAttribute("evSigla",  safe(() -> eventIter.getSigla()));
+      req.setAttribute("evDesc",   safe(() -> eventIter.getDescripcion()));
+      req.setAttribute("evFecha",  formatFecha(safeObj(() -> eventIter.getFecha())));
+      req.setAttribute("evCategorias", categoriasALista(safeObj(() -> eventIter.getCategorias())));
 
       // === Imagen: resolver URL final igual que en Inicio ===
-      String raw = e.getImagen(); // puede ser "archivo.jpg" o "/img/archivo.jpg" o "/eventos/archivo.jpg" o URL absoluta
+      String raw = eventIter.getImagen(); // puede ser "archivo.jpg" o "/img/archivo.jpg" o "/eventos/archivo.jpg" o URL absoluta
       req.setAttribute("evImagen", raw); // compat por si alguna JSP lo usa así
 
       String imgUrl = null;
@@ -107,8 +107,8 @@ public class EventoServlet extends HttpServlet {
       try {
         List<DTEdicion> ediciones = new ArrayList<>();
 
-        if (e.getEdiciones() != null && !e.getEdiciones().isEmpty()) {
-          for (Ediciones ed : e.getEdiciones().values()) {
+        if (eventIter.getEdiciones() != null && !eventIter.getEdiciones().isEmpty()) {
+          for (Ediciones ed : eventIter.getEdiciones().values()) {
             String organizadorNick = null;
             if (ed.getOrganizador() != null) {
               organizadorNick = ed.getOrganizador().getNickname();
@@ -158,10 +158,10 @@ public class EventoServlet extends HttpServlet {
 
         List<DTEvento> lista;
         if (!isBlank(cat)) {
-          lista = ce.listarEventosPorCategoria(cat);
+          lista = controladorEv.listarEventosPorCategoria(cat);
           req.setAttribute("categoriaSeleccionada", cat);
         } else {
-          lista = ce.listarEventos();
+          lista = controladorEv.listarEventos();
         }
 
         List<String> categorias = ControladorEvento.listarCategorias();
@@ -199,9 +199,9 @@ public class EventoServlet extends HttpServlet {
 
       List<String> categoriasList = new ArrayList<>();
       if (!isBlank(cats)) {
-        for (String c : cats.split(",")) {
-          String t = c.trim();
-          if (!t.isEmpty()) categoriasList.add(t);
+        for (String cAux : cats.split(",")) {
+          String tAux = cAux.trim();
+          if (!tAux.isEmpty()) categoriasList.add(tAux);
         }
       }
       if (categoriasList.isEmpty()) {
@@ -257,11 +257,11 @@ public class EventoServlet extends HttpServlet {
       DTCategorias dtCategorias = new DTCategorias(categoriasList);
 
       try {
-        ce.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
+        controladorEv.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
 
         if (imagenFileName != null) {
           try {
-            ce.actualizarImagenEvento(nombre, imagenFileName);
+            controladorEv.actualizarImagenEvento(nombre, imagenFileName);
           } catch (IllegalArgumentException ex) {
             System.err.println("No se pudo asociar imagen al evento: " + ex.getMessage());
           }
@@ -295,8 +295,8 @@ public class EventoServlet extends HttpServlet {
   }
 
   private boolean requiereOrganizador(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    HttpSession s = req.getSession(false);
-    String rol = s == null ? null : (String) s.getAttribute("rol");
+    HttpSession sAux = req.getSession(false);
+    String rol = sAux == null ? null : (String) sAux.getAttribute("rol");
     if (!"ORGANIZADOR".equals(rol)) {
       resp.sendRedirect(ctx(req) + "/auth/login");
       return false;
@@ -305,37 +305,37 @@ public class EventoServlet extends HttpServlet {
   }
 
   private boolean requiereLogin(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    HttpSession s = req.getSession(false);
-    if (s == null || s.getAttribute("nick") == null) {
+    HttpSession sAux = req.getSession(false);
+    if (sAux == null || sAux.getAttribute("nick") == null) {
       resp.sendRedirect(ctx(req) + "/auth/login");
       return false;
     }
     return true;
   }
 
-  private static String trim(String s){ return s == null ? null : s.trim(); }
-  private static boolean isBlank(String s){ return s == null || s.trim().isEmpty(); }
+  private static String trim(String sAux){ return sAux == null ? null : sAux.trim(); }
+  private static boolean isBlank(String sAux){ return sAux == null || sAux.trim().isEmpty(); }
 
   @FunctionalInterface
   private interface SCall { Object get() throws Exception; }
 
-  private String safe(SCall c) {
-    try { Object v = c.get(); return v == null ? null : v.toString(); }
+  private String safe(SCall cAux) {
+    try { Object vAux = cAux.get(); return vAux == null ? null : vAux.toString(); }
     catch (Exception e) { return null; }
   }
 
-  private Object safeObj(SCall c) {
-    try { return c.get(); } catch (Exception e) { return null; }
+  private Object safeObj(SCall cAux) {
+    try { return cAux.get(); } catch (Exception e) { return null; }
   }
 
-  private String extractNombre(Object o) {
-    if (o == null) return "—";
+  private String extractNombre(Object oAux) {
+    if (oAux == null) return "—";
     try {
-      var m = o.getClass().getMethod("getNombre");
-      Object v = m.invoke(o);
-      return v == null ? "—" : v.toString();
+      var mAux = oAux.getClass().getMethod("getNombre");
+      Object vAux = mAux.invoke(oAux);
+      return vAux == null ? "—" : vAux.toString();
     } catch (Exception ignore) { }
-    return o.toString();
+    return oAux.toString();
   }
 
   private List<String> categoriasALista(Object cobj) {
@@ -343,9 +343,9 @@ public class EventoServlet extends HttpServlet {
     if (cobj == null) return out;
 
     try {
-      if (cobj instanceof java.util.Map<?,?> m) {
-        for (Object k : m.keySet()) if (k != null) out.add(k.toString());
-        if (out.isEmpty()) for (Object v : m.values()) out.add(extractNombre(v));
+      if (cobj instanceof java.util.Map<?,?> mAux) {
+        for (Object kAux : mAux.keySet()) if (kAux != null) out.add(kAux.toString());
+        if (out.isEmpty()) for (Object v : mAux.values()) out.add(extractNombre(v));
         return out;
       }
       if (cobj instanceof java.util.Collection<?> col) {
@@ -353,13 +353,13 @@ public class EventoServlet extends HttpServlet {
         return out;
       }
       if (cobj.getClass().isArray()) {
-        int n = java.lang.reflect.Array.getLength(cobj);
-        for (int i=0;i<n;i++) out.add(extractNombre(java.lang.reflect.Array.get(cobj,i)));
+        int nAux = java.lang.reflect.Array.getLength(cobj);
+        for (int i=0;i<nAux;i++) out.add(extractNombre(java.lang.reflect.Array.get(cobj,i)));
         return out;
       }
-      if (cobj instanceof String s) {
-        for (String p : s.split("[,;]")) {
-          String t = p.trim(); if (!t.isEmpty()) out.add(t);
+      if (cobj instanceof String sAux) {
+        for (String pAux : sAux.split("[,;]")) {
+          String tAux = pAux.trim(); if (!tAux.isEmpty()) out.add(tAux);
         }
         return out;
       }
@@ -368,25 +368,25 @@ public class EventoServlet extends HttpServlet {
     return out;
   }
 
-  private String formatFecha(Object f) {
-    if (f == null) return null;
+  private String formatFecha(Object fAux) {
+    if (fAux == null) return null;
     try {
-      if (f instanceof java.time.LocalDate ld) {
-        return ld.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+      if (fAux instanceof java.time.LocalDate ident) {
+        return ident.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
       }
-      if (f instanceof java.time.LocalDateTime ldt) {
-        return ldt.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
+      if (fAux instanceof java.time.LocalDateTime ident2) {
+        return ident2.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"));
       }
-      if (f instanceof java.util.Date d) {
-        return new java.text.SimpleDateFormat("dd/MM/yyyy").format(d);
+      if (fAux instanceof java.util.Date dateAux) {
+        return new java.text.SimpleDateFormat("dd/MM/yyyy").format(dateAux);
       }
     } catch (Exception ignore) {}
-    return f.toString();
+    return fAux.toString();
   }
 
   // ====== helpers de archivo ======
-  private static String getSafeFilename(Part p) {
-    String name = p.getSubmittedFileName();
+  private static String getSafeFilename(Part partAux) {
+    String name = partAux.getSubmittedFileName();
     if (name == null) return "archivo";
     name = name.replace("\\", "/");
     int slash = name.lastIndexOf('/');

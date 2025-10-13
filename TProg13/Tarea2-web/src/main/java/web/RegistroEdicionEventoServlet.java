@@ -42,12 +42,12 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             if (nombresEd == null) continue;
 
             for (String nomEd : nombresEd) {
-                Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);
-                if (ed != null && ed.getEstado() == DTEstado.Aceptada) {
-                    edicionesAceptadas.add(ed);
+                Ediciones edicionIter = ce().obtenerEdicion(nombreEvento, nomEd);
+                if (edicionIter != null && edicionIter.getEstado() == DTEstado.Aceptada) {
+                    edicionesAceptadas.add(edicionIter);
                     edicionesPorEvento
                         .computeIfAbsent(nombreEvento, k -> new ArrayList<>())
-                        .add(ed);
+                        .add(edicionIter);
                 }
             }
         }
@@ -64,8 +64,8 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         if (!requiereAsistente(req, resp)) return;
 
         String siglaEdicion = trim(req.getParameter("edicion"));
-        HttpSession s = req.getSession(false);
-        String nick = (s == null) ? null : (String) s.getAttribute("nick");
+        HttpSession sAux = req.getSession(false);
+        String nick = (sAux == null) ? null : (String) sAux.getAttribute("nick");
 
         if (isBlank(siglaEdicion) || isBlank(nick)) {
             req.setAttribute("error", "Debe seleccionar una edición aceptada.");
@@ -75,8 +75,8 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         }
 
         try {
-            Ediciones ed = ce().obtenerEdicionPorSigla(siglaEdicion);
-            if (ed == null || ed.getEstado() != DTEstado.Aceptada) {
+            Ediciones edicionIter = ce().obtenerEdicionPorSigla(siglaEdicion);
+            if (edicionIter == null || edicionIter.getEstado() != DTEstado.Aceptada) {
                 req.setAttribute("error", "La edición seleccionada no está aceptada.");
                 recargarDatos(req);
                 req.getRequestDispatcher(JSP_INSCRIPCION).forward(req, resp);
@@ -91,11 +91,11 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
                 return;
             }
 
-            Eventos evento = ed.getEvento();
+            Eventos evento = edicionIter.getEvento();
 
             // Primer tipo disponible
             TipoRegistro tipoRegistro = null;
-            Collection<TipoRegistro> tipos = ed.getTiposRegistro();
+            Collection<TipoRegistro> tipos = edicionIter.getTiposRegistro();
             if (tipos != null && !tipos.isEmpty()) {
                 tipoRegistro = tipos.iterator().next();
             }
@@ -110,22 +110,22 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             String idRegistro = UUID.randomUUID().toString();
             LocalDate fechaRegistro = LocalDate.now();
             float costo = tipoRegistro.getCosto();
-            LocalDate fechaInicio = ed.getFechaInicio();
+            LocalDate fechaInicio = edicionIter.getFechaInicio();
 
             ce().altaRegistroEdicionEvento(
-                idRegistro, usuario, evento, ed, tipoRegistro, fechaRegistro, costo, fechaInicio
+                idRegistro, usuario, evento, edicionIter, tipoRegistro, fechaRegistro, costo, fechaInicio
             );
 
             // ===================== 🔧 BLOQUE AÑADIDO 🔧 =====================
             // Crear el registro en las estructuras locales también
-            Registro nuevo = new Registro(idRegistro, usuario, ed, tipoRegistro, fechaRegistro, costo, fechaInicio);
-            ed.agregarRegistro(idRegistro, nuevo);
+            Registro nuevo = new Registro(idRegistro, usuario, edicionIter, tipoRegistro, fechaRegistro, costo, fechaInicio);
+            edicionIter.agregarRegistro(idRegistro, nuevo);
 
             if (usuario instanceof Asistente asistente) {
                 asistente.addRegistro(idRegistro, nuevo);
             }
 
-            System.out.println("✅ Registro agregado: " + usuario.getNickname() + " en edición " + ed.getNombre());
+            System.out.println("✅ Registro agregado: " + usuario.getNickname() + " en edición " + edicionIter.getNombre());
             // ================================================================
 
             req.setAttribute("mensaje", "Inscripción realizada correctamente.");
@@ -151,12 +151,12 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             if (nombresEd == null) continue;
 
             for (String nomEd : nombresEd) {
-                Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);
-                if (ed != null && ed.getEstado() == DTEstado.Aceptada) {
-                    edicionesAceptadas.add(ed);
+                Ediciones edicionIter = ce().obtenerEdicion(nombreEvento, nomEd);
+                if (edicionIter != null && edicionIter.getEstado() == DTEstado.Aceptada) {
+                    edicionesAceptadas.add(edicionIter);
                     edicionesPorEvento
                         .computeIfAbsent(nombreEvento, k -> new ArrayList<>())
-                        .add(ed);
+                        .add(edicionIter);
                 }
             }
         }
@@ -166,8 +166,8 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
     }
 
     private boolean requiereAsistente(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        HttpSession s = req.getSession(false);
-        String rol = s == null ? null : (String) s.getAttribute("rol");
+        HttpSession sAux = req.getSession(false);
+        String rol = sAux == null ? null : (String) sAux.getAttribute("rol");
         if (!"ASISTENTE".equals(rol)) {
             resp.sendRedirect(ctx(req) + "/auth/login");
             return false;
@@ -175,6 +175,6 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         return true;
     }
 
-    private static String trim(String s) { return s == null ? null : s.trim(); }
-    private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
+    private static String trim(String sAux) { return sAux == null ? null : sAux.trim(); }
+    private static boolean isBlank(String sAux) { return sAux == null || sAux.trim().isEmpty(); }
 }

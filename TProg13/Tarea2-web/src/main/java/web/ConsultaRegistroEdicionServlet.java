@@ -5,8 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
-import logica.fabrica;
-import logica.interfaces.IControladorEvento;
+
 import logica.clases.Registro;
 import logica.clases.Usuario;
 
@@ -14,7 +13,7 @@ import logica.clases.Usuario;
 public class ConsultaRegistroEdicionServlet extends HttpServlet {
     private static final String JSP_CONSULTA = "/WEB-INF/registro/ConsultaRegistroEdicion.jsp";
 
-    private IControladorEvento ce() { return fabrica.getInstance().getIControladorEvento(); }
+    
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

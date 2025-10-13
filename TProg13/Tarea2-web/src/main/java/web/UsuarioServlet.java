@@ -31,17 +31,17 @@ public class UsuarioServlet extends HttpServlet {
   private static final String JSP_CONSULTA = "/WEB-INF/usuario/ConsultaUsuario.jsp";
   private static final String JSP_MODIF    = "/WEB-INF/usuario/ModificarUsuario.jsp";
 
-  private final IControladorUsuario cu = fabrica.getInstance().getIControladorUsuario();
+  private final IControladorUsuario controladorUs = fabrica.getInstance().getIControladorUsuario();
 
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
   private String nickEnSesion(HttpServletRequest req) {
-    HttpSession s = req.getSession(false);
-    return s == null ? null : (String) s.getAttribute("nick");
+    HttpSession sAux = req.getSession(false);
+    return sAux == null ? null : (String) sAux.getAttribute("nick");
   }
 
   private void cargarInstituciones(HttpServletRequest req) {
-    java.util.Collection<String> instituciones = cu.getInstituciones();
+    java.util.Collection<String> instituciones = controladorUs.getInstituciones();
     req.setAttribute("instituciones", instituciones);
   }
 
@@ -68,7 +68,7 @@ public class UsuarioServlet extends HttpServlet {
           if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
         }
         try {
-          DTDatosUsuario dto = cu.obtenerDatosUsuario(nick);
+          DTDatosUsuario dto = controladorUs.obtenerDatosUsuario(nick);
           req.setAttribute("dto", dto);
           req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
         } catch (UsuarioNoExisteException e) {
@@ -82,7 +82,7 @@ public class UsuarioServlet extends HttpServlet {
         String nick = nickEnSesion(req);
         if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
         try {
-          DTDatosUsuario dto = cu.obtenerDatosUsuario(nick);
+          DTDatosUsuario dto = controladorUs.obtenerDatosUsuario(nick);
           req.setAttribute("dto", dto);
           req.getRequestDispatcher(JSP_MODIF).forward(req, resp);
         } catch (UsuarioNoExisteException e) {
@@ -182,7 +182,7 @@ public class UsuarioServlet extends HttpServlet {
       // === Crear usuario ===
       boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rol);
       try {
-        cu.altaUsuario(
+        controladorUs.altaUsuario(
             nick,
             nombre,
             correo,
@@ -197,8 +197,8 @@ public class UsuarioServlet extends HttpServlet {
         );
 
         // ✅ Crear sesión como en login
-        HttpSession s = req.getSession(true);
-        Map<String, Usuario> usuarios = cu.listarUsuarios();
+        HttpSession sAux = req.getSession(true);
+        Map<String, Usuario> usuarios = controladorUs.listarUsuarios();
         Usuario usr = usuarios.get(nick);
 
         if (usr == null) {
@@ -210,17 +210,17 @@ public class UsuarioServlet extends HttpServlet {
           }
         }
 
-        s.setAttribute("usuario_logueado", usr);
-        s.setAttribute("nick", nick);
-        s.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
-        s.setAttribute("estado_sesion", "LOGIN_CORRECTO");
+        sAux.setAttribute("usuario_logueado", usr);
+        sAux.setAttribute("nick", nick);
+        sAux.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
+        sAux.setAttribute("estado_sesion", "LOGIN_CORRECTO");
 
 
-        Enumeration<String> names = s.getAttributeNames();
+        Enumeration<String> names = sAux.getAttributeNames();
         while (names.hasMoreElements()) {
-          String n = names.nextElement();
-          Object v = s.getAttribute(n);
-          System.out.println("   * " + n + " = " + v);
+          String nAux = names.nextElement();
+          Object vAux = sAux.getAttribute(nAux);
+          System.out.println("   * " + nAux + " = " + vAux);
         }
 
         resp.sendRedirect(ctx(req) + "/inicio");
@@ -251,7 +251,7 @@ public class UsuarioServlet extends HttpServlet {
       }
 
       try {
-        cu.modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaNac, institucion);
+        controladorUs.modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaNac, institucion);
         resp.sendRedirect(ctx(req) + "/usuario/consulta?nick=" + nick);
       } catch (UsuarioNoExisteException | UsuarioTipoIncorrectoException e) {
         req.setAttribute("error", e.getMessage());

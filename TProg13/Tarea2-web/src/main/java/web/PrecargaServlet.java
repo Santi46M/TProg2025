@@ -18,10 +18,10 @@ public class PrecargaServlet extends HttpServlet {
 
 
     	
-        IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
+        IControladorEvento controladorEv = fabrica.getInstance().getIControladorEvento();
         try {
         	// Con los eventos chequeamos si realmente hay datos cargados o no
-        	boolean yaHayDatos = (ce.listarEventos() != null && !ce.listarEventos().isEmpty());
+        	boolean yaHayDatos = (controladorEv.listarEventos() != null && !controladorEv.listarEventos().isEmpty());
         	System.out.println("Datos existentes: " + yaHayDatos);
         	if (!yaHayDatos) {
             	// Cargar datos

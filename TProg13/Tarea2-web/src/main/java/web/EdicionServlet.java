@@ -40,12 +40,12 @@ public class EdicionServlet extends HttpServlet {
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
   private Usuario getUsuario(HttpServletRequest req) {
-    HttpSession s = req.getSession(false);
-    return s == null ? null : (Usuario) s.getAttribute("usuario_logueado");
+    HttpSession sAux = req.getSession(false);
+    return sAux == null ? null : (Usuario) sAux.getAttribute("usuario_logueado");
   }
   private String getRol(HttpServletRequest req) {
-    HttpSession s = req.getSession(false);
-    return s == null ? null : (String) s.getAttribute("rol");
+    HttpSession sAux = req.getSession(false);
+    return sAux == null ? null : (String) sAux.getAttribute("rol");
   }
 
   @Override
@@ -303,8 +303,8 @@ public class EdicionServlet extends HttpServlet {
   }
 
   private boolean requiereOrganizador(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    HttpSession s = req.getSession(false);
-    String rol = s == null ? null : (String) s.getAttribute("rol");
+    HttpSession sAux = req.getSession(false);
+    String rol = sAux == null ? null : (String) sAux.getAttribute("rol");
     if (!"ORGANIZADOR".equals(rol)) {
       resp.sendRedirect(ctx(req) + "/auth/login");
       return false;
@@ -312,12 +312,12 @@ public class EdicionServlet extends HttpServlet {
     return true;
   }
 
-  private static String trim(String s){ return s == null ? null : s.trim(); }
-  private static boolean isBlank(String s){ return s == null || s.trim().isEmpty(); }
+  private static String trim(String sAux){ return sAux == null ? null : sAux.trim(); }
+  private static boolean isBlank(String sAux){ return sAux == null || sAux.trim().isEmpty(); }
 
 
-  private static String getSafeFilename(Part p) {
-    String name = p.getSubmittedFileName();
+  private static String getSafeFilename(Part pAux) {
+    String name = pAux.getSubmittedFileName();
     if (name == null) return "archivo";
     name = name.replace("\\", "/");
     int slash = name.lastIndexOf('/');

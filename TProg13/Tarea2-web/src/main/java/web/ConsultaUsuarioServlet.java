@@ -29,8 +29,8 @@ public class ConsultaUsuarioServlet extends HttpServlet {
     String nick = trim(request.getParameter("nick"));
 
     if (!forzarListado && isBlank(nick)) {
-      HttpSession s = request.getSession(false);
-      if (s != null) nick = (String) s.getAttribute("nick");
+      HttpSession sAux = request.getSession(false);
+      if (sAux != null) nick = (String) sAux.getAttribute("nick");
     }
 
     final IControladorUsuario ctrlUsuario = fabrica.getInstance().getIControladorUsuario();
@@ -46,8 +46,8 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         request.setAttribute("usuario", usuario);
 
         // Mapa edicion -> evento para armar links
-        final IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
-        final List<DTEvento> eventos = ce.listarEventos();
+        final IControladorEvento controladorEv = fabrica.getInstance().getIControladorEvento();
+        final List<DTEvento> eventos = controladorEv.listarEventos();
         final Map<String, String> edicionToEvento = new HashMap<>();
         if (eventos != null) {
           for (DTEvento ev : eventos) {
@@ -83,11 +83,11 @@ public class ConsultaUsuarioServlet extends HttpServlet {
   }
 
   // ===== Helpers =====
-  private static String trim(String s) { return s == null ? null : s.trim(); }
-  private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
-  private static boolean isTrue(String v) {
-    if (v == null) return false;
-    String s = v.trim().toLowerCase(java.util.Locale.ROOT);
-    return "1".equals(s) || "true".equals(s) || "on".equals(s) || "yes".equals(s) || "y".equals(s);
+  private static String trim(String sAux) { return sAux == null ? null : sAux.trim(); }
+  private static boolean isBlank(String sAux) { return sAux == null || sAux.trim().isEmpty(); }
+  private static boolean isTrue(String vAux) {
+    if (vAux == null) return false;
+    String sAux = vAux.trim().toLowerCase(java.util.Locale.ROOT);
+    return "1".equals(sAux) || "true".equals(sAux) || "on".equals(sAux) || "yes".equals(sAux) || "y".equals(sAux);
   }
 }

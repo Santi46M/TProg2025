@@ -22,18 +22,18 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
       resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Faltan parámetros");
       return;
     }
-    IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
-    Ediciones ed = ce.obtenerEdicion(evento, edicion);
-    if (ed == null) {
+    IControladorEvento controladorEv = fabrica.getInstance().getIControladorEvento();
+    Ediciones edicionIter = controladorEv.obtenerEdicion(evento, edicion);
+    if (edicionIter == null) {
       resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Edición no encontrada");
       return;
     }
-    Patrocinio p = ed.getPatrocinio(codigoPatrocinio);
-    if (p == null) {
+    Patrocinio patro = edicionIter.getPatrocinio(codigoPatrocinio);
+    if (patro == null) {
       resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Patrocinio no encontrado");
       return;
     }
-    req.setAttribute("patrocinio", p);
+    req.setAttribute("patrocinio", patro);
     req.getRequestDispatcher("/WEB-INF/patrocinio/ConsultaPatrocinio.jsp").forward(req, resp);
   }
 }
