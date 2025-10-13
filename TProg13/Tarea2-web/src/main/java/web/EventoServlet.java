@@ -19,6 +19,7 @@ import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
 import logica.clases.Eventos;
+import logica.clases.Ediciones;
 import excepciones.EventoYaExisteException;
 import logica.controladores.ControladorEvento;
 
@@ -29,16 +30,13 @@ import logica.controladores.ControladorEvento;
 )
 public class EventoServlet extends HttpServlet {
 
-  // ===== JSPs =====
   private static final String JSP_ALTA     = "/WEB-INF/evento/alta.jsp";
   private static final String JSP_CONSULTA = "/WEB-INF/evento/ConsultaEvento.jsp";
   private static final String JSP_REGISTRO = "/WEB-INF/evento/RegistrarseEvento.jsp";
   private static final String JSP_LISTAR   = "/WEB-INF/evento/listado.jsp";
 
-  // Guardaremos en /img/eventos
   private static final String IMG_REL_BASE = "/eventos";
 
-  // ===== Lógica =====
   private final IControladorEvento ce = fabrica.getInstance().getIControladorEvento();
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
@@ -47,15 +45,15 @@ public class EventoServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
-    String path = req.getPathInfo(); // puede ser null
+    String path = req.getPathInfo();
 
     if (path == null || "/".equals(path) || "/ConsultaEvento".equals(path)) {
-      // Consulta por NOMBRE (query param ?nombre=...)
       String nombre = trim(req.getParameter("nombre"));
       if (isBlank(nombre)) {
         resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Falta parámetro 'nombre'");
         return;
       }
+
       Eventos e = ce.consultaEvento(nombre);
       if (e == null) {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Evento no encontrado: " + nombre);
@@ -68,18 +66,43 @@ public class EventoServlet extends HttpServlet {
       req.setAttribute("evDesc",   safe(() -> e.getDescripcion()));
       req.setAttribute("evFecha",  formatFecha(safeObj(() -> e.getFecha())));
       req.setAttribute("evCategorias", categoriasALista(safeObj(() -> e.getCategorias())));
-      req.setAttribute("evImagen", safe(() -> e.getImagen())); // campo imagen en tu entidad
+      req.setAttribute("evImagen", safe(() -> e.getImagen()));
 
-      // Obtener ediciones asociadas al evento
-      List<String> nombresEdiciones = ce.listarEdicionesEvento(nombre);
-      List<DTEdicion> ediciones = new ArrayList<>();
-      if (nombresEdiciones != null) {
-        for (String nombreEd : nombresEdiciones) {
-          DTEdicion ed = ce.consultaEdicionEvento(nombre, nombreEd);
-          if (ed != null) ediciones.add(ed);
+      // 🟢 Obtener ediciones asociadas al evento directamente del objeto real
+      try {
+        List<DTEdicion> ediciones = new ArrayList<>();
+
+        if (e.getEdiciones() != null && !e.getEdiciones().isEmpty()) {
+          for (Ediciones ed : e.getEdiciones().values()) {
+              String organizadorNick = null;
+              if (ed.getOrganizador() != null) {
+                organizadorNick = ed.getOrganizador().getNickname();
+              }
+
+              String ciudad = ed.getCiudad() != null ? ed.getCiudad() : "(sin ciudad)";
+              String pais   = ed.getPais() != null ? ed.getPais() : "(sin país)";
+              DTEdicion dte = new DTEdicion(
+              ed.getNombre(),
+              ed.getSigla(),
+              ed.getFechaInicio(),
+              ed.getFechaFin(),
+              ed.getFechaAlta(),
+              organizadorNick,
+              ciudad,
+              pais
+            );
+            ediciones.add(dte);
+            System.out.println("[EventoServlet] Edición cargada desde evento: " + ed.getNombre());
+          }
+        } else {
+          System.out.println("[EventoServlet] No hay ediciones en el evento: " + nombre);
         }
+
+        req.setAttribute("evEdiciones", ediciones);
+      } catch (Exception ex) {
+        System.err.println("[EventoServlet] Error al obtener ediciones del evento " + nombre + ": " + ex.getMessage());
+        req.setAttribute("evEdiciones", java.util.Collections.emptyList());
       }
-      req.setAttribute("evEdiciones", ediciones);
 
       req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
       return;
@@ -109,7 +132,6 @@ public class EventoServlet extends HttpServlet {
 
         List<String> categorias = ControladorEvento.listarCategorias();
         req.setAttribute("categorias", categorias);
-
         req.setAttribute("lista", lista);
         req.getRequestDispatcher(JSP_LISTAR).forward(req, resp);
         return;
@@ -129,7 +151,6 @@ public class EventoServlet extends HttpServlet {
     if ("/alta".equals(path)) {
       if (!requiereOrganizador(req, resp)) return;
 
-      // Con @MultipartConfig, getParameter funciona en multipart
       String nombre = trim(req.getParameter("nombre"));
       String desc   = trim(req.getParameter("desc"));
       String sigla  = trim(req.getParameter("sigla"));
@@ -142,18 +163,16 @@ public class EventoServlet extends HttpServlet {
           if (!t.isEmpty()) categoriasList.add(t);
         }
       }
+
       if (categoriasList.isEmpty()) {
         req.setAttribute("error", "Debe asociar al menos una categoría al evento");
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
         return;
       }
 
-      // Manejo de la imagen (opcional) — ahora guardamos en /img/eventos
-      String imagenRelPath = null; // p.ej. "/img/eventos/MISIGLA.jpg"
+      String imagenRelPath = null;
       try {
-        Part imgPart = null;
-        try { imgPart = req.getPart("imagen"); } catch (IllegalStateException ise) { imgPart = null; }
-
+        Part imgPart = req.getPart("imagen");
         if (imgPart != null && imgPart.getSize() > 0) {
           String ctype = imgPart.getContentType();
           if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
@@ -162,27 +181,17 @@ public class EventoServlet extends HttpServlet {
             return;
           }
 
-          // Carpeta física de /img/eventos dentro de la webapp
           String baseImg = getServletContext().getRealPath(IMG_REL_BASE);
-          if (baseImg == null) {
-            System.err.println("WARN: getRealPath('" + IMG_REL_BASE + "') es null; no se guardará la imagen en la webapp.");
-          } else {
+          if (baseImg != null) {
             Files.createDirectories(Path.of(baseImg));
-
-            String original = getSafeFilename(imgPart);
-            String ext = getExtension(original);
+            String ext = getExtension(imgPart.getSubmittedFileName());
             if (isBlank(ext)) ext = guessExtensionFromContentType(ctype);
             if (isBlank(ext)) ext = ".bin";
 
-            // Si querés reemplazar siempre por sigla: mismo nombre; si querés evitar colisiones, agregá timestamp.
             String finalName = (isBlank(sigla) ? "evento" : sigla) + ext;
-            // Alternativa para evitar choque: 
-            // String finalName = (isBlank(sigla) ? "evento" : sigla) + "-" + System.currentTimeMillis() + ext;
-
             Path destino = Path.of(baseImg, finalName);
             imgPart.write(destino.toAbsolutePath().toString());
-
-            imagenRelPath = IMG_REL_BASE + "/" + finalName; // usable desde el JSP: <img src="${ctx}${evImagen}">
+            imagenRelPath = IMG_REL_BASE + "/" + finalName;
           }
         }
       } catch (Exception fileEx) {
@@ -191,14 +200,11 @@ public class EventoServlet extends HttpServlet {
         return;
       }
 
-      // Crear DTCategorias
       DTCategorias dtCategorias = new DTCategorias(categoriasList);
 
       try {
-        // Alta del evento
         ce.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
 
-        // Asociar imagen al evento (si se subió y se pudo guardar)
         if (imagenRelPath != null) {
           try {
             ce.actualizarImagenEvento(nombre, imagenRelPath);
@@ -226,6 +232,7 @@ public class EventoServlet extends HttpServlet {
         req.getRequestDispatcher(JSP_REGISTRO).forward(req, resp);
         return;
       }
+
       String nombreEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8.name());
       resp.sendRedirect(ctx(req) + "/evento/ConsultaEvento?nombre=" + nombreEnc);
       return;
@@ -324,15 +331,6 @@ public class EventoServlet extends HttpServlet {
       }
     } catch (Exception ignore) {}
     return f.toString();
-  }
-
-  // ====== helpers de archivo ======
-  private static String getSafeFilename(Part p) {
-    String name = p.getSubmittedFileName();
-    if (name == null) return "archivo";
-    name = name.replace("\\", "/");
-    int slash = name.lastIndexOf('/');
-    return (slash >= 0) ? name.substring(slash + 1) : name;
   }
 
   private static String getExtension(String filename) {

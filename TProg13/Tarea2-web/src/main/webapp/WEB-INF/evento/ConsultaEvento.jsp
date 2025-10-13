@@ -93,11 +93,16 @@
         <ul class="ediciones-list">
         <%
           for (logica.datatypes.DTEdicion ed : ediciones) {
+       		System.out.println("[JSP] Mostrando edición: " + ed.getNombre());
         %>
           <li>
             <strong><%= ed.getNombre() %></strong>
             <span>(<%= ed.getFechaInicio() %> - <%= ed.getFechaFin() %>)</span>
-            <a class="btn" href="<%= ctx %>/edicion/ConsultaEdicion?evento=<%= java.net.URLEncoder.encode(evNombre, "UTF-8") %>&edicion=<%= java.net.URLEncoder.encode(ed.getNombre(), "UTF-8") %>">Ver detalles</a>
+            <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
+              <input type="hidden" name="evento" value="<%= evNombre %>" />
+              <input type="hidden" name="edicion" value="<%= ed.getNombre() %>" />
+              <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
+            </form>
           </li>
         <% } %>
         </ul>

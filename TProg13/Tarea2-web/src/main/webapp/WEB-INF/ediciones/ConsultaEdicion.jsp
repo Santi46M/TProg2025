@@ -158,7 +158,7 @@
   <aside class="card" style="min-width:300px; flex:1; margin-left:2rem; align-self:flex-start;">
     <h3>Organizador</h3>
     <% if (organizador != null) { %>
-      <p><strong>Nombre:</strong> <%= organizador.getNombre() %></p>
+      <p><strong>Nombre:</strong> <%= organizador.getNickname() %></p>
     <% } else { %>
       <p>No disponible</p>
     <% } %>

@@ -8,11 +8,11 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import logica.fabrica;
-import logica.interfaces.IControladorEvento;   // <-- ajustá si el nombre real difiere
-import logica.datatypes.DTEdicion;             // <-- ajustá si usás otro DTO
-import excepciones.EdicionYaExisteException;   // <-- ajustá a tu excepción real
+import logica.interfaces.IControladorEvento;
+import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.FechasCruzadasException;
 import logica.clases.Eventos;
@@ -20,22 +20,19 @@ import logica.clases.Usuario;
 import logica.clases.Ediciones;
 
 @WebServlet("/edicion/*")
-@MultipartConfig // porque tu form tiene <input type="file" name="imagen">
+@MultipartConfig
 public class EdicionServlet extends HttpServlet {
 
-  // ===== JSPs =====
   private static final String JSP_ALTA     = "/WEB-INF/ediciones/AltaEdicion.jsp";
   private static final String JSP_CONSULTA = "/WEB-INF/ediciones/ConsultaEdicion.jsp";
   private static final String JSP_LISTADO  = "/WEB-INF/ediciones/ListarEdiciones.jsp";
 
-  // ===== Lógica =====
-  private IControladorEvento ce() {  // fábrica hacia tu capa de lógica
+  private IControladorEvento ce() {  
     return fabrica.getInstance().getIControladorEvento();
   }
 
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
-  // ===== Helpers =====
   private Usuario getUsuario(HttpServletRequest req) {
     HttpSession s = req.getSession(false);
     return s == null ? null : (Usuario) s.getAttribute("usuario_logueado");
@@ -50,48 +47,68 @@ public class EdicionServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
-    String path = req.getPathInfo(); // puede ser null
+    String path = req.getPathInfo(); 
 
     if (path == null || "/".equals(path) || "/ConsultaEdicion".equals(path)) {
-      // Ejemplo: consulta por nombre (?evento=...&edicion=...)
       String evento  = trim(req.getParameter("evento"));
       String edicion = trim(req.getParameter("edicion"));
+
       if (isBlank(evento) || isBlank(edicion)) {
         resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Faltan parámetros 'evento' y/o 'edicion'");
         return;
       }
 
-      Ediciones edicionObj = ce().obtenerEdicion(evento, edicion); // Obtener la clase Ediciones
+      // 🔹 Obtener la edición solicitada
+      Ediciones edicionObj = ce().obtenerEdicion(evento, edicion);
       if (edicionObj == null) {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Edición no encontrada: " + edicion);
         return;
       }
-      req.setAttribute("edicion", edicionObj); // Pasar el objeto Ediciones
+
+      req.setAttribute("edicion", edicionObj);
       req.setAttribute("organizador", edicionObj.getOrganizador());
       req.setAttribute("tiposRegistro", edicionObj.getTiposRegistro());
       req.setAttribute("patrocinios", edicionObj.getPatrocinios());
       req.setAttribute("evNombre", evento);
+
+      // 🟢 Nuevo: recargar ediciones directamente desde el evento actual
+      java.util.List<Ediciones> edicionesLista = listarEdicionesEventoCompleto(evento);
+      req.setAttribute("evEdiciones", edicionesLista);
+
+      System.out.println("[EdicionServlet] Ediciones del evento '" + evento + "':");
+      if (edicionesLista.isEmpty()) {
+        System.out.println("  (ninguna)");
+      } else {
+        for (Ediciones e : edicionesLista) {
+          System.out.println("  - " + e.getNombre());
+        }
+      }
+
       // --- lógica para mostrar registros solo al organizador ---
       HttpSession session = req.getSession(false);
       String nickSesion = session != null ? (String) session.getAttribute("nick") : null;
-      boolean esOrganizador = nickSesion != null && edicionObj.getOrganizador() != null && nickSesion.equals(edicionObj.getOrganizador().getNickname());
+      boolean esOrganizador = nickSesion != null && edicionObj.getOrganizador() != null 
+                              && nickSesion.equals(edicionObj.getOrganizador().getNickname());
+
       java.util.List<logica.clases.Registro> registrosList = null;
       if (esOrganizador) {
         java.util.Map<String, logica.clases.Registro> registrosMap = edicionObj.getRegistros();
         registrosList = new java.util.ArrayList<>(registrosMap.values());
       } else if (nickSesion != null) {
-        // Mostrar solo el registro del asistente logueado en esta edición
         logica.clases.Usuario usuarioLogueado = logica.manejadores.manejadorUsuario.getInstancia().findUsuario(nickSesion);
         if (usuarioLogueado instanceof logica.clases.Asistente asistente) {
           registrosList = new java.util.ArrayList<>();
           java.util.Map<String, logica.clases.Registro> registrosAsist = asistente.getRegistros();
           for (logica.clases.Registro r : registrosAsist.values()) {
-            if (r.getEdicion() != null && r.getEdicion().getNombre().equals(edicionObj.getNombre()) && r.getEdicion().getEvento().getNombre().equals(edicionObj.getEvento().getNombre())) {
+            if (r.getEdicion() != null && 
+                r.getEdicion().getNombre().equals(edicionObj.getNombre()) && 
+                r.getEdicion().getEvento().getNombre().equals(edicionObj.getEvento().getNombre())) {
               registrosList.add(r);
             }
           }
         }
       }
+
       if (registrosList == null) registrosList = new java.util.ArrayList<>();
       req.setAttribute("registros", registrosList);
       req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
@@ -110,12 +127,12 @@ public class EdicionServlet extends HttpServlet {
         return;
       }
       case "/listar": {
-        String evento = trim(req.getParameter("evento")); // obtener el nombre del evento
+        String evento = trim(req.getParameter("evento"));
         if (isBlank(evento)) {
           resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Falta parámetro 'evento'");
           return;
         }
-        req.setAttribute("listaEdiciones", ce().listarEdicionesEvento(evento)); // ajustado
+        req.setAttribute("listaEdiciones", listarEdicionesEventoCompleto(evento));
         req.getRequestDispatcher(JSP_LISTADO).forward(req, resp);
         return;
       }
@@ -134,7 +151,7 @@ public class EdicionServlet extends HttpServlet {
     if ("/alta".equals(path)) {
       if (!requiereOrganizador(req, resp)) return;
 
-      String evento = trim(req.getParameter("evento"));   // viene del <select name="evento">
+      String evento = trim(req.getParameter("evento"));
       String nombre = trim(req.getParameter("nombre"));
       String desc   = trim(req.getParameter("desc"));
       String iniStr = trim(req.getParameter("fechaInicio"));
@@ -142,7 +159,6 @@ public class EdicionServlet extends HttpServlet {
       String ciudad = trim(req.getParameter("ciudad"));
       String pais   = trim(req.getParameter("pais"));
 
-      // Archivo (opcional)
       Part imagen = null;
       try { imagen = req.getPart("imagen"); } catch (Exception ignore) {}
 
@@ -166,29 +182,28 @@ public class EdicionServlet extends HttpServlet {
       }
 
       try {
-        // Obtener el organizador desde la sesión
+        Usuario org = getUsuario(req);
+        if (org == null || !"ORGANIZADOR".equals(getRol(req))) {
+          req.setAttribute("error", "Debés iniciar sesión como organizador.");
+          req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+          return;
+        }
 
-
-		 // Verificar que el usuario sea organizador
-    	  Usuario org = getUsuario(req);
-
-
-    	  if (org == null || !"ORGANIZADOR".equals(getRol(req))) {
-    	      
-    	      req.setAttribute("error", "Debés iniciar sesión como organizador.");
-    	      req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-    	      return;
-    	  }
-
-
-        // Guardado en capa lógica. Ajustá firma: quizá pases bytes de imagen, stream, o null.
-        // byte[] imgBytes = null; // imagen no se usa en la lógica real
         Eventos evObj = ce().consultaEvento(evento);
-        ce().altaEdicionEvento(evObj, org, nombre, nombre, desc, ini, fin, LocalDate.now(), ciudad, pais, null); // ajustado a la firma real
+        ce().altaEdicionEvento(evObj, org, nombre, nombre, desc, ini, fin, LocalDate.now(), ciudad, pais, null);
+
+        // 🔹 Confirmar que se agregó en memoria
+        System.out.println("[EdicionServlet] Ediciones actuales para " + evento + ":");
+        if (evObj != null && evObj.getEdiciones() != null) {
+          for (Ediciones e : evObj.getEdiciones().values()) {
+            System.out.println("  - " + e.getNombre());
+          }
+        }
 
         String evEnc = URLEncoder.encode(evento, StandardCharsets.UTF_8);
         String edEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8);
         resp.sendRedirect(ctx(req) + "/edicion/ConsultaEdicion?evento=" + evEnc + "&edicion=" + edEnc);
+
       } catch (EdicionYaExisteException | EventoYaExisteException | FechasCruzadasException ex) {
         req.setAttribute("error", ex.getMessage());
         req.setAttribute("listaEventos", ce().listarEventos());
@@ -200,7 +215,21 @@ public class EdicionServlet extends HttpServlet {
     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
 
-  // ===== Auth helpers (idénticos a los de tu EventoServlet) =====
+  // ===== Método auxiliar =====
+  private java.util.List<Ediciones> listarEdicionesEventoCompleto(String nombreEvento) {
+    java.util.List<Ediciones> lista = new ArrayList<>();
+    try {
+      Eventos evento = ce().consultaEvento(nombreEvento);
+      if (evento == null) return lista;
+      if (evento.getEdiciones() != null && !evento.getEdiciones().isEmpty()) {
+        lista.addAll(evento.getEdiciones().values());
+      }
+    } catch (Exception e) {
+      System.err.println("[listarEdicionesEventoCompleto] Error: " + e.getMessage());
+    }
+    return lista;
+  }
+
   private boolean requiereOrganizador(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     HttpSession s = req.getSession(false);
     String rol = s == null ? null : (String) s.getAttribute("rol");
@@ -211,7 +240,6 @@ public class EdicionServlet extends HttpServlet {
     return true;
   }
 
-  // ===== Utils =====
   private static String trim(String s){ return s == null ? null : s.trim(); }
   private static boolean isBlank(String s){ return s == null || s.trim().isEmpty(); }
 }
