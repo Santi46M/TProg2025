@@ -2,86 +2,68 @@ package test;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("ControladorEvento – consultas fallidas tolerantes (sin tocar lógica)")
+@DisplayName("ControladorEvento – consultas fallidas tolerantes")
 class ControladorEventoConsultaFallidaTest {
 
     @Test
-    void consultasInexistentes() throws Exception {
+    void consultasInexistentes() throws Throwable {  // ✅ permite que TestUtils lance Throwable
         TestUtils.resetAll();
 
-        // CE desde fábrica si existe; si no, implementación concreta
+        // CE desde fábrica si existe; si no, por implementación concreta
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
         Method getter;
-        try { getter = fab.getMethod("getInstance"); }
-        catch (NoSuchMethodException e) { getter = fab.getMethod("getInstancia"); }
+        try {
+            getter = fab.getMethod("getInstance");
+        } catch (NoSuchMethodException e) {
+            getter = fab.getMethod("getInstancia");
+        }
         Object fabrica = getter.invoke(null);
 
         Object controladorEv;
         try {
-            controladorEv = TestUtils.tryInvoke(
-                    fabrica,
-                    new String[]{"getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
+            controladorEv = TestUtils.tryInvoke(fabrica, new String[]{
+                    "getIEvento", "getIControladorEvento", "getControladorEvento", "getEvento"});
         } catch (AssertionError e) {
-            controladorEv = Class.forName("logica.controladores.ControladorEvento")
+            controladorEv = Class.forName("logica.Controladores.ControladorEvento")
                     .getDeclaredConstructor().newInstance();
         }
 
-        // 1) consultaEvento("NO_EXISTE")
-        assertTrue(lanzaOEsNulo(() ->
-                TestUtils.invokeUnwrapped(controladorEv, new String[]{"consultaEvento"}, "NO_EXISTE")),
-                "consultaEvento debe lanzar excepción O devolver null ante inexistente");
+        // ✅ ce no es efectivamente final, así que copiamos
+        final Object ceFinal = controladorEv;
 
-        // 2) consultaEdicionEvento("NO_EVT","NO_ED") — orden evento, edición
-        assertTrue(lanzaOEsNulo(() ->
-                TestUtils.invokeUnwrapped(controladorEv, new String[]{"consultaEdicionEvento"}, "NO_EVT", "NO_ED")),
-                "consultaEdicionEvento(ev, ed) debe lanzar excepción O devolver null");
+     // Acepta "cualquier" excepción: no hay catches genéricos, Checkstyle OK
+        ejecutarEsperando(Throwable.class,
+            () -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEvento"}, "NO_EXISTE"));
 
-        // 3) consultaEdicionEvento("NO_ED","NO_EVT") — algunas firmas invierten semántica
-        assertTrue(lanzaOEsNulo(() ->
-                TestUtils.invokeUnwrapped(controladorEv, new String[]{"consultaEdicionEvento"}, "NO_ED", "NO_EVT")),
-                "consultaEdicionEvento(x, y) alternativa debe lanzar excepción O devolver null");
+        ejecutarEsperando(Throwable.class,
+            () -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEdicionEvento"}, "NO_EVT", "NO_ED"));
 
-        // 4) listarEdicionesEvento("NO_EVT")
-        assertTrue(lanzaONuloOVacia(() ->
-                TestUtils.invokeUnwrapped(controladorEv, new String[]{"listarEdicionesEvento"}, "NO_EVT")),
-                "listarEdicionesEvento debe lanzar excepción O devolver null/colección vacía");
+        ejecutarEsperando(Throwable.class,
+            () -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"consultaEdicionEvento"}, "NO_ED", "NO_EVT"));
+
+        ejecutarEsperando(Throwable.class,
+            () -> TestUtils.invokeUnwrapped(ceFinal, new String[]{"listarEdicionesEvento"}, "NO_EVT"));
+
     }
 
-    // ===== Helpers tolerantes (no exigen throws si la lógica devuelve null/vacío) =====
-
-    /** Ejecuta y retorna true si: lanzó excepción, o devolvió null. */
-    private static boolean lanzaOEsNulo(ThrowingSupplier<Object> run) {
-        try {
-            Object res = run.get();
-            return res == null; // sin excepción: válido sólo si devuelve null
-        } catch (Throwable t) {
-            return true; // lanzó: también válido
-        }
+ // Si NO debe lanzar nada:
+    private void ejecutarSinExcepcion(ThrowingRunnable run) {
+        assertDoesNotThrow(run::run);
     }
 
-    /** Ejecuta y retorna true si: lanzó excepción, o devolvió null, o una colección vacía. */
-    private static boolean lanzaONuloOVacia(ThrowingSupplier<Object> run) {
-        try {
-            Object res = run.get();
-            if (res == null) return true;
-            if (res instanceof Collection<?>) return ((Collection<?>) res).isEmpty();
-            // Si tu implementación devuelve un array en lugar de Collection:
-            if (res.getClass().isArray()) return java.lang.reflect.Array.getLength(res) == 0;
-            // Cualquier otro retorno no nulo y no colección/array se considera no válido en "listar"
-            return false;
-        } catch (Throwable t) {
-            return true; // lanzó: válido
-        }
+    // Si DEBE lanzar una excepción específica:
+    private <Tirable extends Throwable> Tirable ejecutarEsperando(Class<Tirable> tipo, ThrowingRunnable run) {
+        return assertThrows(tipo, run::run);
     }
 
     @FunctionalInterface
-    private interface ThrowingSupplier<T> {
-        T get() throws Throwable;
+    private interface ThrowingRunnable {
+        void run() throws Throwable;
     }
 }

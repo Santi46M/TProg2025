@@ -67,11 +67,11 @@ class ControladorUsuarioEdgeCasesTest {
     @Test
     @DisplayName("AltaInstitucion duplicada → idempotente o lanza (aceptamos ambos)")
     void altaInstitucionDuplicada() {
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_X", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_X", "d", "w");
         // si lanza, lo aceptamos; si no, también (idempotente)
         try {
             assertThrows(Exception.class, () ->
-                TestUtils.invokeUnwrapped(controladorUs, new String[]{"altaInstitucion"}, "Inst_X", "d2", "w2")
+                TestUtils.invokeUnwrapped(controladorUs, new String[]{"AltaInstitucion"}, "Inst_X", "d2", "w2")
             );
         } catch (AssertionError ignored) {
             // no lanzó: lo tomamos como idempotente

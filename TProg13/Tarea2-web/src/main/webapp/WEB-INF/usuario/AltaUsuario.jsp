@@ -152,7 +152,7 @@
       <!-- Acciones -->
       <div class="acciones-form">
         <button type="submit" class="btn">Crear cuenta</button>
-        <a class="btn ghost" href="<%=ctx%>/">Cancelar</a>
+        <button type="submit" class="btn ghost" name="accion" value="cancelar">Cancelar</button>
       </div>
     </form>
   </main>

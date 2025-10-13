@@ -47,15 +47,22 @@
         </div>
         <div class="form-actions-registroEdicionEvento">
           <button type="submit" class="btn-guardar-registroEdicionEvento">Registrarse</button>
-          <a href="<%=ctx%>/index.jsp" class="btn-cancelar-registroEdicionEvento">Cancelar</a>
+          <button type="submit" class="btn-cancelar-registroEdicionEvento" name="accion" value="cancelar">Cancelar</button>
         </div>
       </form>
+      <script>
+        document.querySelector('.btn-cancelar-registroEdicionEvento').addEventListener('click', function(e) {
+          var form = document.getElementById('form-registro-edicion');
+          Array.from(form.querySelectorAll('[required]')).forEach(function(input) {
+            input.removeAttribute('required');
+          });
+        });
+      </script>
     </section>
   </main>
 </div>
 
 <script>
-  // data: { "Evento": [ {sigla:"...", nombre:"..."}, ... ], ... }
   const data = {
   <% if (mapa != null && !mapa.isEmpty()) {
        int ecount = 0;

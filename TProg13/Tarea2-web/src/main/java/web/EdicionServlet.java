@@ -7,6 +7,8 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -27,7 +29,11 @@ public class EdicionServlet extends HttpServlet {
   private static final String JSP_CONSULTA = "/WEB-INF/ediciones/ConsultaEdicion.jsp";
   private static final String JSP_LISTADO  = "/WEB-INF/ediciones/ListarEdiciones.jsp";
 
-  private IControladorEvento ce() {  
+  // Carpeta pública para imágenes de ediciones (URL final: <ctx>/ediciones/archivo.ext)
+  private static final String IMG_REL_BASE_ED = "/ediciones";
+
+  private IControladorEvento ce() {
+
     return fabrica.getInstance().getIControladorEvento();
   }
 
@@ -42,12 +48,13 @@ public class EdicionServlet extends HttpServlet {
     return s == null ? null : (String) s.getAttribute("rol");
   }
 
-  // ===== GET =====
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
+
     String path = req.getPathInfo(); 
+
 
     if (path == null || "/".equals(path) || "/ConsultaEdicion".equals(path)) {
       String evento  = trim(req.getParameter("evento"));
@@ -58,7 +65,7 @@ public class EdicionServlet extends HttpServlet {
         return;
       }
 
-      // 🔹 Obtener la edición solicitada
+
       Ediciones edicionObj = ce().obtenerEdicion(evento, edicion);
       if (edicionObj == null) {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Edición no encontrada: " + edicion);
@@ -71,24 +78,47 @@ public class EdicionServlet extends HttpServlet {
       req.setAttribute("patrocinios", edicionObj.getPatrocinios());
       req.setAttribute("evNombre", evento);
 
-      // 🟢 Nuevo: recargar ediciones directamente desde el evento actual
-      java.util.List<Ediciones> edicionesLista = listarEdicionesEventoCompleto(evento);
-      req.setAttribute("evEdiciones", edicionesLista);
 
-      System.out.println("[EdicionServlet] Ediciones del evento '" + evento + "':");
-      if (edicionesLista.isEmpty()) {
-        System.out.println("  (ninguna)");
-      } else {
-        for (Ediciones e : edicionesLista) {
-          System.out.println("  - " + e.getNombre());
+      // -------- IMAGEN: resolver URL final (igual que en Inicio/Evento) ----------
+      String raw = edicionObj.getImagen(); // puede ser "archivo.jpg" o ruta "/img/... /ediciones/..."
+      String imgUrl = null;
+      String ctxPath = ctx(req);
+
+      if (raw != null && !raw.isBlank()) {
+        if (raw.startsWith("http://") || raw.startsWith("https://")) {
+          imgUrl = raw;                       // absoluta
+        } else if (raw.startsWith("/")) {
+          imgUrl = ctxPath + raw;             // ya viene con ruta
+        } else {
+          String[] candidates = new String[] {
+            "/img/" + raw,
+            "/img/ediciones/" + raw,
+            IMG_REL_BASE_ED + "/" + raw      // subidas por la app
+          };
+          for (String rel : candidates) {
+            String abs = getServletContext().getRealPath(rel);
+            boolean exists;
+            if (abs != null) {
+              exists = java.nio.file.Files.exists(java.nio.file.Path.of(abs));
+            } else {
+              exists = true; // en algunos runtimes getRealPath() puede ser null; no bloqueamos
+            }
+            if (exists) { imgUrl = ctxPath + rel; break; }
+          }
         }
       }
+      if (imgUrl != null) {
+        req.setAttribute("edImagenUrl", imgUrl);
+      }
+      // ---------------------------------------------------------------------------
 
-      // --- lógica para mostrar registros solo al organizador ---
+      // Registros visibles (organizador: todos; asistente: sólo el suyo)
       HttpSession session = req.getSession(false);
       String nickSesion = session != null ? (String) session.getAttribute("nick") : null;
-      boolean esOrganizador = nickSesion != null && edicionObj.getOrganizador() != null 
-                              && nickSesion.equals(edicionObj.getOrganizador().getNickname());
+      boolean esOrganizador = nickSesion != null
+          && edicionObj.getOrganizador() != null
+          && nickSesion.equals(edicionObj.getOrganizador().getNickname());
+
 
       java.util.List<logica.clases.Registro> registrosList = null;
       if (esOrganizador) {
@@ -100,9 +130,11 @@ public class EdicionServlet extends HttpServlet {
           registrosList = new java.util.ArrayList<>();
           java.util.Map<String, logica.clases.Registro> registrosAsist = asistente.getRegistros();
           for (logica.clases.Registro r : registrosAsist.values()) {
+
             if (r.getEdicion() != null && 
                 r.getEdicion().getNombre().equals(edicionObj.getNombre()) && 
                 r.getEdicion().getEvento().getNombre().equals(edicionObj.getEvento().getNombre())) {
+
               registrosList.add(r);
             }
           }
@@ -111,6 +143,7 @@ public class EdicionServlet extends HttpServlet {
 
       if (registrosList == null) registrosList = new java.util.ArrayList<>();
       req.setAttribute("registros", registrosList);
+
       req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
       return;
     }
@@ -133,6 +166,7 @@ public class EdicionServlet extends HttpServlet {
           return;
         }
         req.setAttribute("listaEdiciones", listarEdicionesEventoCompleto(evento));
+
         req.getRequestDispatcher(JSP_LISTADO).forward(req, resp);
         return;
       }
@@ -141,7 +175,6 @@ public class EdicionServlet extends HttpServlet {
     }
   }
 
-  // ===== POST =====
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
@@ -181,6 +214,48 @@ public class EdicionServlet extends HttpServlet {
         return;
       }
 
+      // ---- Guardar imagen (opcional) en /ediciones y persistir SOLO el nombre ----
+      String imagenFileName = null;
+      try {
+
+        if (imagen != null && imagen.getSize() > 0) {
+          String ctype = imagen.getContentType();
+          if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
+            req.setAttribute("error", "El archivo subido no es una imagen válida.");
+            req.setAttribute("listaEventos", ce().listarEventos());
+            req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+            return;
+          }
+          String baseImg = getServletContext().getRealPath(IMG_REL_BASE_ED);
+          if (baseImg == null) {
+            String root = getServletContext().getRealPath("/");
+            if (root != null) baseImg = Path.of(root, "ediciones").toString();
+          }
+          if (baseImg != null) {
+            Files.createDirectories(Path.of(baseImg));
+
+            String original = getSafeFilename(imagen);
+            String ext = getExtension(original);
+            if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
+            if (ext == null || ext.isBlank()) ext = ".jpg";
+
+            // Usamos el nombre de la edición para el archivo
+            String finalName = (isBlank(nombre) ? "edicion" : nombre) + ext;
+            Path destino = Path.of(baseImg, finalName);
+            imagen.write(destino.toAbsolutePath().toString());
+
+            imagenFileName = finalName; // persistimos solo el NOMBRE
+            System.out.println("[IMG-ED] Guardada en: " + destino + " | URL: " + ctx(req) + IMG_REL_BASE_ED + "/" + finalName);
+          }
+        }
+      } catch (Exception ex) {
+        req.setAttribute("error", "Error al procesar la imagen: " + ex.getMessage());
+        req.setAttribute("listaEventos", ce().listarEventos());
+        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+        return;
+      }
+      // --------------------------------------------------------------------------
+
       try {
         Usuario org = getUsuario(req);
         if (org == null || !"ORGANIZADOR".equals(getRol(req))) {
@@ -190,15 +265,11 @@ public class EdicionServlet extends HttpServlet {
         }
 
         Eventos evObj = ce().consultaEvento(evento);
-        ce().altaEdicionEvento(evObj, org, nombre, nombre, desc, ini, fin, LocalDate.now(), ciudad, pais, null);
 
-        // 🔹 Confirmar que se agregó en memoria
-        System.out.println("[EdicionServlet] Ediciones actuales para " + evento + ":");
-        if (evObj != null && evObj.getEdiciones() != null) {
-          for (Ediciones e : evObj.getEdiciones().values()) {
-            System.out.println("  - " + e.getNombre());
-          }
-        }
+        // Ajustá la firma si tu método difiere; aquí asumimos que el último parámetro es imagen
+        ce().altaEdicionEvento(evObj, org, nombre, nombre, desc, ini, fin,
+                               LocalDate.now(), ciudad, pais, imagenFileName);
+
 
         String evEnc = URLEncoder.encode(evento, StandardCharsets.UTF_8);
         String edEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8);
@@ -214,6 +285,7 @@ public class EdicionServlet extends HttpServlet {
 
     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
+
 
   // ===== Método auxiliar =====
   private java.util.List<Ediciones> listarEdicionesEventoCompleto(String nombreEvento) {
@@ -242,4 +314,32 @@ public class EdicionServlet extends HttpServlet {
 
   private static String trim(String s){ return s == null ? null : s.trim(); }
   private static boolean isBlank(String s){ return s == null || s.trim().isEmpty(); }
+
+
+  private static String getSafeFilename(Part p) {
+    String name = p.getSubmittedFileName();
+    if (name == null) return "archivo";
+    name = name.replace("\\", "/");
+    int slash = name.lastIndexOf('/');
+    return (slash >= 0) ? name.substring(slash + 1) : name;
+  }
+
+  private static String getExtension(String filename) {
+    if (filename == null) return null;
+    int dot = filename.lastIndexOf('.');
+    if (dot < 0 || dot == filename.length() - 1) return null;
+    return filename.substring(dot).toLowerCase();
+  }
+
+  private static String guessExtensionFromContentType(String ctype) {
+    if (ctype == null) return null;
+    ctype = ctype.toLowerCase();
+    if (ctype.contains("jpeg")) return ".jpg";
+    if (ctype.contains("jpg"))  return ".jpg";
+    if (ctype.contains("png"))  return ".png";
+    if (ctype.contains("gif"))  return ".gif";
+    if (ctype.contains("webp")) return ".webp";
+    return null;
+  }
+
 }

@@ -36,7 +36,7 @@ class InstitucionPojoExtraTest {
         Object controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
 
         // Alta por CU (lado “oficial”)
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_X", "Desc X", "webX");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_X", "Desc X", "webX");
 
         // Verificación de que fue registrada
         Object setObj = TestUtils.tryInvoke(controladorUs, new String[]{"getInstituciones"});
@@ -48,9 +48,9 @@ class InstitucionPojoExtraTest {
         Object inst = DomainAccess.obtenerInstitucion("Inst_X");
         if (inst == null) {
             try {
-                inst = TestUtils.tolerantNew("logica.clases.Institucion", "Inst_X", "Desc X", "webX");
+                inst = TestUtils.tolerantNew("logica.Clases.Institucion", "Inst_X", "Desc X", "webX");
             } catch (IllegalStateException e) {
-                inst = TestUtils.tolerantNew("logica.clases.Institucion");
+                inst = TestUtils.tolerantNew("logica.Clases.Institucion");
 
                 // Seteos manuales por si existen setters
                 try {

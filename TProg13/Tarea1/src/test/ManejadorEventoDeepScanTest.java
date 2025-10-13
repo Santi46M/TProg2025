@@ -34,18 +34,18 @@ class ManejadorEventoDeepScanTest {
             controladorEv = Class.forName("logica.ControladorEvento").getDeclaredConstructor().newInstance();
         }
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_DS", "d", "w");
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaInstitucion"}, "Inst_DS", "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"AltaUsuario"},
                 "orgDS", "Org DS", "o@x", "d", "l", " Ap",
                 LocalDate.of(1990, 1, 1), "Inst_DS", true);
         try {
-            TestUtils.invokeUnwrapped(controladorEv, new String[]{"altaCategoria"}, "DS-Cat");
+            TestUtils.invokeUnwrapped(controladorEv, new String[]{"AltaCategoria"}, "DS-Cat");
         } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException ignored) {
             // método no invocable / falló al ejecutar: seguimos
         }
 
-        Object cats = TestUtils.tolerantNew("logica.datatypes.DTCategorias", List.of("DS-Cat"));
-        TestUtils.tryInvoke(controladorEv, new String[]{"altaEvento"},
+        Object cats = TestUtils.tolerantNew("logica.Datatypes.DTCategorias", List.of("DS-Cat"));
+        TestUtils.tryInvoke(controladorEv, new String[]{"AltaEvento"},
                 "DS-Event", "d", LocalDate.now(), "DSEV", cats);
         TestUtils.tryInvoke(controladorEv, new String[]{"altaEdicionEvento"},
                 "DS-Event", "ED-A", "EDAS", "x",

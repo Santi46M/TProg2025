@@ -95,51 +95,57 @@
             <button type="submit" class="btn-guardar-altaEvento">
               <i class='bx bx-save'></i> Guardar
             </button>
-
-            <!-- Cancelar sin href -->
-            <form action="<%=ctx%>/inicio" method="get" style="display:inline">
-              <button type="submit" class="btn btn-cancelar-altaEvento">
-                <i class='bx bx-x-circle'></i> Cancelar
-              </button>
-            </form>
+            <button type="submit" class="btn btn-cancelar-altaEvento" name="accion" value="cancelar">
+              <i class='bx bx-x-circle'></i> Cancelar
+            </button>
           </div>
         </form>
+        <script>
+          (function () {
+            const form = document.getElementById('form-alta-evento');
+            const cancelarBtn = document.querySelector('.btn-cancelar-altaEvento');
+            cancelarBtn.addEventListener('click', function(e) {
+              Array.from(form.querySelectorAll('[required]')).forEach(function(input) {
+                input.removeAttribute('required');
+              });
+            });
+
+            // Validación de categorías + serialización
+            form.addEventListener('submit', function (e) {
+              // Detectar si el submit fue por Cancelar
+              if (e.submitter && e.submitter.name === 'accion' && e.submitter.value === 'cancelar') {
+                // No validar nada, dejar que el form se envíe
+                return;
+              }
+              const checks = Array.from(document.querySelectorAll('.cat'));
+              const sel = checks.filter(c => c.checked).map(c => c.value);
+              if (sel.length === 0) {
+                e.preventDefault();
+                document.getElementById('fs-categorias').scrollIntoView({behavior:'smooth', block:'center'});
+                const errorCat = document.getElementById('error-categorias');
+                errorCat.textContent = 'Debe marcar al menos una categoría.';
+                errorCat.classList.remove('hidden');
+                return;
+              }
+              document.getElementById('error-categorias').classList.add('hidden');
+              document.getElementById('categorias').value = sel.join(',');
+            });
+
+            // Verificación básica de tamaño de imagen (sin vista previa)
+            const inputImg = document.getElementById('imagen');
+            const MAX_BYTES = 2 * 1024 * 1024; // 2MB
+            inputImg.addEventListener('change', function () {
+              const file = this.files && this.files[0];
+              if (file && file.size > MAX_BYTES) {
+                alert('La imagen supera 2 MB. Elegí un archivo más liviano.');
+                this.value = '';
+              }
+            });
+          })();
+        </script>
       </section>
     </main>
   </div>
-
-  <script>
-    (function () {
-      const form = document.getElementById('form-alta-evento');
-
-      // Validación de categorías + serialización
-      form.addEventListener('submit', function (e) {
-        const checks = Array.from(document.querySelectorAll('.cat'));
-        const sel = checks.filter(c => c.checked).map(c => c.value);
-        if (sel.length === 0) {
-          e.preventDefault();
-          document.getElementById('fs-categorias').scrollIntoView({behavior:'smooth', block:'center'});
-          const errorCat = document.getElementById('error-categorias');
-          errorCat.textContent = 'Debe marcar al menos una categoría.';
-          errorCat.classList.remove('hidden');
-          return;
-        }
-        document.getElementById('error-categorias').classList.add('hidden');
-        document.getElementById('categorias').value = sel.join(',');
-      });
-
-      // Verificación básica de tamaño de imagen (sin vista previa)
-      const inputImg = document.getElementById('imagen');
-      const MAX_BYTES = 2 * 1024 * 1024; // 2MB
-      inputImg.addEventListener('change', function () {
-        const file = this.files && this.files[0];
-        if (file && file.size > MAX_BYTES) {
-          alert('La imagen supera 2 MB. Elegí un archivo más liviano.');
-          this.value = '';
-        }
-      });
-    })();
-  </script>
 
 </body>
 </html>

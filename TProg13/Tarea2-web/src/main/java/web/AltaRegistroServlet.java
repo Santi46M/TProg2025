@@ -66,6 +66,13 @@ public class AltaRegistroServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         String path = req.getPathInfo();
 
+        // Cancelar: redirige a inicio sin validaciones
+        String accion = req.getParameter("accion");
+        if ("cancelar".equalsIgnoreCase(accion)) {
+            resp.sendRedirect(ctx(req) + "/inicio");
+            return;
+        }
+
         if ("/alta".equals(path)) {
             if (!requiereOrganizador(req, resp)) return;
 
@@ -117,8 +124,9 @@ public class AltaRegistroServlet extends HttpServlet {
         String nick = s == null ? null : (String) s.getAttribute("nick");
         List<Ediciones> ediciones = new ArrayList<>();
         if (nick != null) {
-            List<String> eventosConEdiciones = ce().listarEventosConEdicionesIngresadas();
-            for (String nombreEvento : eventosConEdiciones) {
+            List<DTEvento> eventos = ce().listarEventos();
+            for (DTEvento evento : eventos) {
+                String nombreEvento = evento.getNombre();
                 List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
                 for (String nomEd : nombresEd) {
                     Ediciones ed = ce().obtenerEdicion(nombreEvento, nomEd);

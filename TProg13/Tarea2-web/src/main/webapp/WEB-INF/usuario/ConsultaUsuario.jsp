@@ -64,9 +64,12 @@ String ctx = request.getContextPath();
             %>
               <div class="card usuario-card">
                 <h3>
-                  <a href="<%=ctx%>/usuario/ConsultaUsuario?nick=<%=u.getNickname()%>">
-                    <i class='bx <%= esOrg ? "bxs-microphone" : "bxs-id-card" %>'></i> <%=u.getNickname()%>
-                  </a>
+                  <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
+                    <input type="hidden" name="nick" value="<%=u.getNickname()%>" />
+                    <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;display:flex;align-items:center;font-size:1.1em;font-weight:600;">
+                      <i class='bx <%= esOrg ? "bxs-microphone" : "bxs-id-card" %>' style="font-size:1.2em;margin-right:0.3em;"></i> <span><%=u.getNickname()%></span>
+                    </button>
+                  </form>
                 </h3>
                 <p><strong>Nombre:</strong> <%=u.getNombre()%></p>
                 <p><strong>Email:</strong> <%=u.getEmail()%></p>
@@ -110,9 +113,14 @@ String ctx = request.getContextPath();
                     String eventoNombre = (edicionToEvento != null) ? edicionToEvento.get(e.getNombre()) : "";
               %>
                 <li>
-                  <strong><%= e.getNombre() %></strong>
+                  <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
+                    <input type="hidden" name="evento" value="<%= eventoNombre %>" />
+                    <input type="hidden" name="edicion" value="<%= e.getNombre() %>" />
+                    <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;">
+                      <strong><%= e.getNombre() %></strong>
+                    </button>
+                  </form>
                   <span>(<%= e.getFechaInicio() %> - <%= e.getFechaFin() %>)</span>
-                  <a class="btn" href="<%= ctx %>/edicion/ConsultaEdicion?evento=<%= java.net.URLEncoder.encode(eventoNombre, "UTF-8") %>&edicion=<%= java.net.URLEncoder.encode(e.getNombre(), "UTF-8") %>">Ver detalles</a>
                   <em class="estado"> — <%= estado %></em>
                 </li>
               <% 
@@ -125,13 +133,21 @@ String ctx = request.getContextPath();
           <% if (esSuPropioPerfil && esAsist) { %>
             <h2>Eventos registrados</h2>
             <ul class="lista-eventos">
-              <% for (DTRegistro r : usuario.getRegistros()) { %>
+              <% for (DTRegistro r : usuario.getRegistros()) { 
+                   String eventoNombre = (edicionToEvento != null) ? edicionToEvento.get(r.getEdicion()) : "";
+              %>
                 <li>
-                  <strong><%= r.getEdicion() %></strong>
+                  <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
+                    <input type="hidden" name="evento" value="<%= eventoNombre %>" />
+                    <input type="hidden" name="edicion" value="<%= r.getEdicion() %>" />
+                    <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;">
+                      <strong><%= r.getEdicion() %></strong>
+                    </button>
+                  </form>
                   <span>| <strong>Tipo:</strong> <%= r.getTipoRegistro() %></span>
                   <span>| <strong>Fecha registro:</strong> <%= r.getFechaRegistro() %></span>
                   <span>| <strong>Costo:</strong> $<%= r.getCosto() %></span>
-                  <a class="btn" href="<%= ctx %>/registro/ConsultaTipoRegistro?edicion=<%= java.net.URLEncoder.encode(r.getEdicion(), "UTF-8") %>&tipoRegistro=<%= java.net.URLEncoder.encode(r.getTipoRegistro(), "UTF-8") %>">Ver detalles</a>
+                  <a class="btn" href="<%= ctx %>/registro/ConsultaRegistroEdicion?idRegistro=<%= java.net.URLEncoder.encode(r.getId(), "UTF-8") %>">Ver detalles</a>
                 </li>
               <% } %>
             </ul>

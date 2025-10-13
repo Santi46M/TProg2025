@@ -32,7 +32,6 @@
       <% if (request.getAttribute("sinEventos") != null && (Boolean)request.getAttribute("sinEventos")) { %>
         <p style="color:#c00">No hay eventos disponibles. Debe crear un evento antes de poder crear una edición.</p>
       <% } %>
-      <!-- IMPORTANTE: el action apunta a tu servlet /edicion/alta (POST) -->
       <form id="form-alta-edicion" method="post" action="<%=ctx%>/edicion/alta" enctype="multipart/form-data">
         <div class="form-group-altaEvento">
           <label for="evento">Evento<span style="color:red">*</span></label>
@@ -95,9 +94,17 @@
 
         <div class="form-actions-altaEvento">
           <button type="submit" class="btn-guardar-altaEvento" <%= (request.getAttribute("sinEventos") != null && (Boolean)request.getAttribute("sinEventos")) ? "disabled" : "" %>>Guardar</button>
-          <a class="btn-cancelar-altaEvento btn" href="<%=ctx%>/">Cancelar</a>
+          <button type="submit" class="btn-cancelar-altaEvento btn" name="accion" value="cancelar">Cancelar</button>
         </div>
       </form>
+      <script>
+        document.querySelector('.btn-cancelar-altaEvento').addEventListener('click', function(e) {
+          var form = document.getElementById('form-alta-edicion');
+          Array.from(form.querySelectorAll('[required]')).forEach(function(input) {
+            input.removeAttribute('required');
+          });
+        });
+      </script>
     </section>
   </main>
 </div>
