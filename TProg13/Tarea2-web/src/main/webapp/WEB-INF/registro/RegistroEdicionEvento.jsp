@@ -16,7 +16,22 @@
   <meta charset="UTF-8"/>
   <title>Registrarse a una Edición de Evento</title>
   <link rel="stylesheet" href="<%=ctx%>/css/style.css"/>
-  <link rel="stylesheet" href="<%=ctx%>/css/RegistroEdicionEvento.css"/>
+  <link rel="stylesheet" href="../../css/RegistroEdicionEvento.css">
+<style>
+.form-card-registroEdicionEvento,.event-card{background:#fff;border:1px solid var(--line,#ddd);border-radius:10px;padding:1.2rem 1.5rem;box-shadow:0 2px 6px rgba(0,0,0,0.05);margin-bottom:.8rem}
+.form-card-registroEdicionEvento h2,.event-card h3{color:#111;margin:0 0 .75rem;font-weight:700;font-size:1.2rem}
+.form-group-registroEdicionEvento label{display:block;font-weight:600;color:#333;margin-bottom:.25rem}
+.form-group-registroEdicionEvento select,.form-group-registroEdicionEvento input{width:100%;padding:.45rem .7rem;border:1px solid #ccc;border-radius:6px;font-size:.95rem;outline:none;transition:border-color .2s,box-shadow .2s}
+.form-group-registroEdicionEvento select:focus,.form-group-registroEdicionEvento input:focus{border-color:#0b5ed7;box-shadow:0 0 0 2px rgba(11,94,215,.15)}
+#label-tipo{font-weight:600;margin:.75rem 0 .4rem}
+.event-card label input[type=radio]{accent-color:#0b5ed7;margin-right:.25rem}
+.event-card label span{font-size:.95rem}
+.btn-guardar-registroEdicionEvento{background:#0b5ed7;color:#fff;border:none;padding:.6rem 1.2rem;border-radius:8px;font-weight:600;font-size:.95rem;cursor:pointer;transition:background-color .2s,transform .1s,box-shadow .2s}
+.btn-guardar-registroEdicionEvento:hover{background:#084bb1;box-shadow:0 3px 8px rgba(11,94,215,.25);transform:translateY(-1px)}
+.btn-guardar-registroEdicionEvento:active{transform:translateY(1px);box-shadow:none}
+small{color:#555;font-size:.85rem}
+p[style*="color:#c00"]{background:#ffecec;border:1px solid #ffb3b3;border-radius:6px;padding:.5rem 1rem;font-weight:500;color:#a00!important;margin-bottom:1rem}
+</style>
 </head>
 <body>
 

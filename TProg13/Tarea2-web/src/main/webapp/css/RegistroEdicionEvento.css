@@ -1,39 +1,89 @@
-/* ===== RegistroEdicionEvento.css ===== */
+/* ====== Tarjeta del formulario ====== */
+.form-card-registroEdicionEvento,
+.event-card {
+  background: #fff;
+  border: 1px solid var(--line, #ddd);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 1rem;
+}
 
-/* Encabezado */
-.topbar {
-    position: sticky; top:0; z-index:50;
-    background:#fff; border-bottom:1px solid #e5e7eb;
-    box-shadow:0 2px 8px rgba(0,0,0,.04);
-  }
-  .topbar-wrap {
-    max-width:1100px; margin:0 auto; padding:.8rem 1rem;
-    display:flex; align-items:center;
-  }
-  .topbar-brand {
-    font-weight:800; font-size:1.05rem; color:#111827;
-    text-decoration:none;
-  }
-  .topbar-brand:hover { text-decoration:underline; }
-  
-  /* Layout */
-  label { display:block; margin:.8rem 0; }
-  select, input {
-    width:100%; padding:.6rem .7rem;
-    border:1px solid var(--line,#e5e7eb);
-    border-radius:.5rem;
-  }
-  .card {
-    background:#fff; border:1px solid var(--line,#e5e7eb);
-    border-radius:.6rem; padding:1rem; margin:1rem 0;
-    box-shadow:0 2px 6px rgba(0,0,0,.04);
-  }
-  .hide { display:none; }
-  .btn {
-    margin-top:1rem;
-    padding:.6rem 1rem;
-    border:none; border-radius:.5rem;
-    background:#2563eb; color:#fff;
-    cursor:pointer;
-  }
-  .btn:hover { filter:brightness(.95); }
+/* ====== Títulos ====== */
+.form-card-registroEdicionEvento h2,
+.event-card h3 {
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+}
+
+/* ====== Etiquetas y selects ====== */
+.form-group-registroEdicionEvento label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: .25rem;
+}
+
+.form-group-registroEdicionEvento select,
+.form-group-registroEdicionEvento input {
+  width: 100%;
+  padding: .5rem .75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.form-group-registroEdicionEvento select:focus,
+.form-group-registroEdicionEvento input:focus {
+  border-color: #0b5ed7;
+}
+
+/* ====== Tipos de registro ====== */
+#label-tipo {
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.event-card label input[type="radio"] {
+  accent-color: #0b5ed7;
+}
+
+.event-card label span {
+  font-size: 0.95rem;
+}
+
+/* ====== Botón confirmar ====== */
+.btn-guardar-registroEdicionEvento {
+  background-color: #0b5ed7;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn-guardar-registroEdicionEvento:hover {
+  background-color: #084bb1;
+  transform: translateY(-1px);
+}
+
+.btn-guardar-registroEdicionEvento:active {
+  transform: translateY(1px);
+}
+
+/* ====== Pequeños ajustes ====== */
+small {
+  color: #666;
+}
+
+p[style*="color:#c00"] {
+  background-color: #ffecec;
+  border: 1px solid #ffb3b3;
+  border-radius: 6px;
+  padding: .5rem 1rem;
+}
