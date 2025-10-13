@@ -28,6 +28,12 @@ public class DTDatosUsuario {
         this.ediciones = new HashSet<>();
         this.imagen = null; // por defecto
     }
+    
+    // Constructor conveniente con imagen (opcional)
+    public DTDatosUsuario(String nickname, String nombre, String email, String imagen) {
+        this(nickname, nombre, email);
+        this.imagen = imagen;
+    }
 
     // --- Getters ---
     public String getNickname() { return nickname; }

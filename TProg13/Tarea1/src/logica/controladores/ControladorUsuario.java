@@ -47,28 +47,46 @@ public class ControladorUsuario implements IControladorUsuario {
     }
 
     public void altaUsuario(String nickname, String nombre, String correo, String descripcion, String link,
-                            String apellido, LocalDate fechaNacimiento, String institucion, boolean esOrganizador, String contrasena, String imagen) throws UsuarioYaExisteException {
+            String apellido, LocalDate fechaNacimiento, String institucion,
+            boolean esOrganizador, String contrasena, String imagen)
+throws UsuarioYaExisteException {
 
-        // verificar unicidad de nickname y correo
-        if (manejador.findUsuario(nickname) != null) {
-            throw new UsuarioYaExisteException("El usuario con nickname " + nickname + " ya esta registrado");
-        }
-        if (manejador.findCorreo(correo)) {
-        	throw new UsuarioYaExisteException("El usuario con correo " + correo + " ya esta registrado");
+// verificar unicidad de nickname y correo
+if (manejador.findUsuario(nickname) != null) {
+throw new UsuarioYaExisteException("El usuario con nickname " + nickname + " ya esta registrado");
+}
+if (manejador.findCorreo(correo)) {
+throw new UsuarioYaExisteException("El usuario con correo " + correo + " ya esta registrado");
+}
 
-        }
+// === Normalizar imagen a "solo nombre de archivo" o null ===
+String img = (imagen == null) ? null : imagen.trim();
+if (img != null && img.isEmpty()) img = null;
+if (img != null) {
+img = img.replace("\\", "/");
+int slash = img.lastIndexOf('/');
+if (slash >= 0 && slash < img.length() - 1) {
+img = img.substring(slash + 1); // nos quedamos con el nombre (p.ej. IMG-US01.jpg)
+}
+}
 
-        Usuario nuevoUsuario;
+Usuario nuevoUsuario;
+if (esOrganizador) {
+// Asegurate que este ctor realmente setea la imagen interna; por las dudas la seteamos luego.
+nuevoUsuario = new Organizador(nickname, nombre, correo, contrasena, img, descripcion, link);
+} else {
+Institucion inst = manejador.findInstitucion(institucion);
+nuevoUsuario = new Asistente(nickname, nombre, correo, contrasena, img, apellido, fechaNacimiento, inst);
+}
 
-        if (esOrganizador) {
-            nuevoUsuario = new Organizador(nickname, nombre, correo, contrasena, imagen, descripcion, link);
-        } else {
-            Institucion inst = manejador.findInstitucion(institucion);
-            nuevoUsuario = new Asistente(nickname, nombre, correo, contrasena, imagen, apellido, fechaNacimiento, inst);
-        }
+// === Por si el constructor no guardó la imagen, la forzamos ===
+if (img != null && (nuevoUsuario.getImagen() == null || nuevoUsuario.getImagen().isBlank())) {
+nuevoUsuario.setImagen(img);
+}
 
-        manejador.addUsuario(nuevoUsuario);
-    }
+manejador.addUsuario(nuevoUsuario);
+}
+
 
     public void altaInstitucion(String nombre, String descripcion, String link) throws InstitucionYaExisteException {
         if (manejador.findInstitucion(nombre) != null) {
@@ -131,6 +149,23 @@ public class ControladorUsuario implements IControladorUsuario {
         this.usuarioSeleccionadoNickname = nickname;
 
         DTDatosUsuario dto = new DTDatosUsuario(user.getNickname(), user.getNombre(), user.getEmail());
+
+        // === NUEVO: pasar imagen al DTO (normalizada) ===
+        String img = user.getImagen();
+        if (img != null) {
+            img = img.trim();
+            if (img.isEmpty()) img = null;
+            // si por error viniera con ruta tipo "/img/usuarios/archivo.jpg", nos quedamos con el nombre
+            if (img != null && (img.contains("/") || img.contains("\\"))) {
+                img = img.replace("\\", "/");
+                int last = img.lastIndexOf('/');
+                if (last >= 0 && last < img.length() - 1) {
+                    img = img.substring(last + 1);
+                }
+            }
+        }
+        dto.setImagen(img);
+
         if (user instanceof Asistente) {
             Asistente asisUser = (Asistente) user;
             dto.setApellido(asisUser.getApellido());

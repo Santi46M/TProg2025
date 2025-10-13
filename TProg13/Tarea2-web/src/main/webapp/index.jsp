@@ -24,11 +24,13 @@
     .card{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;padding:12px}
     .card__media{position:relative; aspect-ratio:16/9; background:#f3f4f6; overflow:hidden; border-radius:10px; margin-bottom:8px}
     .card__media img{width:100%; height:100%; object-fit:cover; display:block}
-    .card__placeholder{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:#6b7280; font-size:.9rem}
     .card h2{margin:.25rem 0 .5rem}
     .card .actions{margin-top:.5rem}
     .btn-linklike{background:#f9fafb; border:1px solid #d1d5db; padding:.45rem .75rem; border-radius:8px; cursor:pointer}
     .btn-linklike:hover{background:#f3f4f6}
+
+    /* ajuste cuando NO hay imagen: quitamos el espacio que dejaba la media */
+    .card.no-media h2{ margin-top: 0; }
   </style>
 </head>
 <body>
@@ -45,22 +47,20 @@
           if (eventos != null && !eventos.isEmpty()) {
             for (logica.datatypes.DTEvento e : eventos) {
               String imgUrl = (imgUrls == null) ? null : imgUrls.get(e.getNombre());
+              boolean hasImg = (imgUrl != null && !imgUrl.isBlank());
         %>
-          <article class="card">
-            <div class="card__media">
-              <% if (imgUrl != null && !imgUrl.isBlank()) { %>
+          <article class="card <%= hasImg ? "" : "no-media" %>">
+            <% if (hasImg) { %>
+              <div class="card__media">
                 <img src="<%= imgUrl %>" alt="Imagen de <%= e.getNombre() %>">
-              <% } else { %>
-                <div class="card__placeholder">Sin imagen</div>
-              <% } %>
-            </div>
+              </div>
+            <% } %>
 
             <h2><%= e.getNombre() %></h2>
             <p><strong>Descripción:</strong> <%= e.getDescripcion() == null ? "" : e.getDescripcion() %></p>
             <p><strong>Fecha:</strong> <%= e.getFecha() == null ? "" : e.getFecha() %></p>
 
             <div class="actions">
-              <!-- Sin href: form hacia ConsultaEvento -->
               <form action="<%=ctx%>/evento/ConsultaEvento" method="get" style="display:inline">
                 <input type="hidden" name="nombre" value="<%= e.getNombre() %>">
                 <button type="submit" class="btn-linklike">Ver más</button>

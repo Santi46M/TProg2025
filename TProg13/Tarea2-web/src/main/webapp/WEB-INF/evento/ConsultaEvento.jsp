@@ -13,6 +13,7 @@
 
   // URL de imagen ya resuelta por el servlet (si existe)
   String evImagenUrl = (String) request.getAttribute("evImagenUrl");
+  boolean hasImg = (evImagenUrl != null && !evImagenUrl.isBlank());
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -25,9 +26,9 @@
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <style>
     .event-hero { display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem; }
-    .event-hero__img { width:360px; max-width:40vw; aspect-ratio:16/9; background:#f3f4f6; border-radius:12px; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .event-hero.no-img { display:block; }            /* cuando no hay imagen, el texto ocupa todo */
+    .event-hero__img { width:360px; max-width:40vw; aspect-ratio:16/9; background:#f3f4f6; border-radius:12px; overflow:hidden; flex-shrink:0; }
     .event-hero__img img { width:100%; height:100%; object-fit:cover; display:block; }
-    .event-hero__placeholder { color:#6b7280; font-size:.95rem; }
     .chips { display:flex; flex-wrap:wrap; gap:.4rem; }
     .chip { background:#eef2ff; color:#3730a3; padding:.2rem .5rem; border-radius:999px; font-size:.9rem; }
     .ediciones-list { list-style:none; padding:0; margin:0; display:grid; gap:.6rem; }
@@ -47,14 +48,12 @@
     <!-- Contenido principal -->
     <main class="container consulta-evento-main" style="flex:2; min-width:0; padding: 15px; line-height: 2 ">
       <section class="event-card">
-        <div class="event-hero">
-          <div class="event-hero__img">
-            <% if (evImagenUrl != null && !evImagenUrl.isBlank()) { %>
+        <div class="event-hero <%= hasImg ? "" : "no-img" %>">
+          <% if (hasImg) { %>
+            <div class="event-hero__img">
               <img src="<%= evImagenUrl %>" alt="Imagen de <%= (evNombre != null ? evNombre : "Evento") %>">
-            <% } else { %>
-              <div class="event-hero__placeholder">Sin imagen</div>
-            <% } %>
-          </div>
+            </div>
+          <% } %>
 
           <div class="event-hero__meta">
             <h1 class="event-title"><%= (evNombre != null ? evNombre : "Evento") %></h1>
@@ -69,11 +68,9 @@
                 <span class="categorias-label" style="margin-right:.3rem;"><strong>Categorías:</strong></span>
                 <% if (evCategorias.isEmpty()) { %>
                   <span class="chip">—</span>
-                <% } else {
-                     for (String c : evCategorias) { %>
-                       <span class="chip"><%= c %></span>
-                <%   }
-                   } %>
+                <% } else { for (String c : evCategorias) { %>
+                  <span class="chip"><%= c %></span>
+                <% } } %>
               </div>
 
               <div class="event-meta" style="margin-top:.5rem;"><strong>Fecha alta:</strong> <%= (evFecha != null ? evFecha : "—") %></div>
@@ -95,15 +92,12 @@
         } else {
       %>
         <ul class="ediciones-list">
-        <%
-          for (logica.datatypes.DTEdicion ed : ediciones) {
-        %>
+        <% for (logica.datatypes.DTEdicion ed : ediciones) { %>
           <li>
             <div>
               <strong><%= ed.getNombre() %></strong>
               <span>(<%= ed.getFechaInicio() %> - <%= ed.getFechaFin() %>)</span>
             </div>
-            <!-- Navegación con botón (sin href): GET a ConsultaEdicion -->
             <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
               <input type="hidden" name="evento" value="<%= evNombre %>" />
               <input type="hidden" name="edicion" value="<%= ed.getNombre() %>" />

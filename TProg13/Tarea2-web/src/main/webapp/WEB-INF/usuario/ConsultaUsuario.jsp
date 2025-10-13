@@ -5,7 +5,7 @@
 <%@ page import="logica.datatypes.*" %>
 
 <%
-String ctx = request.getContextPath();
+  String ctx = request.getContextPath();
   String nickSesion = (String) session.getAttribute("nick");
   String rolSesion  = (String) session.getAttribute("rol");
 
@@ -13,6 +13,10 @@ String ctx = request.getContextPath();
   DTDatosUsuario usuario = (DTDatosUsuario) request.getAttribute("usuario");
   Map<String, String> edicionToEvento = (Map<String, String>) request.getAttribute("edicionToEvento");
   String error = (String) request.getAttribute("error");
+
+  // URLs ya resueltas por el servlet:
+  Map<String,String> fotos = (Map<String,String>) request.getAttribute("fotos");      // nick -> url
+  String usrImagenUrl = (String) request.getAttribute("usrImagenUrl");                // url perfil
 %>
 
 <!DOCTYPE html>
@@ -24,135 +28,147 @@ String ctx = request.getContextPath();
   <link rel="stylesheet" href="<%=ctx%>/css/ConsultaUsuario.css">
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+  <style>
+    .usuario-card .avatar { width:72px; height:72px; border-radius:50%; object-fit:cover; background:#f3f4f6; display:block; margin-bottom:.25rem; }
+    .perfil-header { display:flex; align-items:center; gap:1rem; margin-bottom:1rem; }
+    .perfil-header .avatar { width:96px; height:96px; border-radius:50%; object-fit:cover; background:#f3f4f6; }
+    .no-avatar {
+      width:72px; height:72px; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      background:#f3f4f6; color:#6b7280; font-size:.72rem; text-align:center;
+      padding:6px; box-sizing:border-box; margin-bottom:.25rem;
+    }
+    .perfil-header .no-avatar { width:96px; height:96px; font-size:.82rem; padding:8px; margin:0; }
+  </style>
 </head>
 
 <body>
   <!-- Header -->
   <jsp:include page="/WEB-INF/templates/header.jsp" />
 
-  <!-- Layout -->
   <div class="container row layout-inicio">
     <!-- Sidebar -->
     <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
     <!-- Main -->
     <main class="main-inicio">
-      <%
-      if (error != null) {
-      %>
+      <% if (error != null) { %>
         <p class="error"><%=error%></p>
-      <%
-      }
-      %>
+      <% } %>
 
-      <%
-      if (usuario == null) {
-      %>
+      <% if (usuario == null) { %>
         <h1>Usuarios registrados</h1>
         <div class="usuarios-grid">
-          <%
-          if (usuarios == null || usuarios.isEmpty()) {
-          %>
+          <% if (usuarios == null || usuarios.isEmpty()) { %>
             <p>No hay usuarios registrados.</p>
-          <%
-          } else {
+          <% } else {
+               for (Usuario u : usuarios) {
+                 boolean esOrg = (u instanceof logica.clases.Organizador);
+                 boolean esAsist = (u instanceof logica.clases.Asistente);
+                 String fotoUrl = (fotos == null) ? null : fotos.get(u.getNickname());
           %>
-            <%
-            for (Usuario u : usuarios) { 
-                             boolean esOrg = (u instanceof logica.clases.Organizador);
-                             boolean esAsist = (u instanceof logica.clases.Asistente);
-            %>
-              <div class="card usuario-card">
-                <h3>
-                  <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
-                    <input type="hidden" name="nick" value="<%=u.getNickname()%>" />
-                    <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;display:flex;align-items:center;font-size:1.1em;font-weight:600;">
-                      <i class='bx <%= esOrg ? "bxs-microphone" : "bxs-id-card" %>' style="font-size:1.2em;margin-right:0.3em;"></i> <span><%=u.getNickname()%></span>
-                    </button>
-                  </form>
-                </h3>
-                <p><strong>Nombre:</strong> <%=u.getNombre()%></p>
-                <p><strong>Email:</strong> <%=u.getEmail()%></p>
-                <% if (esOrg) { %>
-                  <span class="rol-tag org">Organizador</span>
-                <% } else if (esAsist) { %>
-                  <span class="rol-tag asist">Asistente</span>
-                <% } %>
-              </div>
-            <% } %>
-          <% } %>
+            <div class="card usuario-card">
+              <% if (fotoUrl != null && !fotoUrl.isBlank()) { %>
+                <img class="avatar" src="<%= fotoUrl %>" alt="Avatar de <%= u.getNickname() %>">
+              <% } else { %>
+                <div class="no-avatar" aria-label="Sin imagen">sin imagen</div>
+              <% } %>
+
+              <h3>
+                <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
+                  <input type="hidden" name="nick" value="<%=u.getNickname()%>" />
+                  <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;display:flex;align-items:center;font-size:1.1em;font-weight:600;">
+                    <i class='bx <%= esOrg ? "bxs-microphone" : "bxs-id-card" %>' style="font-size:1.2em;margin-right:0.3em;"></i>
+                    <span><%=u.getNickname()%></span>
+                  </button>
+                </form>
+              </h3>
+              <p><strong>Nombre:</strong> <%=u.getNombre()%></p>
+              <p><strong>Email:</strong> <%=u.getEmail()%></p>
+              <% if (esOrg) { %>
+                <span class="rol-tag org">Organizador</span>
+              <% } else if (esAsist) { %>
+                <span class="rol-tag asist">Asistente</span>
+              <% } %>
+            </div>
+          <% } } %>
         </div>
 
       <% } else { %>
         <h1>Perfil de <%= usuario.getNickname() %></h1>
-        <div class="usuario-detalle">
-          <p><strong>Nombre:</strong> <%= usuario.getNombre() %></p>
-          <p><strong>Email:</strong> <%= usuario.getEmail() %></p>
-          <% if (usuario.getInstitucion() != null) { %>
-            <p><strong>Institución:</strong> <%= usuario.getInstitucion() %></p>
-          <% } %>
-          <% if (usuario.getDesc() != null) { %>
-            <p><strong>Descripción:</strong> <%= usuario.getDesc() %></p>
-          <% } %>
 
-          <%
-            boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname());
-            boolean esOrg = usuario.getEdiciones() != null && !usuario.getEdiciones().isEmpty();
-            boolean esAsist = usuario.getRegistros() != null && !usuario.getRegistros().isEmpty();
-          %>
-
-          <% if (esOrg) { %>
-            <h2>Ediciones de eventos</h2>
-            <ul class="lista-ediciones">
-              <% 
-                for (DTEdicion e : usuario.getEdiciones()) { 
-                  String estado = (e.getEstado() != null) ? e.getEstado().toString() : "Sin estado";
-                  boolean mostrar = "Aceptada".equalsIgnoreCase(estado) || 
-                                    (esSuPropioPerfil && ("Ingresada".equalsIgnoreCase(estado) || "Rechazada".equalsIgnoreCase(estado)));
-                  if (mostrar) {
-                    String eventoNombre = (edicionToEvento != null) ? edicionToEvento.get(e.getNombre()) : "";
-              %>
-                <li>
-                  <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
-                    <input type="hidden" name="evento" value="<%= eventoNombre %>" />
-                    <input type="hidden" name="edicion" value="<%= e.getNombre() %>" />
-                    <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;">
-                      <strong><%= e.getNombre() %></strong>
-                    </button>
-                  </form>
-                  <span>(<%= e.getFechaInicio() %> - <%= e.getFechaFin() %>)</span>
-                  <em class="estado"> — <%= estado %></em>
-                </li>
-              <% 
-                  } 
-                } 
-              %>
-            </ul>
+        <div class="perfil-header">
+          <% if (usrImagenUrl != null && !usrImagenUrl.isBlank()) { %>
+            <img class="avatar" src="<%= usrImagenUrl %>" alt="Avatar de <%= usuario.getNickname() %>">
+          <% } else { %>
+            <div class="no-avatar" aria-label="Sin imagen">sin imagen</div>
           <% } %>
-
-          <% if (esSuPropioPerfil && esAsist) { %>
-            <h2>Eventos registrados</h2>
-            <ul class="lista-eventos">
-              <% for (DTRegistro r : usuario.getRegistros()) { 
-                   String eventoNombre = (edicionToEvento != null) ? edicionToEvento.get(r.getEdicion()) : "";
-              %>
-                <li>
-                  <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
-                    <input type="hidden" name="evento" value="<%= eventoNombre %>" />
-                    <input type="hidden" name="edicion" value="<%= r.getEdicion() %>" />
-                    <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;">
-                      <strong><%= r.getEdicion() %></strong>
-                    </button>
-                  </form>
-                  <span>| <strong>Tipo:</strong> <%= r.getTipoRegistro() %></span>
-                  <span>| <strong>Fecha registro:</strong> <%= r.getFechaRegistro() %></span>
-                  <span>| <strong>Costo:</strong> $<%= r.getCosto() %></span>
-                  <a class="btn" href="<%= ctx %>/registro/ConsultaRegistroEdicion?idRegistro=<%= java.net.URLEncoder.encode(r.getId(), "UTF-8") %>">Ver detalles</a>
-                </li>
-              <% } %>
-            </ul>
-          <% } %>
+          <div>
+            <p><strong>Nombre:</strong> <%= usuario.getNombre() %></p>
+            <p><strong>Email:</strong> <%= usuario.getEmail() %></p>
+            <% if (usuario.getInstitucion() != null) { %>
+              <p><strong>Institución:</strong> <%= usuario.getInstitucion() %></p>
+            <% } %>
+          </div>
         </div>
+
+        <% if (usuario.getDesc() != null) { %>
+          <p><strong>Descripción:</strong> <%= usuario.getDesc() %></p>
+        <% } %>
+
+        <%
+          boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname());
+          boolean esOrg = usuario.getEdiciones() != null && !usuario.getEdiciones().isEmpty();
+          boolean esAsist = usuario.getRegistros() != null && !usuario.getRegistros().isEmpty();
+        %>
+
+        <% if (esOrg) { %>
+          <h2>Ediciones de eventos</h2>
+          <ul class="lista-ediciones">
+            <% for (DTEdicion e : usuario.getEdiciones()) {
+                 String estado = (e.getEstado() != null) ? e.getEstado().toString() : "Sin estado";
+                 boolean mostrar = "Aceptada".equalsIgnoreCase(estado) ||
+                                   (esSuPropioPerfil && ("Ingresada".equalsIgnoreCase(estado) || "Rechazada".equalsIgnoreCase(estado)));
+                 if (mostrar) {
+                   String eventoNombre = (edicionToEvento != null) ? edicionToEvento.get(e.getNombre()) : "";
+            %>
+              <li>
+                <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
+                  <input type="hidden" name="evento" value="<%= eventoNombre %>" />
+                  <input type="hidden" name="edicion" value="<%= e.getNombre() %>" />
+                  <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;">
+                    <strong><%= e.getNombre() %></strong>
+                  </button>
+                </form>
+                <span>(<%= e.getFechaInicio() %> - <%= e.getFechaFin() %>)</span>
+                <em class="estado"> — <%= estado %></em>
+              </li>
+            <% } } %>
+          </ul>
+        <% } %>
+
+        <% if (esSuPropioPerfil && esAsist) { %>
+          <h2>Eventos registrados</h2>
+          <ul class="lista-eventos">
+            <% for (DTRegistro r : usuario.getRegistros()) {
+                 String eventoNombre = (edicionToEvento != null) ? edicionToEvento.get(r.getEdicion()) : "";
+            %>
+              <li>
+                <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
+                  <input type="hidden" name="evento" value="<%= eventoNombre %>" />
+                  <input type="hidden" name="edicion" value="<%= r.getEdicion() %>" />
+                  <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;">
+                    <strong><%= r.getEdicion() %></strong>
+                  </button>
+                </form>
+                <span>| <strong>Tipo:</strong> <%= r.getTipoRegistro() %></span>
+                <span>| <strong>Fecha registro:</strong> <%= r.getFechaRegistro() %></span>
+                <span>| <strong>Costo:</strong> $<%= r.getCosto() %></span>
+                <a class="btn" href="<%= ctx %>/registro/ConsultaRegistroEdicion?idRegistro=<%= java.net.URLEncoder.encode(r.getId(), "UTF-8") %>">Ver detalles</a>
+              </li>
+            <% } %>
+          </ul>
+        <% } %>
       <% } %>
     </main>
   </div>

@@ -12,19 +12,20 @@ String ctx = request.getContextPath();
   String catSel = (String) request.getAttribute("categoriaSeleccionada");
 %>
 
-<!-- CSS global -->
 <link rel="stylesheet" href="<%=ctx%>/css/style.css">
-<!-- CSS específico de listado -->
 <link rel="stylesheet" href="<%=ctx%>/css/listado.css">
 
 <jsp:include page="/WEB-INF/templates/header.jsp"/>
 
+<style>
+  /* si la tarjeta no tiene cover, ajusto paddings/márgenes */
+  .event-card.list.no-cover .event-title { margin-top: .25rem; }
+</style>
+
 <div class="container">
   <div class="page-list">
-    <!-- Aside -->
     <jsp:include page="/WEB-INF/templates/menu.jsp"/>
 
-    <!-- Contenido -->
     <main class="content">
       <h1 class="list-title"><%= (catSel==null||catSel.isBlank()) ? "Todos los eventos" : "Eventos en " + catSel %></h1>
       <p class="list-sub">
@@ -41,13 +42,14 @@ String ctx = request.getContextPath();
              String desc   = (ev.getDescripcion() == null ? "" : ev.getDescripcion());
              java.util.List<String> evCats = ev.getCategorias();
              java.util.List<String> evEds  = ev.getEdiciones();
+
+             String img = ev.getImagen();
+             boolean hasImg = (img != null && !img.isBlank());
         %>
-          <article class="card event-card list">
-            <%
-            String img = ev.getImagen();
-            if (img != null && !img.isBlank()) { %>
+          <article class="card event-card list <%= hasImg ? "" : "no-cover" %>">
+            <% if (hasImg) { %>
               <img class="event-cover" src="<%=ctx%>/img/<%=img%>" alt="Imagen de <%=nombre%>">
-            <% }%>
+            <% } %>
 
             <h3 class="event-title"><%= nombre %></h3>
             <p class="event-sub"><%= (sigla==null||sigla.isBlank()) ? "—" : sigla %></p>

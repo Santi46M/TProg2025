@@ -4,8 +4,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Enumeration;
 import java.util.Map;
@@ -30,6 +31,8 @@ public class UsuarioServlet extends HttpServlet {
   private static final String JSP_ALTA     = "/WEB-INF/usuario/AltaUsuario.jsp";
   private static final String JSP_CONSULTA = "/WEB-INF/usuario/ConsultaUsuario.jsp";
   private static final String JSP_MODIF    = "/WEB-INF/usuario/ModificarUsuario.jsp";
+
+  private static final String IMG_REL_BASE_USR = "/img/usuarios"; // ← carpeta pública para avatares
 
   private final IControladorUsuario controladorUs = fabrica.getInstance().getIControladorUsuario();
 
@@ -106,19 +109,52 @@ public class UsuarioServlet extends HttpServlet {
 
     if ("/usuario/AltaUsuario".equals(path)) {
 
-      // === Procesar imagen (opcional) ===
-      Part imagenPart = req.getPart("imagen");
+      // === Procesar imagen (opcional) → /img/usuarios ===
+      Part imagenPart = null;
+      try { imagenPart = req.getPart("imagen"); } catch (Exception ignore) {}
       String nombreArchivo = null;
 
       if (imagenPart != null && imagenPart.getSize() > 0) {
-        nombreArchivo = imagenPart.getSubmittedFileName();
-        String rutaUploads = getServletContext().getRealPath("/uploads");
-        File uploadsDir = new File(rutaUploads);
-        if (!uploadsDir.exists()) uploadsDir.mkdir();
+        String ctype = imagenPart.getContentType();
+        if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
+          req.setAttribute("error", "El archivo subido no es una imagen válida.");
+          cargarInstituciones(req);
+          req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+          return;
+        }
 
-        File destino = new File(uploadsDir, nombreArchivo);
-        imagenPart.write(destino.getAbsolutePath());
-        System.out.println("✅ Imagen guardada en: " + destino.getAbsolutePath());
+        // Ruta física dentro del webapp (exploded)
+        String baseImg = getServletContext().getRealPath(IMG_REL_BASE_USR);
+        if (baseImg == null) {
+          String root = getServletContext().getRealPath("/");
+          if (root != null) {
+            baseImg = Path.of(root, "img", "usuarios").toString();
+          }
+        }
+        if (baseImg == null) {
+          throw new ServletException("No se pudo resolver la ruta física de /img/usuarios. " +
+              "Verificá deploy 'exploded' y carpeta webapp/img/usuarios.");
+        }
+
+        Files.createDirectories(Path.of(baseImg));
+
+        // nombre final: nick + extensión
+        String nickParam = req.getParameter("nick");
+        String original = getSafeFilename(imagenPart);
+        String ext = getExtension(original);
+        if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
+        if (ext == null || ext.isBlank()) ext = ".jpg";
+
+        String finalName = (nickParam == null || nickParam.isBlank() ? "avatar" : nickParam) + ext;
+        Path destino = Path.of(baseImg, finalName);
+
+        try (var in = imagenPart.getInputStream()) {
+          Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        nombreArchivo = finalName; // ← guardamos SOLO el nombre
+        System.out.println("✅ Imagen guardada: " + destino.toAbsolutePath()
+            + " | URL esperada: " + ctx(req) + IMG_REL_BASE_USR + "/" + finalName);
       }
 
       // === Leer parámetros ===
@@ -193,7 +229,7 @@ public class UsuarioServlet extends HttpServlet {
             institucion,
             esOrganizador,
             pass1,
-            nombreArchivo
+            nombreArchivo  // ← SOLO nombre (p.ej. "vale23.jpg")
         );
 
         // ✅ Crear sesión como en login
@@ -214,7 +250,6 @@ public class UsuarioServlet extends HttpServlet {
         sAux.setAttribute("nick", nick);
         sAux.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
         sAux.setAttribute("estado_sesion", "LOGIN_CORRECTO");
-
 
         Enumeration<String> names = sAux.getAttributeNames();
         while (names.hasMoreElements()) {
@@ -252,7 +287,8 @@ public class UsuarioServlet extends HttpServlet {
 
       try {
         controladorUs.modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaNac, institucion);
-        resp.sendRedirect(ctx(req) + "/usuario/consulta?nick=" + nick);
+        // corregimos a la ruta existente mapeada por este servlet
+        resp.sendRedirect(ctx(req) + "/usuario/ConsultaUsuario?nick=" + java.net.URLEncoder.encode(nick, java.nio.charset.StandardCharsets.UTF_8));
       } catch (UsuarioNoExisteException | UsuarioTipoIncorrectoException e) {
         req.setAttribute("error", e.getMessage());
         req.getRequestDispatcher(JSP_MODIF).forward(req, resp);
@@ -277,5 +313,30 @@ public class UsuarioServlet extends HttpServlet {
     req.setAttribute("instIdA", institucion);
     req.setAttribute("nacA", nacStr);
     req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+  }
+
+  // ==== helpers de archivo ====
+  private static String getSafeFilename(Part p) {
+    String name = p.getSubmittedFileName();
+    if (name == null) return "archivo";
+    name = name.replace("\\", "/");
+    int slash = name.lastIndexOf('/');
+    return (slash >= 0) ? name.substring(slash + 1) : name;
+  }
+  private static String getExtension(String filename) {
+    if (filename == null) return null;
+    int dot = filename.lastIndexOf('.');
+    if (dot < 0 || dot == filename.length() - 1) return null;
+    return filename.substring(dot).toLowerCase();
+  }
+  private static String guessExtensionFromContentType(String ctype) {
+    if (ctype == null) return null;
+    ctype = ctype.toLowerCase();
+    if (ctype.contains("jpeg")) return ".jpg";
+    if (ctype.contains("jpg"))  return ".jpg";
+    if (ctype.contains("png"))  return ".png";
+    if (ctype.contains("gif"))  return ".gif";
+    if (ctype.contains("webp")) return ".webp";
+    return ".jpg";
   }
 }
