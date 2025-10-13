@@ -1,110 +1,182 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.*,logica.datatypes.DTEvento,logica.clases.Ediciones,logica.enumerados.DTEstado" %>
+<%@ page import="java.util.*,logica.datatypes.DTEvento,logica.clases.Ediciones,logica.clases.TipoRegistro" %>
 <%
   String ctx = request.getContextPath();
+
   List<DTEvento> eventos = (List<DTEvento>) request.getAttribute("eventos");
-  List<Ediciones> ediciones = (List<Ediciones>) request.getAttribute("ediciones");
   Map<String, List<Ediciones>> mapa = (Map<String, List<Ediciones>>) request.getAttribute("edicionesPorEvento");
+  Ediciones edSel = (Ediciones) request.getAttribute("edicionSeleccionada");
+
+  String eventoSel = request.getParameter("evento");         // nombre del evento (GET)
+  String edicionSel = request.getParameter("edicion");       // nombre de edición (GET)
 %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Registrarse a Edición de Evento — Eventos.uy</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="<%=ctx%>/css/style.css">
-  <link rel="stylesheet" href="<%=ctx%>/css/RegistroEdicionEvento.css">
-  <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+  <meta charset="UTF-8"/>
+  <title>Registrarse a una Edición de Evento</title>
+  <link rel="stylesheet" href="<%=ctx%>/css/style.css"/>
+  <link rel="stylesheet" href="<%=ctx%>/css/RegistroEdicionEvento.css"/>
 </head>
 <body>
 
 <jsp:include page="/WEB-INF/templates/header.jsp" />
+
 <div class="container row" style="margin-top:1rem; display:flex; align-items:flex-start;">
   <jsp:include page="/WEB-INF/templates/menu.jsp" />
+
   <main class="container" style="flex:2; min-width:0;">
+
+    <% if (request.getAttribute("error") != null) { %>
+      <p style="color:#c00; font-weight:600"><%= request.getAttribute("error") %></p>
+    <% } %>
+
+    <!-- === PASO 1: Selección (GET) - JS solo para poblar ediciones === -->
     <section class="form-card-registroEdicionEvento">
-      <h2>Registrarse a Edición de Evento</h2>
-      <% if (request.getAttribute("error") != null) { %>
-        <p style="color:#c00"><%= request.getAttribute("error") %></p>
-      <% } %>
-      <form action="<%=ctx%>/registro/inscripcion" method="post" id="form-registro-edicion">
+      <h2>Registrarse a una Edición de Evento</h2>
+
+      <form id="formSelección" action="<%=ctx%>/registro/inscripcion" method="get">
         <div class="form-group-registroEdicionEvento">
-          <label>Evento <span style="color:red">*</span></label>
+          <label for="selectEvento">Evento <span style="color:red">*</span></label>
           <select id="selectEvento" name="evento" required>
             <option value="">-- Seleccione un evento --</option>
             <% if (eventos != null) {
-                 for (DTEvento ev : eventos) { %>
-                   <option value="<%= ev.getNombre() %>"><%= ev.getNombre() %></option>
-            <%   }
-               } %>
+                 for (DTEvento ev : eventos) {
+                   String sel = (ev.getNombre().equals(eventoSel)) ? "selected" : "";
+            %>
+              <option value="<%=ev.getNombre()%>" <%=sel%>><%=ev.getNombre()%></option>
+            <% } } %>
           </select>
         </div>
+
         <div class="form-group-registroEdicionEvento">
-          <label>Edición aceptada <span style="color:red">*</span></label>
-          <select id="selectEdicion" name="edicion" required disabled>
+          <label for="selectEdicion">Edición aceptada <span style="color:red">*</span></label>
+          <select id="selectEdicion" name="edicion" required <%= (eventoSel==null||eventoSel.isBlank())?"disabled":"" %>>
             <option value="">-- Seleccione primero un evento --</option>
           </select>
         </div>
-        <div class="form-actions-registroEdicionEvento">
-          <button type="submit" class="btn-guardar-registroEdicionEvento">Registrarse</button>
-          <button type="submit" class="btn-cancelar-registroEdicionEvento" name="accion" value="cancelar">Cancelar</button>
-        </div>
       </form>
-      <script>
-        document.querySelector('.btn-cancelar-registroEdicionEvento').addEventListener('click', function(e) {
-          var form = document.getElementById('form-registro-edicion');
-          Array.from(form.querySelectorAll('[required]')).forEach(function(input) {
-            input.removeAttribute('required');
-          });
-        });
-      </script>
     </section>
+
+    <!-- === PASO 2: Detalle de la edición (SIN JS) y elección de tipo (POST) === -->
+    <% if (edSel != null) { %>
+      <section class="event-card" style="margin-top:1rem">
+        <h3 style="margin-bottom:.5rem">Datos de la edición</h3>
+        <ul>
+          <li><strong>Evento:</strong> <%= edSel.getEvento().getNombre() %></li>
+          <li><strong>Edición:</strong> <%= edSel.getNombre() %></li>
+          <li><strong>Sigla:</strong> <%= edSel.getSigla() %></li>
+          <li><strong>Fecha inicio:</strong> <%= edSel.getFechaInicio() %></li>
+          <li><strong>Fecha fin:</strong> <%= edSel.getFechaFin() %></li>
+          <li><strong>Ciudad:</strong> <%= edSel.getCiudad() %></li>
+          <li><strong>País:</strong> <%= edSel.getPais() %></li>
+        </ul>
+
+        <h3 style="margin:.75rem 0 .25rem">Tipos de registro</h3>
+        <%
+          Collection<TipoRegistro> tipos = edSel.getTiposRegistro();
+          boolean hayTipos = (tipos != null && !tipos.isEmpty());
+        %>
+        <% if (!hayTipos) { %>
+          <p>No hay tipos de registro disponibles para esta edición.</p>
+        <% } else { %>
+          <form action="<%=ctx%>/registro/inscripcion" method="post" id="formInscripcion" style="margin-top:.5rem">
+            <!-- Datos fijos para el POST -->
+            <input type="hidden" name="evento"  value="<%= edSel.getEvento().getNombre() %>"/>
+            <input type="hidden" name="edicion" value="<%= edSel.getNombre() %>"/>
+
+            <div role="group" aria-labelledby="label-tipo">
+              <p id="label-tipo" style="margin:.25rem 0 .5rem"><strong>Seleccione un tipo:</strong></p>
+              <% for (TipoRegistro tr : tipos) { %>
+                <label style="display:block; margin:.25rem 0;">
+                  <input type="radio" name="tipo" value="<%= tr.getNombre() %>" required/>
+                  <span style="margin-left:.25rem">
+                    <strong><%= tr.getNombre() %></strong>
+                    — <em><%= tr.getDescripcion() %></em>
+                    — $<%= tr.getCosto() %>
+                  </span>
+                </label>
+              <% } %>
+            </div>
+
+            <div class="form-group-registroEdicionEvento" style="margin-top:.75rem">
+              <label for="codigoPatrocinio">Código de patrocinio (opcional)</label>
+              <input id="codigoPatrocinio" name="codigoPatrocinio" placeholder="Ej: CORREANTEL"/>
+              <small>Si es válido, el costo será $0.</small>
+            </div>
+
+            <div class="form-actions-registroEdicionEvento" style="margin-top:1rem">
+              <button type="submit" class="btn-guardar-registroEdicionEvento">Confirmar inscripción</button>
+            </div>
+          </form>
+        <% } %>
+      </section>
+    <% } %>
   </main>
 </div>
 
 <script>
+  // ===== Datos para poblar ediciones por evento (solo JS aquí) =====
   const data = {
-  <% if (mapa != null && !mapa.isEmpty()) {
-       int ecount = 0;
-       for (Map.Entry<String, List<Ediciones>> entry : mapa.entrySet()) {
-         String evName = entry.getKey() == null ? "" : entry.getKey().replace("\"","\\\"");
-         List<Ediciones> list = entry.getValue();
-         if (list == null || list.isEmpty()) continue;
-         if (ecount++ > 0) out.print(",");
-         out.print("\"" + evName + "\":[");
-         for (int i = 0; i < list.size(); i++) {
-           Ediciones ed = list.get(i);
-           String sigla = ed.getSigla() == null ? "" : ed.getSigla().replace("\"","\\\"");
-           String nombre = ed.getNombre() == null ? "" : ed.getNombre().replace("\"","\\\"");
-           out.print("{\"sigla\":\"" + sigla + "\",\"nombre\":\"" + nombre + "\"}");
-           if (i < list.size() - 1) out.print(",");
+    <% if (mapa != null && !mapa.isEmpty()) {
+         int ecount = 0;
+         for (Map.Entry<String, List<Ediciones>> entry : mapa.entrySet()) {
+           String evName = entry.getKey().replace("\"","\\\"");
+           List<Ediciones> list = entry.getValue();
+           if (list == null || list.isEmpty()) continue;
+           if (ecount++ > 0) out.print(",");
+           out.print("\""+evName+"\":[");
+           for (int i=0;i<list.size();i++){
+             Ediciones ed = list.get(i);
+             String nom = (ed.getNombre()==null)?"":ed.getNombre().replace("\"","\\\"");
+             String sig = (ed.getSigla()==null)?"":ed.getSigla().replace("\"","\\\"");
+             out.print("{\"nombre\":\""+nom+"\",\"sigla\":\""+sig+"\"}");
+             if (i<list.size()-1) out.print(",");
+           }
+           out.print("]");
          }
-         out.print("]");
-       }
-     } %>
+       } %>
   };
 
-  const selectEvento = document.getElementById("selectEvento");
-  const selectEdicion = document.getElementById("selectEdicion");
+  const selEvento  = document.getElementById("selectEvento");
+  const selEdicion = document.getElementById("selectEdicion");
+  const formSel    = document.getElementById("formSelección");
 
-  selectEvento.addEventListener("change", function() {
-    const nombreEv = this.value;
-    const eds = data[nombreEv] || [];
-    selectEdicion.innerHTML = "";
-    if (eds.length === 0) {
-      selectEdicion.innerHTML = "<option value=''>-- No hay ediciones aceptadas --</option>";
-      selectEdicion.disabled = true;
-    } else {
-      selectEdicion.innerHTML = "<option value=''>-- Seleccione una edición --</option>";
-      eds.forEach(function(ed) {
-        const opt = document.createElement("option");
-        opt.value = ed.sigla;     // se envía 'sigla' al POST
-        opt.textContent = ed.nombre;
-        selectEdicion.appendChild(opt);
-      });
-      selectEdicion.disabled = false;
+  function renderEdiciones(nombreEvento, preselect) {
+    selEdicion.innerHTML = "";
+    const eds = data[nombreEvento] || [];
+    if (!eds.length) {
+      selEdicion.innerHTML = "<option value=''>-- No hay ediciones aceptadas --</option>";
+      selEdicion.disabled = true;
+      return;
     }
+    selEdicion.disabled = false;
+    selEdicion.insertAdjacentHTML("beforeend","<option value=''>-- Seleccione una edición --</option>");
+    eds.forEach(ed => {
+      const opt = document.createElement("option");
+      opt.value = ed.nombre;                          // enviamos el NOMBRE de la edición en el GET
+      opt.textContent = ed.nombre;
+      if (preselect && preselect === ed.nombre) opt.selected = true;
+      selEdicion.appendChild(opt);
+    });
+  }
+
+  // Cambiar evento → poblar ediciones (sin enviar)
+  selEvento.addEventListener("change", () => {
+    renderEdiciones(selEvento.value, null);
   });
+
+  // Cambiar edición → enviar GET (sin más JS después)
+  selEdicion.addEventListener("change", () => {
+    if (selEvento.value && selEdicion.value) formSel.submit();
+  });
+
+  // Estado inicial (si venimos con parámetros)
+  (function init(){
+    const ev = "<%= (eventoSel==null?"":eventoSel.replace("\"","\\\"")) %>";
+    const ed = "<%= (edicionSel==null?"":edicionSel.replace("\"","\\\"")) %>";
+    if (ev) renderEdiciones(ev, ed);
+  })();
 </script>
 
 </body>

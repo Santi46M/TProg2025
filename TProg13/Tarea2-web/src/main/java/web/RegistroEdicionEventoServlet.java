@@ -22,159 +22,168 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
 
     private IControladorEvento ce() { return fabrica.getInstance().getIControladorEvento(); }
     private IControladorUsuario cu() { return fabrica.getInstance().getIControladorUsuario(); }
-    private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
+    // =============== GET: lista eventos/ediciones y muestra detalle si ya hay edición ===============
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        req.setCharacterEncoding("UTF-8");
+
         if (!requiereAsistente(req, resp)) return;
 
+        // --- 1) Listar eventos ---
         List<DTEvento> eventos = ce().listarEventos();
         req.setAttribute("eventos", eventos);
 
-        List<Ediciones> edicionesAceptadas = new ArrayList<>();
+        // --- 2) Mapa evento → ediciones aceptadas (para el combo dinámico con JS) ---
         Map<String, List<Ediciones>> edicionesPorEvento = new LinkedHashMap<>();
-
         for (DTEvento ev : eventos) {
-            String nombreEvento = ev.getNombre();
-            List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
+            List<String> nombresEd = ce().listarEdicionesEvento(ev.getNombre());
             if (nombresEd == null) continue;
-
+            List<Ediciones> aceptadas = new ArrayList<>();
             for (String nomEd : nombresEd) {
-                Ediciones edicionIter = ce().obtenerEdicion(nombreEvento, nomEd);
-                if (edicionIter != null && edicionIter.getEstado() == DTEstado.Aceptada) {
-                    edicionesAceptadas.add(edicionIter);
-                    edicionesPorEvento
-                        .computeIfAbsent(nombreEvento, k -> new ArrayList<>())
-                        .add(edicionIter);
+                Ediciones ed = ce().obtenerEdicion(ev.getNombre(), nomEd);
+                if (ed != null && ed.getEstado() == DTEstado.Aceptada) {
+                    aceptadas.add(ed);
                 }
+            }
+            if (!aceptadas.isEmpty()) edicionesPorEvento.put(ev.getNombre(), aceptadas);
+        }
+        req.setAttribute("edicionesPorEvento", edicionesPorEvento);
+
+        // --- 3) Si hay evento y edición seleccionados → traer detalle completo ---
+        String evento = trim(req.getParameter("evento"));
+        String edicion = trim(req.getParameter("edicion"));
+        if (!isBlank(evento) && !isBlank(edicion)) {
+            Ediciones edSel = ce().obtenerEdicion(evento, edicion);
+            if (edSel != null && edSel.getEstado() == DTEstado.Aceptada) {
+                req.setAttribute("edicionSeleccionada", edSel);
+            } else {
+                req.setAttribute("error", "La edición seleccionada no existe o no está aceptada.");
             }
         }
 
-        req.setAttribute("ediciones", edicionesAceptadas);
-        req.setAttribute("edicionesPorEvento", edicionesPorEvento);
         req.getRequestDispatcher(JSP_INSCRIPCION).forward(req, resp);
     }
 
+    // =============== POST: realiza inscripción y aplica código de patrocinio si corresponde ===============
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        req.setCharacterEncoding("UTF-8");
+
         if (!requiereAsistente(req, resp)) return;
+        req.setCharacterEncoding("UTF-8");
 
-        String siglaEdicion = trim(req.getParameter("edicion"));
-        HttpSession sAux = req.getSession(false);
-        String nick = (sAux == null) ? null : (String) sAux.getAttribute("nick");
+        String evento = trim(req.getParameter("evento"));
+        String edicion = trim(req.getParameter("edicion"));
+        String tipoNom = trim(req.getParameter("tipo"));
+        String codigoPatrocinio = trim(req.getParameter("codigoPatrocinio"));
 
-        if (isBlank(siglaEdicion) || isBlank(nick)) {
-            req.setAttribute("error", "Debe seleccionar una edición aceptada.");
-            recargarDatos(req);
-            req.getRequestDispatcher(JSP_INSCRIPCION).forward(req, resp);
+        HttpSession s = req.getSession(false);
+        String nick = (s == null) ? null : (String) s.getAttribute("nick");
+
+        if (isBlank(evento) || isBlank(edicion) || isBlank(tipoNom) || isBlank(nick)) {
+            req.setAttribute("error", "Debe seleccionar evento, edición y tipo de registro.");
+            doGet(req, resp);
             return;
         }
 
+        Usuario usuario = cu().listarUsuarios().get(nick);
+        if (!(usuario instanceof Asistente asistente)) {
+            req.setAttribute("error", "Solo los asistentes pueden registrarse en ediciones.");
+            doGet(req, resp);
+            return;
+        }
+
+        Ediciones ed = ce().obtenerEdicion(evento, edicion);
+        if (ed == null || ed.getEstado() != DTEstado.Aceptada) {
+            req.setAttribute("error", "La edición seleccionada no está aceptada o no existe.");
+            doGet(req, resp);
+            return;
+        }
+
+        // --- Buscar el tipo de registro elegido ---
+        TipoRegistro tipo = null;
+        Collection<TipoRegistro> tipos = ed.getTiposRegistro();
+        if (tipos != null) {
+            for (TipoRegistro t : tipos) {
+                if (t.getNombre().equalsIgnoreCase(tipoNom)) {
+                    tipo = t;
+                    break;
+                }
+            }
+        }
+        if (tipo == null) {
+            req.setAttribute("error", "El tipo de registro seleccionado no es válido.");
+            doGet(req, resp);
+            return;
+        }
+
+        // --- Costo base ---
+        float costo = tipo.getCosto();
+
+        // --- Verificar código de patrocinio ---
+        if (!isBlank(codigoPatrocinio)) {
+            Collection<Patrocinio> patrocinios = ed.getPatrocinios();
+            boolean valido = false;
+
+            if (patrocinios != null) {
+                for (Patrocinio p : patrocinios) {
+                    if (p != null && p.getCodigoPatrocinio() != null &&
+                        p.getCodigoPatrocinio().equalsIgnoreCase(codigoPatrocinio)) {
+                        valido = true;
+                        break;
+                    }
+                }
+            }
+
+            if (valido) {
+                costo = 0f;
+                System.out.println("✅ Código de patrocinio válido: " + codigoPatrocinio);
+            } else {
+                System.out.println("❌ Código de patrocinio inválido: " + codigoPatrocinio);
+                req.setAttribute("error", "El código de patrocinio no es válido.");
+                doGet(req, resp);
+                return;
+            }
+        }
+
+        // --- Crear registro ---
         try {
-            Ediciones edicionIter = ce().obtenerEdicionPorSigla(siglaEdicion);
-            if (edicionIter == null || edicionIter.getEstado() != DTEstado.Aceptada) {
-                req.setAttribute("error", "La edición seleccionada no está aceptada.");
-                recargarDatos(req);
-                req.getRequestDispatcher(JSP_INSCRIPCION).forward(req, resp);
-                return;
-            }
-
-            Usuario usuario = cu().listarUsuarios().get(nick);
-            if (!(usuario instanceof Asistente)) {
-                req.setAttribute("error", "Solo asistentes pueden inscribirse.");
-                recargarDatos(req);
-                req.getRequestDispatcher(JSP_INSCRIPCION).forward(req, resp);
-                return;
-            }
-
-            Eventos evento = edicionIter.getEvento();
-
-            // Primer tipo disponible
-            TipoRegistro tipoRegistro = null;
-            Collection<TipoRegistro> tipos = edicionIter.getTiposRegistro();
-            if (tipos != null && !tipos.isEmpty()) {
-                tipoRegistro = tipos.iterator().next();
-            }
-            if (tipoRegistro == null) {
-                req.setAttribute("error", "No hay tipos de registro disponibles para esta edición.");
-                recargarDatos(req);
-                req.getRequestDispatcher(JSP_INSCRIPCION).forward(req, resp);
-                return;
-            }
-
-            // Crear registro a través de la lógica
             String idRegistro = UUID.randomUUID().toString();
             LocalDate fechaRegistro = LocalDate.now();
-            float costo = tipoRegistro.getCosto();
-            LocalDate fechaInicio = edicionIter.getFechaInicio();
 
             ce().altaRegistroEdicionEvento(
-                idRegistro, usuario, evento, edicionIter, tipoRegistro, fechaRegistro, costo, fechaInicio
+                idRegistro, usuario, ed.getEvento(), ed, tipo,
+                fechaRegistro, costo, ed.getFechaInicio()
             );
 
-            // ===================== 🔧 BLOQUE AÑADIDO 🔧 =====================
-            // Crear el registro en las estructuras locales también
-            Registro nuevo = new Registro(idRegistro, usuario, edicionIter, tipoRegistro, fechaRegistro, costo, fechaInicio);
-            edicionIter.agregarRegistro(idRegistro, nuevo);
-
-            if (usuario instanceof Asistente asistente) {
-                asistente.addRegistro(idRegistro, nuevo);
-            }
-
-            System.out.println("✅ Registro agregado: " + usuario.getNickname() + " en edición " + edicionIter.getNombre());
-            // ================================================================
+            // Mantener coherencia en memoria
+            Registro nuevo = new Registro(idRegistro, usuario, ed, tipo, fechaRegistro, costo, ed.getFechaInicio());
+            ed.agregarRegistro(idRegistro, nuevo);
+            asistente.addRegistro(idRegistro, nuevo);
 
             req.setAttribute("mensaje", "Inscripción realizada correctamente.");
             req.getRequestDispatcher(JSP_OK).forward(req, resp);
 
-        } catch (IllegalArgumentException e) {
-            req.setAttribute("error", e.getMessage());
-            recargarDatos(req);
-            req.getRequestDispatcher(JSP_INSCRIPCION).forward(req, resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("error", "Ocurrió un error al registrar: " + e.getMessage());
+            doGet(req, resp);
         }
     }
 
-    private void recargarDatos(HttpServletRequest req) {
-        List<DTEvento> eventos = ce().listarEventos();
-        req.setAttribute("eventos", eventos);
-
-        List<Ediciones> edicionesAceptadas = new ArrayList<>();
-        Map<String, List<Ediciones>> edicionesPorEvento = new LinkedHashMap<>();
-
-        for (DTEvento ev : eventos) {
-            String nombreEvento = ev.getNombre();
-            List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
-            if (nombresEd == null) continue;
-
-            for (String nomEd : nombresEd) {
-                Ediciones edicionIter = ce().obtenerEdicion(nombreEvento, nomEd);
-                if (edicionIter != null && edicionIter.getEstado() == DTEstado.Aceptada) {
-                    edicionesAceptadas.add(edicionIter);
-                    edicionesPorEvento
-                        .computeIfAbsent(nombreEvento, k -> new ArrayList<>())
-                        .add(edicionIter);
-                }
-            }
-        }
-
-        req.setAttribute("ediciones", edicionesAceptadas);
-        req.setAttribute("edicionesPorEvento", edicionesPorEvento);
-    }
+    // =============== Métodos auxiliares ===============
 
     private boolean requiereAsistente(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        HttpSession sAux = req.getSession(false);
-        String rol = sAux == null ? null : (String) sAux.getAttribute("rol");
+        HttpSession s = req.getSession(false);
+        String rol = s == null ? null : (String) s.getAttribute("rol");
         if (!"ASISTENTE".equals(rol)) {
-            resp.sendRedirect(ctx(req) + "/auth/login");
+            resp.sendRedirect(req.getContextPath() + "/auth/login");
             return false;
         }
         return true;
     }
 
-    private static String trim(String sAux) { return sAux == null ? null : sAux.trim(); }
-    private static boolean isBlank(String sAux) { return sAux == null || sAux.trim().isEmpty(); }
+    private static String trim(String s){ return s==null?null:s.trim(); }
+    private static boolean isBlank(String s){ return s==null || s.trim().isEmpty(); }
 }
