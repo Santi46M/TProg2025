@@ -37,8 +37,8 @@ import logica.enumerados.DTEstado;
 import logica.enumerados.DTNivel;
 import logica.interfaces.IControladorEvento;
 import logica.manejadores.ManejadorEvento;
-import logica.manejadores.manejadorAuxiliar;
-import logica.manejadores.manejadorUsuario;
+import logica.manejadores.ManejadorAuxiliar;
+import logica.manejadores.ManejadorUsuario;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -47,7 +47,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class ControladorEvento implements IControladorEvento {
     private ManejadorEvento manejador = ManejadorEvento.getInstancia();
-    private manejadorUsuario mUsuario = manejadorUsuario.getInstancia();
+    private ManejadorUsuario mUsuario = ManejadorUsuario.getInstancia();
 
     private String edicionSeleccionadaSigla = null;
 
@@ -58,7 +58,7 @@ public class ControladorEvento implements IControladorEvento {
         if (manejador.existeEvento(nombre)) {
             throw new EventoYaExisteException(nombre);
         }
-        manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
+        ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
         Map<String, Categoria> categoriasMap = new java.util.HashMap<>();
         for (String nombreCat : categorias.getCategorias()) {
             Categoria cat = manejadorAux.obtenerCategoria(nombreCat);
@@ -88,7 +88,7 @@ public class ControladorEvento implements IControladorEvento {
     }
 
     public void altaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException {
-        manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
+        ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
         for (Patrocinio p : manejadorAux.listarPatrocinios()) {
             if (p.getInstitucion().equals(institucion) && p.getEdicion().equals(edicion)) {
                 throw new PatrocinioYaExisteException(institucion.getNombre(), edicion.getNombre());
@@ -107,7 +107,7 @@ public class ControladorEvento implements IControladorEvento {
     }
 
     public void altaCategoria(String nombre) {
-        manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
+        ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
         if (manejadorAux.existeCategoria(nombre)) {
             throw new RuntimeException("Ya existe la categoría: " + nombre);
         }
@@ -256,7 +256,7 @@ public class ControladorEvento implements IControladorEvento {
     
  // En ControladorEvento
     public static List<String> listarCategorias() {
-        Set<String> set = manejadorAuxiliar.getInstancia().listarCategorias();
+        Set<String> set = ManejadorAuxiliar.getInstancia().listarCategorias();
         List<String> res = new ArrayList<>();
         if (set == null || set.isEmpty()) return res;
 

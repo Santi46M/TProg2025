@@ -11,8 +11,8 @@ import logica.clases.Institucion;
 import logica.clases.Organizador;
 import logica.clases.Usuario;
 
-public class manejadorUsuario {
-	private static manejadorUsuario instancia; //singleton
+public class ManejadorUsuario {
+	private static ManejadorUsuario instancia; //singleton
 	private Map<String, Usuario> usuarios = new HashMap<String, Usuario>();
 	private Map<String, Asistente> asistentes = new HashMap<String, Asistente>();
 	private Map<String, Organizador> organizadores = new HashMap<String, Organizador>();
@@ -20,16 +20,16 @@ public class manejadorUsuario {
 	private Set<String> instituciones = new HashSet<String>();
 	
 	//// instancia de manejador singleton (no se si esta del todo bien)
-	private manejadorUsuario() {
+	private ManejadorUsuario() {
 		 usuarios = new HashMap<>();
 		 asistentes = new HashMap<>();
 		 organizadores = new HashMap<>();
 		 instituciones = new HashSet<>();
 	}
 	
-	public static manejadorUsuario getInstancia() {
+	public static ManejadorUsuario getInstancia() {
 		if (instancia == null) {
-			instancia = new manejadorUsuario();
+			instancia = new ManejadorUsuario();
 		}
 		return instancia;
 	}

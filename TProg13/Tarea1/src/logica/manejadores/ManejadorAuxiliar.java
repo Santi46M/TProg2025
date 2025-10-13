@@ -9,21 +9,21 @@ import java.util.Set;
 import logica.clases.Categoria;
 import logica.clases.Patrocinio;
 
-public class manejadorAuxiliar {
-	private static manejadorAuxiliar instancia; //singleton
+public class ManejadorAuxiliar {
+	private static ManejadorAuxiliar instancia; //singleton
 	// Usar Map para categorías y Set para patrocinios (objetos)
 	private Map<String, Categoria> categorias = new HashMap<>();
 	private Set<Patrocinio> patrocinios = new HashSet<>();
 	
 	//// instancia de manejador singleton (no se si esta del todo bien)
-	private manejadorAuxiliar() {
+	private ManejadorAuxiliar() {
 		 this.categorias = new HashMap<>();
 		 this.patrocinios = new HashSet<>();
 	}
 	
-	public static manejadorAuxiliar getInstancia() {
+	public static ManejadorAuxiliar getInstancia() {
 		if (instancia == null) {
-			instancia = new manejadorAuxiliar();
+			instancia = new ManejadorAuxiliar();
 		}
 		return instancia;
 	}

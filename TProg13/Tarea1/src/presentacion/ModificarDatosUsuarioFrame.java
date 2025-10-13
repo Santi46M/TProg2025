@@ -102,7 +102,7 @@ public class ModificarDatosUsuarioFrame extends JInternalFrame {
         gbc.gridy++;
 
         JLabel lblInstitucion = new JLabel("Institución:");
-        String[] instituciones = logica.manejadores.manejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
+        String[] instituciones = logica.manejadores.ManejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
         JComboBox<String> comboInstitucion = new JComboBox<>(instituciones);
         panelDatos.add(lblInstitucion, gbc);
         gbc.gridx = 1;

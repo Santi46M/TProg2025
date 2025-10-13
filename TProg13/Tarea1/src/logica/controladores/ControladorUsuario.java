@@ -24,14 +24,14 @@ import logica.datatypes.DTEdicion;
 import logica.datatypes.DTRegistro;
 import logica.interfaces.IControladorUsuario;
 import logica.manejadores.ManejadorEvento;
-import logica.manejadores.manejadorAuxiliar;
-import logica.manejadores.manejadorUsuario;
+import logica.manejadores.ManejadorAuxiliar;
+import logica.manejadores.ManejadorUsuario;
 
 public class ControladorUsuario implements IControladorUsuario {
 	
-    private manejadorUsuario manejador = manejadorUsuario.getInstancia();
+    private ManejadorUsuario manejador = ManejadorUsuario.getInstancia();
     private ManejadorEvento manejadorEv = ManejadorEvento.getInstancia();
-    private manejadorAuxiliar manejadorAux = manejadorAuxiliar.getInstancia();
+    private ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
 
     // --- estado de selección para consultas ---
     private String usuarioSeleccionadoNickname = null;
@@ -301,7 +301,7 @@ public class ControladorUsuario implements IControladorUsuario {
     
     @Override
     public boolean validarLogin(String nickOrEmail, String contrasena) {
-        manejadorUsuario manejadorUser = manejadorUsuario.getInstancia();
+        ManejadorUsuario manejadorUser = ManejadorUsuario.getInstancia();
 
         // Buscar por nickname o por correo electrónico
         Usuario user = manejadorUser.obtenerUsuarioPorNickOEmail(nickOrEmail);

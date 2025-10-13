@@ -13,8 +13,8 @@ import logica.fabrica;
 import logica.CargaDatosPrueba;
 import logica.interfaces.IControladorUsuario;
 import logica.manejadores.ManejadorEvento;
-import logica.manejadores.manejadorAuxiliar;
-import logica.manejadores.manejadorUsuario;
+import logica.manejadores.ManejadorAuxiliar;
+import logica.manejadores.ManejadorUsuario;
 
 
 
@@ -23,8 +23,8 @@ public class TestCasosPrueba {
     static private fabrica fabrica = new fabrica();
     
     static private IControladorUsuario cUsuario = fabrica.getIControladorUsuario();
-    static private manejadorAuxiliar mAux = manejadorAuxiliar.getInstancia();
-    static private manejadorUsuario mUsr = manejadorUsuario.getInstancia();
+    static private ManejadorAuxiliar mAux = ManejadorAuxiliar.getInstancia();
+    static private ManejadorUsuario mUsr = ManejadorUsuario.getInstancia();
     static private ManejadorEvento mEv = ManejadorEvento.getInstancia();
 
     @BeforeAll

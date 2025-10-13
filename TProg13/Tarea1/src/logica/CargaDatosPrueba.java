@@ -236,7 +236,7 @@ public class CargaDatosPrueba {
     public static void cargarEdicionesEjemplo() throws EdicionYaExisteException {
         var controladorEve = new logica.controladores.ControladorEvento();
         var manejadorEve = ManejadorEvento.getInstancia();
-        var manejadorUsu = logica.manejadores.manejadorUsuario.getInstancia();
+        var manejadorUsu = logica.manejadores.ManejadorUsuario.getInstancia();
 
         // Helper: crea la edición y le setea estado (si tu Controlador no recibe estado)
         java.util.function.BiConsumer<String, DTEstado> setEstadoEdicion = (sigla, estado) -> {
@@ -468,7 +468,7 @@ public class CargaDatosPrueba {
     public static void cargarRegistrosEjemplo() {
         var controladorEve = new logica.controladores.ControladorEvento();
         var manejadorEve = ManejadorEvento.getInstancia();
-        var manejadorUsu = logica.manejadores.manejadorUsuario.getInstancia();
+        var manejadorUsu = logica.manejadores.ManejadorUsuario.getInstancia();
 
         controladorEve.altaRegistroEdicionEvento("atorres MONROCK25",
             manejadorUsu.getUsuarios().get("atorres"),
@@ -544,7 +544,7 @@ public class CargaDatosPrueba {
 
         controladorEve.altaPatrocinio(
             manejadorEve.obtenerEdicion("CONFTECH26"),
-            logica.manejadores.manejadorUsuario.getInstancia().findInstitucion("Facultad de Ingeniería"),
+            logica.manejadores.ManejadorUsuario.getInstancia().findInstitucion("Facultad de Ingeniería"),
             DTNivel.ORO,
             manejadorEve.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("Estudiante"),
             20000,
@@ -555,7 +555,7 @@ public class CargaDatosPrueba {
 
         controladorEve.altaPatrocinio(
             manejadorEve.obtenerEdicion("CONFTECH26"),
-            logica.manejadores.manejadorUsuario.getInstancia().findInstitucion("Agencia Nacional de Investigación e Innovación (ANII)"),
+            logica.manejadores.ManejadorUsuario.getInstancia().findInstitucion("Agencia Nacional de Investigación e Innovación (ANII)"),
             DTNivel.PLATA,
             manejadorEve.obtenerEdicion("CONFTECH26").obtenerTipoRegistro("General"),
             10000,
@@ -566,7 +566,7 @@ public class CargaDatosPrueba {
 
         controladorEve.altaPatrocinio(
             manejadorEve.obtenerEdicion("MARATON25"),
-            logica.manejadores.manejadorUsuario.getInstancia().findInstitucion("Antel"),
+            logica.manejadores.ManejadorUsuario.getInstancia().findInstitucion("Antel"),
             DTNivel.PLATINO,
             manejadorEve.obtenerEdicion("MARATON25").obtenerTipoRegistro("Corredor 10K"),
             25000,
@@ -577,7 +577,7 @@ public class CargaDatosPrueba {
 
         controladorEve.altaPatrocinio(
             manejadorEve.obtenerEdicion("EXPOAGRO25"),
-            logica.manejadores.manejadorUsuario.getInstancia().findInstitucion("Universidad Católica del Uruguay"),
+            logica.manejadores.ManejadorUsuario.getInstancia().findInstitucion("Universidad Católica del Uruguay"),
             DTNivel.BRONCE,
             manejadorEve.obtenerEdicion("EXPOAGRO25").obtenerTipoRegistro("General"),
             15000,

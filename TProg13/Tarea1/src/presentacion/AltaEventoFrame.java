@@ -37,7 +37,7 @@ public class AltaEventoFrame extends JInternalFrame {
         listModelCategorias.clear();
         categoriasSeleccionadasFlags = new java.util.ArrayList<>();
         try {
-            java.util.List<String> categorias = new java.util.ArrayList<>(logica.manejadores.manejadorAuxiliar.getInstancia().listarCategorias());
+            java.util.List<String> categorias = new java.util.ArrayList<>(logica.manejadores.ManejadorAuxiliar.getInstancia().listarCategorias());
             for (String cat : categorias) {
                 listModelCategorias.addElement(cat);
                 categoriasSeleccionadasFlags.add(false);

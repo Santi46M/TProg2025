@@ -193,7 +193,7 @@ public class AltaPatrocinioFrame extends JInternalFrame {
                 String nombreInstitucion = comboInstituciones.getItemAt(idxInstitucion);
                 String tipoRegistroGratuito = comboTipoGratuito.getItemAt(idxTipoGratuito);
                 logica.clases.Ediciones edicion = controlador.obtenerEdicion(nombreEvento, nombreEdicion);
-                logica.clases.Institucion institucion = logica.manejadores.manejadorUsuario.getInstancia().findInstitucion(nombreInstitucion);
+                logica.clases.Institucion institucion = logica.manejadores.ManejadorUsuario.getInstancia().findInstitucion(nombreInstitucion);
                 logica.clases.TipoRegistro tipoRegistro = edicion != null ? edicion.getTipoRegistro(tipoRegistroGratuito) : null;
                 logica.enumerados.DTNivel nivelEnum = logica.enumerados.DTNivel.valueOf(nivel.toUpperCase());
                 java.time.LocalDate fechaHoy = java.time.LocalDate.now();
@@ -263,14 +263,14 @@ public class AltaPatrocinioFrame extends JInternalFrame {
         }
         tiposPorEdicion = tiposList.toArray(new String[0][0]);
         costosTipoRegistro = costosList.stream().mapToDouble(Double::doubleValue).toArray();
-        instituciones = logica.manejadores.manejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
+        instituciones = logica.manejadores.ManejadorUsuario.getInstancia().getInstituciones().toArray(new String[0]);
         codigosPatrocinio = new HashSet<>();
-        for (var patrocinioIter : logica.manejadores.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+        for (var patrocinioIter : logica.manejadores.ManejadorAuxiliar.getInstancia().listarPatrocinios()) {
             if (patrocinioIter != null && patrocinioIter.getCodigoPatrocinio() != null)
                 codigosPatrocinio.add(patrocinioIter.getCodigoPatrocinio().toLowerCase());
         }
         patrociniosInstitucionEdicion = new HashSet<>();
-        for (var patrocinioIter : logica.manejadores.manejadorAuxiliar.getInstancia().listarPatrocinios()) {
+        for (var patrocinioIter : logica.manejadores.ManejadorAuxiliar.getInstancia().listarPatrocinios()) {
             if (patrocinioIter != null && patrocinioIter.getInstitucion() != null && patrocinioIter.getEdicion() != null && patrocinioIter.getInstitucion().getNombre() != null && patrocinioIter.getEdicion().getNombre() != null)
                 patrociniosInstitucionEdicion.add(patrocinioIter.getInstitucion().getNombre().toLowerCase() + "-" + patrocinioIter.getEdicion().getNombre().toLowerCase());
         }
