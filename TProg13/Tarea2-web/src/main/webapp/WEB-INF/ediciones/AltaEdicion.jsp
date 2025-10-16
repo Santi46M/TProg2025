@@ -62,7 +62,7 @@
         </div>
 
         <div class="form-group-altaEvento">
-          <label for="desc">Descripción<span style="color:red">*</span></label>
+          <label for="desc">Sigla<span style="color:red">*</span></label>
           <textarea id="desc" name="desc" rows="4" required></textarea>
         </div>
 
