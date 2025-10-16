@@ -1,8 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
 String ctx = request.getContextPath();
-  String nick = (String) session.getAttribute("nick");
-  logica.clases.TipoRegistro tipoRegistro = (logica.clases.TipoRegistro) request.getAttribute("tipoRegistro");
+String nick = (String) session.getAttribute("nick");
+logica.datatypes.DTTipoRegistro tipoRegistro = (logica.datatypes.DTTipoRegistro) request.getAttribute("tipoRegistro");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -26,9 +26,6 @@ String ctx = request.getContextPath();
           <div class="event-meta"><strong>Descripción:</strong> <%= tipoRegistro.getDescripcion() %></div>
           <div class="event-meta"><strong>Costo:</strong> <%= tipoRegistro.getCosto() %></div>
           <div class="event-meta"><strong>Cupo:</strong> <%= tipoRegistro.getCupo() %></div>
-          <% if (tipoRegistro.getEdicion() != null) { %>
-            <div class="event-meta"><strong>Edición asociada:</strong> <%= tipoRegistro.getEdicion().getNombre() %></div>
-          <% } %>
         <% } else { %>
           <p>No se encontró información del tipo de registro.</p>
         <% } %>

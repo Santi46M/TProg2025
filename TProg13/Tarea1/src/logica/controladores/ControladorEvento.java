@@ -33,6 +33,7 @@ import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
 import logica.datatypes.DTRegistro;
+import logica.datatypes.DTTipoRegistro;
 import logica.enumerados.DTEstado;
 import logica.enumerados.DTNivel;
 import logica.interfaces.IControladorEvento;
@@ -475,5 +476,21 @@ public class ControladorEvento implements IControladorEvento {
         }
         evento.setImagen(imagenPath); // asegurate de haber agregado get/setImagenPath en la entidad
         // Si tu Manejador requiere persistir/cerrar transacción, hacelo aquí (p.ej., me().guardar(ev);)
+    }
+
+    @Override
+    public DTTipoRegistro consultaTipoRegistro(String evento, String edicion, String tipoRegistro) {
+        Eventos eventoObj = manejador.obtenerEvento(evento);
+        if (eventoObj == null) return null;
+        Ediciones edicionObj = eventoObj.obtenerEdicion(edicion);
+        if (edicionObj == null) return null;
+        TipoRegistro tipoObj = edicionObj.getTipoRegistro(tipoRegistro);
+        if (tipoObj == null) return null;
+        return new DTTipoRegistro(
+            tipoObj.getNombre(),
+            tipoObj.getDescripcion(),
+            tipoObj.getCosto(),
+            tipoObj.getCupo()
+        );
     }
 }
