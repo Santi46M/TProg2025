@@ -6,8 +6,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import logica.fabrica;
 import logica.interfaces.IControladorEvento;
-import logica.clases.Ediciones;
-import logica.clases.TipoRegistro;
+import logica.datatypes.DTTipoRegistro;
 
 @WebServlet("/registro/ConsultaTipoRegistro")
 public class ConsultaTipoRegistroServlet extends HttpServlet {
@@ -23,12 +22,7 @@ public class ConsultaTipoRegistroServlet extends HttpServlet {
       return;
     }
     IControladorEvento controladorEv = fabrica.getInstance().getIControladorEvento();
-    Ediciones edicionIter = controladorEv.obtenerEdicion(evento, edicion);
-    if (edicionIter == null) {
-      resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Edición no encontrada");
-      return;
-    }
-    TipoRegistro tipoReg = edicionIter.getTipoRegistro(tipoRegistro);
+    DTTipoRegistro tipoReg = controladorEv.consultaTipoRegistro(evento, edicion, tipoRegistro);
     if (tipoReg == null) {
       resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Tipo de registro no encontrado");
       return;

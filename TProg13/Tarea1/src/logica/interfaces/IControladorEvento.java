@@ -18,6 +18,7 @@ import logica.clases.Usuario;
 import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
+import logica.datatypes.DTTipoRegistro;
 import logica.enumerados.DTNivel;
 
 
@@ -47,4 +48,6 @@ public interface IControladorEvento {
     public List<DTEvento> listarEventosPorCategoria(String nombreCategoria);
     public List<String> listarCategoriasConEventos();
     public void actualizarImagenEvento(String nombreEvento, String imagenPath) throws IllegalArgumentException;
+    /** Obtiene el DTTipoRegistro para un evento, edición y tipo de registro */
+    public DTTipoRegistro consultaTipoRegistro(String evento, String edicion, String tipoRegistro);
 }
