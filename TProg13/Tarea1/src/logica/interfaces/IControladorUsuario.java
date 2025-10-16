@@ -39,6 +39,7 @@ public interface IControladorUsuario {
     public void actualizarOrganizador(String nickname, String desc, String link) throws UsuarioNoExisteException, UsuarioTipoIncorrectoException;
 
     // Consulta
+    public Set<DTDatosUsuario> obtenerUsuariosDT() throws UsuarioNoExisteException;
     public DTDatosUsuario obtenerDatosUsuario(String nickname) throws UsuarioNoExisteException;
     public Set<DTRegistro> obtenerRegistrosAsistente(Asistente asist);
     public DTRegistro obtenerDatosRegistros(String identificador);

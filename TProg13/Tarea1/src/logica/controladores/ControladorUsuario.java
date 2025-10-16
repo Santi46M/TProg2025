@@ -139,6 +139,22 @@ manejador.addUsuario(nuevoUsuario);
         orgUser.setLink(link);
     }
 
+    public Set<DTDatosUsuario> obtenerUsuariosDT() throws UsuarioNoExisteException {
+        Map<String, Usuario> usuarios = manejador.getUsuarios();
+        Set<DTDatosUsuario> datosUsuarios = new HashSet<>();
+        
+        for (Map.Entry<String, Usuario> entry : usuarios.entrySet()) {
+            String nickname = entry.getKey();
+            DTDatosUsuario datos = obtenerDatosUsuario(nickname);
+            if (datos != null) {
+                datosUsuarios.add(datos);
+            }
+        }
+        
+        return datosUsuarios;
+    }
+
+    
     public DTDatosUsuario obtenerDatosUsuario(String nickname) throws UsuarioNoExisteException {
         Usuario user = manejador.findUsuario(nickname);
         if (user == null) {

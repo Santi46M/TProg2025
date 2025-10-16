@@ -6,9 +6,12 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
+
 import logica.fabrica;
 import logica.interfaces.IControladorUsuario;
-import logica.clases.Usuario;
+import logica.datatypes.DTDatosUsuario;
+//import logica.clases.Usuario;
 
 @WebServlet(urlPatterns = {"/auth/login", "/auth/logout"})
 public class LoginServlet extends HttpServlet {
@@ -66,7 +69,7 @@ public class LoginServlet extends HttpServlet {
 
         String nick = nickOrEmail.trim();
 
-        // ✅ Validación con la lógica
+        // ✅ Validación de login
         boolean valido = controladorUser.validarLogin(nick, pass);
 
         if (!valido) {
@@ -77,21 +80,19 @@ public class LoginServlet extends HttpServlet {
         }
 
         // ✅ Login correcto
-        Map<String, Usuario> usuarios = controladorUser.listarUsuarios();
-        Usuario usr = usuarios.get(nick);
+        Set<DTDatosUsuario> usuarios = controladorUser.obtenerUsuariosDT();
+        DTDatosUsuario dto = null;
 
-        // Buscar por correo si no se encontró
-        if (usr == null) {
-            for (Usuario u : usuarios.values()) {
-                if (u.getEmail().equalsIgnoreCase(nickOrEmail)) {
-                    usr = u;
-                    nick = u.getNickname();
-                    break;
-                }
+        // Buscar por correo si no se encontró por nickname
+        for (DTDatosUsuario u : usuarios) {
+            if (u.getEmail().equalsIgnoreCase(nickOrEmail)) {
+                dto = u;
+                nick = u.getNickname();
+                break;
             }
         }
 
-        if (usr == null) {
+        if (dto == null) {
             req.setAttribute("error", "Usuario no encontrado.");
             req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
             return;
@@ -100,21 +101,11 @@ public class LoginServlet extends HttpServlet {
         String rol = controladorUser.esAsistente(nick) ? "ASISTENTE" : "ORGANIZADOR";
 
         HttpSession sAux = req.getSession(true);
-        sAux.setAttribute("usuario_logueado", usr);
+        sAux.setAttribute("usuario_logueado", dto);
         sAux.setAttribute("nick", nick);
         sAux.setAttribute("rol", rol);
         sAux.setAttribute("estado_sesion", "LOGIN_CORRECTO");
 
-        // 🧩 --- DEBUG DE SESIÓN ---
-
-        java.util.Enumeration<String> names = sAux.getAttributeNames();
-        while (names.hasMoreElements()) {
-            String name = names.nextElement();
-            Object val = sAux.getAttribute(name);
-            
-        }
-        // ----------------------------
-
         resp.sendRedirect(ctx(req) + "/inicio");
     }
-}
+   }
