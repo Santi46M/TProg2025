@@ -328,6 +328,26 @@ public class ControladorEvento implements IControladorEvento {
         }
         return lista;
     }
+    
+    public DTEvento ObtenerDatosEvento(String nombreEvento) {
+        Map<String, Eventos> eventos = manejador.obtenerEventos();
+        DTEvento evento = null;
+        for (Eventos eventIter : eventos.values()) {
+            if (eventIter.getNombre().equals(nombreEvento)) {
+            	evento = new DTEvento(
+                        eventIter.getNombre(),
+                        eventIter.getSigla(),
+                        eventIter.getDescripcion(),
+                        eventIter.getFecha(),
+                        new ArrayList<>(eventIter.getCategorias().keySet()),
+                        new ArrayList<>(eventIter.getEdiciones().keySet())
+                    );
+            }
+        	
+
+        }
+        return evento;
+    }
 
     public List<String> listarEdicionesEvento(String nombreEvento) {
         Eventos evento = manejador.obtenerEvento(nombreEvento);

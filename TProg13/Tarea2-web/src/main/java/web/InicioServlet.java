@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.*;
 import logica.interfaces.IControladorEvento;
 import logica.datatypes.DTEvento;
-import logica.clases.Eventos;
+//import logica.clases.Eventos;
 import logica.fabrica;
 
 @WebServlet({"/inicio"})
@@ -23,14 +23,11 @@ public class InicioServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    System.out.println("✅ Entró al InicioServlet");
     IControladorEvento controladorEv = ce();
     List<DTEvento> eventos = controladorEv.listarEventos();
-    System.out.println("Eventos listados: " + (eventos != null ? eventos.size() : "null"));
 
     if (eventos == null || eventos.isEmpty()) {
       getServletContext().setAttribute("datosPrecargados", Boolean.FALSE);
-      System.out.println("⚠️ No hay eventos, datosPrecargados = FALSE");
     }
 
     // nombreEvento -> URL lista para <img src="">
@@ -48,7 +45,7 @@ public class InicioServlet extends HttpServlet {
         // 2) si no vino en el DTO, consultar el evento completo
         if (raw == null || raw.isBlank()) {
           try {
-            Eventos eventIter = controladorEv.consultaEvento(nombre);
+            DTEvento eventIter = controladorEv.ObtenerDatosEvento(nombre);
             if (eventIter != null) raw = eventIter.getImagen();
           } catch (Exception ex) { /* noop */ }
         }
