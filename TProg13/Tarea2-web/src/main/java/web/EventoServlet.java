@@ -29,7 +29,7 @@ public class EventoServlet extends HttpServlet {
     private static final String JSP_REGISTRO = "/WEB-INF/evento/RegistrarseEvento.jsp";
     private static final String JSP_LISTAR = "/WEB-INF/evento/listado.jsp";
 
-    // Carpeta pública donde se guardan subidas
+    // carpeta pública donde se guardan subidas
     private static final String UPLOAD_PUBLIC_DIR = "/img/eventos";
 
     private final IControladorEvento controladorEv = fabrica.getInstance().getIControladorEvento();
@@ -60,11 +60,11 @@ public class EventoServlet extends HttpServlet {
             req.setAttribute("evFecha", formatFecha(ev.getFecha()));
             req.setAttribute("evCategorias", ev.getCategorias());
 
-            // URL de imagen (resuelto contra /img, /img/eventos, etc.)
+            // URL de imagen 
             String evImagenUrl = resolveImagenUrl(req, ev);
             req.setAttribute("evImagenUrl", evImagenUrl);
 
-            // ===== EDICIONES (tolerante a que la lista devuelva NOMBRES o SIGLAS) =====
+            // EDICIONES 
             List<String> claves = controladorEv.listarEdicionesEvento(nombre); // puede ser nombres o siglas
             List<DTEdicion> ediciones = new ArrayList<>();
             String siglaEvento = ev.getSigla();
@@ -72,19 +72,19 @@ public class EventoServlet extends HttpServlet {
             for (String clave : claves) {
                 DTEdicion dtEd = null;
 
-                // 1) Intento por SIGLA (lo que requiere consultaEdicionEvento)
+                // Intento por SIGLA 
                 try {
                     dtEd = controladorEv.consultaEdicionEvento(siglaEvento, clave);
                 } catch (Exception ignore) {}
 
-                // 2) Si no vino nada, pruebo por NOMBRE de edición (sin tocar clases)
+                //  si no vino nada, pruebo por NOMBRE de edición 
                 if (dtEd == null) {
                     try {
                         dtEd = controladorEv.obtenerDtEdicion(nombre, clave);
                     } catch (Exception ignore) {}
                 }
 
-                // 3) Filtrado por estado aceptado (case-insensitive, robusto)
+                // filtrado por estado aceptado 
                 if (dtEd != null && esAceptada(dtEd.getEstado())) {
                     ediciones.add(dtEd);
                 }
@@ -194,7 +194,6 @@ public class EventoServlet extends HttpServlet {
 
             DTCategorias dtCategorias = new DTCategorias(categoriasList);
             try {
-                // NOTA: paso 'sigla' como 'imagen' en alta para mantener compatibilidad con tu firma actual
                 controladorEv.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
 
                 if (imagenFileName != null) {
@@ -228,7 +227,7 @@ public class EventoServlet extends HttpServlet {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 
-    // === Helpers ===
+    // Helpers 
 
     private boolean requiereOrganizador(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession sAux = req.getSession(false);
@@ -271,12 +270,12 @@ public class EventoServlet extends HttpServlet {
         if (raw != null && !raw.isBlank()) {
             String lower = raw.toLowerCase();
             if (lower.startsWith("http://") || lower.startsWith("https://")) {
-                url = raw; // absoluta externa
+                url = raw; 
             } else if (raw.startsWith("/")) {
                 if (raw.startsWith(ctx + "/")) {
                     url = raw;
                 } else {
-                    url = ctx + raw; // ruta app-relative sin ctx
+                    url = ctx + raw; 
                 }
             } else {
                 String[] candidates = new String[] {
@@ -290,7 +289,7 @@ public class EventoServlet extends HttpServlet {
                     if (abs != null) {
                         exists = Files.exists(Path.of(abs));
                     } else {
-                        exists = true; // WAR no exploded → asumimos disponible
+                        exists = true; 
                     }
                     if (exists) {
                         url = ctx + rel;

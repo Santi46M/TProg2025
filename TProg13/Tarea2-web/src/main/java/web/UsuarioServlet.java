@@ -21,9 +21,9 @@ import excepciones.UsuarioTipoIncorrectoException;
 
 @WebServlet(urlPatterns = {"/usuario/AltaUsuario", "/usuario/modificar"})
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024,  // 1 MB antes de escribir en disco
-    maxFileSize = 10 * 1024 * 1024,   // Máximo 10 MB por archivo
-    maxRequestSize = 20 * 1024 * 1024 // Máximo 20 MB por request
+    fileSizeThreshold = 1024 * 1024,  
+    maxFileSize = 10 * 1024 * 1024,   
+    maxRequestSize = 20 * 1024 * 1024 
 )
 public class UsuarioServlet extends HttpServlet {
 
@@ -32,7 +32,7 @@ public class UsuarioServlet extends HttpServlet {
   private static final String JSP_CONSULTA = "/WEB-INF/usuario/ConsultaUsuario.jsp";
   private static final String JSP_MODIF    = "/WEB-INF/usuario/ModificarUsuario.jsp";
 
-  private static final String IMG_REL_BASE_USR = "/img/usuarios"; // ← carpeta pública para avatares
+  private static final String IMG_REL_BASE_USR = "/img/usuarios"; //  carpeta para las imágenes de usuario nuevas
 
   private final IControladorUsuario controladorUs = fabrica.getInstance().getIControladorUsuario();
 
@@ -109,7 +109,6 @@ public class UsuarioServlet extends HttpServlet {
 
     if ("/usuario/AltaUsuario".equals(path)) {
 
-      // === Procesar imagen (opcional) → /img/usuarios ===
       Part imagenPart = null;
       try { imagenPart = req.getPart("imagen"); } catch (Exception ignore) {}
       String nombreArchivo = null;
@@ -123,7 +122,7 @@ public class UsuarioServlet extends HttpServlet {
           return;
         }
 
-        // Ruta física dentro del webapp (exploded)
+        // Ruta física dentro del webapp 
         String baseImg = getServletContext().getRealPath(IMG_REL_BASE_USR);
         if (baseImg == null) {
           String root = getServletContext().getRealPath("/");
@@ -138,7 +137,6 @@ public class UsuarioServlet extends HttpServlet {
 
         Files.createDirectories(Path.of(baseImg));
 
-        // nombre final: nick + extensión
         String nickParam = req.getParameter("nick");
         String original = getSafeFilename(imagenPart);
         String ext = getExtension(original);
@@ -152,7 +150,7 @@ public class UsuarioServlet extends HttpServlet {
           Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
         }
 
-        nombreArchivo = finalName; // ← guardamos SOLO el nombre
+        nombreArchivo = finalName; // guardamos el nombre
         System.out.println("✅ Imagen guardada: " + destino.toAbsolutePath()
             + " | URL esperada: " + ctx(req) + IMG_REL_BASE_USR + "/" + finalName);
       }
@@ -171,7 +169,6 @@ public class UsuarioServlet extends HttpServlet {
       String institucion = req.getParameter("instIdA");
       String nacStr      = req.getParameter("nacA");
 
-      // === Validaciones básicas ===
       if (pass1 == null || pass2 == null || pass1.isBlank() || pass2.isBlank() || !pass1.equals(pass2)) {
         req.setAttribute("error", "Las contraseñas no coinciden o están vacías.");
         cargarInstituciones(req);
@@ -186,7 +183,7 @@ public class UsuarioServlet extends HttpServlet {
         return;
       }
 
-      // === Validación específica por rol ===
+      //  Validación específica por rol 
       LocalDate fechaNac = null;
       if ("ASISTENTE".equalsIgnoreCase(rol)) {
         if (nacStr == null || nacStr.isBlank()) {
@@ -218,15 +215,14 @@ public class UsuarioServlet extends HttpServlet {
       // === Crear usuario ===
       boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rol);
 
-   // nombre final según el rol:
-   // - Asistente: nombreA
-   // - Organizador: nombreO (organizacion)
+   // nombre final según el rol
+   //arreglo de consultaUsuario
    String nombreFinal = esOrganizador ? organizacion : nombre;
 
    try {
      controladorUs.altaUsuario(
          nick,
-         nombreFinal,   // <-- acá va el correcto
+         nombreFinal,   
          correo,
          descripcion,
          link,
@@ -238,7 +234,7 @@ public class UsuarioServlet extends HttpServlet {
          nombreArchivo
      );
 
-        // ✅ Crear sesión como en login
+      
         HttpSession sAux = req.getSession(true);
         Map<String, Usuario> usuarios = controladorUs.listarUsuarios();
         Usuario usr = usuarios.get(nick);
@@ -275,7 +271,7 @@ public class UsuarioServlet extends HttpServlet {
       return;
     }
 
-    // === Modificar usuario ===
+    //  Modificar usuario para la siguiente tarea 
     if ("/modificar".equals(path)) {
       String nick = nickEnSesion(req);
       if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
@@ -293,7 +289,6 @@ public class UsuarioServlet extends HttpServlet {
 
       try {
         controladorUs.modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaNac, institucion);
-        // corregimos a la ruta existente mapeada por este servlet
         resp.sendRedirect(ctx(req) + "/usuario/ConsultaUsuario?nick=" + java.net.URLEncoder.encode(nick, java.nio.charset.StandardCharsets.UTF_8));
       } catch (UsuarioNoExisteException | UsuarioTipoIncorrectoException e) {
         req.setAttribute("error", e.getMessage());

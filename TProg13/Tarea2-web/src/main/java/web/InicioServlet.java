@@ -30,7 +30,7 @@ public class InicioServlet extends HttpServlet {
       getServletContext().setAttribute("datosPrecargados", Boolean.FALSE);
     }
 
-    // nombreEvento -> URL lista para <img src="">
+    // nombreEvento -> urlImagen
     Map<String, String> imgUrls = new HashMap<>();
     String ctx = req.getContextPath();
 
@@ -39,10 +39,10 @@ public class InicioServlet extends HttpServlet {
         String nombre = e.getNombre();
         String raw = null;
 
-        // 1) intentar desde el DTO
+        //  intentar desde el DTO
         try { raw = e.getImagen(); } catch (Exception ignore) {}
 
-        // 2) si no vino en el DTO, consultar el evento completo
+        //  si no vino en el DTO, consultar el evento completo
         if (raw == null || raw.isBlank()) {
           try {
             DTEvento eventIter = controladorEv.consultaDTEvento(nombre);
@@ -53,15 +53,14 @@ public class InicioServlet extends HttpServlet {
         String url = null;
         if (raw != null && !raw.isBlank()) {
           if (raw.startsWith("http://") || raw.startsWith("https://")) {
-            url = raw; // absoluta
+            url = raw; 
           } else if (raw.startsWith("/")) {
-            url = ctx + raw; // ya viene con ruta (/img/... u otra)
+            url = ctx + raw; // ya viene con ruta (/img/ o otra)
           } else {
             // Solo nombre de archivo:
-            // Preferimos /img/<archivo> (estáticos precargados). Si no existe, /eventos/<archivo> (nuevos).
             String[] candidates = new String[] {
               "/img/" + raw,
-              "/img/eventos/" + raw,   // por si tenés esta subcarpeta
+              "/img/eventos/" + raw,  
               "/eventos/" + raw        // subidos por la app
             };
 
@@ -71,8 +70,6 @@ public class InicioServlet extends HttpServlet {
               if (abs != null) {
                 exists = Files.exists(Path.of(abs));
               } else {
-                // Si getRealPath es null (algunos entornos), igual elegimos el primer candidato
-                // y dejamos que el servidor sirva si está disponible.
                 exists = true; // asumimos true para no bloquear
               }
               if (exists) {

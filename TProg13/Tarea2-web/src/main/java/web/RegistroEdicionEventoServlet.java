@@ -81,7 +81,7 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
                                 if (reg.getTipoRegistro() != null && reg.getTipoRegistro().equalsIgnoreCase(tipo.getNombre())) {
                                     registrados++;
                                 }
-                                // Control de ya registrado
+                                // control de ya registrado
                                 if (reg.getUsuario() != null && reg.getUsuario().equals(nick)) {
                                     yaRegistrado = true;
                                 }
@@ -162,7 +162,7 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             return;
         }
 
-        // Calcular costo antes del try
+        // calcular costo antes del try
         float costo = tipoSel.getCosto();
         if (!isBlank(codigoPatrocinio)) {
             List<DTPatrocinio> patrocinios = edSel.getPatrocinios();
@@ -211,7 +211,7 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         }
     }
 
-    // ==================== Helpers ====================
+    // Helpers 
 
     private boolean requiereAsistente(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession s = req.getSession(false);

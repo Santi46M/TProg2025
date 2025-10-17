@@ -1,4 +1,4 @@
-package web;
+ package web;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -30,7 +30,7 @@ public class EdicionServlet extends HttpServlet {
   private static final String JSP_CONSULTA = "/WEB-INF/ediciones/ConsultaEdicion.jsp";
   private static final String JSP_LISTADO  = "/WEB-INF/ediciones/ListarEdiciones.jsp";
 
-  // ⬅️ Usar la misma convención que eventos: carpeta pública bajo /img
+  //carpeta pública bajo /img
   private static final String UPLOAD_PUBLIC_DIR_ED = "/img/ediciones";
 
   private IControladorEvento ce() { return fabrica.getInstance().getIControladorEvento(); }
@@ -73,13 +73,13 @@ public class EdicionServlet extends HttpServlet {
       req.setAttribute("patrocinios", edicionObj.getPatrocinios());
       req.setAttribute("evNombre", evento);
 
-      // ⬅️ Resolver URL de imagen de edición (mismo criterio que en eventos)
+      // URL de imagen de edición 
       String edImagenUrl = resolveImagenUrlEdicion(req, edicionObj.getImagen());
       if (edImagenUrl != null) {
         req.setAttribute("edImagenUrl", edImagenUrl);
       }
 
-      // Registros visibles (organizador ve todos; asistente ve los suyos)
+      // registros visibles (organizador ve todos, asistente ve los suyos)
       HttpSession session = req.getSession(false);
       String nickSesion = session != null ? (String) session.getAttribute("nick") : null;
       boolean esOrganizador = nickSesion != null
@@ -181,7 +181,7 @@ public class EdicionServlet extends HttpServlet {
             req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
             return;
           }
-          // ⬅️ Guardar en /img/ediciones
+          //  guardar en /img/ediciones
           String baseImg = getServletContext().getRealPath(UPLOAD_PUBLIC_DIR_ED);
           if (baseImg == null) {
             String root = getServletContext().getRealPath("/");
@@ -294,7 +294,7 @@ public class EdicionServlet extends HttpServlet {
     return null;
   }
 
-  // ⬅️ Resolución unificada de URL para imagen de edición
+  //  Resolución unificada de URL para imagen de edición
   private String resolveImagenUrlEdicion(HttpServletRequest req, String raw) {
     if (raw == null || raw.isBlank()) return null;
     String ctx = ctx(req);
@@ -304,15 +304,15 @@ public class EdicionServlet extends HttpServlet {
       return raw;
     }
     if (raw.startsWith("/")) {
-      // si ya incluye el ctx no lo dupliques
+      // si ya incluye el ctx 
       return raw.startsWith(ctx + "/") ? raw : (ctx + raw);
     }
 
-    // Solo filename → probar rutas habituales
+    // Solo filename
     String[] candidates = new String[] {
       "/img/" + raw,
       "/img/ediciones/" + raw,
-      "/ediciones/" + raw // legacy (por si quedó algo viejo)
+      "/ediciones/" + raw 
     };
     for (String rel : candidates) {
       String abs = getServletContext().getRealPath(rel);
@@ -320,7 +320,6 @@ public class EdicionServlet extends HttpServlet {
       if (abs != null) {
         exists = java.nio.file.Files.exists(java.nio.file.Path.of(abs));
       } else {
-        // WAR no explotado: asumimos disponible
         exists = true;
       }
       if (exists) return ctx + rel;

@@ -35,7 +35,7 @@ public class AltaRegistroServlet extends HttpServlet {
         if (path == null || "/".equals(path) || "/alta".equals(path)) {
             if (!requiereOrganizador(req, resp)) return;
 
-            // Cargar ediciones del organizador (solo DTs)
+            // Cargar ediciones del organizador 
             recargarDatosDT(req);
 
             req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
@@ -79,8 +79,6 @@ public class AltaRegistroServlet extends HttpServlet {
                 float costo = Float.parseFloat(costoStr);
                 int cupo    = Integer.parseInt(cupoStr);
 
-                // Validar edición SOLO con DTs
-//                ce().seleccionarEdicion(siglaEdicion);
                 DTEdicion dtSel = ce().obtenerEdicionPorSiglaDT(siglaEdicion);
                 
                 if (dtSel == null) {
@@ -99,16 +97,14 @@ public class AltaRegistroServlet extends HttpServlet {
 				}
                 
 
-                // === Alta “DTO-based” del TipoRegistro (agregá este método en tu controlador/impl) ===
-                // Firma sugerida: void altaTipoRegistroDTO(String siglaEdicion, String nombre, String descripcion, float costo, int cupo)
+                //  Alta
                 
                 ce().altaTipoRegistroDTO(dtSel, nombre, descripcion, costo, cupo);
 
-                // Redirigir a la consulta del TipoRegistro (armamos params con DT)
+                // Redirigir a la consulta del TipoRegistro 
                 String eventoNombre = null;
                 try { eventoNombre = ce().encontrarEventoPorSigla(siglaEdicion); } catch (Exception ignore) {}
                 if (isBlank(eventoNombre)) {
-                    // si tu DTEdicion expone el nombre del evento, úsalo
                     try { eventoNombre = dtSel.getEvento().getNombre(); } catch (Exception ignore) {}
                 }
 
@@ -138,35 +134,7 @@ public class AltaRegistroServlet extends HttpServlet {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 
-    // ================= Helpers (solo DTs) =================
-
-//    private void recargarDatosDT(HttpServletRequest req) {
-//        HttpSession sAux = req.getSession(false);
-//        String nick = sAux == null ? null : (String) sAux.getAttribute("nick");
-//
-//        List<DTEdicion> ediciones = new ArrayList<>();
-//        if (nick != null) {
-//            // Si tenés este listado “de ingresadas”, usalo para reducir el recorrido
-//        	List<DTEvento> eventosConEd = ce().listarEventos();
-//            List<String> eventosConEd = ce().listarEventosConEdicionesIngresadas();
-//            for (String nombreEvento : eventosConEd) {
-//                List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
-//                for (String nomEd : nombresEd) {
-//                    DTEdicion dt = ce().obtenerDtEdicion(nombreEvento, nomEd);
-//                    if (dt != null) {
-//                        // Filtrar por organizador si el DTO lo expone (ajusta el getter si cambia el nombre)
-//                        String org = null;
-//                        try { org = dt.getOrganizador(); } catch (Exception ignore) {}
-//                        if (org == null || org.equals(nick)) {
-//                            ediciones.add(dt);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//
-//        req.setAttribute("ediciones", ediciones);
-//    }
+    // Helpers  
 
     private void recargarDatosDT(HttpServletRequest req) {
         HttpSession sAux = req.getSession(false);
@@ -175,7 +143,7 @@ public class AltaRegistroServlet extends HttpServlet {
         List<DTEdicion> ediciones = new ArrayList<>();
 
         if (nick != null) {
-            // Recorremos todos los eventos (no solo los ingresados)
+            // Recorremos todos los eventos 
             List<DTEvento> eventos = ce().listarEventos();
 
             for (DTEvento ev : eventos) {
@@ -185,7 +153,7 @@ public class AltaRegistroServlet extends HttpServlet {
                 for (String nomEd : nombresEd) {
                     DTEdicion dt = ce().obtenerDtEdicion(nombreEvento, nomEd);
                     if (dt != null) {
-                        // Filtrar por organizador (si aplica)
+                        // Filtrar por organizador 
                         String org = null;
                         try { org = dt.getOrganizador(); } catch (Exception ignore) {}
                         if (org == null || org.equals(nick)) {
