@@ -33,6 +33,7 @@ import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
 import logica.datatypes.DTRegistro;
+import logica.datatypes.DTPatrocinio;
 import logica.enumerados.DTEstado;
 import logica.enumerados.DTNivel;
 import logica.interfaces.IControladorEvento;
@@ -614,5 +615,25 @@ public class ControladorEvento implements IControladorEvento {
             // Mantengo tu else tal cual
             throw new excepciones.EventoYaExisteException(evento.getNombre());
         }
+    }
+
+    @Override
+    public DTPatrocinio obtenerDTPatrocinio(String codigoPatrocinio) {
+        ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
+        for (Patrocinio p : manejadorAux.listarPatrocinios()) {
+            if (p.getCodigoPatrocinio().equals(codigoPatrocinio)) {
+                return new DTPatrocinio(
+                    p.getCodigoPatrocinio(),
+                    p.getAporte(),
+                    p.getFechaPatrocinio(),
+                    p.getNivel(),
+                    p.getCantidadRegistros(),
+                    p.getInstitucion().getNombre(),
+                    p.getEdicion().getNombre(),
+                    p.getTipoRegistro().getNombre()
+                );
+            }
+        }
+        return null;
     }
 }

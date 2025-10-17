@@ -33,8 +33,6 @@ public interface IControladorEvento {
     public List<DTEvento> listarEventos();
     public List<String> listarEdicionesEvento(String nombreEvento);
     public Ediciones obtenerEdicion(String nombreEvento, String nombreEdicion);
-
-    // ARREGLADO NUEVO
     public DTEdicion obtenerDtEdicion(String nombreEvento, String nombreEdicion);
     public DTEvento consultaDTEvento(String nombreEvento);
 
@@ -77,4 +75,5 @@ public interface IControladorEvento {
     ) throws excepciones.EdicionYaExisteException,
          excepciones.EventoYaExisteException,
          excepciones.FechasCruzadasException;
+    public logica.datatypes.DTPatrocinio obtenerDTPatrocinio(String codigoPatrocinio);
 }

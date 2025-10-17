@@ -27,8 +27,7 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
 
     IControladorEvento controladorEv = fabrica.getInstance().getIControladorEvento();
 
-    // Nuevo: pedimos el DTO directo al controlador
-    DTPatrocinio dto = controladorEv.obtenerDTPatrocinio(evento, edicion, codigoPatrocinio);
+    DTPatrocinio dto = controladorEv.obtenerDTPatrocinio(codigoPatrocinio);
     if (dto == null) {
       resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Patrocinio no encontrado");
       return;
