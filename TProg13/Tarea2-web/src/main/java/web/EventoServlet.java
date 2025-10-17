@@ -47,7 +47,6 @@ public class EventoServlet extends HttpServlet {
                 return;
             }
 
-            // Usá el método correcto de tu interfaz si el nombre difiere
             DTEvento ev = controladorEv.consultaDTEvento(nombre);
             if (ev == null) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Evento no encontrado: " + nombre);
@@ -61,17 +60,32 @@ public class EventoServlet extends HttpServlet {
             req.setAttribute("evFecha", formatFecha(ev.getFecha()));
             req.setAttribute("evCategorias", ev.getCategorias());
 
-            // === URL de imagen con la misma lógica que InicioServlet, evitando duplicar ctx ===
+            // URL de imagen (resuelto contra /img, /img/eventos, etc.)
             String evImagenUrl = resolveImagenUrl(req, ev);
             req.setAttribute("evImagenUrl", evImagenUrl);
 
-            // Ediciones
-            List<String> siglas = controladorEv.listarEdicionesEvento(nombre);
-            String siglaEvento = ev.getSigla();
+            // ===== EDICIONES (tolerante a que la lista devuelva NOMBRES o SIGLAS) =====
+            List<String> claves = controladorEv.listarEdicionesEvento(nombre); // puede ser nombres o siglas
             List<DTEdicion> ediciones = new ArrayList<>();
-            for (String siglaEd : siglas) {
-                DTEdicion dtEd = controladorEv.consultaEdicionEvento(siglaEvento, siglaEd);
-                if (dtEd != null && dtEd.getEstado() != null && dtEd.getEstado().name().equals("Aceptada")) {
+            String siglaEvento = ev.getSigla();
+
+            for (String clave : claves) {
+                DTEdicion dtEd = null;
+
+                // 1) Intento por SIGLA (lo que requiere consultaEdicionEvento)
+                try {
+                    dtEd = controladorEv.consultaEdicionEvento(siglaEvento, clave);
+                } catch (Exception ignore) {}
+
+                // 2) Si no vino nada, pruebo por NOMBRE de edición (sin tocar clases)
+                if (dtEd == null) {
+                    try {
+                        dtEd = controladorEv.obtenerDtEdicion(nombre, clave);
+                    } catch (Exception ignore) {}
+                }
+
+                // 3) Filtrado por estado aceptado (case-insensitive, robusto)
+                if (dtEd != null && esAceptada(dtEd.getEstado())) {
                     ediciones.add(dtEd);
                 }
             }
@@ -179,6 +193,7 @@ public class EventoServlet extends HttpServlet {
 
             DTCategorias dtCategorias = new DTCategorias(categoriasList);
             try {
+                // NOTA: paso 'sigla' como 'imagen' en alta para mantener compatibilidad con tu firma actual
                 controladorEv.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
 
                 if (imagenFileName != null) {
@@ -257,14 +272,12 @@ public class EventoServlet extends HttpServlet {
             if (lower.startsWith("http://") || lower.startsWith("https://")) {
                 url = raw; // absoluta externa
             } else if (raw.startsWith("/")) {
-                // Si ya empieza con el context-path, no lo volvemos a anteponer
                 if (raw.startsWith(ctx + "/")) {
                     url = raw;
                 } else {
                     url = ctx + raw; // ruta app-relative sin ctx
                 }
             } else {
-                // Solo filename → probamos /img, /img/eventos, /eventos (legacy)
                 String[] candidates = new String[] {
                     "/img/" + raw,
                     "/img/eventos/" + raw,
@@ -276,8 +289,7 @@ public class EventoServlet extends HttpServlet {
                     if (abs != null) {
                         exists = Files.exists(Path.of(abs));
                     } else {
-                        // Si no hay realPath (WAR no exploded), asumimos disponible
-                        exists = true;
+                        exists = true; // WAR no exploded → asumimos disponible
                     }
                     if (exists) {
                         url = ctx + rel;
@@ -288,6 +300,13 @@ public class EventoServlet extends HttpServlet {
         }
         if (url == null) url = ctx + "/img/evento-default.jpg";
         return url;
+    }
+
+    private static boolean esAceptada(Object estado) {
+        if (estado == null) return false;
+        // Soporta enum.name() = "ACEPTADA" o toString() = "Aceptada", etc.
+        String s = String.valueOf(estado);
+        return "ACEPTADA".equalsIgnoreCase(s);
     }
 
     private static String getSafeFilename(Part partAux) {

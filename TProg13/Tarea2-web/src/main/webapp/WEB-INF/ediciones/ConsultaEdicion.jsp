@@ -6,16 +6,33 @@
   String nick = (String) session.getAttribute("nick");
   String rol  = (String) session.getAttribute("rol");
 
+  DTEdicion edicion = (DTEdicion) request.getAttribute("edicion");
 
-  logica.datatypes.DTEdicion       edicion      = (logica.datatypes.DTEdicion)       request.getAttribute("edicion");
-  logica.datatypes.DTDatosUsuario  organizador  = (logica.datatypes.DTDatosUsuario)  request.getAttribute("organizador");
-  java.util.List<logica.datatypes.DTRegistro>     registros     = (java.util.List<logica.datatypes.DTRegistro>)     request.getAttribute("registros");
-  java.util.List<logica.datatypes.DTTipoRegistro> tiposRegistro = (java.util.List<logica.datatypes.DTTipoRegistro>) request.getAttribute("tiposRegistro");
-  java.util.List<logica.datatypes.DTPatrocinio>   patrocinios   = (java.util.List<logica.datatypes.DTPatrocinio>)   request.getAttribute("patrocinios");
+  // ---- organizador puede venir como String (nickname) o como DTDatosUsuario ----
+  Object orgAttr = request.getAttribute("organizador");
+  DTDatosUsuario organizadorDTO = (orgAttr instanceof DTDatosUsuario) ? (DTDatosUsuario) orgAttr : null;
+  String orgNick = null;      // para comparar con 'nick' de sesión
+  String orgMostrar = null;   // para mostrar en el aside
 
-  // Como DTEdicion ya no trae DTEvento dentro, el servlet nos deja el nombre del evento por separado
+  if (organizadorDTO != null) {
+    try { orgNick = organizadorDTO.getNickname(); } catch (Throwable __) {}
+    try { orgMostrar = (organizadorDTO.getNombre() != null && !organizadorDTO.getNombre().isBlank())
+                        ? organizadorDTO.getNombre()
+                        : orgNick; } catch (Throwable __) {}
+  } else if (orgAttr instanceof String) {
+    orgNick = (String) orgAttr;
+    orgMostrar = orgNick;
+  }
+
+  @SuppressWarnings("unchecked")
+  List<DTRegistro> registros = (List<DTRegistro>) request.getAttribute("registros");
+  @SuppressWarnings("unchecked")
+  List<DTTipoRegistro> tiposRegistro = (List<DTTipoRegistro>) request.getAttribute("tiposRegistro");
+  @SuppressWarnings("unchecked")
+  List<DTPatrocinio> patrocinios = (List<DTPatrocinio>) request.getAttribute("patrocinios");
+
+  // El servlet deja el nombre del evento por separado
   String evNombre = (String) request.getAttribute("evNombre");
-
 
   String edImagenUrl = (String) request.getAttribute("edImagenUrl");
   boolean hasServletImg = (edImagenUrl != null && !edImagenUrl.isBlank());
@@ -72,11 +89,7 @@
         <div class="event-info event-text" style="padding: 15px; line-height: 2">
           <h3>Datos de la Edición</h3>
           <% if (edicion != null) { %>
-<<<<<<< HEAD
             <div class="event-meta"><strong>Evento:</strong> <%= (evNombre != null ? evNombre : "—") %></div>
-=======
-            <div class="event-meta"><strong>Evento:</strong> <%= request.getAttribute("evNombre") %></div>
->>>>>>> 53d47e9e16b1f44b3a4985c26a1b1bb3bebf00e7
             <div class="event-meta"><strong>Sigla:</strong> <%= edicion.getSigla() %></div>
             <div class="event-meta"><strong>Fecha inicio:</strong> <%= edicion.getFechaInicio() %></div>
             <div class="event-meta"><strong>Fecha fin:</strong> <%= edicion.getFechaFin() %></div>
@@ -88,9 +101,7 @@
 
           <% if (registros != null && !registros.isEmpty()) { %>
             <% if ("ASISTENTE".equals(rol) && registros.size() == 1) {
-
-                 logica.datatypes.DTRegistro registro = registros.get(0);
-
+                 DTRegistro registro = registros.get(0);
             %>
               <h3>Tu registro en esta edición</h3>
               <p><strong>Tipo:</strong> <%= registro.getTipoRegistro() %></p>
@@ -99,15 +110,13 @@
 
             <% } else if ("ORGANIZADOR".equals(rol)
                           && edicion != null
-
-                          && organizador != null
-                          && organizador.equals(nick)) { %>
+                          && orgNick != null
+                          && orgNick.equals(nick)) { %>
 
               <h3>Asistentes registrados</h3>
               <ul class="lista-asistentes">
                 <%
                   int i = 0;
-
                   for (DTRegistro registro : registros) {
                     String id = "detalle-" + i++;
                 %>
@@ -136,7 +145,6 @@
                   </tr>
                 </thead>
                 <tbody>
-
                   <% for (DTRegistro r : registros) { %>
                     <tr>
                       <td><%= r.getUsuario() %></td>
@@ -158,8 +166,8 @@
 
   <aside class="card" style="min-width:300px; flex:1; margin-left:2rem; align-self:flex-start;">
     <h3>Organizador</h3>
-    <% if (organizador != null) { %>
-      <p><strong>Nombre:</strong> <%= organizador %></p>
+    <% if (orgMostrar != null && !orgMostrar.isBlank()) { %>
+      <p><strong>Nombre:</strong> <%= orgMostrar %></p>
     <% } else { %>
       <p>No disponible</p>
     <% } %>
@@ -167,14 +175,13 @@
     <h3>Tipos de Registro</h3>
     <% if (tiposRegistro != null && !tiposRegistro.isEmpty()) { %>
       <ul>
-
         <% for (DTTipoRegistro tr : tiposRegistro) { %>
           <li>
             <strong><%= tr.getNombre() %></strong>
             <form action="<%=ctx%>/registro/ConsultaTipoRegistro" method="get" style="display:inline;">
-              <input type="hidden" name="evento" value="<%=request.getAttribute("evNombre")%>" />
-              <input type="hidden" name="edicion" value="<%=edicion.getNombre()%>" />
-              <input type="hidden" name="tipoRegistro" value="<%=tr.getNombre()%>" />
+              <input type="hidden" name="evento" value="<%= evNombre %>" />
+              <input type="hidden" name="edicion" value="<%= edicion != null ? edicion.getNombre() : "" %>" />
+              <input type="hidden" name="tipoRegistro" value="<%= tr.getNombre() %>" />
               <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
             </form>
           </li>
@@ -187,14 +194,13 @@
     <h3>Patrocinios</h3>
     <% if (patrocinios != null && !patrocinios.isEmpty()) { %>
       <ul>
-
         <% for (DTPatrocinio p : patrocinios) { %>
           <li>
             <strong><%= p.getInstitucion() %></strong>
             <form action="<%=ctx%>/edicion/ConsultaPatrocinio" method="get" style="display:inline;">
-              <input type="hidden" name="evento" value="<%=request.getAttribute("evNombre")%>" />
-              <input type="hidden" name="edicion" value="<%=edicion.getNombre()%>" />
-              <input type="hidden" name="codigoPatrocinio" value="<%=p.getCodigo()%>" />
+              <input type="hidden" name="evento" value="<%= evNombre %>" />
+              <input type="hidden" name="edicion" value="<%= edicion != null ? edicion.getNombre() : "" %>" />
+              <input type="hidden" name="codigoPatrocinio" value="<%= p.getCodigo() %>" />
               <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
             </form>
           </li>
