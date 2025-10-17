@@ -10,7 +10,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import logica.fabrica;
-import logica.clases.Usuario;
 import logica.datatypes.DTDatosUsuario;
 import logica.datatypes.DTEvento;
 import logica.interfaces.IControladorUsuario;

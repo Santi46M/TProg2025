@@ -1,7 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="logica.clases.Usuario" %>
 <%@ page import="logica.datatypes.*" %>
 
 <%
@@ -9,7 +8,7 @@
   String nickSesion = (String) session.getAttribute("nick");
   String rolSesion  = (String) session.getAttribute("rol");
 
-  Collection<Usuario> usuarios = (Collection<Usuario>) request.getAttribute("usuarios");
+  Collection<DTDatosUsuario> usuarios = (Collection<DTDatosUsuario>) request.getAttribute("usuarios");
   DTDatosUsuario usuario = (DTDatosUsuario) request.getAttribute("usuario");
   Map<String, String> edicionToEvento = (Map<String, String>) request.getAttribute("edicionToEvento");
   String error = (String) request.getAttribute("error");
@@ -62,10 +61,10 @@
           <% if (usuarios == null || usuarios.isEmpty()) { %>
             <p>No hay usuarios registrados.</p>
           <% } else {
-               for (Usuario u : usuarios) {
-                 boolean esOrg = (u instanceof logica.clases.Organizador);
-                 boolean esAsist = (u instanceof logica.clases.Asistente);
+               for (DTDatosUsuario u : usuarios) {
                  String fotoUrl = (fotos == null) ? null : fotos.get(u.getNickname());
+                 boolean esOrg = u.getEdiciones() != null && !u.getEdiciones().isEmpty();
+                 boolean esAsist = u.getRegistros() != null && !u.getRegistros().isEmpty();
           %>
             <div class="card usuario-card">
               <% if (fotoUrl != null && !fotoUrl.isBlank()) { %>
@@ -95,6 +94,7 @@
         </div>
 
       <% } else { %>
+        <!-- 🧩 Esta parte ya usaba DTDatosUsuario, se mantiene igual -->
         <h1>Perfil de <%= usuario.getNickname() %></h1>
 
         <div class="perfil-header">

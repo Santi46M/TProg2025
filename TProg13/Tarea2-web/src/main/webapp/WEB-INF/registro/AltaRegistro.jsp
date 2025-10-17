@@ -1,9 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.*,logica.datatypes.DTEvento,logica.clases.Ediciones" %>
+<%@ page import="java.util.*, logica.datatypes.DTEvento, logica.datatypes.DTEdicion" %>
 <%
   String ctx = request.getContextPath();
   List<DTEvento> eventos = (List<DTEvento>) request.getAttribute("eventos");
-  List<Ediciones> ediciones = (List<Ediciones>) request.getAttribute("ediciones");
+  List<DTEdicion> ediciones = (List<DTEdicion>) request.getAttribute("ediciones");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -21,10 +21,7 @@
 
 <div class="container row" style="margin-top:1rem;">
  <!-- Sidebar -->
-
-	<jsp:include page="/WEB-INF/templates/menu.jsp" />
-
-  
+ <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
   <!-- Contenido principal -->
   <main class="container">
@@ -42,8 +39,10 @@
           <select id="selectEdicion" name="edicion" required>
             <option value="">-- Seleccione una edición --</option>
             <% if (ediciones != null) {
-                 for (Ediciones ed : ediciones) { %>
-                   <option value="<%= ed.getSigla() %>"><%= ed.getNombre() %> (<%= ed.getEvento().getNombre() %>)</option>
+                 for (DTEdicion ed : ediciones) { %>
+                   <option value="<%= ed.getSigla() %>">
+                     <%= ed.getNombre() %> (<%= ed.getEvento().getNombre() %>)
+                   </option>
             <%   }
                } %>
           </select>
@@ -74,6 +73,7 @@
           <button type="submit" class="btn-cancelar-altaEvento" name="accion" value="cancelar">Cancelar</button>
         </div>
       </form>
+
       <script>
         document.querySelector('.btn-cancelar-altaEvento').addEventListener('click', function(e) {
           var form = document.getElementById('form-alta-tipo');
