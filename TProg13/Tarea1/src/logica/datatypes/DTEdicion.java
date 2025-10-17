@@ -35,7 +35,8 @@ public class DTEdicion {
 
     public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
                      LocalDate fechaAlta, String organizador, String ciudad, String pais, String imagen, DTEstado estado) {
-        this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais, (String) null);
+        // Antes pasaba (String) null, descartando la imagen.
+        this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais, imagen);
         this.estado = estado;
     }
 

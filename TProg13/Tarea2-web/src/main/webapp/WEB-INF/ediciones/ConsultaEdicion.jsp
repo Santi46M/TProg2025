@@ -6,21 +6,21 @@
   String nick = (String) session.getAttribute("nick");
   String rol  = (String) session.getAttribute("rol");
 
+  DTEdicion edicion = (DTEdicion) request.getAttribute("edicion");
+  String organizador = (String) request.getAttribute("organizador");
+  @SuppressWarnings("unchecked")
+  List<DTRegistro> registros = (List<DTRegistro>) request.getAttribute("registros");
+  @SuppressWarnings("unchecked")
+  List<DTTipoRegistro> tiposRegistro = (List<DTTipoRegistro>) request.getAttribute("tiposRegistro");
+  @SuppressWarnings("unchecked")
+  List<DTPatrocinio> patrocinios = (List<DTPatrocinio>) request.getAttribute("patrocinios");
 
-   logica.datatypes.DTEdicion       edicion      = (logica.datatypes.DTEdicion)       request.getAttribute("edicion");
-  String organizador  = (String) request.getAttribute("organizador");
-  java.util.List<logica.datatypes.DTRegistro>     registros     = (java.util.List<logica.datatypes.DTRegistro>)     request.getAttribute("registros");
-  java.util.List<logica.datatypes.DTTipoRegistro> tiposRegistro = (java.util.List<logica.datatypes.DTTipoRegistro>) request.getAttribute("tiposRegistro");
-  java.util.List<logica.datatypes.DTPatrocinio>   patrocinios   = (java.util.List<logica.datatypes.DTPatrocinio>)   request.getAttribute("patrocinios");
-
-  // Como DTEdicion ya no trae DTEvento dentro, el servlet nos deja el nombre del evento por separado
+  // Nombre del evento provisto por el servlet
   String evNombre = (String) request.getAttribute("evNombre");
 
-
+  // URL de imagen ya resuelta por el servlet (no duplicar ctx en la JSP)
   String edImagenUrl = (String) request.getAttribute("edImagenUrl");
-  boolean hasServletImg = (edImagenUrl != null && !edImagenUrl.isBlank());
-  boolean hasEdImg = (edicion != null && edicion.getImagen() != null && !edicion.getImagen().isEmpty());
-  boolean hasAnyImg = hasServletImg || hasEdImg;
+  boolean hasAnyImg = (edImagenUrl != null && !edImagenUrl.isBlank());
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -61,11 +61,7 @@
 
         <% if (hasAnyImg) { %>
           <div class="img-frame">
-            <% if (hasServletImg) { %>
-              <img src="<%= edImagenUrl %>" alt="Imagen de la edición <%= (edicion != null ? edicion.getNombre() : "") %>">
-            <% } else { %>
-              <img src="<%= edicion.getImagen() %>" alt="Imagen de la edición <%= (edicion != null ? edicion.getNombre() : "") %>">
-            <% } %>
+            <img src="<%= edImagenUrl %>" alt="Imagen de la edición <%= (edicion != null ? edicion.getNombre() : "") %>">
           </div>
         <% } %>
 
@@ -84,9 +80,7 @@
 
           <% if (registros != null && !registros.isEmpty()) { %>
             <% if ("ASISTENTE".equals(rol) && registros.size() == 1) {
-
-                 logica.datatypes.DTRegistro registro = registros.get(0);
-
+                 DTRegistro registro = registros.get(0);
             %>
               <h3>Tu registro en esta edición</h3>
               <p><strong>Tipo:</strong> <%= registro.getTipoRegistro() %></p>
@@ -95,7 +89,6 @@
 
             <% } else if ("ORGANIZADOR".equals(rol)
                           && edicion != null
-
                           && organizador != null
                           && organizador.equals(nick)) { %>
 
@@ -103,7 +96,6 @@
               <ul class="lista-asistentes">
                 <%
                   int i = 0;
-
                   for (DTRegistro registro : registros) {
                     String id = "detalle-" + i++;
                 %>
@@ -132,7 +124,6 @@
                   </tr>
                 </thead>
                 <tbody>
-
                   <% for (DTRegistro r : registros) { %>
                     <tr>
                       <td><%= r.getUsuario() %></td>
@@ -154,7 +145,7 @@
 
   <aside class="card" style="min-width:300px; flex:1; margin-left:2rem; align-self:flex-start;">
     <h3>Organizador</h3>
-    <% if (organizador != null) { %>
+    <% if (organizador != null && !organizador.isBlank()) { %>
       <p><strong>Nombre:</strong> <%= organizador %></p>
     <% } else { %>
       <p>No disponible</p>
@@ -163,14 +154,13 @@
     <h3>Tipos de Registro</h3>
     <% if (tiposRegistro != null && !tiposRegistro.isEmpty()) { %>
       <ul>
-
         <% for (DTTipoRegistro tr : tiposRegistro) { %>
           <li>
             <strong><%= tr.getNombre() %></strong>
             <form action="<%=ctx%>/registro/ConsultaTipoRegistro" method="get" style="display:inline;">
-              <input type="hidden" name="evento" value="<%=request.getAttribute("evNombre")%>" />
-              <input type="hidden" name="edicion" value="<%=edicion.getNombre()%>" />
-              <input type="hidden" name="tipoRegistro" value="<%=tr.getNombre()%>" />
+              <input type="hidden" name="evento" value="<%= (evNombre != null ? evNombre : "") %>" />
+              <input type="hidden" name="edicion" value="<%= (edicion != null ? edicion.getNombre() : "") %>" />
+              <input type="hidden" name="tipoRegistro" value="<%= tr.getNombre() %>" />
               <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
             </form>
           </li>
@@ -183,14 +173,13 @@
     <h3>Patrocinios</h3>
     <% if (patrocinios != null && !patrocinios.isEmpty()) { %>
       <ul>
-
         <% for (DTPatrocinio p : patrocinios) { %>
           <li>
             <strong><%= p.getInstitucion() %></strong>
             <form action="<%=ctx%>/edicion/ConsultaPatrocinio" method="get" style="display:inline;">
-              <input type="hidden" name="evento" value="<%=request.getAttribute("evNombre")%>" />
-              <input type="hidden" name="edicion" value="<%=edicion.getNombre()%>" />
-              <input type="hidden" name="codigoPatrocinio" value="<%=p.getCodigo()%>" />
+              <input type="hidden" name="evento" value="<%= (evNombre != null ? evNombre : "") %>" />
+              <input type="hidden" name="edicion" value="<%= (edicion != null ? edicion.getNombre() : "") %>" />
+              <input type="hidden" name="codigoPatrocinio" value="<%= p.getCodigo() %>" />
               <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
             </form>
           </li>
