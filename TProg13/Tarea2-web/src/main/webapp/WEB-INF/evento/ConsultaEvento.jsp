@@ -5,11 +5,10 @@
 <%@ page import="java.util.Collections" %>
 <%@ page import="java.time.LocalDate" %>
 
-
 <%
   String ctx  = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
-  // Obtenemos el datatype del evento (no el objeto de la lógica)
+
   DTEvento ev = (DTEvento) request.getAttribute("evento");
   String evNombre = (ev != null ? ev.getNombre() : null);
   String evSigla  = (ev != null ? ev.getSigla() : null);
@@ -17,7 +16,28 @@
   LocalDate evFecha  = (ev != null ? ev.getFecha() : null);
   List<String> evCategorias = (ev != null ? ev.getCategorias() : Collections.emptyList());
 
-  String evImagenUrl = (ev != null ? ev.getImagen() : null);
+  // 1) Preferir SIEMPRE la URL ya resuelta por el servlet
+  String evImagenUrl = (String) request.getAttribute("evImagenUrl");
+
+  // 2) Fallback seguro (sin duplicar ctx) si el servlet no lo envió
+  if (evImagenUrl == null || evImagenUrl.isBlank()) {
+      String raw = (ev != null ? ev.getImagen() : null);
+      if (raw != null && !raw.isBlank()) {
+          String lower = raw.toLowerCase();
+          if (lower.startsWith("http://") || lower.startsWith("https://")) {
+              evImagenUrl = raw; // externa
+          } else if (raw.startsWith(ctx + "/")) {
+              evImagenUrl = raw; // ya viene con ctx incluido (evitar duplicar)
+          } else if (raw.startsWith("/")) {
+              evImagenUrl = ctx + raw; // app-relative (/img/...) → anteponer ctx
+          } else {
+              // solo filename → dinámicas
+              evImagenUrl = ctx + "/img/eventos/" + raw;
+          }
+      } else {
+          evImagenUrl = ctx + "/img/evento-default.jpg";
+      }
+  }
 
   boolean hasImg = (evImagenUrl != null && !evImagenUrl.isBlank());
 
@@ -47,19 +67,17 @@
 </head>
 <body>
 
-  <!-- Header -->
   <jsp:include page="/WEB-INF/templates/header.jsp" />
 
   <div class="container row layout-inicio" style="display:flex; align-items:flex-start;">
     <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
-    <!-- Contenido principal -->
     <main class="container consulta-evento-main" style="flex:2; min-width:0; padding:15px; line-height:2;">
       <section class="event-card">
         <div class="event-hero <%= hasImg ? "" : "no-img" %>">
           <% if (hasImg) { %>
             <div class="event-hero__img">
-              <img src="<%= evImagenUrl %>" alt="Imagen de <%= evNombre %>">
+              <img src="<%= evImagenUrl %>" alt="Imagen de <%= (evNombre != null ? evNombre : "Evento") %>">
             </div>
           <% } %>
 
@@ -120,4 +138,3 @@
 
 </body>
 </html>
-

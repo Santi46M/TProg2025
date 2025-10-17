@@ -19,7 +19,6 @@ import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
 import excepciones.EventoYaExisteException;
-import logica.controladores.ControladorEvento;
 
 @WebServlet("/evento/*")
 @MultipartConfig(maxFileSize = 2 * 1024 * 1024, maxRequestSize = 4 * 1024 * 1024)
@@ -29,7 +28,9 @@ public class EventoServlet extends HttpServlet {
     private static final String JSP_CONSULTA = "/WEB-INF/evento/ConsultaEvento.jsp";
     private static final String JSP_REGISTRO = "/WEB-INF/evento/RegistrarseEvento.jsp";
     private static final String JSP_LISTAR = "/WEB-INF/evento/listado.jsp";
-    private static final String IMG_REL_BASE = "/eventos";
+
+    // Carpeta pública donde se guardan subidas
+    private static final String UPLOAD_PUBLIC_DIR = "/img/eventos";
 
     private final IControladorEvento controladorEv = fabrica.getInstance().getIControladorEvento();
     private String ctx(HttpServletRequest req) { return req.getContextPath(); }
@@ -46,7 +47,8 @@ public class EventoServlet extends HttpServlet {
                 return;
             }
 
-            DTEvento ev = controladorEv.ObtenerDatosEvento(nombre);
+            // Usá el método correcto de tu interfaz si el nombre difiere
+            DTEvento ev = controladorEv.consultaDTEvento(nombre);
             if (ev == null) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Evento no encontrado: " + nombre);
                 return;
@@ -58,17 +60,20 @@ public class EventoServlet extends HttpServlet {
             req.setAttribute("evDesc", ev.getDescripcion());
             req.setAttribute("evFecha", formatFecha(ev.getFecha()));
             req.setAttribute("evCategorias", ev.getCategorias());
-            req.setAttribute("evImagenUrl", ev.getImagen());
 
+            // === URL de imagen con la misma lógica que InicioServlet, evitando duplicar ctx ===
+            String evImagenUrl = resolveImagenUrl(req, ev);
+            req.setAttribute("evImagenUrl", evImagenUrl);
+
+            // Ediciones
             List<String> siglas = controladorEv.listarEdicionesEvento(nombre);
-            String siglaEvento = ev.getSigla(); // DTEvento ev ya tiene la sigla del evento
+            String siglaEvento = ev.getSigla();
             List<DTEdicion> ediciones = new ArrayList<>();
             for (String siglaEd : siglas) {
                 DTEdicion dtEd = controladorEv.consultaEdicionEvento(siglaEvento, siglaEd);
                 if (dtEd != null) ediciones.add(dtEd);
             }
             req.setAttribute("evEdiciones", ediciones);
-
 
             req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
             return;
@@ -143,10 +148,13 @@ public class EventoServlet extends HttpServlet {
                         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                         return;
                     }
-                    String baseImg = getServletContext().getRealPath(IMG_REL_BASE);
+
+                    // Guardar físicamente en /img/eventos
+                    String baseImg = getServletContext().getRealPath(UPLOAD_PUBLIC_DIR);
                     if (baseImg == null) {
+                        // fallback si WAR no está exploded
                         String root = getServletContext().getRealPath("/");
-                        if (root != null) baseImg = Path.of(root, "eventos").toString();
+                        if (root != null) baseImg = Path.of(root, "img", "eventos").toString();
                     }
                     if (baseImg != null) {
                         Files.createDirectories(Path.of(baseImg));
@@ -158,9 +166,9 @@ public class EventoServlet extends HttpServlet {
                         Path destino = Path.of(baseImg, finalName);
                         imgPart.write(destino.toAbsolutePath().toString());
                         imagenFileName = finalName;
-                        System.out.println("[IMG] Guardada en: " + destino + " | URL: " + ctx(req) + IMG_REL_BASE + "/" + finalName);
+                        System.out.println("[IMG] Guardada en: " + destino + " | URL: " + ctx(req) + UPLOAD_PUBLIC_DIR + "/" + finalName);
                     } else {
-                        System.err.println("WARN: No se pudo resolver ruta física para " + IMG_REL_BASE);
+                        System.err.println("WARN: No se pudo resolver ruta física para " + UPLOAD_PUBLIC_DIR);
                     }
                 }
             } catch (Exception fileEx) {
@@ -172,10 +180,13 @@ public class EventoServlet extends HttpServlet {
             DTCategorias dtCategorias = new DTCategorias(categoriasList);
             try {
                 controladorEv.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
+
+                // Persistimos SOLO el filename; los servlets resuelven la URL final
                 if (imagenFileName != null) {
-                    try { controladorEv.actualizarImagenEvento(nombre, imagenFileName); } 
+                    try { controladorEv.actualizarImagenEvento(nombre, imagenFileName); }
                     catch (IllegalArgumentException ex) { System.err.println("No se pudo asociar imagen al evento: " + ex.getMessage()); }
                 }
+
                 String nombreEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8.name());
                 resp.sendRedirect(ctx(req) + "/evento/ConsultaEvento?nombre=" + nombreEnc);
             } catch (EventoYaExisteException e) {
@@ -201,6 +212,8 @@ public class EventoServlet extends HttpServlet {
 
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
+
+    // === Helpers ===
 
     private boolean requiereOrganizador(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession sAux = req.getSession(false);
@@ -232,6 +245,50 @@ public class EventoServlet extends HttpServlet {
             if (fAux instanceof java.util.Date dateAux) return new java.text.SimpleDateFormat("dd/MM/yyyy").format(dateAux);
         } catch (Exception ignore) {}
         return fAux.toString();
+    }
+
+    private String resolveImagenUrl(HttpServletRequest req, DTEvento ev) {
+        String ctx = ctx(req);
+        String raw = null;
+        try { raw = ev.getImagen(); } catch (Exception ignore) {}
+
+        String url = null;
+        if (raw != null && !raw.isBlank()) {
+            String lower = raw.toLowerCase();
+            if (lower.startsWith("http://") || lower.startsWith("https://")) {
+                url = raw; // absoluta externa
+            } else if (raw.startsWith("/")) {
+                // Si ya empieza con el context-path, no lo volvemos a anteponer
+                if (raw.startsWith(ctx + "/")) {
+                    url = raw;
+                } else {
+                    url = ctx + raw; // ruta app-relative sin ctx
+                }
+            } else {
+                // Solo filename → probamos /img, /img/eventos, /eventos (legacy)
+                String[] candidates = new String[] {
+                    "/img/" + raw,
+                    "/img/eventos/" + raw,
+                    "/eventos/" + raw
+                };
+                for (String rel : candidates) {
+                    String abs = getServletContext().getRealPath(rel);
+                    boolean exists;
+                    if (abs != null) {
+                        exists = Files.exists(Path.of(abs));
+                    } else {
+                        // Si no hay realPath (WAR no exploded), asumimos disponible
+                        exists = true;
+                    }
+                    if (exists) {
+                        url = ctx + rel;
+                        break;
+                    }
+                }
+            }
+        }
+        if (url == null) url = ctx + "/img/evento-default.jpg";
+        return url;
     }
 
     private static String getSafeFilename(Part partAux) {
