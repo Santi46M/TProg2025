@@ -5,12 +5,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import logica.fabrica;
 import logica.interfaces.IControladorUsuario;
 import logica.datatypes.DTDatosUsuario;
+import excepciones.UsuarioNoExisteException;
 //import logica.clases.Usuario;
 
 @WebServlet(urlPatterns = {"/auth/login", "/auth/logout"})
@@ -79,18 +81,28 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // ✅ Login correcto
-        Set<DTDatosUsuario> usuarios = controladorUser.obtenerUsuariosDT();
-        DTDatosUsuario dto = null;
+     // ✅ Login correcto
+        Set<DTDatosUsuario> usuarios = new HashSet<>();
+        try {
+            usuarios = controladorUser.obtenerUsuariosDT();
+        } catch (UsuarioNoExisteException e) {
+            e.printStackTrace();
+        }
 
-        // Buscar por correo si no se encontró por nickname
+        DTDatosUsuario dto = null;
+        
+        
+
+        // Buscar tanto por email como por nickname
         for (DTDatosUsuario u : usuarios) {
-            if (u.getEmail().equalsIgnoreCase(nickOrEmail)) {
+            if (u.getEmail().equalsIgnoreCase(nickOrEmail)
+                    || u.getNickname().equalsIgnoreCase(nickOrEmail)) {
                 dto = u;
                 nick = u.getNickname();
                 break;
             }
         }
+
 
         if (dto == null) {
             req.setAttribute("error", "Usuario no encontrado.");
