@@ -8,7 +8,7 @@
 
 
   logica.datatypes.DTEdicion       edicion      = (logica.datatypes.DTEdicion)       request.getAttribute("edicion");
-  logica.datatypes.DTDatosUsuario  organizador  = (logica.datatypes.DTDatosUsuario)  request.getAttribute("organizador");
+  String organizador  = (String) request.getAttribute("organizador");
   java.util.List<logica.datatypes.DTRegistro>     registros     = (java.util.List<logica.datatypes.DTRegistro>)     request.getAttribute("registros");
   java.util.List<logica.datatypes.DTTipoRegistro> tiposRegistro = (java.util.List<logica.datatypes.DTTipoRegistro>) request.getAttribute("tiposRegistro");
   java.util.List<logica.datatypes.DTPatrocinio>   patrocinios   = (java.util.List<logica.datatypes.DTPatrocinio>)   request.getAttribute("patrocinios");
@@ -72,11 +72,8 @@
         <div class="event-info event-text" style="padding: 15px; line-height: 2">
           <h3>Datos de la Edición</h3>
           <% if (edicion != null) { %>
-<<<<<<< HEAD
             <div class="event-meta"><strong>Evento:</strong> <%= (evNombre != null ? evNombre : "—") %></div>
-=======
             <div class="event-meta"><strong>Evento:</strong> <%= request.getAttribute("evNombre") %></div>
->>>>>>> 53d47e9e16b1f44b3a4985c26a1b1bb3bebf00e7
             <div class="event-meta"><strong>Sigla:</strong> <%= edicion.getSigla() %></div>
             <div class="event-meta"><strong>Fecha inicio:</strong> <%= edicion.getFechaInicio() %></div>
             <div class="event-meta"><strong>Fecha fin:</strong> <%= edicion.getFechaFin() %></div>
