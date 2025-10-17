@@ -33,6 +33,8 @@ import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
 import logica.datatypes.DTRegistro;
+import logica.datatypes.DTPatrocinio;
+import logica.datatypes.DTTipoRegistro;
 import logica.enumerados.DTEstado;
 import logica.enumerados.DTNivel;
 import logica.interfaces.IControladorEvento;
@@ -614,5 +616,41 @@ public class ControladorEvento implements IControladorEvento {
             // Mantengo tu else tal cual
             throw new excepciones.EventoYaExisteException(evento.getNombre());
         }
+    }
+
+    @Override
+    public DTPatrocinio obtenerDTPatrocinio(String codigoPatrocinio) {
+        ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
+        for (Patrocinio p : manejadorAux.listarPatrocinios()) {
+            if (p.getCodigoPatrocinio().equals(codigoPatrocinio)) {
+                return new DTPatrocinio(
+                    p.getCodigoPatrocinio(),
+                    p.getAporte(),
+                    p.getFechaPatrocinio(),
+                    p.getNivel(),
+                    p.getCantidadRegistros(),
+                    p.getInstitucion().getNombre(),
+                    p.getEdicion().getNombre(),
+                    p.getTipoRegistro().getNombre()
+                );
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public DTTipoRegistro consultaTipoRegistro(String nombreEvento, String nombreEdicion, String nombreTipoRegistro) {
+        Eventos evento = manejador.obtenerEvento(nombreEvento);
+        if (evento == null) return null;
+        Ediciones edicion = evento.obtenerEdicion(nombreEdicion);
+        if (edicion == null) return null;
+        TipoRegistro tipo = edicion.obtenerTipoRegistro(nombreTipoRegistro);
+        if (tipo == null) return null;
+        return new DTTipoRegistro(
+            tipo.getNombre(),
+            tipo.getDescripcion(),
+            tipo.getCosto(),
+            tipo.getCupo()
+        );
     }
 }

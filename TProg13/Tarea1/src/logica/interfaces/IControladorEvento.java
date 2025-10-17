@@ -18,6 +18,8 @@ import logica.clases.Usuario;
 import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
+import logica.datatypes.DTRegistro;
+import logica.datatypes.DTTipoRegistro;
 import logica.enumerados.DTNivel;
 
 
@@ -33,8 +35,6 @@ public interface IControladorEvento {
     public List<DTEvento> listarEventos();
     public List<String> listarEdicionesEvento(String nombreEvento);
     public Ediciones obtenerEdicion(String nombreEvento, String nombreEdicion);
-
-    // ARREGLADO NUEVO
     public DTEdicion obtenerDtEdicion(String nombreEvento, String nombreEdicion);
     public DTEvento consultaDTEvento(String nombreEvento);
 
@@ -77,4 +77,7 @@ public interface IControladorEvento {
     ) throws excepciones.EdicionYaExisteException,
          excepciones.EventoYaExisteException,
          excepciones.FechasCruzadasException;
+    public logica.datatypes.DTPatrocinio obtenerDTPatrocinio(String codigoPatrocinio);
+    public DTRegistro consultaRegistro(Usuario user, String idRegistro);
+    public DTTipoRegistro consultaTipoRegistro(String nombreEvento, String nombreEdicion, String nombreTipoRegistro);
 }
