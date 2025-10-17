@@ -1,21 +1,17 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.*" %>
-<%@ page import="java.net.URLEncoder" %>
-<%@ page import="logica.datatypes.*" %>
+<%@ page import="java.util.*, java.net.URLEncoder, logica.datatypes.*" %>
 
 <%
   String ctx = request.getContextPath();
   String nickSesion = (String) session.getAttribute("nick");
-  String rolSesion  = (String) session.getAttribute("rol");
 
   Collection<DTDatosUsuario> usuarios = (Collection<DTDatosUsuario>) request.getAttribute("usuarios");
   DTDatosUsuario usuario = (DTDatosUsuario) request.getAttribute("usuario");
   Map<String, String> edicionToEvento = (Map<String, String>) request.getAttribute("edicionToEvento");
   String error = (String) request.getAttribute("error");
 
-  // URLs ya resueltas por el servlet:
-  Map<String,String> fotos = (Map<String,String>) request.getAttribute("fotos");      // nick -> url
-  String usrImagenUrl = (String) request.getAttribute("usrImagenUrl");                // url perfil
+  Map<String,String> fotos = (Map<String,String>) request.getAttribute("fotos");
+  String usrImagenUrl = (String) request.getAttribute("usrImagenUrl");
 %>
 
 <!DOCTYPE html>
@@ -63,8 +59,6 @@
           <% } else {
                for (DTDatosUsuario u : usuarios) {
                  String fotoUrl = (fotos == null) ? null : fotos.get(u.getNickname());
-                 boolean esOrg = u.getEdiciones() != null && !u.getEdiciones().isEmpty();
-                 boolean esAsist = u.getRegistros() != null && !u.getRegistros().isEmpty();
           %>
             <div class="card usuario-card">
               <% if (fotoUrl != null && !fotoUrl.isBlank()) { %>
@@ -77,24 +71,17 @@
                 <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
                   <input type="hidden" name="nick" value="<%=u.getNickname()%>" />
                   <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;display:flex;align-items:center;font-size:1.1em;font-weight:600;">
-                    <i class='bx <%= esOrg ? "bxs-microphone" : "bxs-id-card" %>' style="font-size:1.2em;margin-right:0.3em;"></i>
+                    <i class='bx bxs-id-card' style="font-size:1.2em;margin-right:0.3em;"></i>
                     <span><%=u.getNickname()%></span>
                   </button>
                 </form>
               </h3>
-              <p><strong>Nombre:</strong> <%=u.getNombre()%></p>
-              <p><strong>Email:</strong> <%=u.getEmail()%></p>
-              <% if (esOrg) { %>
-                <span class="rol-tag org">Organizador</span>
-              <% } else if (esAsist) { %>
-                <span class="rol-tag asist">Asistente</span>
-              <% } %>
+              <p><strong>Nickname:</strong> <%=u.getNickname()%></p>
             </div>
           <% } } %>
         </div>
 
       <% } else { %>
-        <!-- 🧩 Esta parte ya usaba DTDatosUsuario, se mantiene igual -->
         <h1>Perfil de <%= usuario.getNickname() %></h1>
 
         <div class="perfil-header">
@@ -104,8 +91,11 @@
             <div class="no-avatar" aria-label="Sin imagen">sin imagen</div>
           <% } %>
           <div>
-            <p><strong>Nombre:</strong> <%= usuario.getNombre() %></p>
-            <p><strong>Email:</strong> <%= usuario.getEmail() %></p>
+              <p><strong>Nickname:</strong> <%=usuario.getNickname()%></p>
+              <p><strong>Nombre:</strong> <%=usuario.getNombre()%></p>
+              <p><strong>Apellido:</strong> <%=usuario.getApellido()%></p>
+              <p><strong>Email:</strong> <%=usuario.getEmail()%></p>
+              <p><strong>Fecha de nacimiento:</strong> <%=usuario.getFechaNac()%></p>
             <% if (usuario.getInstitucion() != null) { %>
               <p><strong>Institución:</strong> <%= usuario.getInstitucion() %></p>
             <% } %>
@@ -118,11 +108,11 @@
 
         <%
           boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname());
-          boolean esOrg = usuario.getEdiciones() != null && !usuario.getEdiciones().isEmpty();
-          boolean esAsist = usuario.getRegistros() != null && !usuario.getRegistros().isEmpty();
+          boolean tieneEdiciones = usuario.getEdiciones() != null && !usuario.getEdiciones().isEmpty();
+          boolean tieneRegistros = usuario.getRegistros() != null && !usuario.getRegistros().isEmpty();
         %>
 
-        <% if (esOrg) { %>
+        <% if (tieneEdiciones) { %>
           <h2>Ediciones de eventos</h2>
           <ul class="lista-ediciones">
             <% for (DTEdicion e : usuario.getEdiciones()) {
@@ -147,7 +137,7 @@
           </ul>
         <% } %>
 
-        <% if (esSuPropioPerfil && esAsist) { %>
+        <% if (esSuPropioPerfil && tieneRegistros) { %>
           <h2>Eventos registrados</h2>
           <ul class="lista-eventos">
             <% for (DTRegistro r : usuario.getRegistros()) {
@@ -164,7 +154,7 @@
                 <span>| <strong>Tipo:</strong> <%= r.getTipoRegistro() %></span>
                 <span>| <strong>Fecha registro:</strong> <%= r.getFechaRegistro() %></span>
                 <span>| <strong>Costo:</strong> $<%= r.getCosto() %></span>
-                <a class="btn" href="<%= ctx %>/registro/ConsultaRegistroEdicion?idRegistro=<%= java.net.URLEncoder.encode(r.getId(), "UTF-8") %>">Ver detalles</a>
+                <a class="btn" href="<%= ctx %>/registro/ConsultaRegistroEdicion?idRegistro=<%= URLEncoder.encode(r.getId(), "UTF-8") %>">Ver detalles</a>
               </li>
             <% } %>
           </ul>
