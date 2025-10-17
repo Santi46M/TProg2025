@@ -75,15 +75,21 @@
           <fieldset class="form-group-altaEvento" id="fs-categorias">
             <legend>Categorías <span class="req">*</span></legend>
             <div class="checkbox-grid-ev">
-              <label><span>Tecnología</span><input type="checkbox" class="cat" value="Tecnología"></label>
-              <label><span>Innovación</span><input type="checkbox" class="cat" value="Innovación"></label>
-              <label><span>Literatura</span><input type="checkbox" class="cat" value="Literatura"></label>
-              <label><span>Cultura</span><input type="checkbox" class="cat" value="Cultura"></label>
-              <label><span>Música</span><input type="checkbox" class="cat" value="Música"></label>
-              <label><span>Deporte</span><input type="checkbox" class="cat" value="Deporte"></label>
-              <label><span>Salud</span><input type="checkbox" class="cat" value="Salud"></label>
-              <label><span>Entretenimiento</span><input type="checkbox" class="cat" value="Entretenimiento"></label>
-              <label><span>Negocios</span><input type="checkbox" class="cat" value="Negocios"></label>
+              <% 
+                java.util.List<String> cats = (java.util.List<String>) request.getAttribute("categorias");
+                if (cats == null) { cats = logica.controladores.ControladorEvento.listarCategorias(); }
+                if (cats != null && !cats.isEmpty()) {
+                  for (String c : cats) {
+              %>
+                    <label><span><%= c %></span><input type="checkbox" class="cat" value="<%= c %>"></label>
+              <%
+                  }
+                } else {
+              %>
+                    <label><span>(Sin categorías)</span></label>
+              <%
+                }
+              %>
             </div>
             <input type="hidden" id="categorias" name="categorias" value="">
             <small class="helper">Podés elegir más de una.</small>
