@@ -1,14 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
-String ctx = request.getContextPath();
+  String ctx = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
-  logica.clases.Patrocinio patrocinio = (logica.clases.Patrocinio) request.getAttribute("patrocinio");
+  logica.datatypes.DTPatrocinio patrocinio = (logica.datatypes.DTPatrocinio) request.getAttribute("patrocinio");
 %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Consulta Patrocinio — <%= (patrocinio != null ? patrocinio.getCodigoPatrocinio() : "Patrocinio") %></title>
+  <title>Consulta Patrocinio — <%= (patrocinio != null ? patrocinio.getCodigo() : "Patrocinio") %></title>
   <link rel="stylesheet" href="<%=ctx%>/css/style.css">
   <link rel="stylesheet" href="<%=ctx%>/css/ConsultaPatrocinio.css">
 </head>
@@ -19,19 +19,19 @@ String ctx = request.getContextPath();
   <main class="main-inicio">
     <section class="event-card">
       <div class="event-header">
-        <h1 class="event-title">Patrocinio: <%= (patrocinio != null ? patrocinio.getCodigoPatrocinio() : "Patrocinio") %></h1>
+        <h1 class="event-title">Patrocinio: <%= (patrocinio != null ? patrocinio.getCodigo() : "Patrocinio") %></h1>
       </div>
       <div class="event-info">
         <% if (patrocinio != null) { %>
-          <div class="event-meta"><strong>Institución:</strong> <%= patrocinio.getInstitucion().getNombre() %></div>
-          <div class="event-meta"><strong>Nivel:</strong> <%= patrocinio.getNivel() %></div>
-          <div class="event-meta"><strong>Tipo de Registro:</strong> <%= patrocinio.getTipoRegistro().getNombre() %></div>
-          <div class="event-meta"><strong>Aporte:</strong> <%= patrocinio.getAporte() %></div>
-          <div class="event-meta"><strong>Fecha de Patrocinio:</strong> <%= patrocinio.getFechaPatrocinio() %></div>
-          <div class="event-meta"><strong>Cantidad de Registros:</strong> <%= patrocinio.getCantidadRegistros() %></div>
-          <div class="event-meta"><strong>Código de Patrocinio:</strong> <%= patrocinio.getCodigoPatrocinio() %></div>
-          <% if (patrocinio.getEdicion() != null) { %>
-            <div class="event-meta"><strong>Edición asociada:</strong> <%= patrocinio.getEdicion().getNombre() %></div>
+          <div class="event-meta"><strong>Institución:</strong> <%= patrocinio.getInstitucion() %></div>
+          <div class="event-meta"><strong>Nivel:</strong> <%= String.valueOf(patrocinio.getNivel()) %></div>
+          <div class="event-meta"><strong>Tipo de Registro:</strong> <%= patrocinio.getTipoRegistro() %></div>
+          <div class="event-meta"><strong>Aporte:</strong> <%= patrocinio.getMonto() %></div>
+          <div class="event-meta"><strong>Fecha de Patrocinio:</strong> <%= patrocinio.getFecha() %></div>
+          <div class="event-meta"><strong>Cantidad de Registros:</strong> <%= patrocinio.getCantRegistrosGratuitos() %></div>
+          <div class="event-meta"><strong>Código de Patrocinio:</strong> <%= patrocinio.getCodigo() %></div>
+          <% if (patrocinio.getSiglaEdicion() != null) { %>
+            <div class="event-meta"><strong>Edición asociada:</strong> <%= patrocinio.getSiglaEdicion() %></div>
           <% } %>
         <% } else { %>
           <p>No se encontró información del patrocinio.</p>
