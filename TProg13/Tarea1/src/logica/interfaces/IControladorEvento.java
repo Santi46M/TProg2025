@@ -18,6 +18,8 @@ import logica.clases.Usuario;
 import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
+import logica.datatypes.DTRegistro;
+import logica.datatypes.DTTipoRegistro;
 import logica.enumerados.DTNivel;
 
 
@@ -76,4 +78,6 @@ public interface IControladorEvento {
          excepciones.EventoYaExisteException,
          excepciones.FechasCruzadasException;
     public logica.datatypes.DTPatrocinio obtenerDTPatrocinio(String codigoPatrocinio);
+    public DTRegistro consultaRegistro(Usuario user, String idRegistro);
+    public DTTipoRegistro consultaTipoRegistro(String nombreEvento, String nombreEdicion, String nombreTipoRegistro);
 }

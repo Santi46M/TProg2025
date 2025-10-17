@@ -34,6 +34,7 @@ import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
 import logica.datatypes.DTRegistro;
 import logica.datatypes.DTPatrocinio;
+import logica.datatypes.DTTipoRegistro;
 import logica.enumerados.DTEstado;
 import logica.enumerados.DTNivel;
 import logica.interfaces.IControladorEvento;
@@ -635,5 +636,21 @@ public class ControladorEvento implements IControladorEvento {
             }
         }
         return null;
+    }
+
+    @Override
+    public DTTipoRegistro consultaTipoRegistro(String nombreEvento, String nombreEdicion, String nombreTipoRegistro) {
+        Eventos evento = manejador.obtenerEvento(nombreEvento);
+        if (evento == null) return null;
+        Ediciones edicion = evento.obtenerEdicion(nombreEdicion);
+        if (edicion == null) return null;
+        TipoRegistro tipo = edicion.obtenerTipoRegistro(nombreTipoRegistro);
+        if (tipo == null) return null;
+        return new DTTipoRegistro(
+            tipo.getNombre(),
+            tipo.getDescripcion(),
+            tipo.getCosto(),
+            tipo.getCupo()
+        );
     }
 }
