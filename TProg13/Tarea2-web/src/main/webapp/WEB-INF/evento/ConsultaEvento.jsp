@@ -16,30 +16,29 @@
   LocalDate evFecha  = (ev != null ? ev.getFecha() : null);
   List<String> evCategorias = (ev != null ? ev.getCategorias() : Collections.emptyList());
 
-  // 1) Preferir SIEMPRE la URL ya resuelta por el servlet
-  String evImagenUrl = (String) request.getAttribute("evImagenUrl");
+  // 1) Tomar la URL ya resuelta por el servlet si existe
+  String raw = (String) request.getAttribute("evImagenUrl");
 
-  // 2) Fallback seguro (sin duplicar ctx) si el servlet no lo envió
-  if (evImagenUrl == null || evImagenUrl.isBlank()) {
-      String raw = (ev != null ? ev.getImagen() : null);
-      if (raw != null && !raw.isBlank()) {
-          String lower = raw.toLowerCase();
-          if (lower.startsWith("http://") || lower.startsWith("https://")) {
-              evImagenUrl = raw; // externa
-          } else if (raw.startsWith(ctx + "/")) {
-              evImagenUrl = raw; // ya viene con ctx incluido (evitar duplicar)
-          } else if (raw.startsWith("/")) {
-              evImagenUrl = ctx + raw; // app-relative (/img/...) → anteponer ctx
-          } else {
-              // solo filename → dinámicas
-              evImagenUrl = ctx + "/img/eventos/" + raw;
-          }
-      } else {
-          evImagenUrl = ctx + "/img/evento-default.jpg";
-      }
+  // 2) Si el servlet no la puso, usamos lo que venga en el DTO (sin fallback “default”)
+  if ((raw == null || raw.isBlank()) && ev != null) {
+      raw = ev.getImagen();
   }
 
-  boolean hasImg = (evImagenUrl != null && !evImagenUrl.isBlank());
+  // 3) Normalizar SOLO si hay una imagen real (si no, no mostramos nada)
+  String evImagenUrl = null;
+  boolean hasImgCandidate = false;
+  if (raw != null && !raw.isBlank()) {
+      if (raw.startsWith("http://") || raw.startsWith("https://")) {
+          evImagenUrl = raw;                       // externa
+      } else if (raw.startsWith(ctx + "/")) {
+          evImagenUrl = raw;                       // ya incluye ctx
+      } else if (raw.startsWith("/")) {
+          evImagenUrl = ctx + raw;                 // app-relative (/img/...)
+      } else {
+          evImagenUrl = ctx + "/img/eventos/" + raw; // filename (dinámica)
+      }
+      hasImgCandidate = (evImagenUrl != null && !evImagenUrl.isBlank());
+  }
 
   List<DTEdicion> ediciones = (List<DTEdicion>) request.getAttribute("evEdiciones");
 %>
@@ -53,10 +52,16 @@
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <style>
+    /* ---- layout principal ---- */
     .event-hero { display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem; }
-    .event-hero.no-img { display:block; }
-    .event-hero__img { width:360px; max-width:40vw; aspect-ratio:16/9; background:#f3f4f6; border-radius:12px; overflow:hidden; flex-shrink:0; }
+    .event-hero.no-img { display:block; } /* cuando no hay imagen, el texto ocupa todo */
+
+    /* ---- bloque de imagen: oculto por defecto; se muestra solo si carga OK ---- */
+    .event-hero__img { display:none; width:360px; max-width:40vw; aspect-ratio:16/9; background:#f3f4f6; border-radius:12px; overflow:hidden; flex-shrink:0; }
+    .event-hero.has-img .event-hero__img { display:block; }
+
     .event-hero__img img { width:100%; height:100%; object-fit:cover; display:block; }
+
     .chips { display:flex; flex-wrap:wrap; gap:.4rem; }
     .chip { background:#eef2ff; color:#3730a3; padding:.2rem .5rem; border-radius:999px; font-size:.9rem; }
     .ediciones-list { list-style:none; padding:0; margin:0; display:grid; gap:.6rem; }
@@ -74,10 +79,15 @@
 
     <main class="container consulta-evento-main" style="flex:2; min-width:0; padding:15px; line-height:2;">
       <section class="event-card">
-        <div class="event-hero <%= hasImg ? "" : "no-img" %>">
-          <% if (hasImg) { %>
+        <div class="event-hero <%= hasImgCandidate ? "" : "no-img" %>">
+          <% if (hasImgCandidate) { %>
             <div class="event-hero__img">
-              <img src="<%= evImagenUrl %>" alt="Imagen de <%= (evNombre != null ? evNombre : "Evento") %>">
+              <img
+                src="<%= evImagenUrl %>"
+                alt="Imagen de <%= (evNombre != null ? evNombre : "Evento") %>"
+                onload="this.closest('.event-hero')?.classList.add('has-img');"
+                onerror="const hero=this.closest('.event-hero'); if(hero){ hero.classList.add('no-img'); } this.parentElement.remove();"
+              >
             </div>
           <% } %>
 
