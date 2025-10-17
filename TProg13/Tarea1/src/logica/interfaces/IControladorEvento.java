@@ -51,4 +51,30 @@ public interface IControladorEvento {
     public List<DTEvento> listarEventosPorCategoria(String nombreCategoria);
     public List<String> listarCategoriasConEventos();
     public void actualizarImagenEvento(String nombreEvento, String imagenPath) throws IllegalArgumentException;
+    public void altaRegistroEdicionEvento(
+            String idRegistro,
+            String nickUsuario,
+            String nombreEvento,
+            String nombreEdicion,
+            String nombreTipoRegistro,
+            LocalDate fechaRegistro,
+            float costo,
+            LocalDate fechaInicio
+        );
+    
+    void altaEdicionEventoDTO(
+            logica.datatypes.DTEvento eventoDTO,
+            logica.datatypes.DTDatosUsuario usuarioDTO,
+            String nombre,
+            String sigla,
+            String desc,
+            java.time.LocalDate fechaInicio,
+            java.time.LocalDate fechaFin,
+            java.time.LocalDate fechaAlta,
+            String ciudad,
+            String pais,
+            String imagen
+    ) throws excepciones.EdicionYaExisteException,
+         excepciones.EventoYaExisteException,
+         excepciones.FechasCruzadasException;
 }

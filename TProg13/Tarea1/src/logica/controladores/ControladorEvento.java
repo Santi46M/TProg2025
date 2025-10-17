@@ -504,4 +504,105 @@ public class ControladorEvento implements IControladorEvento {
         evento.setImagen(imagenPath); // asegurate de haber agregado get/setImagenPath en la entidad
         // Si tu Manejador requiere persistir/cerrar transacción, hacelo aquí (p.ej., me().guardar(ev);)
     }
+    
+    @Override
+    public void altaRegistroEdicionEvento(
+        String idRegistro,
+        String nickUsuario,
+        String nombreEvento,
+        String nombreEdicion,
+        String nombreTipoRegistro,
+        LocalDate fechaRegistro,
+        float costo,
+        LocalDate fechaInicio
+    ) {
+        ManejadorUsuario mu = ManejadorUsuario.getInstancia();
+        ManejadorEvento me = ManejadorEvento.getInstancia();
+
+        Usuario usuario = mu.findUsuario(nickUsuario);
+        if (usuario == null || !(usuario instanceof Asistente asistente)) {
+            throw new IllegalArgumentException("El usuario no es un asistente válido.");
+        }
+
+        Eventos evento = me.obtenerEvento(nombreEvento);
+        if (evento == null) {
+            throw new IllegalArgumentException("Evento no encontrado: " + nombreEvento);
+        }
+
+        Ediciones edicion = evento.getEdiciones().get(nombreEdicion);
+        if (edicion == null) {
+            throw new IllegalArgumentException("Edición no encontrada: " + nombreEdicion);
+        }
+
+        TipoRegistro tipo = null;
+        for (TipoRegistro t : edicion.getTiposRegistro()) {
+            if (t.getNombre().equalsIgnoreCase(nombreTipoRegistro)) {
+                tipo = t;
+                break;
+            }
+        }
+        if (tipo == null) {
+            throw new IllegalArgumentException("Tipo de registro no encontrado: " + nombreTipoRegistro);
+        }
+
+        Registro nuevo = new Registro(idRegistro, usuario, edicion, tipo, fechaRegistro, costo, fechaInicio);
+        me.agregarRegistro(nuevo);
+        edicion.agregarRegistro(idRegistro, nuevo);
+        asistente.addRegistro(idRegistro, nuevo);
+    }
+    
+    @Override
+    public void altaEdicionEventoDTO(
+            logica.datatypes.DTEvento eventoDTO,
+            logica.datatypes.DTDatosUsuario usuarioDTO,
+            String nombre,
+            String sigla,
+            String desc,
+            java.time.LocalDate fechaInicio,
+            java.time.LocalDate fechaFin,
+            java.time.LocalDate fechaAlta,
+            String ciudad,
+            String pais,
+            String imagen
+    ) throws excepciones.EdicionYaExisteException,
+             excepciones.EventoYaExisteException,
+             excepciones.FechasCruzadasException {
+
+        if (eventoDTO == null) throw new IllegalArgumentException("eventoDTO no puede ser null");
+        if (usuarioDTO == null) throw new IllegalArgumentException("usuarioDTO no puede ser null");
+
+        // Resolver entidades desde los DTOs
+        logica.manejadores.ManejadorEvento manejador = logica.manejadores.ManejadorEvento.getInstancia();
+        logica.clases.Eventos evento = manejador.obtenerEvento(eventoDTO.getNombre());
+        if (evento == null) {
+            // Mantengo tu misma excepción usada en el else original
+            throw new excepciones.EventoYaExisteException(eventoDTO.getNombre());
+        }
+
+        logica.clases.Usuario usuario = mUsuario.obtenerUsuarioPorNickOEmail(usuarioDTO.getNickname());
+        if (usuario == null) {
+            // Si preferís otra excepción propia, cambiala; con IllegalArgumentException basta para evitar NPE
+            throw new IllegalArgumentException("Organizador inexistente: " + usuarioDTO.getNickname());
+        }
+
+        // Copia 1:1 de tu lógica original (mismos checks y mismas excepciones)
+        if (fechaInicio.isAfter(fechaFin)) {
+            throw new excepciones.FechasCruzadasException("La fecha de inicio debe ser anterior a la fecha de fin.");
+        }
+        if (manejador.existeEvento(evento.getNombre())) {
+            if (!manejador.existeEdicion(nombre)) {
+                logica.clases.Ediciones nuevaEdicion =
+                    new logica.clases.Ediciones(evento, nombre, sigla, fechaInicio, fechaFin, fechaAlta, usuario, ciudad, pais, imagen);
+
+                evento.agregarEdicion(nuevaEdicion);
+                manejador.agregarEdicion(nuevaEdicion);
+                mUsuario.findOrganizador(usuario.getNickname()).agregarEdicion(nuevaEdicion);
+            } else {
+                throw new excepciones.EdicionYaExisteException("El nombre de la edición " + nombre + " ya está en uso.");
+            }
+        } else {
+            // Mantengo tu else tal cual
+            throw new excepciones.EventoYaExisteException(evento.getNombre());
+        }
+    }
 }

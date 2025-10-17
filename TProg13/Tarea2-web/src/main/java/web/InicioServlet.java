@@ -45,7 +45,7 @@ public class InicioServlet extends HttpServlet {
         // 2) si no vino en el DTO, consultar el evento completo
         if (raw == null || raw.isBlank()) {
           try {
-            DTEvento eventIter = controladorEv.ObtenerDatosEvento(nombre);
+            DTEvento eventIter = controladorEv.consultaDTEvento(nombre);
             if (eventIter != null) raw = eventIter.getImagen();
           } catch (Exception ex) { /* noop */ }
         }

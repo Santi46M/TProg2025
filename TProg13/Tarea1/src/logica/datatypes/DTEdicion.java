@@ -1,10 +1,9 @@
 package logica.datatypes;
+
 import java.time.LocalDate;
-import java.util.Map;
-
+import java.util.ArrayList;
+import java.util.List;
 import logica.enumerados.DTEstado;
-import logica.datatypes.DTRegistro;
-
 
 public class DTEdicion {
     private String nombre;
@@ -15,11 +14,12 @@ public class DTEdicion {
     private String organizador;
     private String ciudad;
     private String pais;
-    private String imagen; // URL o path de la imagen
     private DTEstado estado;
-    private Map<String, DTRegistro> registros;
+    private List<DTTipoRegistro> tiposRegistro = new ArrayList<>();
+    private List<DTPatrocinio> patrocinios = new ArrayList<>();
 
-    public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String organizador, String ciudad, String pais) {
+    public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
+                     LocalDate fechaAlta, String organizador, String ciudad, String pais) {
         this.nombre = nombre;
         this.sigla = sigla;
         this.fechaInicio = fechaInicio;
@@ -29,36 +29,20 @@ public class DTEdicion {
         this.ciudad = ciudad;
         this.pais = pais;
     }
-    
-    public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
-            LocalDate fechaAlta, String organizador, String ciudad, String pais, String	imagen, DTEstado estado) {
-this.nombre = nombre;
-this.sigla = sigla;
-this.fechaInicio = fechaInicio;
-this.fechaFin = fechaFin;
-this.fechaAlta = fechaAlta;
-this.organizador = organizador;
-this.ciudad = ciudad;
-this.pais = pais;
-this.imagen = imagen;
-this.estado = estado;
-}
 
-// ARREGLADO NUEVO
-public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
-            LocalDate fechaAlta, String organizador, String ciudad, String pais, DTEstado estado, Map<String, DTRegistro> registros) {
-this.nombre = nombre;
-this.sigla = sigla;
-this.fechaInicio = fechaInicio;
-this.fechaFin = fechaFin;
-this.fechaAlta = fechaAlta;
-this.organizador = organizador;
-this.ciudad = ciudad;
-this.pais = pais;
-this.estado = estado;
-this.registros = registros;
-}
-    
+    public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
+                     LocalDate fechaAlta, String organizador, String ciudad, String pais, DTEstado estado) {
+        this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais);
+        this.estado = estado;
+    }
+
+    public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
+                     LocalDate fechaAlta, String organizador, String ciudad, String pais, DTEstado estado,
+                     List<DTTipoRegistro> tiposRegistro, List<DTPatrocinio> patrocinios) {
+        this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais, estado);
+        if (tiposRegistro != null) this.tiposRegistro = tiposRegistro;
+        if (patrocinios != null) this.patrocinios = patrocinios;
+    }
 
     public String getNombre() { return nombre; }
     public String getSigla() { return sigla; }
@@ -68,11 +52,9 @@ this.registros = registros;
     public String getOrganizador() { return organizador; }
     public String getCiudad() { return ciudad; }
     public String getPais() { return pais; }
-    public String getImagen() { return imagen; }
     public DTEstado getEstado() { return estado; }
 
-    public Map<String, DTRegistro> getRegistros() { return registros; }
-
-    
-    
+    public List<DTTipoRegistro> getTiposRegistro() { return tiposRegistro; }
+    public List<DTPatrocinio> getPatrocinios() { return patrocinios; }
 }
+

@@ -7,41 +7,37 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
+import excepciones.UsuarioNoExisteException;
 import logica.fabrica;
 import logica.interfaces.IControladorEvento;
 import logica.interfaces.IControladorUsuario;
-import logica.clases.*;
-import logica.datatypes.DTEvento;
+import logica.datatypes.*;
 import logica.enumerados.DTEstado;
 
 @WebServlet("/registro/inscripcion")
 public class RegistroEdicionEventoServlet extends HttpServlet {
 
     private static final String JSP_INSCRIPCION = "/WEB-INF/registro/RegistroEdicionEvento.jsp";
-    private static final String JSP_OK = "/WEB-INF/registro/AltaRegistroOK.jsp";
 
     private IControladorEvento ce() { return fabrica.getInstance().getIControladorEvento(); }
     private IControladorUsuario cu() { return fabrica.getInstance().getIControladorUsuario(); }
 
-    // =============== GET: lista eventos/ediciones y muestra detalle si ya hay edición ===============
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         if (!requiereAsistente(req, resp)) return;
 
-        // --- 1) Listar eventos ---
         List<DTEvento> eventos = ce().listarEventos();
         req.setAttribute("eventos", eventos);
 
-        // --- 2) Mapa evento → ediciones aceptadas (para el combo dinámico con JS) ---
-        Map<String, List<Ediciones>> edicionesPorEvento = new LinkedHashMap<>();
+        Map<String, List<DTEdicion>> edicionesPorEvento = new LinkedHashMap<>();
         for (DTEvento ev : eventos) {
             List<String> nombresEd = ce().listarEdicionesEvento(ev.getNombre());
             if (nombresEd == null) continue;
-            List<Ediciones> aceptadas = new ArrayList<>();
+            List<DTEdicion> aceptadas = new ArrayList<>();
             for (String nomEd : nombresEd) {
-                Ediciones ed = ce().obtenerEdicion(ev.getNombre(), nomEd);
+                DTEdicion ed = ce().consultaEdicionEvento(ev.getNombre(), nomEd);
                 if (ed != null && ed.getEstado() == DTEstado.Aceptada) {
                     aceptadas.add(ed);
                 }
@@ -50,13 +46,15 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         }
         req.setAttribute("edicionesPorEvento", edicionesPorEvento);
 
-        // --- 3) Si hay evento y edición seleccionados → traer detalle completo ---
         String evento = trim(req.getParameter("evento"));
         String edicion = trim(req.getParameter("edicion"));
+
         if (!isBlank(evento) && !isBlank(edicion)) {
-            Ediciones edSel = ce().obtenerEdicion(evento, edicion);
+            DTEdicion edSel = ce().consultaEdicionEvento(evento, edicion);
             if (edSel != null && edSel.getEstado() == DTEstado.Aceptada) {
                 req.setAttribute("edicionSeleccionada", edSel);
+                List<DTTipoRegistro> tipos = edSel.getTiposRegistro() != null ? edSel.getTiposRegistro() : new ArrayList<>();
+                req.setAttribute("tiposRegistro", tipos);
             } else {
                 req.setAttribute("error", "La edición seleccionada no existe o no está aceptada.");
             }
@@ -65,7 +63,6 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         req.getRequestDispatcher(JSP_INSCRIPCION).forward(req, resp);
     }
 
-    // =============== POST: realiza inscripción y aplica código de patrocinio si corresponde ===============
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
@@ -87,82 +84,82 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             return;
         }
 
-        Usuario usuario = cu().listarUsuarios().get(nick);
-        if (!(usuario instanceof Asistente asistente)) {
-            req.setAttribute("error", "Solo los asistentes pueden registrarse en ediciones.");
+        DTDatosUsuario dtUsuario = null;
+        try {
+            dtUsuario = cu().obtenerDatosUsuario(nick);
+        } catch (UsuarioNoExisteException e) {
+            req.setAttribute("error", "El usuario no existe o la sesión ha expirado.");
+            doGet(req, resp);
+            return;
+        }
+        if (dtUsuario == null) {
+            req.setAttribute("error", "El usuario no existe o la sesión ha expirado.");
             doGet(req, resp);
             return;
         }
 
-        Ediciones ed = ce().obtenerEdicion(evento, edicion);
-        if (ed == null || ed.getEstado() != DTEstado.Aceptada) {
+        DTEdicion edSel = ce().consultaEdicionEvento(evento, edicion);
+        if (edSel == null || edSel.getEstado() != DTEstado.Aceptada) {
             req.setAttribute("error", "La edición seleccionada no está aceptada o no existe.");
             doGet(req, resp);
             return;
         }
 
-        // --- Buscar el tipo de registro elegido ---
-        TipoRegistro tipo = null;
-        Collection<TipoRegistro> tipos = ed.getTiposRegistro();
+        List<DTTipoRegistro> tipos = edSel.getTiposRegistro();
+        DTTipoRegistro tipoSel = null;
         if (tipos != null) {
-            for (TipoRegistro t : tipos) {
+            for (DTTipoRegistro t : tipos) {
                 if (t.getNombre().equalsIgnoreCase(tipoNom)) {
-                    tipo = t;
+                    tipoSel = t;
                     break;
                 }
             }
         }
-        if (tipo == null) {
+        if (tipoSel == null) {
             req.setAttribute("error", "El tipo de registro seleccionado no es válido.");
             doGet(req, resp);
             return;
         }
 
-        // --- Costo base ---
-        float costo = tipo.getCosto();
+        float costo = tipoSel.getCosto();
 
-        // --- Verificar código de patrocinio ---
         if (!isBlank(codigoPatrocinio)) {
-            Collection<Patrocinio> patrocinios = ed.getPatrocinios();
+            List<DTPatrocinio> patrocinios = edSel.getPatrocinios();
             boolean valido = false;
-
             if (patrocinios != null) {
-                for (Patrocinio p : patrocinios) {
-                	if (p != null && p.getCodigoPatrocinio() != null &&
-                		    p.getCodigoPatrocinio().equalsIgnoreCase(codigoPatrocinio) &&
-                		    p.getTipoRegistro() != null &&
-                		    p.getTipoRegistro().getNombre().equalsIgnoreCase(tipoNom)) {
-                		    valido = true;
-                		    break;
-                		}
+                for (DTPatrocinio p : patrocinios) {
+                    if (p != null && p.getCodigo() != null &&
+                        p.getCodigo().equalsIgnoreCase(codigoPatrocinio) &&
+                        p.getTipoRegistro() != null &&
+                        p.getTipoRegistro().equalsIgnoreCase(tipoNom)) {
+                        valido = true;
+                        break;
+                    }
                 }
             }
-
             if (valido) {
                 costo = 0f;
-                System.out.println("✅ Código de patrocinio válido: " + codigoPatrocinio);
             } else {
-                System.out.println("❌ Código de patrocinio inválido: " + codigoPatrocinio);
                 req.setAttribute("error", "El código de patrocinio no es válido.");
                 doGet(req, resp);
                 return;
             }
         }
 
-        // --- Crear registro ---
         try {
             String idRegistro = UUID.randomUUID().toString();
             LocalDate fechaRegistro = LocalDate.now();
 
             ce().altaRegistroEdicionEvento(
-                idRegistro, usuario, ed.getEvento(), ed, tipo,
-                fechaRegistro, costo, ed.getFechaInicio()
+                idRegistro,
+                nick,
+                evento,
+                edicion,
+                tipoNom,
+                fechaRegistro,
+                costo,
+                edSel.getFechaInicio()
             );
-
-            // Mantener coherencia en memoria
-            Registro nuevo = new Registro(idRegistro, usuario, ed, tipo, fechaRegistro, costo, ed.getFechaInicio());
-            ed.agregarRegistro(idRegistro, nuevo);
-            asistente.addRegistro(idRegistro, nuevo);
 
             resp.sendRedirect(req.getContextPath() + "/inicio");
 
@@ -172,8 +169,6 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             doGet(req, resp);
         }
     }
-
-    // =============== Métodos auxiliares ===============
 
     private boolean requiereAsistente(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession s = req.getSession(false);
@@ -185,6 +180,6 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         return true;
     }
 
-    private static String trim(String s){ return s==null?null:s.trim(); }
-    private static boolean isBlank(String s){ return s==null || s.trim().isEmpty(); }
+    private static String trim(String s) { return s == null ? null : s.trim(); }
+    private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
 }
