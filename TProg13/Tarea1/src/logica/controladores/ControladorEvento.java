@@ -341,8 +341,8 @@ public class ControladorEvento implements IControladorEvento {
                         eventIter.getDescripcion(),
                         eventIter.getFecha(),
                         new ArrayList<>(eventIter.getCategorias().keySet()),
-                        new ArrayList<>(eventIter.getEdiciones().keySet())
-                    );
+                        new ArrayList<>(eventIter.getEdiciones().keySet()),
+                        eventIter.getImagen());
             }
         	
 

@@ -50,4 +50,5 @@ public interface IControladorEvento {
     public void actualizarImagenEvento(String nombreEvento, String imagenPath) throws IllegalArgumentException;
     /** Obtiene el DTTipoRegistro para un evento, edición y tipo de registro */
     public DTTipoRegistro consultaTipoRegistro(String evento, String edicion, String tipoRegistro);
+    public DTEvento ObtenerDatosEvento(String nombreEvento);
 }

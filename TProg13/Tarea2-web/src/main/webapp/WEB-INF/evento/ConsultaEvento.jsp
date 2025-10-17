@@ -1,19 +1,27 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="logica.datatypes.DTEvento" %>
+<%@ page import="logica.datatypes.DTEdicion" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="java.time.LocalDate" %>
+
+
 <%
   String ctx  = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
+  // Obtenemos el datatype del evento (no el objeto de la lógica)
+  DTEvento ev = (DTEvento) request.getAttribute("evento");
+  String evNombre = (ev != null ? ev.getNombre() : null);
+  String evSigla  = (ev != null ? ev.getSigla() : null);
+  String evDesc   = (ev != null ? ev.getDescripcion() : null);
+  LocalDate evFecha  = (ev != null ? ev.getFecha() : null);
+  List<String> evCategorias = (ev != null ? ev.getCategorias() : Collections.emptyList());
 
-  String evNombre = (String) request.getAttribute("evNombre");
-  String evSigla  = (String) request.getAttribute("evSigla");
-  String evDesc   = (String) request.getAttribute("evDesc");
-  String evFecha  = (String) request.getAttribute("evFecha");
-  java.util.List<String> evCategorias =
-      (java.util.List<String>) request.getAttribute("evCategorias");
-  if (evCategorias == null) evCategorias = java.util.Collections.emptyList();
+  String evImagenUrl = (ev != null ? ev.getImagen() : null);
 
-  // URL de imagen ya resuelta por el servlet (si existe)
-  String evImagenUrl = (String) request.getAttribute("evImagenUrl");
   boolean hasImg = (evImagenUrl != null && !evImagenUrl.isBlank());
+
+  List<DTEdicion> ediciones = (List<DTEdicion>) request.getAttribute("evEdiciones");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -26,7 +34,7 @@
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <style>
     .event-hero { display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem; }
-    .event-hero.no-img { display:block; }            /* cuando no hay imagen, el texto ocupa todo */
+    .event-hero.no-img { display:block; }
     .event-hero__img { width:360px; max-width:40vw; aspect-ratio:16/9; background:#f3f4f6; border-radius:12px; overflow:hidden; flex-shrink:0; }
     .event-hero__img img { width:100%; height:100%; object-fit:cover; display:block; }
     .chips { display:flex; flex-wrap:wrap; gap:.4rem; }
@@ -46,12 +54,12 @@
     <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
     <!-- Contenido principal -->
-    <main class="container consulta-evento-main" style="flex:2; min-width:0; padding: 15px; line-height: 2 ">
+    <main class="container consulta-evento-main" style="flex:2; min-width:0; padding:15px; line-height:2;">
       <section class="event-card">
         <div class="event-hero <%= hasImg ? "" : "no-img" %>">
           <% if (hasImg) { %>
             <div class="event-hero__img">
-              <img src="<%= evImagenUrl %>" alt="Imagen de <%= (evNombre != null ? evNombre : "Evento") %>">
+              <img src="<%= evImagenUrl %>" alt="Imagen de <%= evNombre %>">
             </div>
           <% } %>
 
@@ -66,14 +74,16 @@
 
               <div class="chips" style="margin:.5rem 0 0;">
                 <span class="categorias-label" style="margin-right:.3rem;"><strong>Categorías:</strong></span>
-                <% if (evCategorias.isEmpty()) { %>
+                <% if (evCategorias == null || evCategorias.isEmpty()) { %>
                   <span class="chip">—</span>
                 <% } else { for (String c : evCategorias) { %>
                   <span class="chip"><%= c %></span>
                 <% } } %>
               </div>
 
-              <div class="event-meta" style="margin-top:.5rem;"><strong>Fecha alta:</strong> <%= (evFecha != null ? evFecha : "—") %></div>
+              <div class="event-meta" style="margin-top:.5rem;">
+                <strong>Fecha alta:</strong> <%= (evFecha != null ? evFecha : "—") %>
+              </div>
             </div>
           </div>
         </div>
@@ -83,8 +93,6 @@
     <aside class="editions" style="min-width:300px; flex:1; margin-left:2rem; align-self:flex-start;">
       <h3>Ediciones</h3>
       <%
-        java.util.List<logica.datatypes.DTEdicion> ediciones =
-          (java.util.List<logica.datatypes.DTEdicion>) request.getAttribute("evEdiciones");
         if (ediciones == null || ediciones.isEmpty()) {
       %>
         <p>No hay ediciones asociadas a este evento.</p>
@@ -92,7 +100,7 @@
         } else {
       %>
         <ul class="ediciones-list">
-        <% for (logica.datatypes.DTEdicion ed : ediciones) { %>
+        <% for (DTEdicion ed : ediciones) { %>
           <li>
             <div>
               <strong><%= ed.getNombre() %></strong>
@@ -112,3 +120,4 @@
 
 </body>
 </html>
+
