@@ -33,7 +33,6 @@ import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
 import logica.datatypes.DTRegistro;
-import logica.datatypes.DTTipoRegistro;
 import logica.enumerados.DTEstado;
 import logica.enumerados.DTNivel;
 import logica.interfaces.IControladorEvento;
@@ -276,6 +275,23 @@ public class ControladorEvento implements IControladorEvento {
         return manejador.obtenerEvento(nombreEvento);
     }
 
+    // ARREGLADO NUEVO
+    @Override
+    public DTEvento consultaDTEvento(String nombreEvento) {
+        ManejadorEvento manejador = ManejadorEvento.getInstancia();
+        Eventos evento = manejador.obtenerEvento(nombreEvento);
+        if (evento == null) return null;
+        return new DTEvento(
+            evento.getNombre(),
+            evento.getSigla(),
+            evento.getDescripcion(),
+            evento.getFecha(),
+            new ArrayList<>(evento.getCategorias().keySet()),
+            new ArrayList<>(evento.getEdiciones().keySet()),
+            evento.getImagen()
+        );
+    }
+
     public void altaRegistroEdicionEvento(String idRegistro, Usuario usuario, Eventos evento, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         if (usuario.esAsistente(usuario)) {
@@ -328,26 +344,6 @@ public class ControladorEvento implements IControladorEvento {
             ));
         }
         return lista;
-    }
-    
-    public DTEvento ObtenerDatosEvento(String nombreEvento) {
-        Map<String, Eventos> eventos = manejador.obtenerEventos();
-        DTEvento evento = null;
-        for (Eventos eventIter : eventos.values()) {
-            if (eventIter.getNombre().equals(nombreEvento)) {
-            	evento = new DTEvento(
-                        eventIter.getNombre(),
-                        eventIter.getSigla(),
-                        eventIter.getDescripcion(),
-                        eventIter.getFecha(),
-                        new ArrayList<>(eventIter.getCategorias().keySet()),
-                        new ArrayList<>(eventIter.getEdiciones().keySet()),
-                        eventIter.getImagen());
-            }
-        	
-
-        }
-        return evento;
     }
 
     public List<String> listarEdicionesEvento(String nombreEvento) {
@@ -410,6 +406,37 @@ public class ControladorEvento implements IControladorEvento {
             edicionIter.getPais()
         );
     }
+
+    // ARREGLADO NUEVO
+    @Override
+    DTEdicion obtenerDtEdicion(String nombreEvento, String nombreEdicion) {
+        Ediciones edicion = obtenerEdicion(nombreEvento, nombreEdicion);
+        if (edicion == null) return null;
+        return new DTEdicion(
+            edicion.getNombre(),
+            edicion.getSigla(),
+            edicion.getFechaInicio(),
+            edicion.getFechaFin(),
+            edicion.getFechaAlta(),
+            edicion.getOrganizador() != null ? edicion.getOrganizador().getNickname() : null,
+            edicion.getCiudad(),
+            edicion.getPais()
+            
+            for (Registro reg : edicion.getRegistros().values()) {
+                DTRegistro dtReg = new DTRegistro(
+                    reg.getId(),
+                    reg.getUsuario().getNombre(),
+                    edicion.getNombre(),
+                    reg.getTipoRegistro().getNombre(),
+                    reg.getFechaRegistro(),
+                    reg.getCosto(),
+                    reg.getFechaInicio()
+                );
+                registrosMap.put(reg.getId(), dtReg);
+            }
+        );
+    }
+
     @Override
     public Ediciones obtenerEdicionPorSigla(String sigla) {
         return manejador.obtenerEdicion(sigla);
@@ -476,21 +503,5 @@ public class ControladorEvento implements IControladorEvento {
         }
         evento.setImagen(imagenPath); // asegurate de haber agregado get/setImagenPath en la entidad
         // Si tu Manejador requiere persistir/cerrar transacción, hacelo aquí (p.ej., me().guardar(ev);)
-    }
-
-    @Override
-    public DTTipoRegistro consultaTipoRegistro(String evento, String edicion, String tipoRegistro) {
-        Eventos eventoObj = manejador.obtenerEvento(evento);
-        if (eventoObj == null) return null;
-        Ediciones edicionObj = eventoObj.obtenerEdicion(edicion);
-        if (edicionObj == null) return null;
-        TipoRegistro tipoObj = edicionObj.getTipoRegistro(tipoRegistro);
-        if (tipoObj == null) return null;
-        return new DTTipoRegistro(
-            tipoObj.getNombre(),
-            tipoObj.getDescripcion(),
-            tipoObj.getCosto(),
-            tipoObj.getCupo()
-        );
     }
 }

@@ -1,14 +1,16 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.*" %>
+<%@ page import="logica.datatypes.*" %>
 <%
   String ctx  = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
   String rol  = (String) session.getAttribute("rol");
 
-  logica.clases.Ediciones edicion = (logica.clases.Ediciones) request.getAttribute("edicion");
-  logica.clases.Usuario organizador = (logica.clases.Usuario) request.getAttribute("organizador");
-  java.util.Collection tiposRegistro = (java.util.Collection) request.getAttribute("tiposRegistro");
-  java.util.Collection patrocinios = (java.util.Collection) request.getAttribute("patrocinios");
-  java.util.List registros = (java.util.List) request.getAttribute("registros");
+  DTEdicion edicion = (DTEdicion) request.getAttribute("edicion");
+  String organizador = (String) request.getAttribute("organizador");
+  Collection<DTTipoRegistro> tiposRegistro = (Collection<DTTipoRegistro>) request.getAttribute("tiposRegistro");
+  Collection<DTPatrocinio> patrocinios = (Collection<DTPatrocinio>) request.getAttribute("patrocinios");
+  List<DTRegistro> registros = (List<DTRegistro>) request.getAttribute("registros");
 
   String edImagenUrl = (String) request.getAttribute("edImagenUrl");
   boolean hasServletImg = (edImagenUrl != null && !edImagenUrl.isBlank());
@@ -67,7 +69,7 @@
         <div class="event-info event-text" style="padding: 15px; line-height: 2 ">
           <h3>Datos de la Edición</h3>
           <% if (edicion != null) { %>
-            <div class="event-meta"><strong>Evento:</strong> <%= edicion.getEvento().getNombre() %></div>
+            <div class="event-meta"><strong>Evento:</strong> <%= request.getAttribute("evNombre") %></div>
             <div class="event-meta"><strong>Sigla:</strong> <%= edicion.getSigla() %></div>
             <div class="event-meta"><strong>Fecha inicio:</strong> <%= edicion.getFechaInicio() %></div>
             <div class="event-meta"><strong>Fecha fin:</strong> <%= edicion.getFechaFin() %></div>
@@ -79,31 +81,30 @@
 
           <% if (registros != null && !registros.isEmpty()) { %>
             <% if ("ASISTENTE".equals(rol) && registros.size() == 1) {
-                 logica.clases.Registro registro = (logica.clases.Registro) registros.get(0);
+                 DTRegistro registro = registros.get(0);
             %>
               <h3>Tu registro en esta edición</h3>
-              <p><strong>Tipo:</strong> <%= registro.getTipoRegistro().getNombre() %></p>
+              <p><strong>Tipo:</strong> <%= registro.getTipoRegistro() %></p>
               <p><strong>Fecha registro:</strong> <%= registro.getFechaRegistro() %></p>
               <p><strong>Costo:</strong> $<%= registro.getCosto() %></p>
 
             <% } else if ("ORGANIZADOR".equals(rol)
                           && edicion != null
-                          && edicion.getOrganizador() != null
-                          && edicion.getOrganizador().getNickname().equals(nick)) { %>
+                          && organizador != null
+                          && organizador.equals(nick)) { %>
               <h3>Asistentes registrados</h3>
               <ul class="lista-asistentes">
                 <%
                   int i = 0;
-                  for (Object regObj : registros) {
-                    logica.clases.Registro registro = (logica.clases.Registro) regObj;
+                  for (DTRegistro registro : registros) {
                     String id = "detalle-" + i++;
                 %>
                   <li class="asistente-item">
                     <button class="asistente-btn" type="button" onclick="toggleDetalles('<%=id%>')">
-                      👤 <%= registro.getUsuario().getNickname() %>
+                      👤 <%= registro.getUsuario() %>
                     </button>
                     <div id="<%=id%>" class="asistente-detalle oculto">
-                      <p><strong>Tipo:</strong> <%= registro.getTipoRegistro().getNombre() %></p>
+                      <p><strong>Tipo:</strong> <%= registro.getTipoRegistro() %></p>
                       <p><strong>Fecha registro:</strong> <%= registro.getFechaRegistro() %></p>
                       <p><strong>Costo:</strong> $<%= registro.getCosto() %></p>
                     </div>
@@ -123,12 +124,10 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <% for (Object regObj : registros) {
-                       logica.clases.Registro r = (logica.clases.Registro) regObj;
-                  %>
+                  <% for (DTRegistro r : registros) { %>
                     <tr>
-                      <td><%= r.getUsuario().getNickname() %></td>
-                      <td><%= r.getTipoRegistro().getNombre() %></td>
+                      <td><%= r.getUsuario() %></td>
+                      <td><%= r.getTipoRegistro() %></td>
                       <td><%= r.getFechaRegistro() %></td>
                       <td>$<%= r.getCosto() %></td>
                     </tr>
@@ -147,7 +146,7 @@
   <aside class="card" style="min-width:300px; flex:1; margin-left:2rem; align-self:flex-start;">
     <h3>Organizador</h3>
     <% if (organizador != null) { %>
-      <p><strong>Nombre:</strong> <%= organizador.getNickname() %></p>
+      <p><strong>Nombre:</strong> <%= organizador %></p>
     <% } else { %>
       <p>No disponible</p>
     <% } %>
@@ -155,13 +154,11 @@
     <h3>Tipos de Registro</h3>
     <% if (tiposRegistro != null && !tiposRegistro.isEmpty()) { %>
       <ul>
-        <% for (Object trObj : tiposRegistro) {
-             logica.clases.TipoRegistro tr = (logica.clases.TipoRegistro) trObj;
-        %>
+        <% for (DTTipoRegistro tr : tiposRegistro) { %>
           <li>
             <strong><%= tr.getNombre() %></strong>
             <form action="<%=ctx%>/registro/ConsultaTipoRegistro" method="get" style="display:inline;">
-              <input type="hidden" name="evento" value="<%=edicion.getEvento().getNombre()%>" />
+              <input type="hidden" name="evento" value="<%=request.getAttribute("evNombre")%>" />
               <input type="hidden" name="edicion" value="<%=edicion.getNombre()%>" />
               <input type="hidden" name="tipoRegistro" value="<%=tr.getNombre()%>" />
               <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
@@ -176,15 +173,13 @@
     <h3>Patrocinios</h3>
     <% if (patrocinios != null && !patrocinios.isEmpty()) { %>
       <ul>
-        <% for (Object pObj : patrocinios) {
-             logica.clases.Patrocinio p = (logica.clases.Patrocinio) pObj;
-        %>
+        <% for (DTPatrocinio p : patrocinios) { %>
           <li>
-            <strong><%= p.getInstitucion().getNombre() %></strong>
-            <form action="<%=ctx%>/edicion/ConsultaPatrocinio" method="get" style="display:inline%;">
-              <input type="hidden" name="evento" value="<%=edicion.getEvento().getNombre()%>" />
+            <strong><%= p.getInstitucion() %></strong>
+            <form action="<%=ctx%>/edicion/ConsultaPatrocinio" method="get" style="display:inline;">
+              <input type="hidden" name="evento" value="<%=request.getAttribute("evNombre")%>" />
               <input type="hidden" name="edicion" value="<%=edicion.getNombre()%>" />
-              <input type="hidden" name="codigoPatrocinio" value="<%=p.getCodigoPatrocinio()%>" />
+              <input type="hidden" name="codigoPatrocinio" value="<%=p.getCodigo()%>" />
               <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
             </form>
           </li>

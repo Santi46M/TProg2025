@@ -20,6 +20,10 @@ import excepciones.FechasCruzadasException;
 import logica.clases.Eventos;
 import logica.clases.Usuario;
 import logica.clases.Ediciones;
+import logica.datatypes.DTDatosUsuario;
+import logica.datatypes.DTEdicion;
+import logica.datatypes.DTRegistro;
+import logica.datatypes.DTEvento;
 
 @WebServlet("/edicion/*")
 @MultipartConfig
@@ -39,9 +43,9 @@ public class EdicionServlet extends HttpServlet {
 
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
-  private Usuario getUsuario(HttpServletRequest req) {
+  private DTDatosUsuario getUsuario(HttpServletRequest req) {
     HttpSession sAux = req.getSession(false);
-    return sAux == null ? null : (Usuario) sAux.getAttribute("usuario_logueado");
+    return sAux == null ? null : (DTDatosUsuario) sAux.getAttribute("usuario_logueado");
   }
   private String getRol(HttpServletRequest req) {
     HttpSession sAux = req.getSession(false);
@@ -66,18 +70,17 @@ public class EdicionServlet extends HttpServlet {
       }
 
 
-      Ediciones edicionObj = ce().obtenerEdicion(evento, edicion);
+      DTEdicion edicionObj = ce().obtenerEdicion(evento, edicion);
       if (edicionObj == null) {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Edición no encontrada: " + edicion);
         return;
       }
 
       req.setAttribute("edicion", edicionObj);
-      req.setAttribute("organizador", edicionObj.getOrganizador());
-      req.setAttribute("tiposRegistro", edicionObj.getTiposRegistro());
-      req.setAttribute("patrocinios", edicionObj.getPatrocinios());
+      req.setAttribute("organizador", edicionObj.getOrganizador()); // nickname
+      req.setAttribute("tiposRegistro", ce().obtenerTiposRegistroDT(evento, edicion));
+      req.setAttribute("patrocinios", ce().obtenerPatrociniosDT(evento, edicion));
       req.setAttribute("evNombre", evento);
-
 
       // -------- IMAGEN: resolver URL final (igual que en Inicio/Evento) ----------
       String raw = edicionObj.getImagen(); // puede ser "archivo.jpg" o ruta "/img/... /ediciones/..."
@@ -117,31 +120,22 @@ public class EdicionServlet extends HttpServlet {
       String nickSesion = session != null ? (String) session.getAttribute("nick") : null;
       boolean esOrganizador = nickSesion != null
           && edicionObj.getOrganizador() != null
-          && nickSesion.equals(edicionObj.getOrganizador().getNickname());
+          && nickSesion.equals(edicionObj.getOrganizador());
 
-
-      java.util.List<logica.clases.Registro> registrosList = null;
+      java.util.List<DTRegistro> registrosList = new java.util.ArrayList<>();
       if (esOrganizador) {
-        java.util.Map<String, logica.clases.Registro> registrosMap = edicionObj.getRegistros();
-        registrosList = new java.util.ArrayList<>(registrosMap.values());
+        if (edicionObj.getRegistros() != null)
+          registrosList.addAll(edicionObj.getRegistros().values());
       } else if (nickSesion != null) {
-        logica.clases.Usuario usuarioLogueado = logica.manejadores.ManejadorUsuario.getInstancia().findUsuario(nickSesion);
-        if (usuarioLogueado instanceof logica.clases.Asistente asistente) {
-          registrosList = new java.util.ArrayList<>();
-          java.util.Map<String, logica.clases.Registro> registrosAsist = asistente.getRegistros();
-          for (logica.clases.Registro r : registrosAsist.values()) {
-
-            if (r.getEdicion() != null && 
-                r.getEdicion().getNombre().equals(edicionObj.getNombre()) && 
-                r.getEdicion().getEvento().getNombre().equals(edicionObj.getEvento().getNombre())) {
-
+        DTDatosUsuario usuarioLogueado = ce().obtenerUsuario(nickSesion);
+        if (usuarioLogueado.getRegistros() != null) {
+          for (DTRegistro r : usuarioLogueado.getRegistros().values()) {
+            if (r.getEdicion() != null && r.getEdicion().equals(edicionObj.getNombre())) {
               registrosList.add(r);
             }
           }
         }
       }
-
-      if (registrosList == null) registrosList = new java.util.ArrayList<>();
       req.setAttribute("registros", registrosList);
 
       req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
@@ -257,14 +251,14 @@ public class EdicionServlet extends HttpServlet {
       // --------------------------------------------------------------------------
 
       try {
-        Usuario org = getUsuario(req);
+        DTDatosUsuario org = getUsuario(req);
         if (org == null || !"ORGANIZADOR".equals(getRol(req))) {
           req.setAttribute("error", "Debés iniciar sesión como organizador.");
           req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
           return;
         }
 
-        Eventos evObj = ce().consultaEvento(evento);
+        DTEvento evObj = ce().consultaDTEvento(evento);
 
         // Ajustá la firma si tu método difiere; aquí asumimos que el último parámetro es imagen
         ce().altaEdicionEvento(evObj, org, nombre, nombre, desc, ini, fin,
@@ -288,10 +282,10 @@ public class EdicionServlet extends HttpServlet {
 
 
   // ===== Método auxiliar =====
-  private java.util.List<Ediciones> listarEdicionesEventoCompleto(String nombreEvento) {
-    java.util.List<Ediciones> lista = new ArrayList<>();
+  private java.util.List<DTEdicion> listarEdicionesEventoCompleto(String nombreEvento) {
+    java.util.List<DTEdicion> lista = new ArrayList<>();
     try {
-      Eventos evento = ce().consultaEvento(nombreEvento);
+      DTEvento evento = ce().consultaDTEvento(nombreEvento);
       if (evento == null) return lista;
       if (evento.getEdiciones() != null && !evento.getEdiciones().isEmpty()) {
         lista.addAll(evento.getEdiciones().values());
