@@ -6,9 +6,12 @@
   Map<String, List<DTEdicion>> mapa = (Map<String, List<DTEdicion>>) request.getAttribute("edicionesPorEvento");
   DTEdicion edSel = (DTEdicion) request.getAttribute("edicionSeleccionada");
   List<DTTipoRegistro> tipos = (List<DTTipoRegistro>) request.getAttribute("tiposRegistro");
+  Map<String, Integer> cuposDisponibles = (Map<String, Integer>) request.getAttribute("cuposDisponibles");
 
   String eventoSel = request.getParameter("evento");
   String edicionSel = request.getParameter("edicion");
+  Boolean yaRegistrado = (Boolean) request.getAttribute("yaRegistrado");
+  if (yaRegistrado == null) yaRegistrado = false;
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -70,27 +73,33 @@
           <li><strong>País:</strong> <%= edSel.getPais() %></li>
         </ul>
 
+        <% if (yaRegistrado) { %>
+          <div style="color:#c00; font-weight:600; margin:1rem 0;">
+            Ya estás registrado a esta edición. No puedes inscribirte nuevamente.
+          </div>
+        <% } %>
+
         <h3>Tipos de registro</h3>
         <% if (tipos == null || tipos.isEmpty()) { %>
           <p>No hay tipos de registro disponibles para esta edición.</p>
-        <% } else { %>
+        <% } else if (!yaRegistrado) { %>
           <form action="<%=ctx%>/registro/inscripcion" method="post" id="formInscripcion">
             <input type="hidden" name="evento" value="<%= eventoSel %>"/>
             <input type="hidden" name="edicion" value="<%= edSel.getNombre() %>"/>
-
             <% for (DTTipoRegistro tr : tipos) { %>
               <label style="display:block; margin:.25rem 0;">
                 <input type="radio" name="tipo" value="<%= tr.getNombre() %>" required/>
                 <strong><%= tr.getNombre() %></strong> — <em><%= tr.getDescripcion() %></em> — $<%= tr.getCosto() %>
+                <span style="color:#007700; font-weight:600;">
+                  Cupos disponibles: <%= (cuposDisponibles != null && cuposDisponibles.get(tr.getNombre()) != null) ? cuposDisponibles.get(tr.getNombre()) : 0 %>
+                </span>
               </label>
             <% } %>
-
             <div class="form-group-registroEdicionEvento" style="margin-top:1rem">
               <label for="codigoPatrocinio">Código de patrocinio (opcional)</label>
               <input id="codigoPatrocinio" name="codigoPatrocinio" placeholder="Ej: CORREANTEL"/>
               <small>Si es válido, el costo será $0.</small>
             </div>
-
             <button type="submit" class="btn-guardar-registroEdicionEvento" style="margin-top:1rem;">Confirmar inscripción</button>
           </form>
         <% } %>

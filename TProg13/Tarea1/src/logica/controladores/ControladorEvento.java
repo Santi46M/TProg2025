@@ -302,6 +302,9 @@ public class ControladorEvento implements IControladorEvento {
             if (tipoRegistro == null) {
                 throw new RuntimeException("No se encontró el tipo de registro especificado para la edición.");
             }
+            if (tipoRegistro.getCupo() <= 0) {
+                throw new excepciones.CupoTipoRegistroInvalidoException(tipoRegistro.getCupo());
+            }
             boolean yaRegistrado = false;
             for (Registro reg : manejadorEvento.obtenerRegistros().values()) {
                 if (reg.getUsuario().equals(usuario) && reg.getEdicion().equals(edicion)) {
@@ -318,12 +321,12 @@ public class ControladorEvento implements IControladorEvento {
             if (yaRegistrado) {
                 throw new RuntimeException("El usuario ya está registrado a esta edición.");
             }
-            if (cantidadRegistrados > tipoRegistro.getCupo()) {
+            if (cantidadRegistrados >= tipoRegistro.getCupo()) {
                 throw new excepciones.CupoTipoRegistroInvalidoException(tipoRegistro.getCupo());
             }
             Registro nuevoRegistro = new Registro(idRegistro, usuario, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio);
             manejadorEvento.agregarRegistro(nuevoRegistro);
-            edicion.agregarRegistro(idRegistro, nuevoRegistro); // <-- Agrega el registro a la edición
+            edicion.agregarRegistro(idRegistro, nuevoRegistro);
             Asistente asist = (Asistente) usuario;
             asist.addRegistro(idRegistro, nuevoRegistro);
         } else {
@@ -558,7 +561,7 @@ public class ControladorEvento implements IControladorEvento {
         LocalDate fechaRegistro,
         float costo,
         LocalDate fechaInicio
-    ) {
+    ) throws RuntimeException {
         ManejadorUsuario mu = ManejadorUsuario.getInstancia();
         ManejadorEvento me = ManejadorEvento.getInstancia();
 
@@ -586,6 +589,30 @@ public class ControladorEvento implements IControladorEvento {
         }
         if (tipo == null) {
             throw new IllegalArgumentException("Tipo de registro no encontrado: " + nombreTipoRegistro);
+        }
+
+        if (tipo.getCupo() <= 0) {
+            throw new excepciones.CupoTipoRegistroInvalidoException(tipo.getCupo());
+        }
+
+        // Control de ya registrado
+        for (Registro reg : me.obtenerRegistros().values()) {
+            if (reg.getUsuario().equals(usuario) && reg.getEdicion().equals(edicion)) {
+                throw new RuntimeException("El usuario ya está registrado a esta edición.");
+            }
+        }
+
+        // Control de cupo ocupado (comparar por nombre, no por instancia)
+        int cantidadRegistrados = 0;
+        for (Registro reg : me.obtenerRegistros().values()) {
+            if (reg.getEdicion().equals(edicion)
+                && reg.getTipoRegistro() != null
+                && reg.getTipoRegistro().getNombre().equalsIgnoreCase(nombreTipoRegistro)) {
+                cantidadRegistrados++;
+            }
+        }
+        if (cantidadRegistrados >= tipo.getCupo()) {
+            throw new excepciones.CupoTipoRegistroInvalidoException(tipo.getCupo());
         }
 
         Registro nuevo = new Registro(idRegistro, usuario, edicion, tipo, fechaRegistro, costo, fechaInicio);
