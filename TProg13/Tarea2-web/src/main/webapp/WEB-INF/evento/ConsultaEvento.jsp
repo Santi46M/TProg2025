@@ -53,7 +53,7 @@
     .event-hero { display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem; }
     .event-hero.no-img { display:block; } /* cuando no hay imagen, el texto ocupa todo */
 
-    /* ---- bloque de imagen: oculto por defecto; se muestra solo si carga OK ---- */
+    /* ---- bloque de imagen: oculto por defecto */
     .event-hero__img { display:none; width:360px; max-width:40vw; aspect-ratio:16/9; background:#f3f4f6; border-radius:12px; overflow:hidden; flex-shrink:0; }
     .event-hero.has-img .event-hero__img { display:block; }
 

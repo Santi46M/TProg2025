@@ -15,10 +15,10 @@
   @SuppressWarnings("unchecked")
   List<DTPatrocinio> patrocinios = (List<DTPatrocinio>) request.getAttribute("patrocinios");
 
-  // Nombre del evento provisto por el servlet
+  // nombre del evento 
   String evNombre = (String) request.getAttribute("evNombre");
 
-  // URL de imagen ya resuelta por el servlet (no duplicar ctx en la JSP)
+  // (no duplicar ctx en la JSP)
   String edImagenUrl = (String) request.getAttribute("edImagenUrl");
   boolean hasAnyImg = (edImagenUrl != null && !edImagenUrl.isBlank());
 %>

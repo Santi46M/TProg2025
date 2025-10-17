@@ -20,7 +20,7 @@
 <jsp:include page="/WEB-INF/templates/header.jsp" />
 
 <div class="container row" style="margin-top:1rem;">
- <!-- Sidebar -->
+ <!-- menu -->
  <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
   <!-- Contenido principal -->
