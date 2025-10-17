@@ -3,7 +3,7 @@ package logica.clases;
 import java.util.Map;
 
 import logica.datatypes.DTEdicion;
-
+import logica.datatypes.DTEvento;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,6 +30,16 @@ public class Organizador extends Usuario {
     public List<DTEdicion> listarEdicionesAPartirDeOrganizador() {
         List<DTEdicion> lista = new ArrayList<>();
         for (Ediciones e : ediciones.values()) {
+        	DTEvento dtEvento = new DTEvento(
+				this.getNombre(),
+				e.getSigla(),
+				e.getEvento().getDescripcion(),
+				e.getEvento().getFecha(),
+				new ArrayList<>(e.getEvento().getCategorias().keySet()),
+				new ArrayList<>(e.getEvento().getEdiciones().keySet()),
+				e.getEvento().getImagen()
+			);
+        	 // Asegura que el evento esté cargado
             lista.add(new DTEdicion(
                 e.getNombre(),
                 e.getSigla(),
@@ -39,7 +49,8 @@ public class Organizador extends Usuario {
                 this.getNombre(), 
                 e.getCiudad(),
                 e.getPais(),
-                e.getImagen()
+                e.getImagen(),
+                dtEvento
             ));
         }
         return lista;

@@ -10,6 +10,7 @@ import excepciones.RegistroNoExiste;
 import java.util.Map;
 import java.util.Set;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import logica.clases.Asistente;
@@ -21,6 +22,7 @@ import logica.clases.Registro;
 import logica.clases.Usuario;
 import logica.datatypes.DTDatosUsuario;
 import logica.datatypes.DTEdicion;
+import logica.datatypes.DTEvento;
 import logica.datatypes.DTRegistro;
 import logica.interfaces.IControladorUsuario;
 import logica.manejadores.ManejadorEvento;
@@ -219,6 +221,13 @@ manejador.addUsuario(nuevoUsuario);
     public static Set<DTEdicion> listarEdicionesAPartirDeOrganizador(Organizador orgUser) {
         Set<DTEdicion> lista = new HashSet<>();
         for (Ediciones edicionIter : orgUser.getEdiciones().values()) {
+        	DTEvento dtEvento = new DTEvento(edicionIter.getEvento().getNombre(), edicionIter.getSigla(),
+        			edicionIter.getEvento().getDescripcion(),
+        			edicionIter.getEvento().getFecha(),
+    				new ArrayList<>(edicionIter.getEvento().getCategorias().keySet()),
+    				new ArrayList<>(edicionIter.getEvento().getEdiciones().keySet()),
+    				edicionIter.getEvento().getImagen()
+    			);
             lista.add(new DTEdicion(
                 edicionIter.getNombre(),
                 edicionIter.getSigla(),
@@ -229,7 +238,8 @@ manejador.addUsuario(nuevoUsuario);
                 edicionIter.getCiudad(),
                 edicionIter.getPais(),
                 edicionIter.getImagen(),
-                edicionIter.getEstado()
+                edicionIter.getEstado(),
+                dtEvento
             ));
         }
         return lista;

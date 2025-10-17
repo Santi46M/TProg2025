@@ -19,9 +19,10 @@ public class DTEdicion {
     private List<DTTipoRegistro> tiposRegistro = new ArrayList<>();
     private List<DTPatrocinio> patrocinios = new ArrayList<>();
     private List<DTRegistro> registros = new ArrayList<>();
+    private DTEvento evento;
 
     public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
-                     LocalDate fechaAlta, String organizador, String ciudad, String pais, String imagen) {
+                     LocalDate fechaAlta, String organizador, String ciudad, String pais, String imagen, DTEvento evento) {
         this.nombre = nombre;
         this.sigla = sigla;
         this.fechaInicio = fechaInicio;
@@ -31,26 +32,27 @@ public class DTEdicion {
         this.ciudad = ciudad;
         this.pais = pais;
         this.imagen = imagen;
+        this.evento = evento;
     }
 
     public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
-                     LocalDate fechaAlta, String organizador, String ciudad, String pais, String imagen, DTEstado estado) {
-        this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais, (String) null);
+                     LocalDate fechaAlta, String organizador, String ciudad, String pais, String imagen, DTEstado estado,DTEvento evento) {
+        this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais, (String) null, evento);
         this.estado = estado;
     }
 
     public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
                      LocalDate fechaAlta, String organizador, String ciudad, String pais, String imagen, DTEstado estado,
-                     List<DTTipoRegistro> tiposRegistro, List<DTPatrocinio> patrocinios) {
-        this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais, imagen, estado);
+                     List<DTTipoRegistro> tiposRegistro, List<DTPatrocinio> patrocinios, DTEvento evento) {
+        this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais, imagen, estado, evento);
         if (tiposRegistro != null) this.tiposRegistro = tiposRegistro;
         if (patrocinios != null) this.patrocinios = patrocinios;
     }
 
     public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
                      LocalDate fechaAlta, String organizador, String ciudad, String pais, String imagen, DTEstado estado,
-                     List<DTTipoRegistro> tiposRegistro, List<DTPatrocinio> patrocinios, List<DTRegistro> registros) {
-        this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais, imagen, estado);
+                     List<DTTipoRegistro> tiposRegistro, List<DTPatrocinio> patrocinios, List<DTRegistro> registros, DTEvento evento) {
+        this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais, imagen, estado, evento);
         if (tiposRegistro != null) this.tiposRegistro = tiposRegistro;
         if (patrocinios != null) this.patrocinios = patrocinios;
         if (registros != null) this.registros = registros;
@@ -66,6 +68,7 @@ public class DTEdicion {
     public String getPais() { return pais; }
     public String getImagen() { return imagen; }
     public DTEstado getEstado() { return estado; }
+    public DTEvento getEvento() { return evento; }
 
     public List<DTTipoRegistro> getTiposRegistro() { return tiposRegistro; }
     public List<DTPatrocinio> getPatrocinios() { return patrocinios; }

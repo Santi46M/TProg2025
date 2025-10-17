@@ -88,6 +88,12 @@ public class ControladorEvento implements IControladorEvento {
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         manejadorEvento.agregarTipoRegistro(tipo);
     }
+    
+    public void altaTipoRegistroDTO(DTEdicion dtEdicion, String nombre, String descripcion, float costo , int cupo) throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
+    	
+    	Ediciones edicion = obtenerEdicion(dtEdicion.getEvento().getNombre(), dtEdicion.getNombre());
+		altaTipoRegistro(edicion, nombre, descripcion, costo, cupo);
+	}
 
     public void altaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException {
         ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
@@ -139,6 +145,7 @@ public class ControladorEvento implements IControladorEvento {
     public DTEdicion consultaEdicionEvento(String siglaEvento, String siglaEdicion) {
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
         Eventos evento = manejador.obtenerEvento(siglaEvento);
+        DTEvento dtEvento = consultaDTEvento(evento.getNombre());
         if (evento == null) return null;
         Ediciones edicion = evento.obtenerEdicion(siglaEdicion);
         if (edicion == null || edicion.getEstado() == DTEstado.Ingresada || edicion.getEstado() == DTEstado.Rechazada) return null;
@@ -152,7 +159,8 @@ public class ControladorEvento implements IControladorEvento {
             edicion.getCiudad(),
             edicion.getPais(),
             edicion.getImagen(),
-            edicion.getEstado()
+            edicion.getEstado(),
+            dtEvento
         );
     }
     
@@ -388,6 +396,7 @@ public class ControladorEvento implements IControladorEvento {
         if (edicionSeleccionadaSigla == null) return null;
         Ediciones edicionIter = manejador.obtenerEdicion(edicionSeleccionadaSigla);
         if (edicionIter == null) return null;
+        DTEvento dtEvento = consultaDTEvento(edicionIter.getEvento().getNombre());
         return new DTEdicion(
             edicionIter.getNombre(),
             edicionIter.getSigla(),
@@ -397,7 +406,8 @@ public class ControladorEvento implements IControladorEvento {
             edicionIter.getOrganizador() != null ? edicionIter.getOrganizador().getNickname() : null,
             edicionIter.getCiudad(),
             edicionIter.getImagen(),
-            edicionIter.getPais()
+            edicionIter.getPais(),
+            dtEvento
         );
     }
 
@@ -405,7 +415,7 @@ public class ControladorEvento implements IControladorEvento {
     public DTEdicion obtenerDtEdicion(String nombreEvento, String nombreEdicion) {
         Ediciones edicion = obtenerEdicion(nombreEvento, nombreEdicion);
         if (edicion == null) return null;
-
+        DTEvento dtEvento = consultaDTEvento(edicion.getEvento().getNombre());
         List<DTTipoRegistro> tiposRegistroDTO = new ArrayList<>();
         for (TipoRegistro tipo : edicion.getTiposRegistro()) {
             tiposRegistroDTO.add(new DTTipoRegistro(
@@ -456,7 +466,8 @@ public class ControladorEvento implements IControladorEvento {
             edicion.getEstado(),
             tiposRegistroDTO,
             patrociniosDTO,
-            registrosDTO
+            registrosDTO,
+            dtEvento
         );
     }
 

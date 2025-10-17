@@ -89,14 +89,15 @@ public class AltaRegistroServlet extends HttpServlet {
 
                 // === Alta “DTO-based” del TipoRegistro (agregá este método en tu controlador/impl) ===
                 // Firma sugerida: void altaTipoRegistroDTO(String siglaEdicion, String nombre, String descripcion, float costo, int cupo)
-                ce().altaTipoRegistroDTO(siglaEdicion, nombre, descripcion, costo, cupo);
+                
+                ce().altaTipoRegistroDTO(dtSel, nombre, descripcion, costo, cupo);
 
                 // Redirigir a la consulta del TipoRegistro (armamos params con DT)
                 String eventoNombre = null;
                 try { eventoNombre = ce().encontrarEventoPorSigla(siglaEdicion); } catch (Exception ignore) {}
                 if (isBlank(eventoNombre)) {
                     // si tu DTEdicion expone el nombre del evento, úsalo
-                    try { eventoNombre = dtSel.getEvento(); } catch (Exception ignore) {}
+                    try { eventoNombre = dtSel.getEvento().getNombre(); } catch (Exception ignore) {}
                 }
 
                 String eventoEnc  = URLEncoder.encode(eventoNombre != null ? eventoNombre : "", StandardCharsets.UTF_8.name());
