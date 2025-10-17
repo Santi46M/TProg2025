@@ -17,9 +17,6 @@ import logica.interfaces.IControladorEvento;
 import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.FechasCruzadasException;
-import logica.clases.Eventos;
-import logica.clases.Usuario;
-import logica.clases.Ediciones;
 import logica.datatypes.DTDatosUsuario;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTRegistro;
@@ -33,7 +30,6 @@ public class EdicionServlet extends HttpServlet {
   private static final String JSP_CONSULTA = "/WEB-INF/ediciones/ConsultaEdicion.jsp";
   private static final String JSP_LISTADO  = "/WEB-INF/ediciones/ListarEdiciones.jsp";
 
-  // Carpeta pública para imágenes de ediciones (URL final: <ctx>/ediciones/archivo.ext)
   private static final String IMG_REL_BASE_ED = "/ediciones";
 
   private IControladorEvento ce() {
@@ -70,33 +66,32 @@ public class EdicionServlet extends HttpServlet {
       }
 
 
-      DTEdicion edicionObj = ce().obtenerEdicion(evento, edicion);
+      DTEdicion edicionObj = ce().obtenerDtEdicion(evento, edicion);
       if (edicionObj == null) {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Edición no encontrada: " + edicion);
         return;
       }
 
       req.setAttribute("edicion", edicionObj);
-      req.setAttribute("organizador", edicionObj.getOrganizador()); // nickname
-      req.setAttribute("tiposRegistro", ce().obtenerTiposRegistroDT(evento, edicion));
-      req.setAttribute("patrocinios", ce().obtenerPatrociniosDT(evento, edicion));
+      req.setAttribute("organizador", edicionObj.getOrganizador()); 
+      req.setAttribute("tiposRegistro", edicionObj.getTiposRegistro());
+      req.setAttribute("patrocinios", edicionObj.getPatrocinios());
       req.setAttribute("evNombre", evento);
 
-      // -------- IMAGEN: resolver URL final (igual que en Inicio/Evento) ----------
-      String raw = edicionObj.getImagen(); // puede ser "archivo.jpg" o ruta "/img/... /ediciones/..."
+      String raw = edicionObj.getImagen();
       String imgUrl = null;
       String ctxPath = ctx(req);
 
       if (raw != null && !raw.isBlank()) {
         if (raw.startsWith("http://") || raw.startsWith("https://")) {
-          imgUrl = raw;                       // absoluta
+          imgUrl = raw;
         } else if (raw.startsWith("/")) {
-          imgUrl = ctxPath + raw;             // ya viene con ruta
+          imgUrl = ctxPath + raw;
         } else {
           String[] candidates = new String[] {
             "/img/" + raw,
             "/img/ediciones/" + raw,
-            IMG_REL_BASE_ED + "/" + raw      // subidas por la app
+            IMG_REL_BASE_ED + "/" + raw
           };
           for (String rel : candidates) {
             String abs = getServletContext().getRealPath(rel);
@@ -104,7 +99,7 @@ public class EdicionServlet extends HttpServlet {
             if (abs != null) {
               exists = java.nio.file.Files.exists(java.nio.file.Path.of(abs));
             } else {
-              exists = true; // en algunos runtimes getRealPath() puede ser null; no bloqueamos
+              exists = true;
             }
             if (exists) { imgUrl = ctxPath + rel; break; }
           }
@@ -113,9 +108,7 @@ public class EdicionServlet extends HttpServlet {
       if (imgUrl != null) {
         req.setAttribute("edImagenUrl", imgUrl);
       }
-      // ---------------------------------------------------------------------------
 
-      // Registros visibles (organizador: todos; asistente: sólo el suyo)
       HttpSession session = req.getSession(false);
       String nickSesion = session != null ? (String) session.getAttribute("nick") : null;
       boolean esOrganizador = nickSesion != null
@@ -125,11 +118,11 @@ public class EdicionServlet extends HttpServlet {
       java.util.List<DTRegistro> registrosList = new java.util.ArrayList<>();
       if (esOrganizador) {
         if (edicionObj.getRegistros() != null)
-          registrosList.addAll(edicionObj.getRegistros().values());
+          registrosList.addAll(edicionObj.getRegistros());
       } else if (nickSesion != null) {
-        DTDatosUsuario usuarioLogueado = ce().obtenerUsuario(nickSesion);
-        if (usuarioLogueado.getRegistros() != null) {
-          for (DTRegistro r : usuarioLogueado.getRegistros().values()) {
+        DTDatosUsuario usuarioLogueado = getUsuario(req);
+        if (usuarioLogueado != null && usuarioLogueado.getRegistros() != null) {
+          for (DTRegistro r : usuarioLogueado.getRegistros()) {
             if (r.getEdicion() != null && r.getEdicion().equals(edicionObj.getNombre())) {
               registrosList.add(r);
             }
@@ -208,7 +201,6 @@ public class EdicionServlet extends HttpServlet {
         return;
       }
 
-      // ---- Guardar imagen (opcional) en /ediciones y persistir SOLO el nombre ----
       String imagenFileName = null;
       try {
 
@@ -233,12 +225,11 @@ public class EdicionServlet extends HttpServlet {
             if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
             if (ext == null || ext.isBlank()) ext = ".jpg";
 
-            // Usamos el nombre de la edición para el archivo
             String finalName = (isBlank(nombre) ? "edicion" : nombre) + ext;
             Path destino = Path.of(baseImg, finalName);
             imagen.write(destino.toAbsolutePath().toString());
 
-            imagenFileName = finalName; // persistimos solo el NOMBRE
+            imagenFileName = finalName;
             System.out.println("[IMG-ED] Guardada en: " + destino + " | URL: " + ctx(req) + IMG_REL_BASE_ED + "/" + finalName);
           }
         }
@@ -260,8 +251,7 @@ public class EdicionServlet extends HttpServlet {
 
         DTEvento evObj = ce().consultaDTEvento(evento);
 
-        // Ajustá la firma si tu método difiere; aquí asumimos que el último parámetro es imagen
-        ce().altaEdicionEvento(evObj, org, nombre, nombre, desc, ini, fin,
+        ce().altaEdicionEventoDTO(evObj, org, nombre, nombre, desc, ini, fin,
                                LocalDate.now(), ciudad, pais, imagenFileName);
 
 
@@ -288,7 +278,10 @@ public class EdicionServlet extends HttpServlet {
       DTEvento evento = ce().consultaDTEvento(nombreEvento);
       if (evento == null) return lista;
       if (evento.getEdiciones() != null && !evento.getEdiciones().isEmpty()) {
-        lista.addAll(evento.getEdiciones().values());
+        for (String edicionName : evento.getEdiciones()) {
+          DTEdicion ed = ce().obtenerDtEdicion(nombreEvento, edicionName);
+          if (ed != null) lista.add(ed);
+        }
       }
     } catch (Exception e) {
       System.err.println("[listarEdicionesEventoCompleto] Error: " + e.getMessage());

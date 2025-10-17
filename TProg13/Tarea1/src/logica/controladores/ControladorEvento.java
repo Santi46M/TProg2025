@@ -150,13 +150,12 @@ public class ControladorEvento implements IControladorEvento {
             edicion.getFechaAlta(),
             edicion.getOrganizador().getNickname(),
             edicion.getCiudad(),
+            edicion.getPais(),
             edicion.getImagen(),
-            edicion.getPais()
+            edicion.getEstado()
         );
     }
     
- // En ControladorEvento
-
     public List<DTEvento> listarEventosPorCategoria(String categoriaBuscada) {
         String needle = normalizar(categoriaBuscada);
         List<DTEvento> out = new ArrayList<>();
@@ -213,20 +212,17 @@ public class ControladorEvento implements IControladorEvento {
         List<String> res = new ArrayList<>();
         if (ediciones == null || ediciones.isEmpty()) return res;
 
-        // 1) intentar con los values (objetos con nombre)
         for (Object v : ediciones.values()) {
             addNombre(res, v);
         }
         if (!res.isEmpty()) return res;
 
-        // 2) fallback: usar las keys como nombres
         for (Object k : ediciones.keySet()) {
             if (k != null) res.add(String.valueOf(k));
         }
         return res;
     }
 
-    /** Agrega el nombre a la lista si puede obtenerlo del objeto */
     private static void addNombre(List<String> out, Object objAux) {
         if (objAux == null) return;
 
@@ -234,17 +230,11 @@ public class ControladorEvento implements IControladorEvento {
             if (!textObj.isBlank()) out.add(textObj);
             return;
         }
-        // si tus clases concretas están disponibles, probá directo:
-        // if (v instanceof Categoria c) { out.add(c.getNombre()); return; }
-        // if (v instanceof Ediciones e) { out.add(e.getNombre()); return; }
-
-        // fallback por reflexión (getNombre())
         try {
             var nombreObj = objAux.getClass().getMethod("getNombre");
             Object nombre = nombreObj.invoke(objAux);
             if (nombre instanceof String nombreObjString && !nombreObjString.isBlank()) out.add(nombreObjString);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException exept) {
-            // sin getNombre(): se omite
         }
 
     }
@@ -416,21 +406,33 @@ public class ControladorEvento implements IControladorEvento {
         Ediciones edicion = obtenerEdicion(nombreEvento, nombreEdicion);
         if (edicion == null) return null;
 
-        DTEdicion dto = new DTEdicion(
-            edicion.getNombre(),
-            edicion.getSigla(),
-            edicion.getFechaInicio(),
-            edicion.getFechaFin(),
-            edicion.getFechaAlta(),
-            edicion.getOrganizador() != null ? edicion.getOrganizador().getNickname() : null,
-            edicion.getCiudad(),
-            edicion.getImagen(),
-            edicion.getPais()
-        );
+        List<DTTipoRegistro> tiposRegistroDTO = new ArrayList<>();
+        for (TipoRegistro tipo : edicion.getTiposRegistro()) {
+            tiposRegistroDTO.add(new DTTipoRegistro(
+                tipo.getNombre(),
+                tipo.getDescripcion(),
+                tipo.getCosto(),
+                tipo.getCupo()
+            ));
+        }
 
-        java.util.Map<String, DTRegistro> registrosMap = new java.util.HashMap<>();
+        List<DTPatrocinio> patrociniosDTO = new ArrayList<>();
+        for (Patrocinio pat : edicion.getPatrocinios()) {
+            patrociniosDTO.add(new DTPatrocinio(
+                pat.getCodigoPatrocinio(),
+                pat.getAporte(),
+                pat.getFechaPatrocinio(),
+                pat.getNivel(),
+                pat.getCantidadRegistros(),
+                pat.getInstitucion().getNombre(),
+                pat.getEdicion().getNombre(),
+                pat.getTipoRegistro().getNombre()
+            ));
+        }
+
+        List<DTRegistro> registrosDTO = new ArrayList<>();
         for (Registro reg : edicion.getRegistros().values()) {
-            DTRegistro dtReg = new DTRegistro(
+            registrosDTO.add(new DTRegistro(
                 reg.getId(),
                 reg.getUsuario().getNombre(),
                 edicion.getNombre(),
@@ -438,14 +440,24 @@ public class ControladorEvento implements IControladorEvento {
                 reg.getFechaRegistro(),
                 reg.getCosto(),
                 reg.getFechaInicio()
-            );
-            registrosMap.put(reg.getId(), dtReg);
+            ));
         }
 
-        // Si tu DTEdicion tuviera un setter para registros, sería algo así:
-        // dto.setRegistros(registrosMap);
-
-        return dto;
+        return new DTEdicion(
+            edicion.getNombre(),
+            edicion.getSigla(),
+            edicion.getFechaInicio(),
+            edicion.getFechaFin(),
+            edicion.getFechaAlta(),
+            edicion.getOrganizador() != null ? edicion.getOrganizador().getNickname() : null,
+            edicion.getCiudad(),
+            edicion.getPais(),
+            edicion.getImagen(),
+            edicion.getEstado(),
+            tiposRegistroDTO,
+            patrociniosDTO,
+            registrosDTO
+        );
     }
 
 

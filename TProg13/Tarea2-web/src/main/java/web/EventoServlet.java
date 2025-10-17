@@ -71,7 +71,9 @@ public class EventoServlet extends HttpServlet {
             List<DTEdicion> ediciones = new ArrayList<>();
             for (String siglaEd : siglas) {
                 DTEdicion dtEd = controladorEv.consultaEdicionEvento(siglaEvento, siglaEd);
-                if (dtEd != null) ediciones.add(dtEd);
+                if (dtEd != null && dtEd.getEstado() != null && dtEd.getEstado().name().equals("Aceptada")) {
+                    ediciones.add(dtEd);
+                }
             }
             req.setAttribute("evEdiciones", ediciones);
 
@@ -149,10 +151,8 @@ public class EventoServlet extends HttpServlet {
                         return;
                     }
 
-                    // Guardar físicamente en /img/eventos
                     String baseImg = getServletContext().getRealPath(UPLOAD_PUBLIC_DIR);
                     if (baseImg == null) {
-                        // fallback si WAR no está exploded
                         String root = getServletContext().getRealPath("/");
                         if (root != null) baseImg = Path.of(root, "img", "eventos").toString();
                     }
@@ -181,7 +181,6 @@ public class EventoServlet extends HttpServlet {
             try {
                 controladorEv.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
 
-                // Persistimos SOLO el filename; los servlets resuelven la URL final
                 if (imagenFileName != null) {
                     try { controladorEv.actualizarImagenEvento(nombre, imagenFileName); }
                     catch (IllegalArgumentException ex) { System.err.println("No se pudo asociar imagen al evento: " + ex.getMessage()); }

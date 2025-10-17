@@ -16,26 +16,23 @@
   LocalDate evFecha  = (ev != null ? ev.getFecha() : null);
   List<String> evCategorias = (ev != null ? ev.getCategorias() : Collections.emptyList());
 
-  // 1) Tomar la URL ya resuelta por el servlet si existe
   String raw = (String) request.getAttribute("evImagenUrl");
 
-  // 2) Si el servlet no la puso, usamos lo que venga en el DTO (sin fallback “default”)
   if ((raw == null || raw.isBlank()) && ev != null) {
       raw = ev.getImagen();
   }
 
-  // 3) Normalizar SOLO si hay una imagen real (si no, no mostramos nada)
   String evImagenUrl = null;
   boolean hasImgCandidate = false;
   if (raw != null && !raw.isBlank()) {
       if (raw.startsWith("http://") || raw.startsWith("https://")) {
-          evImagenUrl = raw;                       // externa
+          evImagenUrl = raw;                       
       } else if (raw.startsWith(ctx + "/")) {
-          evImagenUrl = raw;                       // ya incluye ctx
+          evImagenUrl = raw;                      
       } else if (raw.startsWith("/")) {
-          evImagenUrl = ctx + raw;                 // app-relative (/img/...)
+          evImagenUrl = ctx + raw;                 
       } else {
-          evImagenUrl = ctx + "/img/eventos/" + raw; // filename (dinámica)
+          evImagenUrl = ctx + "/img/eventos/" + raw; 
       }
       hasImgCandidate = (evImagenUrl != null && !evImagenUrl.isBlank());
   }
