@@ -80,4 +80,5 @@ public interface IControladorEvento {
     public logica.datatypes.DTPatrocinio obtenerDTPatrocinio(String codigoPatrocinio);
     public DTRegistro consultaRegistro(Usuario user, String idRegistro);
     public DTTipoRegistro consultaTipoRegistro(String nombreEvento, String nombreEdicion, String nombreTipoRegistro);
+    public DTEdicion obtenerEdicionPorSiglaDT(String sigla);
 }

@@ -477,6 +477,14 @@ public class ControladorEvento implements IControladorEvento {
         return manejador.obtenerEdicion(sigla);
     }
     
+    
+    public DTEdicion obtenerEdicionPorSiglaDT(String sigla) {
+        String nombreEvento = obtenerEdicionPorSigla(sigla).getEvento().getNombre();
+        String nombreEdicion = obtenerEdicionPorSigla(sigla).getNombre();
+    	return obtenerDtEdicion(nombreEvento,nombreEdicion);
+        	
+    }
+    
     @Override
     public String encontrarEventoPorSigla(String siglaEdicion) {
         Ediciones edicionIter = manejador.obtenerEdicion(siglaEdicion);
