@@ -1,10 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="java.util.*" %>
+<%@ page import="logica.datatypes.*" %>
 <%
   String ctx  = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
   String rol  = (String) session.getAttribute("rol");
 
-  // === SOLO DTOs ===
+
   logica.datatypes.DTEdicion       edicion      = (logica.datatypes.DTEdicion)       request.getAttribute("edicion");
   logica.datatypes.DTDatosUsuario  organizador  = (logica.datatypes.DTDatosUsuario)  request.getAttribute("organizador");
   java.util.List<logica.datatypes.DTRegistro>     registros     = (java.util.List<logica.datatypes.DTRegistro>)     request.getAttribute("registros");
@@ -13,6 +15,7 @@
 
   // Como DTEdicion ya no trae DTEvento dentro, el servlet nos deja el nombre del evento por separado
   String evNombre = (String) request.getAttribute("evNombre");
+
 
   String edImagenUrl = (String) request.getAttribute("edImagenUrl");
   boolean hasServletImg = (edImagenUrl != null && !edImagenUrl.isBlank());
@@ -69,7 +72,11 @@
         <div class="event-info event-text" style="padding: 15px; line-height: 2">
           <h3>Datos de la Edición</h3>
           <% if (edicion != null) { %>
+<<<<<<< HEAD
             <div class="event-meta"><strong>Evento:</strong> <%= (evNombre != null ? evNombre : "—") %></div>
+=======
+            <div class="event-meta"><strong>Evento:</strong> <%= request.getAttribute("evNombre") %></div>
+>>>>>>> 53d47e9e16b1f44b3a4985c26a1b1bb3bebf00e7
             <div class="event-meta"><strong>Sigla:</strong> <%= edicion.getSigla() %></div>
             <div class="event-meta"><strong>Fecha inicio:</strong> <%= edicion.getFechaInicio() %></div>
             <div class="event-meta"><strong>Fecha fin:</strong> <%= edicion.getFechaFin() %></div>
@@ -81,7 +88,9 @@
 
           <% if (registros != null && !registros.isEmpty()) { %>
             <% if ("ASISTENTE".equals(rol) && registros.size() == 1) {
+
                  logica.datatypes.DTRegistro registro = registros.get(0);
+
             %>
               <h3>Tu registro en esta edición</h3>
               <p><strong>Tipo:</strong> <%= registro.getTipoRegistro() %></p>
@@ -90,14 +99,17 @@
 
             <% } else if ("ORGANIZADOR".equals(rol)
                           && edicion != null
-                          && edicion.getOrganizador() != null
-                          && edicion.getOrganizador().equals(nick)) { %>
+
+                          && organizador != null
+                          && organizador.equals(nick)) { %>
+
               <h3>Asistentes registrados</h3>
               <ul class="lista-asistentes">
                 <%
                   int i = 0;
-                  for (logica.datatypes.DTRegistro registro : registros) {
-                    String id = "detalle-" + (i++);
+
+                  for (DTRegistro registro : registros) {
+                    String id = "detalle-" + i++;
                 %>
                   <li class="asistente-item">
                     <button class="asistente-btn" type="button" onclick="toggleDetalles('<%=id%>')">
@@ -124,7 +136,8 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <% for (logica.datatypes.DTRegistro r : registros) { %>
+
+                  <% for (DTRegistro r : registros) { %>
                     <tr>
                       <td><%= r.getUsuario() %></td>
                       <td><%= r.getTipoRegistro() %></td>
@@ -146,7 +159,7 @@
   <aside class="card" style="min-width:300px; flex:1; margin-left:2rem; align-self:flex-start;">
     <h3>Organizador</h3>
     <% if (organizador != null) { %>
-      <p><strong>Nombre:</strong> <%= organizador.getNickname() %></p>
+      <p><strong>Nombre:</strong> <%= organizador %></p>
     <% } else { %>
       <p>No disponible</p>
     <% } %>
@@ -154,13 +167,14 @@
     <h3>Tipos de Registro</h3>
     <% if (tiposRegistro != null && !tiposRegistro.isEmpty()) { %>
       <ul>
-        <% for (logica.datatypes.DTTipoRegistro tr : tiposRegistro) { %>
+
+        <% for (DTTipoRegistro tr : tiposRegistro) { %>
           <li>
             <strong><%= tr.getNombre() %></strong>
             <form action="<%=ctx%>/registro/ConsultaTipoRegistro" method="get" style="display:inline;">
-              <input type="hidden" name="evento" value="<%= (evNombre != null ? evNombre : "") %>" />
-              <input type="hidden" name="edicion" value="<%= (edicion != null ? edicion.getNombre() : "") %>" />
-              <input type="hidden" name="tipoRegistro" value="<%= tr.getNombre() %>" />
+              <input type="hidden" name="evento" value="<%=request.getAttribute("evNombre")%>" />
+              <input type="hidden" name="edicion" value="<%=edicion.getNombre()%>" />
+              <input type="hidden" name="tipoRegistro" value="<%=tr.getNombre()%>" />
               <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
             </form>
           </li>
@@ -173,13 +187,14 @@
     <h3>Patrocinios</h3>
     <% if (patrocinios != null && !patrocinios.isEmpty()) { %>
       <ul>
-        <% for (logica.datatypes.DTPatrocinio p : patrocinios) { %>
+
+        <% for (DTPatrocinio p : patrocinios) { %>
           <li>
-            <strong><%= (p.getInstitucion() != null ? p.getInstitucion() : "—") %></strong>
+            <strong><%= p.getInstitucion() %></strong>
             <form action="<%=ctx%>/edicion/ConsultaPatrocinio" method="get" style="display:inline;">
-              <input type="hidden" name="evento" value="<%= (evNombre != null ? evNombre : "") %>" />
-              <input type="hidden" name="edicion" value="<%= (edicion != null ? edicion.getNombre() : "") %>" />
-              <input type="hidden" name="codigoPatrocinio" value="<%= p.getCodigo() %>" />
+              <input type="hidden" name="evento" value="<%=request.getAttribute("evNombre")%>" />
+              <input type="hidden" name="edicion" value="<%=edicion.getNombre()%>" />
+              <input type="hidden" name="codigoPatrocinio" value="<%=p.getCodigo()%>" />
               <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
             </form>
           </li>
