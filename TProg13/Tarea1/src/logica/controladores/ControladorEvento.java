@@ -148,6 +148,7 @@ public class ControladorEvento implements IControladorEvento {
             edicion.getFechaAlta(),
             edicion.getOrganizador().getNickname(),
             edicion.getCiudad(),
+            edicion.getImagen(),
             edicion.getPais()
         );
     }
@@ -403,16 +404,17 @@ public class ControladorEvento implements IControladorEvento {
             edicionIter.getFechaAlta(),
             edicionIter.getOrganizador() != null ? edicionIter.getOrganizador().getNickname() : null,
             edicionIter.getCiudad(),
+            edicionIter.getImagen(),
             edicionIter.getPais()
         );
     }
 
-    // ARREGLADO NUEVO
     @Override
-    DTEdicion obtenerDtEdicion(String nombreEvento, String nombreEdicion) {
+    public DTEdicion obtenerDtEdicion(String nombreEvento, String nombreEdicion) {
         Ediciones edicion = obtenerEdicion(nombreEvento, nombreEdicion);
         if (edicion == null) return null;
-        return new DTEdicion(
+
+        DTEdicion dto = new DTEdicion(
             edicion.getNombre(),
             edicion.getSigla(),
             edicion.getFechaInicio(),
@@ -420,22 +422,30 @@ public class ControladorEvento implements IControladorEvento {
             edicion.getFechaAlta(),
             edicion.getOrganizador() != null ? edicion.getOrganizador().getNickname() : null,
             edicion.getCiudad(),
+            edicion.getImagen(),
             edicion.getPais()
-            
-            for (Registro reg : edicion.getRegistros().values()) {
-                DTRegistro dtReg = new DTRegistro(
-                    reg.getId(),
-                    reg.getUsuario().getNombre(),
-                    edicion.getNombre(),
-                    reg.getTipoRegistro().getNombre(),
-                    reg.getFechaRegistro(),
-                    reg.getCosto(),
-                    reg.getFechaInicio()
-                );
-                registrosMap.put(reg.getId(), dtReg);
-            }
         );
+
+        java.util.Map<String, DTRegistro> registrosMap = new java.util.HashMap<>();
+        for (Registro reg : edicion.getRegistros().values()) {
+            DTRegistro dtReg = new DTRegistro(
+                reg.getId(),
+                reg.getUsuario().getNombre(),
+                edicion.getNombre(),
+                reg.getTipoRegistro().getNombre(),
+                reg.getFechaRegistro(),
+                reg.getCosto(),
+                reg.getFechaInicio()
+            );
+            registrosMap.put(reg.getId(), dtReg);
+        }
+
+        // Si tu DTEdicion tuviera un setter para registros, sería algo así:
+        // dto.setRegistros(registrosMap);
+
+        return dto;
     }
+
 
     @Override
     public Ediciones obtenerEdicionPorSigla(String sigla) {

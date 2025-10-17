@@ -38,7 +38,8 @@ public class Organizador extends Usuario {
                 e.getFechaAlta(),
                 this.getNombre(), 
                 e.getCiudad(),
-                e.getPais()
+                e.getPais(),
+                e.getImagen()
             ));
         }
         return lista;

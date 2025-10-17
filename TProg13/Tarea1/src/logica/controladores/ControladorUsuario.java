@@ -228,6 +228,7 @@ manejador.addUsuario(nuevoUsuario);
                 orgUser.getNombre(),
                 edicionIter.getCiudad(),
                 edicionIter.getPais(),
+                edicionIter.getImagen(),
                 edicionIter.getEstado()
             ));
         }
