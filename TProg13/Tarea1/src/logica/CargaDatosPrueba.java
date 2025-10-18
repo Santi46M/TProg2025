@@ -103,7 +103,7 @@ public class CargaDatosPrueba {
         List<String> catEv04 = Arrays.asList("Deporte", "Salud");
         List<String> catEv05 = Arrays.asList("Cultura", "Entretenimiento");
         List<String> catEv06 = Arrays.asList("Agro", "Negocios");
-        List<String> catEv07 = Arrays.asList("Cultura","Moda");
+        List<String> catEv07 = Arrays.asList("Cultura", "Moda");
 
         // Ref 2025 — Conferencia de Tecnología
         controladorEve.altaEvento(

@@ -30,12 +30,13 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         List<DTEvento> eventos = ce().listarEventos();
         req.setAttribute("eventos", eventos);
 
+        // ediciones ACEPTADAS y NO finalizadas
         Map<String, List<DTEdicion>> edicionesPorEvento = new LinkedHashMap<>();
         for (DTEvento ev : eventos) {
             List<String> claves = ce().listarEdicionesEvento(ev.getNombre()); // nombres o siglas
             if (claves == null) continue;
 
-            List<DTEdicion> aceptadas = new ArrayList<>();
+            List<DTEdicion> visibles = new ArrayList<>();
             for (String clave : claves) {
                 DTEdicion ed = null;
 
@@ -46,11 +47,14 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
                 }
 
                 if (ed != null && esAceptada(ed.getEstado())) {
-                    aceptadas.add(ed);
+                    LocalDate fin = ed.getFechaFin();
+                    if (fin == null || !LocalDate.now().isAfter(fin)) {
+                        visibles.add(ed);
+                    }
                 }
             }
-            if (!aceptadas.isEmpty()) {
-                edicionesPorEvento.put(ev.getNombre(), aceptadas);
+            if (!visibles.isEmpty()) {
+                edicionesPorEvento.put(ev.getNombre(), visibles);
             }
         }
         req.setAttribute("edicionesPorEvento", edicionesPorEvento);
@@ -61,24 +65,32 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         HttpSession s = req.getSession(false);
         String nick = (s == null) ? null : (String) s.getAttribute("nick");
         boolean yaRegistrado = false;
+
         if (!isBlank(eventoParam) && !isBlank(edicionParam) && !isBlank(nick)) {
             ResEvento res = resolverEvento(eventos, eventoParam);
             DTEdicion edSel = resolverEdicion(res, edicionParam);
-            if (edSel != null && esAceptada(edSel.getEstado())) {
+
+            if (edSel != null && esAceptada(edSel.getEstado())
+                    && (edSel.getFechaFin() == null || !LocalDate.now().isAfter(edSel.getFechaFin()))) {
+
                 req.setAttribute("edicionSeleccionada", edSel);
+
                 List<DTTipoRegistro> tipos = (edSel.getTiposRegistro() != null)
                         ? edSel.getTiposRegistro()
                         : new ArrayList<>();
                 req.setAttribute("tiposRegistro", tipos);
-                // Calcular cupos disponibles para cada tipo de registro
+
+                // Calcular cupos disponibles y si el usuario ya está registrado
                 Map<String, Integer> cuposDisponibles = new HashMap<>();
                 if (tipos != null) {
                     for (DTTipoRegistro tipo : tipos) {
-                        int cupo = tipo.getCupo();
+                        int cupo = (tipo == null) ? 0 : tipo.getCupo();
                         int registrados = 0;
                         if (edSel.getRegistros() != null) {
                             for (DTRegistro reg : edSel.getRegistros()) {
-                                if (reg.getTipoRegistro() != null && reg.getTipoRegistro().equalsIgnoreCase(tipo.getNombre())) {
+                                if (reg == null) continue;
+                                if (reg.getTipoRegistro() != null && tipo != null
+                                        && reg.getTipoRegistro().equalsIgnoreCase(tipo.getNombre())) {
                                     registrados++;
                                 }
                                 // control de ya registrado
@@ -87,13 +99,15 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
                                 }
                             }
                         }
-                        cuposDisponibles.put(tipo.getNombre(), cupo - registrados);
+                        if (tipo != null) {
+                            cuposDisponibles.put(tipo.getNombre(), cupo - registrados);
+                        }
                     }
                 }
                 req.setAttribute("cuposDisponibles", cuposDisponibles);
                 req.setAttribute("yaRegistrado", yaRegistrado);
             } else {
-                req.setAttribute("error", "La edición seleccionada no existe o no está aceptada.");
+                req.setAttribute("error", "La edición seleccionada no existe, no está aceptada o ya finalizó.");
             }
         }
 
@@ -144,6 +158,12 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             doGet(req, resp);
             return;
         }
+        LocalDate fin = edSel.getFechaFin();
+        if (fin != null && LocalDate.now().isAfter(fin)) {
+            req.setAttribute("error", "La edición seleccionada ya finalizó.");
+            doGet(req, resp);
+            return;
+        }
 
         // Tipo de registro
         DTTipoRegistro tipoSel = null;
@@ -162,7 +182,7 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             return;
         }
 
-        // calcular costo antes del try
+        // calcular costo antes del try (patrocinio = costo 0 si válido)
         float costo = tipoSel.getCosto();
         if (!isBlank(codigoPatrocinio)) {
             List<DTPatrocinio> patrocinios = edSel.getPatrocinios();
@@ -187,9 +207,11 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
                 return;
             }
         }
+
         try {
             String idRegistro = UUID.randomUUID().toString();
             LocalDate fechaRegistro = LocalDate.now();
+
             ce().altaRegistroEdicionEvento(
                 idRegistro,
                 nick,
@@ -200,6 +222,7 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
                 costo,
                 edSel.getFechaInicio()
             );
+
             resp.sendRedirect(req.getContextPath() + "/inicio");
         } catch (excepciones.CupoTipoRegistroInvalidoException e) {
             req.setAttribute("error", "No hay cupos disponibles para el tipo de registro seleccionado.");
@@ -211,7 +234,7 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         }
     }
 
-    // Helpers 
+    // Helpers
 
     private boolean requiereAsistente(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession s = req.getSession(false);

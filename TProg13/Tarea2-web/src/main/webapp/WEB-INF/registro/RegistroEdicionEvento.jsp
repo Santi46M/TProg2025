@@ -12,6 +12,11 @@
   String edicionSel = request.getParameter("edicion");
   Boolean yaRegistrado = (Boolean) request.getAttribute("yaRegistrado");
   if (yaRegistrado == null) yaRegistrado = false;
+
+  boolean cerrada = false;
+  if (edSel != null && edSel.getFechaFin() != null) {
+    cerrada = java.time.LocalDate.now().isAfter(edSel.getFechaFin());
+  }
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -73,6 +78,12 @@
           <li><strong>País:</strong> <%= edSel.getPais() %></li>
         </ul>
 
+        <% if (cerrada) { %>
+          <div style="color:#c00; font-weight:600; margin:1rem 0;">
+            Esta edición finalizó el <%= edSel.getFechaFin() %>. No admite nuevas inscripciones.
+          </div>
+        <% } %>
+
         <% if (yaRegistrado) { %>
           <div style="color:#c00; font-weight:600; margin:1rem 0;">
             Ya estás registrado a esta edición. No puedes inscribirte nuevamente.
@@ -82,7 +93,7 @@
         <h3>Tipos de registro</h3>
         <% if (tipos == null || tipos.isEmpty()) { %>
           <p>No hay tipos de registro disponibles para esta edición.</p>
-        <% } else if (!yaRegistrado) { %>
+        <% } else if (!yaRegistrado && !cerrada) { %>
           <form action="<%=ctx%>/registro/inscripcion" method="post" id="formInscripcion">
             <input type="hidden" name="evento" value="<%= eventoSel %>"/>
             <input type="hidden" name="edicion" value="<%= edSel.getNombre() %>"/>
