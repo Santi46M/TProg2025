@@ -494,8 +494,8 @@ asist.addRegistro(idRegistro, nuevoRegistro);
     public DTEdicion obtenerEdicionPorSiglaDT(String sigla) {
         String nombreEvento = obtenerEdicionPorSigla(sigla).getEvento().getNombre();
         String nombreEdicion = obtenerEdicionPorSigla(sigla).getNombre();
-    	return obtenerDtEdicion(nombreEvento,nombreEdicion);
-        	
+    	return obtenerDtEdicion(nombreEvento, nombreEdicion);
+        	 
     }
     
     @Override
@@ -572,15 +572,15 @@ asist.addRegistro(idRegistro, nuevoRegistro);
         float costo,
         LocalDate fechaInicio
     ) throws RuntimeException {
-        ManejadorUsuario mu = ManejadorUsuario.getInstancia();
-        ManejadorEvento me = ManejadorEvento.getInstancia();
+        ManejadorUsuario manejU = ManejadorUsuario.getInstancia();
+        ManejadorEvento manejE = ManejadorEvento.getInstancia();
 
-        Usuario usuario = mu.findUsuario(nickUsuario);
+        Usuario usuario = manejU.findUsuario(nickUsuario);
         if (usuario == null || !(usuario instanceof Asistente asistente)) {
             throw new IllegalArgumentException("El usuario no es un asistente válido.");
         }
 
-        Eventos evento = me.obtenerEvento(nombreEvento);
+        Eventos evento = manejE.obtenerEvento(nombreEvento);
         if (evento == null) {
             throw new IllegalArgumentException("Evento no encontrado: " + nombreEvento);
         }
@@ -606,7 +606,7 @@ asist.addRegistro(idRegistro, nuevoRegistro);
         }
 
         // Control de ya registrado
-        for (Registro reg : me.obtenerRegistros().values()) {
+        for (Registro reg : manejE.obtenerRegistros().values()) {
             if (reg.getUsuario().equals(usuario) && reg.getEdicion().equals(edicion)) {
                 throw new RuntimeException("El usuario ya está registrado a esta edición.");
             }
@@ -614,7 +614,7 @@ asist.addRegistro(idRegistro, nuevoRegistro);
 
         // Control de cupo ocupado (comparar por nombre, no por instancia)
         int cantidadRegistrados = 0;
-        for (Registro reg : me.obtenerRegistros().values()) {
+        for (Registro reg : manejE.obtenerRegistros().values()) {
             if (reg.getEdicion().equals(edicion)
                 && reg.getTipoRegistro() != null
                 && reg.getTipoRegistro().getNombre().equalsIgnoreCase(nombreTipoRegistro)) {
@@ -626,7 +626,7 @@ asist.addRegistro(idRegistro, nuevoRegistro);
         }
 
         Registro nuevo = new Registro(idRegistro, usuario, edicion, tipo, fechaRegistro, costo, fechaInicio);
-        me.agregarRegistro(nuevo);
+        manejE.agregarRegistro(nuevo);
         edicion.agregarRegistro(idRegistro, nuevo);
         asistente.addRegistro(idRegistro, nuevo);
     }

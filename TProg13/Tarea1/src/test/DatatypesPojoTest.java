@@ -3,11 +3,14 @@ package test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import logica.datatypes.DTEdicion;
+import logica.datatypes.DTEvento;
 import logica.datatypes.DTPatrocinio;
 import logica.datatypes.DTRegistro;
 import logica.datatypes.DTTipoRegistro;
@@ -18,16 +21,18 @@ import logica.enumerados.DTNivel;
 class DatatypesPojoTest {
 
     @Test
-    @DisplayName("DTEdicion: ctor básico + getters")
+    @DisplayName("DTEdicion: ctor básico + getters (con imagen y evento)")
     void dtEdicionCtorBasico() {
-        LocalDate ini = LocalDate.of(2025, 1, 10);
-        LocalDate fin = LocalDate.of(2025, 1, 12);
+        LocalDate ini  = LocalDate.of(2025, 1, 10);
+        LocalDate fin  = LocalDate.of(2025, 1, 12);
         LocalDate alta = LocalDate.of(2024, 12, 1);
 
         DTEdicion dto = new DTEdicion(
                 "Ed2025", "ED25",
                 ini, fin, alta,
-                "org1", "Montevideo", "Uruguay"
+                "org1", "Montevideo", "Uruguay",
+                "ed2025.png",
+                (DTEvento) null
         );
 
         assertEquals("Ed2025", dto.getNombre());
@@ -38,21 +43,31 @@ class DatatypesPojoTest {
         assertEquals("org1", dto.getOrganizador());
         assertEquals("Montevideo", dto.getCiudad());
         assertEquals("Uruguay", dto.getPais());
+        assertEquals("ed2025.png", dto.getImagen());
         assertNull(dto.getEstado(), "El ctor básico no debe setear estado");
+        assertNull(dto.getEvento(), "Para no depender de DTEvento, pasamos null");
+        assertNotNull(dto.getTiposRegistro());
+        assertNotNull(dto.getPatrocinios());
+        assertNotNull(dto.getRegistros());
+        assertTrue(dto.getTiposRegistro().isEmpty());
+        assertTrue(dto.getPatrocinios().isEmpty());
+        assertTrue(dto.getRegistros().isEmpty());
     }
 
     @Test
-    @DisplayName("DTEdicion: ctor con estado + getters")
+    @DisplayName("DTEdicion: ctor con estado + getters (con imagen y evento)")
     void dtEdicionCtorConEstado() {
-        LocalDate ini = LocalDate.of(2025, 2, 1);
-        LocalDate fin = LocalDate.of(2025, 2, 2);
+        LocalDate ini  = LocalDate.of(2025, 2, 1);
+        LocalDate fin  = LocalDate.of(2025, 2, 2);
         LocalDate alta = LocalDate.of(2025, 1, 1);
 
         DTEdicion dto = new DTEdicion(
                 "EdInvierno", "EDINV",
                 ini, fin, alta,
                 "orgX", "Salto", "Uruguay",
-                DTEstado.Ingresada
+                "invierno.png",
+                DTEstado.Ingresada,   
+                (DTEvento) null
         );
 
         assertEquals("EdInvierno", dto.getNombre());
@@ -63,7 +78,42 @@ class DatatypesPojoTest {
         assertEquals("orgX", dto.getOrganizador());
         assertEquals("Salto", dto.getCiudad());
         assertEquals("Uruguay", dto.getPais());
+        assertEquals("invierno.png", dto.getImagen());
         assertEquals(DTEstado.Ingresada, dto.getEstado());
+        assertNull(dto.getEvento());
+    }
+
+    @Test
+    @DisplayName("DTEdicion: ctor con listas (usa la misma referencia, sin copia defensiva)")
+    void dtEdicionCtorConListas() {
+        LocalDate ini  = LocalDate.of(2025, 5, 1);
+        LocalDate fin  = LocalDate.of(2025, 5, 3);
+        LocalDate alta = LocalDate.of(2025, 4, 1);
+
+        List<DTTipoRegistro> tipos = new ArrayList<>();
+        List<DTPatrocinio>   pats  = new ArrayList<>();
+        List<DTRegistro>     regs  = new ArrayList<>();
+
+        DTEdicion dto = new DTEdicion(
+                "EdOtoño", "EDOT",
+                ini, fin, alta,
+                "orgY", "Colonia", "Uruguay",
+                "otono.png",
+                DTEstado.Aceptada,
+                tipos, pats, regs,
+                (DTEvento) null
+        );
+
+        assertSame(tipos, dto.getTiposRegistro());
+        assertSame(pats,  dto.getPatrocinios());
+        assertSame(regs,  dto.getRegistros());
+
+        tipos.add(null);
+        pats.add(null);
+        regs.add(null);
+        assertEquals(1, dto.getTiposRegistro().size());
+        assertEquals(1, dto.getPatrocinios().size());
+        assertEquals(1, dto.getRegistros().size());
     }
 
     @Test
@@ -95,7 +145,7 @@ class DatatypesPojoTest {
     @Test
     @DisplayName("DTRegistro: ctor + getters")
     void dtRegistro() {
-        LocalDate reg = LocalDate.of(2025, 4, 1);
+        LocalDate reg    = LocalDate.of(2025, 4, 1);
         LocalDate inicio = LocalDate.of(2025, 4, 10);
 
         DTRegistro dto = new DTRegistro(
