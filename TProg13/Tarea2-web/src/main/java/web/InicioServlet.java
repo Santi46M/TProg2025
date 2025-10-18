@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.util.*;
 import logica.interfaces.IControladorEvento;
 import logica.datatypes.DTEvento;
-//import logica.clases.Eventos;
 import logica.fabrica;
 
 @WebServlet({"/inicio"})

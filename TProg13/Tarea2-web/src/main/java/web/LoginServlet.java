@@ -13,7 +13,6 @@ import logica.fabrica;
 import logica.interfaces.IControladorUsuario;
 import logica.datatypes.DTDatosUsuario;
 import excepciones.UsuarioNoExisteException;
-//import logica.clases.Usuario;
 
 @WebServlet(urlPatterns = {"/auth/login", "/auth/logout"})
 public class LoginServlet extends HttpServlet {

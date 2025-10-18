@@ -13,7 +13,6 @@ import java.util.Map;
 
 import logica.fabrica;
 import logica.interfaces.IControladorUsuario;
-import logica.clases.Usuario;
 import logica.datatypes.DTDatosUsuario;
 import excepciones.UsuarioYaExisteException;
 import excepciones.UsuarioNoExisteException;
@@ -234,41 +233,37 @@ public class UsuarioServlet extends HttpServlet {
          nombreArchivo
      );
 
-      
-        HttpSession sAux = req.getSession(true);
-        Map<String, Usuario> usuarios = controladorUs.listarUsuarios();
-        Usuario usr = usuarios.get(nick);
-
-        if (usr == null) {
-          for (Usuario u : usuarios.values()) {
-            if (u.getEmail().equalsIgnoreCase(correo)) {
-              usr = u;
-              break;
-            }
-          }
-        }
-
-        sAux.setAttribute("usuario_logueado", usr);
-        sAux.setAttribute("nick", nick);
-        sAux.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
-        sAux.setAttribute("estado_sesion", "LOGIN_CORRECTO");
-
-        Enumeration<String> names = sAux.getAttributeNames();
-        while (names.hasMoreElements()) {
-          String nAux = names.nextElement();
-          Object vAux = sAux.getAttribute(nAux);
-          System.out.println("   * " + nAux + " = " + vAux);
-        }
-
-        resp.sendRedirect(ctx(req) + "/inicio");
-
-      } catch (UsuarioYaExisteException e) {
-        req.setAttribute("error", e.getMessage());
+      HttpSession sAux = req.getSession(true);
+      DTDatosUsuario usuarioLogueado = null;
+      try {
+        usuarioLogueado = controladorUs.obtenerDatosUsuario(nick);
+      } catch (UsuarioNoExisteException e) {
+        req.setAttribute("error", "No se pudo encontrar el usuario recién creado.");
         cargarInstituciones(req);
         forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+        return;
+      }
+      sAux.setAttribute("usuario_logueado", usuarioLogueado);
+      sAux.setAttribute("nick", nick);
+      sAux.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
+      sAux.setAttribute("estado_sesion", "LOGIN_CORRECTO");
+
+      Enumeration<String> names = sAux.getAttributeNames();
+      while (names.hasMoreElements()) {
+        String nAux = names.nextElement();
+        Object vAux = sAux.getAttribute(nAux);
+        System.out.println("   * " + nAux + " = " + vAux);
       }
 
-      return;
+      resp.sendRedirect(ctx(req) + "/inicio");
+
+    } catch (UsuarioYaExisteException e) {
+      req.setAttribute("error", e.getMessage());
+      cargarInstituciones(req);
+      forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+    }
+
+    return;
     }
 
     //  Modificar usuario para la siguiente tarea 

@@ -11,5 +11,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/jakarta.servlet-api-6.1.0.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>
