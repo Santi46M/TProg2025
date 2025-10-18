@@ -77,7 +77,7 @@
             <div class="checkbox-grid-ev">
               <% 
                 java.util.List<String> cats = (java.util.List<String>) request.getAttribute("categorias");
-                if (cats == null) { cats = logica.controladores.ControladorEvento.listarCategorias(); }
+                
                 if (cats != null && !cats.isEmpty()) {
                   for (String c : cats) {
               %>
