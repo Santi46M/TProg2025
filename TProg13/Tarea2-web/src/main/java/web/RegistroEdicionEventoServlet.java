@@ -27,53 +27,87 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
 
         if (!requiereAsistente(req, resp)) return;
 
-        // 1) Eventos disponibles
         List<DTEvento> eventos = ce().listarEventos();
         req.setAttribute("eventos", eventos);
 
-        // 2) Ediciones (tolerante: listar puede devolver nombres o siglas)
+        // ediciones ACEPTADAS y NO finalizadas
         Map<String, List<DTEdicion>> edicionesPorEvento = new LinkedHashMap<>();
         for (DTEvento ev : eventos) {
             List<String> claves = ce().listarEdicionesEvento(ev.getNombre()); // nombres o siglas
             if (claves == null) continue;
 
-            List<DTEdicion> aceptadas = new ArrayList<>();
+            List<DTEdicion> visibles = new ArrayList<>();
             for (String clave : claves) {
                 DTEdicion ed = null;
 
-                // a) Intento por SIGLA (lo que pide consultaEdicionEvento)
                 try { ed = ce().consultaEdicionEvento(ev.getSigla(), clave); } catch (Exception ignore) {}
 
-                // b) Fallback por NOMBRE de edición
                 if (ed == null) {
                     try { ed = ce().obtenerDtEdicion(ev.getNombre(), clave); } catch (Exception ignore) {}
                 }
 
                 if (ed != null && esAceptada(ed.getEstado())) {
-                    aceptadas.add(ed);
+                    LocalDate fin = ed.getFechaFin();
+                    if (fin == null || !LocalDate.now().isAfter(fin)) {
+                        visibles.add(ed);
+                    }
                 }
             }
-            if (!aceptadas.isEmpty()) {
-                edicionesPorEvento.put(ev.getNombre(), aceptadas);
+            if (!visibles.isEmpty()) {
+                edicionesPorEvento.put(ev.getNombre(), visibles);
             }
         }
         req.setAttribute("edicionesPorEvento", edicionesPorEvento);
 
-        // 3) Si vienen preseleccionados (por querystring), resolvémoslos
         String eventoParam = trim(req.getParameter("evento"));
         String edicionParam = trim(req.getParameter("edicion"));
 
-        if (!isBlank(eventoParam) && !isBlank(edicionParam)) {
-            ResEvento res = resolverEvento(eventos, eventoParam); // obtiene nombre/sigla consistentes
+        HttpSession s = req.getSession(false);
+        String nick = (s == null) ? null : (String) s.getAttribute("nick");
+        boolean yaRegistrado = false;
+
+        if (!isBlank(eventoParam) && !isBlank(edicionParam) && !isBlank(nick)) {
+            ResEvento res = resolverEvento(eventos, eventoParam);
             DTEdicion edSel = resolverEdicion(res, edicionParam);
-            if (edSel != null && esAceptada(edSel.getEstado())) {
+
+            if (edSel != null && esAceptada(edSel.getEstado())
+                    && (edSel.getFechaFin() == null || !LocalDate.now().isAfter(edSel.getFechaFin()))) {
+
                 req.setAttribute("edicionSeleccionada", edSel);
+
                 List<DTTipoRegistro> tipos = (edSel.getTiposRegistro() != null)
                         ? edSel.getTiposRegistro()
                         : new ArrayList<>();
                 req.setAttribute("tiposRegistro", tipos);
+
+                // Calcular cupos disponibles y si el usuario ya está registrado
+                Map<String, Integer> cuposDisponibles = new HashMap<>();
+                if (tipos != null) {
+                    for (DTTipoRegistro tipo : tipos) {
+                        int cupo = (tipo == null) ? 0 : tipo.getCupo();
+                        int registrados = 0;
+                        if (edSel.getRegistros() != null) {
+                            for (DTRegistro reg : edSel.getRegistros()) {
+                                if (reg == null) continue;
+                                if (reg.getTipoRegistro() != null && tipo != null
+                                        && reg.getTipoRegistro().equalsIgnoreCase(tipo.getNombre())) {
+                                    registrados++;
+                                }
+                                // control de ya registrado
+                                if (reg.getUsuario() != null && reg.getUsuario().equals(nick)) {
+                                    yaRegistrado = true;
+                                }
+                            }
+                        }
+                        if (tipo != null) {
+                            cuposDisponibles.put(tipo.getNombre(), cupo - registrados);
+                        }
+                    }
+                }
+                req.setAttribute("cuposDisponibles", cuposDisponibles);
+                req.setAttribute("yaRegistrado", yaRegistrado);
             } else {
-                req.setAttribute("error", "La edición seleccionada no existe o no está aceptada.");
+                req.setAttribute("error", "La edición seleccionada no existe, no está aceptada o ya finalizó.");
             }
         }
 
@@ -87,8 +121,8 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         if (!requiereAsistente(req, resp)) return;
         req.setCharacterEncoding("UTF-8");
 
-        String eventoParam = trim(req.getParameter("evento"));   // suele venir por NOMBRE
-        String edicionParam = trim(req.getParameter("edicion")); // suele venir por NOMBRE
+        String eventoParam = trim(req.getParameter("evento"));
+        String edicionParam = trim(req.getParameter("edicion"));
         String tipoNom = trim(req.getParameter("tipo"));
         String codigoPatrocinio = trim(req.getParameter("codigoPatrocinio"));
 
@@ -115,14 +149,18 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             return;
         }
 
-        // Necesitamos el DTO de la edición para validar estado, tipos y fechaInicio.
-        // Resolver evento y edición tolerando nombre o sigla en los parámetros.
         List<DTEvento> eventos = ce().listarEventos();
         ResEvento res = resolverEvento(eventos, eventoParam);
         DTEdicion edSel = resolverEdicion(res, edicionParam);
 
         if (edSel == null || !esAceptada(edSel.getEstado())) {
             req.setAttribute("error", "La edición seleccionada no está aceptada o no existe.");
+            doGet(req, resp);
+            return;
+        }
+        LocalDate fin = edSel.getFechaFin();
+        if (fin != null && LocalDate.now().isAfter(fin)) {
+            req.setAttribute("error", "La edición seleccionada ya finalizó.");
             doGet(req, resp);
             return;
         }
@@ -144,9 +182,8 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             return;
         }
 
+        // calcular costo antes del try (patrocinio = costo 0 si válido)
         float costo = tipoSel.getCosto();
-
-        // Código de patrocinio (si aplica)
         if (!isBlank(codigoPatrocinio)) {
             List<DTPatrocinio> patrocinios = edSel.getPatrocinios();
             boolean valido = false;
@@ -175,12 +212,11 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             String idRegistro = UUID.randomUUID().toString();
             LocalDate fechaRegistro = LocalDate.now();
 
-            // IMPORTANTE: la firma espera NOMBRES (no siglas). Usamos res.nombreEvento y edicionParam (nombre).
             ce().altaRegistroEdicionEvento(
                 idRegistro,
                 nick,
-                res.nombreEvento,     // nombre del evento
-                edicionParam,         // nombre de la edición (el form lo envía así)
+                res.nombreEvento,
+                edicionParam,
                 tipoNom,
                 fechaRegistro,
                 costo,
@@ -188,15 +224,17 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             );
 
             resp.sendRedirect(req.getContextPath() + "/inicio");
-
+        } catch (excepciones.CupoTipoRegistroInvalidoException e) {
+            req.setAttribute("error", "No hay cupos disponibles para el tipo de registro seleccionado.");
+            req.setAttribute("nombreTipoRegistroSinCupo", tipoNom);
+            doGet(req, resp);
         } catch (Exception e) {
-            e.printStackTrace();
-            req.setAttribute("error", "Ocurrió un error al registrar: " + e.getMessage());
+            req.setAttribute("error", e.getMessage());
             doGet(req, resp);
         }
     }
 
-    // ==================== Helpers ====================
+    // Helpers
 
     private boolean requiereAsistente(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession s = req.getSession(false);
@@ -211,14 +249,12 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
     private static String trim(String s) { return s == null ? null : s.trim(); }
     private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
 
-    /** Aceptada robusto: soporta ACEPTADA/Aceptada/etc. sin acentos. */
     private static boolean esAceptada(Object estado) {
         if (estado == null) return false;
         String s = String.valueOf(estado);
         return "ACEPTADA".equalsIgnoreCase(s);
     }
 
-    /** Mantiene juntos nombre y sigla de un evento resuelto a partir del parámetro (que puede ser nombre o sigla). */
     private static class ResEvento {
         final String nombreEvento;
         final String siglaEvento;
@@ -226,18 +262,15 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         boolean valido() { return nombreEvento != null && siglaEvento != null; }
     }
 
-    /** Dado el parámetro `evento` (nombre o sigla), resuelve nombre+sigla usando los eventos listados. */
     private ResEvento resolverEvento(List<DTEvento> eventos, String eventoParam) {
         if (isBlank(eventoParam)) return new ResEvento(null, null);
 
-        // 1) Intentar como NOMBRE via consultaDTEvento
         DTEvento evByNombre = null;
         try { evByNombre = ce().consultaDTEvento(eventoParam); } catch (Exception ignore) {}
         if (evByNombre != null) {
             return new ResEvento(evByNombre.getNombre(), safe(evByNombre.getSigla()));
         }
 
-        // 2) Intentar como SIGLA buscando en la lista
         if (eventos != null) {
             for (DTEvento e : eventos) {
                 if (e != null && e.getSigla() != null && e.getSigla().equalsIgnoreCase(eventoParam)) {
@@ -245,19 +278,15 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
                 }
             }
         }
-        // 3) No se pudo resolver
         return new ResEvento(null, null);
     }
 
-    /** Dado un evento resuelto (nombre+sigla) y el parámetro `edicion` (nombre o sigla), devuelve el DTO. */
     private DTEdicion resolverEdicion(ResEvento res, String edicionParam) {
         if (res == null || !res.valido() || isBlank(edicionParam)) return null;
 
         DTEdicion ed = null;
-        // a) Intento por SIGLA de edición
         try { ed = ce().consultaEdicionEvento(res.siglaEvento, edicionParam); } catch (Exception ignore) {}
 
-        // b) Fallback por NOMBRE de edición
         if (ed == null) {
             try { ed = ce().obtenerDtEdicion(res.nombreEvento, edicionParam); } catch (Exception ignore) {}
         }

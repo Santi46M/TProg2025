@@ -30,7 +30,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
         String nick = trim(request.getParameter("nick"));
 
-        // Si no se fuerza listado y no vino nick, usar el de sesión
+        // Si no se fuerza listado usar el de sesión
         if (!forzarListado && isBlank(nick)) {
             HttpSession sAux = request.getSession(false);
             if (sAux != null) {
@@ -42,17 +42,16 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         IControladorUsuario ctrlUsuario = fabrica.getInstance().getIControladorUsuario();
 
         if (forzarListado || isBlank(nick)) {
-            // ====== LISTA DE USUARIOS ======
+            //  LISTA DE USUARIOS
         	Set<DTDatosUsuario> usuariosSet = new HashSet<>();
 
         	try {
         	    usuariosSet = ctrlUsuario.obtenerUsuariosDT();
         	} catch (UsuarioNoExisteException e) {
-        	    e.printStackTrace(); // solo para debugging
+        	    e.printStackTrace(); // solo para debug
         	    request.setAttribute("error", "No se pudo obtener la lista de usuarios.");
         	}
 
-        	// siempre asegurás que no sea null
         	request.setAttribute("usuarios", new ArrayList<>(usuariosSet));
             List<DTDatosUsuario> usuarios = new ArrayList<>(usuariosSet);
 
@@ -78,12 +77,11 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             request.setAttribute("nombres", nombres);
 
         } else {
-            // ====== PERFIL INDIVIDUAL ======
+            //PERFIL INDIVIDUAL 
             try {
                 DTDatosUsuario usuario = ctrlUsuario.obtenerDatosUsuario(nick);
                 request.setAttribute("usuario", usuario);
 
-                // nombre seguro (por si viene null)
                 request.setAttribute("usuarioNombreSeguro",
                         nvl(usuario.getNombre(), usuario.getNickname()));
 
@@ -114,7 +112,6 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 request.setAttribute("edicionToEvento", edicionToEvento);
 
             } catch (UsuarioNoExisteException e) {
-                // Usuario no encontrado → 404 + mostrar listado
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 request.setAttribute("error", "El usuario \"" + nick + "\" no existe.");
 
@@ -127,7 +124,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                     request.setAttribute("error", "No se pudo obtener la lista de usuarios.");
                 }
 
-                // siempre asegurás que no sea null
+  
                 request.setAttribute("usuarios", new ArrayList<>(usuariosSet));
                 request.setAttribute("usuarios", new ArrayList<>(usuariosSet));
             }
@@ -143,7 +140,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         doGet(request, response);
     }
 
-    // ===== Helpers =====
+    //  Helpers 
     private static String trim(String s) { return (s == null) ? null : s.trim(); }
     private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
     private static String nvl(String s, String alt) {
@@ -155,7 +152,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         return "1".equals(s) || "true".equals(s) || "on".equals(s) || "yes".equals(s) || "y".equals(s);
     }
 
-    // ====== Resolver imagen ======
+    // Resolver imagen 
     private static String resolveUserImageUrl(String raw, String ctx, ServletContext sc) {
         if (raw == null || raw.isBlank()) return null;
 
@@ -168,7 +165,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         if (low.startsWith("img/")) return ctx + "/" + v;
         if (low.startsWith("usuarios/")) return ctx + "/img/" + v;
 
-        // sólo nombre → probar rutas conocidas
+        // sólo nombre 
         String relImg = "/img/" + v;
         String relUsr = "/img/usuarios/" + v;
 
@@ -181,7 +178,6 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             return null;
         }
 
-        // fallback
         return ctx + relImg;
     }
 

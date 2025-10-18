@@ -6,6 +6,7 @@ import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,12 +29,13 @@ public class AltaRegistroServlet extends HttpServlet {
             throws ServletException, IOException {
 
         req.setCharacterEncoding("UTF-8");
-        String path = req.getPathInfo();
 
+        String path = req.getPathInfo();
+        System.out.println("Entra al doGet de AltaRegistroServlet con path: " + path);
         if (path == null || "/".equals(path) || "/alta".equals(path)) {
             if (!requiereOrganizador(req, resp)) return;
 
-            // Cargar ediciones del organizador (solo DTs)
+            // Cargar ediciones del organizador 
             recargarDatosDT(req);
 
             req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
@@ -49,7 +51,7 @@ public class AltaRegistroServlet extends HttpServlet {
 
         req.setCharacterEncoding("UTF-8");
         String path = req.getPathInfo();
-
+        System.out.println("Entra al doPost de AltaRegistroServlet con path: " + path);
         String accion = req.getParameter("accion");
         if ("cancelar".equalsIgnoreCase(accion)) {
             resp.sendRedirect(ctx(req) + "/inicio");
@@ -77,26 +79,33 @@ public class AltaRegistroServlet extends HttpServlet {
                 float costo = Float.parseFloat(costoStr);
                 int cupo    = Integer.parseInt(cupoStr);
 
-                // Validar edición SOLO con DTs
-                ce().seleccionarEdicion(siglaEdicion);
-                DTEdicion dtSel = ce().obtenerEdicionSeleccionada();
+                DTEdicion dtSel = ce().obtenerEdicionPorSiglaDT(siglaEdicion);
+                
                 if (dtSel == null) {
                     req.setAttribute("error", "No se encontró la edición seleccionada.");
                     recargarDatosDT(req);
                     req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                     return;
                 }
+                
+                if (dtSel.getFechaFin().isBefore(LocalDate.now())) {
+					req.setAttribute("error", "No se pueden agregar tipos de registro a una edición finalizada.");
+					recargarDatosDT(req);
+					
+					req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+					return;
+				}
+                
 
-                // === Alta “DTO-based” del TipoRegistro (agregá este método en tu controlador/impl) ===
-                // Firma sugerida: void altaTipoRegistroDTO(String siglaEdicion, String nombre, String descripcion, float costo, int cupo)
-                ce().altaTipoRegistroDTO(siglaEdicion, nombre, descripcion, costo, cupo);
+                //  Alta
+                
+                ce().altaTipoRegistroDTO(dtSel, nombre, descripcion, costo, cupo);
 
-                // Redirigir a la consulta del TipoRegistro (armamos params con DT)
+                // Redirigir a la consulta del TipoRegistro 
                 String eventoNombre = null;
                 try { eventoNombre = ce().encontrarEventoPorSigla(siglaEdicion); } catch (Exception ignore) {}
                 if (isBlank(eventoNombre)) {
-                    // si tu DTEdicion expone el nombre del evento, úsalo
-                    try { eventoNombre = dtSel.getEvento(); } catch (Exception ignore) {}
+                    try { eventoNombre = dtSel.getEvento().getNombre(); } catch (Exception ignore) {}
                 }
 
                 String eventoEnc  = URLEncoder.encode(eventoNombre != null ? eventoNombre : "", StandardCharsets.UTF_8.name());
@@ -125,22 +134,26 @@ public class AltaRegistroServlet extends HttpServlet {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 
-    // ================= Helpers (solo DTs) =================
+    // Helpers  
 
     private void recargarDatosDT(HttpServletRequest req) {
         HttpSession sAux = req.getSession(false);
         String nick = sAux == null ? null : (String) sAux.getAttribute("nick");
 
         List<DTEdicion> ediciones = new ArrayList<>();
+
         if (nick != null) {
-            // Si tenés este listado “de ingresadas”, usalo para reducir el recorrido
-            List<String> eventosConEd = ce().listarEventosConEdicionesIngresadas();
-            for (String nombreEvento : eventosConEd) {
+            // Recorremos todos los eventos 
+            List<DTEvento> eventos = ce().listarEventos();
+
+            for (DTEvento ev : eventos) {
+                String nombreEvento = ev.getNombre();
                 List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
+
                 for (String nomEd : nombresEd) {
                     DTEdicion dt = ce().obtenerDtEdicion(nombreEvento, nomEd);
                     if (dt != null) {
-                        // Filtrar por organizador si el DTO lo expone (ajusta el getter si cambia el nombre)
+                        // Filtrar por organizador 
                         String org = null;
                         try { org = dt.getOrganizador(); } catch (Exception ignore) {}
                         if (org == null || org.equals(nick)) {
@@ -154,6 +167,7 @@ public class AltaRegistroServlet extends HttpServlet {
         req.setAttribute("ediciones", ediciones);
     }
 
+    
     private boolean requiereOrganizador(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession sAux = req.getSession(false);
         String rol = sAux == null ? null : (String) sAux.getAttribute("rol");

@@ -88,6 +88,12 @@ public class ControladorEvento implements IControladorEvento {
         ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
         manejadorEvento.agregarTipoRegistro(tipo);
     }
+    
+    public void altaTipoRegistroDTO(DTEdicion dtEdicion, String nombre, String descripcion, float costo , int cupo) throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException {
+    	
+    	Ediciones edicion = obtenerEdicion(dtEdicion.getEvento().getNombre(), dtEdicion.getNombre());
+		altaTipoRegistro(edicion, nombre, descripcion, costo, cupo);
+	}
 
     public void altaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException {
         ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
@@ -139,6 +145,7 @@ public class ControladorEvento implements IControladorEvento {
     public DTEdicion consultaEdicionEvento(String siglaEvento, String siglaEdicion) {
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
         Eventos evento = manejador.obtenerEvento(siglaEvento);
+        DTEvento dtEvento = consultaDTEvento(evento.getNombre());
         if (evento == null) return null;
         Ediciones edicion = evento.obtenerEdicion(siglaEdicion);
         if (edicion == null || edicion.getEstado() == DTEstado.Ingresada || edicion.getEstado() == DTEstado.Rechazada) return null;
@@ -152,7 +159,8 @@ public class ControladorEvento implements IControladorEvento {
             edicion.getCiudad(),
             edicion.getPais(),
             edicion.getImagen(),
-            edicion.getEstado()
+            edicion.getEstado(),
+            dtEvento
         );
     }
     
@@ -247,7 +255,6 @@ public class ControladorEvento implements IControladorEvento {
         return textTrim;
     }
     
- // En ControladorEvento
     public static List<String> listarCategorias() {
         Set<String> set = ManejadorAuxiliar.getInstancia().listarCategorias();
         List<String> res = new ArrayList<>();
@@ -285,43 +292,57 @@ public class ControladorEvento implements IControladorEvento {
         );
     }
 
-    public void altaRegistroEdicionEvento(String idRegistro, Usuario usuario, Eventos evento, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
-        ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
-        if (usuario.esAsistente(usuario)) {
-            if (edicion == null) {
-                throw new RuntimeException("No se encontró la edición especificada.");
-            }
-            if (tipoRegistro == null) {
-                throw new RuntimeException("No se encontró el tipo de registro especificado para la edición.");
-            }
-            boolean yaRegistrado = false;
-            for (Registro reg : manejadorEvento.obtenerRegistros().values()) {
-                if (reg.getUsuario().equals(usuario) && reg.getEdicion().equals(edicion)) {
-                    yaRegistrado = true;
-                    break;
-                }
-            }
-            int cantidadRegistrados = 0;
-            for (Registro reg : manejadorEvento.obtenerRegistros().values()) {
-                if (reg.getTipoRegistro().equals(tipoRegistro) && reg.getEdicion().equals(edicion)) {
-                    cantidadRegistrados++;
-                }
-            }
-            if (yaRegistrado) {
-                throw new RuntimeException("El usuario ya está registrado a esta edición.");
-            }
-            if (cantidadRegistrados > tipoRegistro.getCupo()) {
-                throw new excepciones.CupoTipoRegistroInvalidoException(tipoRegistro.getCupo());
-            }
-            Registro nuevoRegistro = new Registro(idRegistro, usuario, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio);
-            manejadorEvento.agregarRegistro(nuevoRegistro);
-            edicion.agregarRegistro(idRegistro, nuevoRegistro); // <-- Agrega el registro a la edición
-            Asistente asist = (Asistente) usuario;
-            asist.addRegistro(idRegistro, nuevoRegistro);
-        } else {
+    public void altaRegistroEdicionEvento(String idRegistro, Usuario usuario, Eventos evento, Ediciones edicion,
+            TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
+ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
+if (usuario.esAsistente(usuario)) {
+if (edicion == null) {
+throw new RuntimeException("No se encontró la edición especificada.");
+}
+if (tipoRegistro == null) {
+throw new RuntimeException("No se encontró el tipo de registro especificado para la edición.");
+}
 
-        }
-    }
+// ===== NUEVO: bloquear si la edición ya terminó =====
+LocalDate hoy = (fechaRegistro != null) ? fechaRegistro : LocalDate.now();
+LocalDate fin = edicion.getFechaFin();
+if (fin != null && hoy.isAfter(fin)) {
+throw new RuntimeException("La edición '" + edicion.getNombre() + "' ya finalizó el " + fin + ".");
+}
+// =====================================================
+
+if (tipoRegistro.getCupo() <= 0) {
+throw new excepciones.CupoTipoRegistroInvalidoException(tipoRegistro.getCupo());
+}
+boolean yaRegistrado = false;
+for (Registro reg : manejadorEvento.obtenerRegistros().values()) {
+if (reg.getUsuario().equals(usuario) && reg.getEdicion().equals(edicion)) {
+yaRegistrado = true;
+break;
+}
+}
+int cantidadRegistrados = 0;
+for (Registro reg : manejadorEvento.obtenerRegistros().values()) {
+if (reg.getTipoRegistro().equals(tipoRegistro) && reg.getEdicion().equals(edicion)) {
+cantidadRegistrados++;
+}
+}
+if (yaRegistrado) {
+throw new RuntimeException("El usuario ya está registrado a esta edición.");
+}
+if (cantidadRegistrados >= tipoRegistro.getCupo()) {
+throw new excepciones.CupoTipoRegistroInvalidoException(tipoRegistro.getCupo());
+}
+Registro nuevoRegistro = new Registro(idRegistro, usuario, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio);
+manejadorEvento.agregarRegistro(nuevoRegistro);
+edicion.agregarRegistro(idRegistro, nuevoRegistro);
+Asistente asist = (Asistente) usuario;
+asist.addRegistro(idRegistro, nuevoRegistro);
+} else {
+// (sin cambios)
+}
+}
+
 
     public List<DTEvento> listarEventos() {
         Map<String, Eventos> eventos = manejador.obtenerEventos();
@@ -388,6 +409,7 @@ public class ControladorEvento implements IControladorEvento {
         if (edicionSeleccionadaSigla == null) return null;
         Ediciones edicionIter = manejador.obtenerEdicion(edicionSeleccionadaSigla);
         if (edicionIter == null) return null;
+        DTEvento dtEvento = consultaDTEvento(edicionIter.getEvento().getNombre());
         return new DTEdicion(
             edicionIter.getNombre(),
             edicionIter.getSigla(),
@@ -397,7 +419,8 @@ public class ControladorEvento implements IControladorEvento {
             edicionIter.getOrganizador() != null ? edicionIter.getOrganizador().getNickname() : null,
             edicionIter.getCiudad(),
             edicionIter.getImagen(),
-            edicionIter.getPais()
+            edicionIter.getPais(),
+            dtEvento
         );
     }
 
@@ -405,7 +428,7 @@ public class ControladorEvento implements IControladorEvento {
     public DTEdicion obtenerDtEdicion(String nombreEvento, String nombreEdicion) {
         Ediciones edicion = obtenerEdicion(nombreEvento, nombreEdicion);
         if (edicion == null) return null;
-
+        DTEvento dtEvento = consultaDTEvento(edicion.getEvento().getNombre());
         List<DTTipoRegistro> tiposRegistroDTO = new ArrayList<>();
         for (TipoRegistro tipo : edicion.getTiposRegistro()) {
             tiposRegistroDTO.add(new DTTipoRegistro(
@@ -456,7 +479,8 @@ public class ControladorEvento implements IControladorEvento {
             edicion.getEstado(),
             tiposRegistroDTO,
             patrociniosDTO,
-            registrosDTO
+            registrosDTO,
+            dtEvento
         );
     }
 
@@ -464,6 +488,14 @@ public class ControladorEvento implements IControladorEvento {
     @Override
     public Ediciones obtenerEdicionPorSigla(String sigla) {
         return manejador.obtenerEdicion(sigla);
+    }
+    
+    
+    public DTEdicion obtenerEdicionPorSiglaDT(String sigla) {
+        String nombreEvento = obtenerEdicionPorSigla(sigla).getEvento().getNombre();
+        String nombreEdicion = obtenerEdicionPorSigla(sigla).getNombre();
+    	return obtenerDtEdicion(nombreEvento,nombreEdicion);
+        	
     }
     
     @Override
@@ -539,7 +571,7 @@ public class ControladorEvento implements IControladorEvento {
         LocalDate fechaRegistro,
         float costo,
         LocalDate fechaInicio
-    ) {
+    ) throws RuntimeException {
         ManejadorUsuario mu = ManejadorUsuario.getInstancia();
         ManejadorEvento me = ManejadorEvento.getInstancia();
 
@@ -567,6 +599,30 @@ public class ControladorEvento implements IControladorEvento {
         }
         if (tipo == null) {
             throw new IllegalArgumentException("Tipo de registro no encontrado: " + nombreTipoRegistro);
+        }
+
+        if (tipo.getCupo() <= 0) {
+            throw new excepciones.CupoTipoRegistroInvalidoException(tipo.getCupo());
+        }
+
+        // Control de ya registrado
+        for (Registro reg : me.obtenerRegistros().values()) {
+            if (reg.getUsuario().equals(usuario) && reg.getEdicion().equals(edicion)) {
+                throw new RuntimeException("El usuario ya está registrado a esta edición.");
+            }
+        }
+
+        // Control de cupo ocupado (comparar por nombre, no por instancia)
+        int cantidadRegistrados = 0;
+        for (Registro reg : me.obtenerRegistros().values()) {
+            if (reg.getEdicion().equals(edicion)
+                && reg.getTipoRegistro() != null
+                && reg.getTipoRegistro().getNombre().equalsIgnoreCase(nombreTipoRegistro)) {
+                cantidadRegistrados++;
+            }
+        }
+        if (cantidadRegistrados >= tipo.getCupo()) {
+            throw new excepciones.CupoTipoRegistroInvalidoException(tipo.getCupo());
         }
 
         Registro nuevo = new Registro(idRegistro, usuario, edicion, tipo, fechaRegistro, costo, fechaInicio);

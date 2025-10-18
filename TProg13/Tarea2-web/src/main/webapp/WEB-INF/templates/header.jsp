@@ -4,7 +4,7 @@
   String error = (String) request.getAttribute("error");
   boolean precargado = Boolean.TRUE.equals(application.getAttribute("datosPrecargados"));
 
-  // Obtenemos el usuario logueado (por ejemplo, su nickname)
+  //obtenemos el usuario logueado 
   String nick = (String) session.getAttribute("nick");
 %>
 <%
@@ -48,7 +48,7 @@
           <% } %>
       </nav>
     <% } else { %>
-      <!-- Visitante (no logueado) -->
+      <!-- Visitante -->
       <nav class="user-nav" id="userNav">
       	 <form action="<%=ctx%>/auth/login" method="get">
   			<button type="submit" class="btn">

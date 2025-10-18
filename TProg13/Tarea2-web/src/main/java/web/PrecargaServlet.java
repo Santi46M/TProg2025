@@ -20,7 +20,7 @@ public class PrecargaServlet extends HttpServlet {
     	
         IControladorEvento controladorEv = fabrica.getInstance().getIControladorEvento();
         try {
-        	// Con los eventos chequeamos si realmente hay datos cargados o no
+        	// con los eventos chequeamos si realmente hay datos cargados 
         	boolean yaHayDatos = (controladorEv.listarEventos() != null && !controladorEv.listarEventos().isEmpty());
         	System.out.println("Datos existentes: " + yaHayDatos);
         	if (!yaHayDatos) {
@@ -33,7 +33,7 @@ public class PrecargaServlet extends HttpServlet {
         	getServletContext().setAttribute("datosPrecargados", Boolean.TRUE);
 
 
-            // Redirigir al inicio dinámico
+            // redirigir al inicio dinámico
             resp.sendRedirect(req.getContextPath() + "/inicio");
 
         } catch (Exception e) {

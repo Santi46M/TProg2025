@@ -61,7 +61,7 @@ public interface IControladorEvento {
             float costo,
             LocalDate fechaInicio
         );
-    
+   public void altaTipoRegistroDTO(DTEdicion dtEdicion, String nombre, String descripcion, float costo , int cupo) throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException; 
     void altaEdicionEventoDTO(
             logica.datatypes.DTEvento eventoDTO,
             logica.datatypes.DTDatosUsuario usuarioDTO,
@@ -80,4 +80,5 @@ public interface IControladorEvento {
     public logica.datatypes.DTPatrocinio obtenerDTPatrocinio(String codigoPatrocinio);
     public DTRegistro consultaRegistro(Usuario user, String idRegistro);
     public DTTipoRegistro consultaTipoRegistro(String nombreEvento, String nombreEdicion, String nombreTipoRegistro);
+    public DTEdicion obtenerEdicionPorSiglaDT(String sigla);
 }

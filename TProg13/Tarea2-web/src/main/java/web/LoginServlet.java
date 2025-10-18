@@ -13,7 +13,6 @@ import logica.fabrica;
 import logica.interfaces.IControladorUsuario;
 import logica.datatypes.DTDatosUsuario;
 import excepciones.UsuarioNoExisteException;
-//import logica.clases.Usuario;
 
 @WebServlet(urlPatterns = {"/auth/login", "/auth/logout"})
 public class LoginServlet extends HttpServlet {
@@ -71,7 +70,6 @@ public class LoginServlet extends HttpServlet {
 
         String nick = nickOrEmail.trim();
 
-        // ✅ Validación de login
         boolean valido = controladorUser.validarLogin(nick, pass);
 
         if (!valido) {
@@ -81,7 +79,6 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-     // ✅ Login correcto
         Set<DTDatosUsuario> usuarios = new HashSet<>();
         try {
             usuarios = controladorUser.obtenerUsuariosDT();
@@ -93,7 +90,6 @@ public class LoginServlet extends HttpServlet {
         
         
 
-        // Buscar tanto por email como por nickname
         for (DTDatosUsuario u : usuarios) {
             if (u.getEmail().equalsIgnoreCase(nickOrEmail)
                     || u.getNickname().equalsIgnoreCase(nickOrEmail)) {

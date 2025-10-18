@@ -29,7 +29,7 @@
 <div class="container row layout-alta-usuario" style="display:flex; align-items:flex-start;">
   <jsp:include page="/WEB-INF/templates/menu.jsp" />
   
-  <!-- Main -->
+  
   <main class="form-wrapper-alta-usuario" style="flex:2; min-width:0;">
     <h1 class="titulo-alta-usuario">Crear cuenta</h1>
 
@@ -39,7 +39,7 @@
       </div>
     <% } %>
 
-    <!-- Formulario principal -->
+    
     <form id="altaForm" class="form-alta-usuario" method="post" 
           action="<%=ctx%>/usuario/AltaUsuario" 
           enctype="multipart/form-data" 
@@ -50,7 +50,7 @@
         <legend>Tipo de cuenta</legend>
         <%
           String rolSel = val(request, "rol");
-          if (rolSel.isEmpty()) rolSel = "asistente"; // valor por defecto
+          if (rolSel.isEmpty()) rolSel = "asistente"; 
         %>
         <label class="rol-opcion">
           <input type="radio" name="rol" value="asistente" 
@@ -149,7 +149,7 @@
         </div>
       </section>
 
-      <!-- Acciones -->
+     
       <div class="acciones-form">
         <button type="submit" class="btn">Crear cuenta</button>
         <button type="submit" class="btn ghost" name="accion" value="cancelar">Cancelar</button>
@@ -158,7 +158,6 @@
   </main>
 </div>
 
-<!-- Script: manejo de roles y vista previa -->
 <script>
 (function(){
   const $ = s => document.querySelector(s);
@@ -192,7 +191,7 @@
 
   rolRadios.forEach(r => r.addEventListener('change', e => applyRoleUI(e.target.value)));
 
-  // 🔹 Vista previa de imagen
+  // vista previa de imagen
   const inputImg = $('#imagen');
   const preview = $('#preview');
   inputImg?.addEventListener('change', e => {

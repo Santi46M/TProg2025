@@ -16,7 +16,7 @@
 </head>
 <body>
   
-  <!-- Header compartido -->
+  <!-- Header  -->
   <jsp:include page="/WEB-INF/templates/header.jsp" />
 
   <!-- Main -->

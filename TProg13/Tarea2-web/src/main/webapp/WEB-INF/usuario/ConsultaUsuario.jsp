@@ -93,12 +93,18 @@
           <div>
               <p><strong>Nickname:</strong> <%=usuario.getNickname()%></p>
               <p><strong>Nombre:</strong> <%=usuario.getNombre()%></p>
-              <p><strong>Apellido:</strong> <%=usuario.getApellido()%></p>
-              <p><strong>Email:</strong> <%=usuario.getEmail()%></p>
-              <p><strong>Fecha de nacimiento:</strong> <%=usuario.getFechaNac()%></p>
-            <% if (usuario.getInstitucion() != null) { %>
-              <p><strong>Institución:</strong> <%= usuario.getInstitucion() %></p>
-            <% } %>
+              <% if (usuario.getApellido() != null && !usuario.getApellido().isEmpty()) { %>
+                <p><strong>Apellido:</strong> <%=usuario.getApellido()%></p>
+              <% } %>
+              <% if (usuario.getEmail() != null && !usuario.getEmail().isEmpty()) { %>
+                <p><strong>Email:</strong> <%=usuario.getEmail()%></p>
+              <% } %>
+              <% if (usuario.getInstitucion() != null && !usuario.getInstitucion().isEmpty()) { %>
+                <p><strong>Institución:</strong> <%= usuario.getInstitucion() %></p>
+              <% } %>
+              <% if (usuario.getFechaNac() != null) { %>
+                <p><strong>Fecha de nacimiento:</strong> <%=usuario.getFechaNac()%></p>
+              <% } %>
           </div>
         </div>
 

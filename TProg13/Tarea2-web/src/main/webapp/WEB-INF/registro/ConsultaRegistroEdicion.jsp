@@ -30,7 +30,7 @@
           <% if (error != null) { %>
             <p class="error"><%= error %></p>
           <% } else if (registro != null) { %>
-            <div class="event-meta"><strong>Identificador:</strong> <%= registro.getId() %></div>
+            <%-- <div class="event-meta"><strong>Identificador:</strong> <%= registro.getId() %></div> --%>
             <div class="event-meta"><strong>Usuario:</strong> <%= registro.getUsuario() %></div>
             <div class="event-meta"><strong>Edición:</strong> <%= registro.getEdicion() %></div>
             <div class="event-meta"><strong>Tipo de registro:</strong> <%= registro.getTipoRegistro() %></div>

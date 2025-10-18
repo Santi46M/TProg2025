@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
-<link rel="stylesheet" href="<%=request.getContextPath()%>/css/layoutMenu.css"><!-- <= acá -->
+<link rel="stylesheet" href="<%=request.getContextPath()%>/css/layoutMenu.css">
 
 <%
 String ctx = request.getContextPath();

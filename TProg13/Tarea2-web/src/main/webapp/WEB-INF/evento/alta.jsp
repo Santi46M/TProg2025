@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <style>
-    /* Centrado del contenido principal sin romper el aside */
+    /* Centrado del contenido principal */
     main.container { display: flex; justify-content: center; }
     .form-card-altaEvento.form-card--wide { max-width: 880px; width: 100%; margin: 0 auto; }
     .helper-note { color:#555; font-size:.9rem; }
@@ -44,7 +44,7 @@
         </div>
         <p id="error-categorias" class="helper-error hidden" aria-live="polite"></p>
 
-        <!-- enctype para permitir subir archivo -->
+        <!-- para permitir subir archivo -->
         <form id="form-alta-evento" method="post" action="<%=ctx%>/evento/alta" enctype="multipart/form-data" novalidate>
           <div class="grid-2">
             <div class="form-group-altaEvento">
@@ -65,7 +65,7 @@
             <textarea id="desc" name="desc" rows="4"></textarea>
           </div>
 
-          <!-- Imagen del evento (opcional) — SIN vista previa -->
+          <!-- Imagen -->
           <div class="form-group-altaEvento">
             <label for="imagen">Imagen del evento (opcional)</label>
             <input type="file" id="imagen" name="imagen" accept="image/*">
@@ -116,11 +116,10 @@
               });
             });
 
-            // Validación de categorías + serialización
             form.addEventListener('submit', function (e) {
-              // Detectar si el submit fue por Cancelar
+              // detectar si el submit fue por Cancelar
               if (e.submitter && e.submitter.name === 'accion' && e.submitter.value === 'cancelar') {
-                // No validar nada, dejar que el form se envíe
+                
                 return;
               }
               const checks = Array.from(document.querySelectorAll('.cat'));
@@ -137,7 +136,7 @@
               document.getElementById('categorias').value = sel.join(',');
             });
 
-            // Verificación básica de tamaño de imagen (sin vista previa)
+            // verificación básica de tamaño de imagen 
             const inputImg = document.getElementById('imagen');
             const MAX_BYTES = 2 * 1024 * 1024; // 2MB
             inputImg.addEventListener('change', function () {

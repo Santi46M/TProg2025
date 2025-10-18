@@ -31,13 +31,13 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
         try {
             IControladorUsuario ctrlUsr = fabrica.getInstance().getIControladorUsuario();
 
-            // Obtener usuario logueado en DTO
+            // Obtener usuario logueado en DT
             DTDatosUsuario dtoUsuario = (DTDatosUsuario) session.getAttribute("usuario");
             if (dtoUsuario == null) {
                 dtoUsuario = ctrlUsr.obtenerDatosUsuario(nick);
             }
 
-            // Obtener DTRegistro directamente desde el controlador
+            // Obtener DTRegistro  desde el controlador
             DTRegistro dtRegistro = ctrlUsr.obtenerDatosRegistros(idRegistro);
 
             if (dtRegistro == null) {
