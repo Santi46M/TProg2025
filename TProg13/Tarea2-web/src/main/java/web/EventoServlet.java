@@ -98,7 +98,8 @@ public class EventoServlet extends HttpServlet {
         switch (path) {
         case "/alta":
             if (!requiereOrganizador(req, resp)) return;
-            req.setAttribute("categorias", logica.controladores.ControladorEvento.listarCategorias());
+            List<DTCategorias> dtCategorias = controladorEv.listarDTCategorias();
+            req.setAttribute("dtCategorias", dtCategorias);
             req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
             return;
             case "/RegistrarseEvento":

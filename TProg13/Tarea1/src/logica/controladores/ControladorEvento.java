@@ -721,4 +721,18 @@ asist.addRegistro(idRegistro, nuevoRegistro);
             tipo.getCupo()
         );
     }
+    
+	@Override
+    public List<DTCategorias> listarDTCategorias() {
+        Set<String> nombresCategorias = ManejadorAuxiliar.getInstancia().listarCategorias();
+        List<DTCategorias> lista = new ArrayList<>();
+        if (nombresCategorias != null) {
+            for (String nombre : nombresCategorias) {
+                List<String> categorias = new ArrayList<>();
+                categorias.add(nombre);
+                lista.add(new DTCategorias(categorias));
+            }
+        }
+        return lista;
+    }
 }
