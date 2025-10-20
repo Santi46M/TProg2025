@@ -3,6 +3,7 @@ package web;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.*;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -15,10 +16,14 @@ import logica.datatypes.DTEvento;
 import logica.interfaces.IControladorUsuario;
 import logica.interfaces.IControladorEvento;
 import excepciones.UsuarioNoExisteException;
+import excepciones.UsuarioTipoIncorrectoException;
 
-@WebServlet("/usuario/ConsultaUsuario")
+@WebServlet(urlPatterns = {"/usuario/ConsultaUsuario", "/usuario/modificar"})
 public class ConsultaUsuarioServlet extends HttpServlet {
 
+    // =====================================================
+    // GET → Consulta de usuario o listado
+    // =====================================================
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -30,7 +35,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
         String nick = trim(request.getParameter("nick"));
 
-        // Si no se fuerza listado usar el de sesión
+        // Si no se fuerza listado, usar el de sesión
         if (!forzarListado && isBlank(nick)) {
             HttpSession sAux = request.getSession(false);
             if (sAux != null) {
@@ -42,19 +47,17 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         IControladorUsuario ctrlUsuario = fabrica.getInstance().getIControladorUsuario();
 
         if (forzarListado || isBlank(nick)) {
-            //  LISTA DE USUARIOS
-        	Set<DTDatosUsuario> usuariosSet = new HashSet<>();
+            // === LISTA DE USUARIOS ===
+            Set<DTDatosUsuario> usuariosSet = new HashSet<>();
 
-        	try {
-        	    usuariosSet = ctrlUsuario.obtenerUsuariosDT();
-        	} catch (UsuarioNoExisteException e) {
-        	    e.printStackTrace(); // solo para debug
-        	    request.setAttribute("error", "No se pudo obtener la lista de usuarios.");
-        	}
+            try {
+                usuariosSet = ctrlUsuario.obtenerUsuariosDT();
+            } catch (UsuarioNoExisteException e) {
+                e.printStackTrace(); // solo para debug
+                request.setAttribute("error", "No se pudo obtener la lista de usuarios.");
+            }
 
-        	request.setAttribute("usuarios", new ArrayList<>(usuariosSet));
             List<DTDatosUsuario> usuarios = new ArrayList<>(usuariosSet);
-
             request.setAttribute("usuarios", usuarios);
 
             Map<String, String> fotos = new HashMap<>();
@@ -77,11 +80,10 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             request.setAttribute("nombres", nombres);
 
         } else {
-            //PERFIL INDIVIDUAL 
+            // === PERFIL INDIVIDUAL ===
             try {
                 DTDatosUsuario usuario = ctrlUsuario.obtenerDatosUsuario(nick);
                 request.setAttribute("usuario", usuario);
-
                 request.setAttribute("usuarioNombreSeguro",
                         nvl(usuario.getNombre(), usuario.getNickname()));
 
@@ -111,22 +113,12 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
                 request.setAttribute("edicionToEvento", edicionToEvento);
 
+                // Cargar instituciones para el dropdown
+                request.setAttribute("instituciones", ctrlUsuario.getInstituciones());
+
             } catch (UsuarioNoExisteException e) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 request.setAttribute("error", "El usuario \"" + nick + "\" no existe.");
-
-                Set<DTDatosUsuario> usuariosSet = new HashSet<>();
-
-                try {
-                    usuariosSet = ctrlUsuario.obtenerUsuariosDT();
-                } catch (UsuarioNoExisteException f) {
-                    e.printStackTrace(); // solo para debugging
-                    request.setAttribute("error", "No se pudo obtener la lista de usuarios.");
-                }
-
-  
-                request.setAttribute("usuarios", new ArrayList<>(usuariosSet));
-                request.setAttribute("usuarios", new ArrayList<>(usuariosSet));
             }
         }
 
@@ -134,13 +126,68 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 .forward(request, response);
     }
 
+    // =====================================================
+    // POST → Modificación de usuario
+    // =====================================================
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+
+        request.setCharacterEncoding("UTF-8");
+        String path = request.getServletPath();
+        IControladorUsuario ctrlUsuario = fabrica.getInstance().getIControladorUsuario();
+
+        // === POST /usuario/modificar ===
+        if ("/usuario/modificar".equals(path)) {
+
+            HttpSession sAux = request.getSession(false);
+            String nick = (sAux != null) ? (String) sAux.getAttribute("nick") : null;
+
+            if (nick == null || nick.isBlank()) {
+                response.sendRedirect(request.getContextPath() + "/auth/login");
+                return;
+            }
+
+            // Leer parámetros del formulario
+            String nombre      = request.getParameter("nombre");
+            String apellido    = request.getParameter("apellido");
+            String email       = request.getParameter("email");
+            String institucion = request.getParameter("institucion");
+            String descripcion = request.getParameter("descripcion");
+            String nacStr      = request.getParameter("fechaNac");
+            String password    = request.getParameter("password");
+            String link        = request.getParameter("link");
+            
+
+            LocalDate fechaNac = null;
+            if (nacStr != null && !nacStr.isBlank()) {
+                try {
+                    fechaNac = LocalDate.parse(nacStr);
+                } catch (Exception ignored) {}
+            }
+
+            try {
+                ctrlUsuario.modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaNac, institucion);
+
+                // Si se ingresó nueva contraseña, actualizarla
+                if (password != null && !password.isBlank()) {
+                    ctrlUsuario.modificarContrasenia(nick, password);
+                }
+
+                // Redirigir al perfil actualizado
+                response.sendRedirect(request.getContextPath() + "/usuario/ConsultaUsuario?nick=" +
+                        java.net.URLEncoder.encode(nick, java.nio.charset.StandardCharsets.UTF_8));
+
+            } catch (UsuarioNoExisteException | UsuarioTipoIncorrectoException e) {
+                request.setAttribute("error", e.getMessage());
+                doGet(request, response); // recargar vista con error
+            }
+        } else {
+            doGet(request, response);
+        }
     }
 
-    //  Helpers 
+    // === Helpers ===
     private static String trim(String s) { return (s == null) ? null : s.trim(); }
     private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
     private static String nvl(String s, String alt) {
@@ -152,7 +199,6 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         return "1".equals(s) || "true".equals(s) || "on".equals(s) || "yes".equals(s) || "y".equals(s);
     }
 
-    // Resolver imagen 
     private static String resolveUserImageUrl(String raw, String ctx, ServletContext sc) {
         if (raw == null || raw.isBlank()) return null;
 
@@ -161,11 +207,9 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
         if (low.startsWith("http://") || low.startsWith("https://")) return v;
         if (v.startsWith("/")) return ctx + v;
-
         if (low.startsWith("img/")) return ctx + "/" + v;
         if (low.startsWith("usuarios/")) return ctx + "/img/" + v;
 
-        // sólo nombre 
         String relImg = "/img/" + v;
         String relUsr = "/img/usuarios/" + v;
 

@@ -18,7 +18,7 @@ import excepciones.UsuarioYaExisteException;
 import excepciones.UsuarioNoExisteException;
 import excepciones.UsuarioTipoIncorrectoException;
 
-@WebServlet(urlPatterns = {"/usuario/AltaUsuario", "/usuario/modificar"})
+@WebServlet(urlPatterns = {"/usuario/AltaUsuario"})
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024,  
     maxFileSize = 10 * 1024 * 1024,   
@@ -29,7 +29,7 @@ public class UsuarioServlet extends HttpServlet {
   private static final String JSP_LOGIN    = "/WEB-INF/auth/login.jsp";
   private static final String JSP_ALTA     = "/WEB-INF/usuario/AltaUsuario.jsp";
   private static final String JSP_CONSULTA = "/WEB-INF/usuario/ConsultaUsuario.jsp";
-  private static final String JSP_MODIF    = "/WEB-INF/usuario/ModificarUsuario.jsp";
+//  private static final String JSP_MODIF    = "/WEB-INF/usuario/ModificarUsuario.jsp";
 
   private static final String IMG_REL_BASE_USR = "/img/usuarios"; //  carpeta para las imágenes de usuario nuevas
 
@@ -64,35 +64,48 @@ public class UsuarioServlet extends HttpServlet {
         return;
 
       case "/usuario/ConsultaUsuario": {
-        String nick = req.getParameter("nick");
-        if (nick == null || nick.isBlank()) {
-          nick = nickEnSesion(req);
-          if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
-        }
-        try {
-          DTDatosUsuario dto = controladorUs.obtenerDatosUsuario(nick);
-          req.setAttribute("dto", dto);
-          req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
-        } catch (UsuarioNoExisteException e) {
-          req.setAttribute("error", e.getMessage());
-          req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
-        }
-        return;
-      }
+    	  String nick = req.getParameter("nick");
+    	  if (nick == null || nick.isBlank()) {
+    	    nick = nickEnSesion(req);
+    	    if (nick == null) {
+    	      req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
+    	      return;
+    	    }
+    	  }
 
-      case "/modificar": {
-        String nick = nickEnSesion(req);
-        if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
-        try {
-          DTDatosUsuario dto = controladorUs.obtenerDatosUsuario(nick);
-          req.setAttribute("dto", dto);
-          req.getRequestDispatcher(JSP_MODIF).forward(req, resp);
-        } catch (UsuarioNoExisteException e) {
-          req.setAttribute("error", e.getMessage());
-          req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
-        }
-        return;
-      }
+    	  try {
+    	    // 🔹 Cargar instituciones para el desplegable
+    	    cargarInstituciones(req);
+
+    	    // 🔹 Obtener los datos del usuario
+    	    DTDatosUsuario dto = controladorUs.obtenerDatosUsuario(nick);
+
+    	    // 🔹 Pasar el usuario como atributo "usuario" (así lo usa tu JSP)
+    	    req.setAttribute("usuario", dto);
+
+    	    req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
+    	  } catch (UsuarioNoExisteException e) {
+    	    req.setAttribute("error", e.getMessage());
+    	    req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
+    	  }
+    	  return;
+    	}
+
+
+//      case "/modificar": {
+//    	cargarInstituciones(req);
+//        String nick = nickEnSesion(req);
+//        if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
+//        try {
+//          DTDatosUsuario dto = controladorUs.obtenerDatosUsuario(nick);
+//          req.setAttribute("dto", dto);
+//          req.getRequestDispatcher(JSP_MODIF).forward(req, resp);
+//        } catch (UsuarioNoExisteException e) {
+//          req.setAttribute("error", e.getMessage());
+//          req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
+//        }
+//        return;
+//      }
 
       default:
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -267,31 +280,40 @@ public class UsuarioServlet extends HttpServlet {
     }
 
     //  Modificar usuario para la siguiente tarea 
-    if ("/modificar".equals(path)) {
-      String nick = nickEnSesion(req);
-      if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
+    if ("/usuario/ConsultaUsuario".equals(path)) {
+    		cargarInstituciones(req);
+    	  String nick = nickEnSesion(req);
+    	  if (nick == null) {
+    	    req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
+    	    return;
+    	  }
 
-      String nombre      = req.getParameter("nombre");
-      String descripcion = req.getParameter("descripcion");
-      String link        = req.getParameter("link");
-      String apellido    = req.getParameter("apellido");
-      String institucion = req.getParameter("institucion");
-      String nacStr      = req.getParameter("nac");
-      LocalDate fechaNac = null;
-      if (nacStr != null && !nacStr.isBlank()) {
-        try { fechaNac = LocalDate.parse(nacStr); } catch (Exception ignored) {}
-      }
+    	  // Obtener parámetros del formulario
+    	  String nombre      = req.getParameter("nombre");
+    	  String apellido    = req.getParameter("apellido");
+    	  String email       = req.getParameter("email");
+    	  String institucion = req.getParameter("institucion");
+    	  String descripcion = req.getParameter("descripcion");
+    	  String nacStr      = req.getParameter("fechaNac");
+    	  LocalDate fechaNac = null;
+    	  if (nacStr != null && !nacStr.isBlank()) {
+    	    try { fechaNac = LocalDate.parse(nacStr); } catch (Exception ignored) {}
+    	  }
 
-      try {
-        controladorUs.modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaNac, institucion);
-        resp.sendRedirect(ctx(req) + "/usuario/ConsultaUsuario?nick=" + java.net.URLEncoder.encode(nick, java.nio.charset.StandardCharsets.UTF_8));
-      } catch (UsuarioNoExisteException | UsuarioTipoIncorrectoException e) {
-        req.setAttribute("error", e.getMessage());
-        req.getRequestDispatcher(JSP_MODIF).forward(req, resp);
-      }
-    } else {
-      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-    }
+    	  try {
+    	    // Llamar al método del controlador (ajustá según tu interfaz)
+    	    controladorUs.modificarDatosUsuario(nick, nombre, apellido, email, institucion, fechaNac, descripcion);
+
+    	    // Redirigir al perfil actualizado
+    	    resp.sendRedirect(ctx(req) + "/usuario/ConsultaUsuario?nick=" +
+    	        java.net.URLEncoder.encode(nick, java.nio.charset.StandardCharsets.UTF_8));
+
+    	  } catch (UsuarioNoExisteException | UsuarioTipoIncorrectoException e) {
+    	    req.setAttribute("error", e.getMessage());
+    	    req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
+    	  }
+    	}
+
   }
 
   private void forwardConDatos(HttpServletRequest req, HttpServletResponse resp,

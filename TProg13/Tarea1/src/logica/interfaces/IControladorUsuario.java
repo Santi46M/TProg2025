@@ -54,7 +54,7 @@ public interface IControladorUsuario {
     public String getRegistroSeleccionadoId();
     public DTRegistro obtenerRegistroSeleccionado();
     public String getUsuarioSeleccionadoNickname();
-	void modificarDatosUsuario(String nickname, String nombre, String descripcion, String link, String apellido, java.time.LocalDate fechaNacimiento, String institucion) throws excepciones.UsuarioNoExisteException, excepciones.UsuarioTipoIncorrectoException;
+	public void modificarDatosUsuario(String nickname, String nombre, String descripcion, String link, String apellido, java.time.LocalDate fechaNacimiento, String institucion) throws excepciones.UsuarioNoExisteException, excepciones.UsuarioTipoIncorrectoException;
 
 
     // Inicio de sesión
@@ -64,4 +64,5 @@ public interface IControladorUsuario {
     public void cierreSesion();
     
     public boolean validarLogin(String nickOrEmail, String contrasena);
+    public void modificarContrasenia(String nickname, String nuevaContrasena) throws UsuarioNoExisteException;
 }

@@ -334,6 +334,13 @@ manejador.addUsuario(nuevoUsuario);
             throw new UsuarioTipoIncorrectoException(nickname);
         }
     }
+    public void modificarContrasenia(String nickname, String nuevaContrasena) throws UsuarioNoExisteException {
+		Usuario user = manejador.findUsuario(nickname);
+		if (user == null) {
+			throw new UsuarioNoExisteException(nickname);
+		}
+		user.setContrasena(nuevaContrasena);
+	}
     
 
     public boolean inicioSesion(String nickOrEmail, String contrasena) {

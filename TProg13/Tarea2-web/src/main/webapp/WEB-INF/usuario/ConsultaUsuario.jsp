@@ -12,6 +12,9 @@
 
   Map<String,String> fotos = (Map<String,String>) request.getAttribute("fotos");
   String usrImagenUrl = (String) request.getAttribute("usrImagenUrl");
+  String rolSesion = (String) session.getAttribute("rol");
+  boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rolSesion);
+  boolean esAsistente = "ASISTENTE".equalsIgnoreCase(rolSesion);
 %>
 
 <!DOCTYPE html>
@@ -52,6 +55,9 @@
       <% } %>
 
       <% if (usuario == null) { %>
+        <!-- ===========================
+             LISTADO DE USUARIOS
+        ============================ -->
         <h1>Usuarios registrados</h1>
         <div class="usuarios-grid">
           <% if (usuarios == null || usuarios.isEmpty()) { %>
@@ -82,6 +88,9 @@
         </div>
 
       <% } else { %>
+        <!-- ===========================
+             PERFIL INDIVIDUAL
+        ============================ -->
         <h1>Perfil de <%= usuario.getNickname() %></h1>
 
         <div class="perfil-header">
@@ -90,32 +99,82 @@
           <% } else { %>
             <div class="no-avatar" aria-label="Sin imagen">sin imagen</div>
           <% } %>
-          <div>
-              <p><strong>Nickname:</strong> <%=usuario.getNickname()%></p>
-              <p><strong>Nombre:</strong> <%=usuario.getNombre()%></p>
-              <% if (usuario.getApellido() != null && !usuario.getApellido().isEmpty()) { %>
-                <p><strong>Apellido:</strong> <%=usuario.getApellido()%></p>
+
+          <div id="datosUsuario">
+            <form id="formEditarUsuario" action="<%= ctx %>/usuario/modificar" method="post">
+              <input type="hidden" name="nick" value="<%= usuario.getNickname() %>">
+
+              <p><strong>Nickname:</strong> <span><%= usuario.getNickname() %></span></p>
+              <p><strong>Email:</strong> <span><%= usuario.getEmail()%></span></p>
+
+
+
+              <% if (!esOrganizador) { %>
+                <!-- 🔹 CAMPOS DE ASISTENTE -->
+                <p><strong>Nombre:</strong>
+                  <span class="view-mode"><%= usuario.getNombre() %></span>
+                  <input class="edit-mode" type="text" name="nombre" value="<%= usuario.getNombre() %>" style="display:none;">
+                </p>
+
+                <p><strong>Apellido:</strong>
+                  <span class="view-mode"><%= usuario.getApellido() %></span>
+                  <input class="edit-mode" type="text" name="apellido" value="<%= usuario.getApellido() %>" style="display:none;">
+                </p>
+
+                <p><strong>Fecha de nacimiento:</strong>
+                  <span class="view-mode"><%= usuario.getFechaNac() != null ? usuario.getFechaNac() : "—" %></span>
+                  <input class="edit-mode" type="date" name="fechaNac" 
+                         value="<%= usuario.getFechaNac() != null ? usuario.getFechaNac() : "" %>" 
+                         style="display:none;">
+                </p>
+
+                <p><strong>Institución:</strong>
+                  <span class="view-mode"><%= (usuario.getInstitucion() != null ? usuario.getInstitucion() : "—") %></span>
+                  <select class="edit-mode" name="institucion" style="display:none;">
+                    <option value="">— Seleccione —</option>
+                    <%
+                      Collection<String> instituciones = (Collection<String>) request.getAttribute("instituciones");
+                      if (instituciones != null) {
+                        for (String inst : instituciones) {
+                          String selected = (usuario.getInstitucion() != null && usuario.getInstitucion().equals(inst)) ? "selected" : "";
+                    %>
+                        <option value="<%= inst %>" <%= selected %>><%= inst %></option>
+                    <% } } %>
+                  </select>
+                </p>
+
+              <% } else { %>
+                <!-- 🔹 CAMPOS DE ORGANIZADOR -->
+                <p><strong>Descripción:</strong>
+                  <span class="view-mode"><%= usuario.getDesc() != null ? usuario.getDesc() : "—" %></span>
+                  <textarea class="edit-mode" name="descripcion" rows="3" style="display:none;"><%= usuario.getDesc() %></textarea>
+                </p>
+
+                <p><strong>Link:</strong>
+                  <span class="view-mode"><%= usuario.getLink() != null ? usuario.getLink() : "—" %></span>
+                  <input class="edit-mode" type="text" name="link" value="<%= usuario.getLink() != null ? usuario.getLink() : "" %>" style="display:none;">
+                </p>
               <% } %>
-              <% if (usuario.getEmail() != null && !usuario.getEmail().isEmpty()) { %>
-                <p><strong>Email:</strong> <%=usuario.getEmail()%></p>
+
+              <% boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname()); %>
+              <% if (esSuPropioPerfil) { %>
+                <p><strong>Contraseña:</strong>
+                  <span class="view-mode">••••••••</span>
+                  <input class="edit-mode" type="password" name="password" placeholder="Nueva contraseña" style="display:none;">
+                </p>
+
+                <div id="accionesPerfil" style="margin-top:1rem;">
+                  <button type="button" id="btnEditar" class="btn">Modificar datos</button>
+                  <button type="submit" id="btnGuardar" class="btn" style="display:none;">Guardar</button>
+                  <button type="button" id="btnCancelar" class="btn" style="display:none;">Cancelar</button>
+                </div>
               <% } %>
-              <% if (usuario.getInstitucion() != null && !usuario.getInstitucion().isEmpty()) { %>
-                <p><strong>Institución:</strong> <%= usuario.getInstitucion() %></p>
-              <% } %>
-              <% if (usuario.getFechaNac() != null) { %>
-                <p><strong>Fecha de nacimiento:</strong> <%=usuario.getFechaNac()%></p>
-              <% } %>
+            </form>
           </div>
         </div>
 
-        <% if (usuario.getDesc() != null) { %>
-          <p><strong>Descripción:</strong> <%= usuario.getDesc() %></p>
-        <% } %>
-
-        <%
-          boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname());
-          boolean tieneEdiciones = usuario.getEdiciones() != null && !usuario.getEdiciones().isEmpty();
-          boolean tieneRegistros = usuario.getRegistros() != null && !usuario.getRegistros().isEmpty();
+        <% boolean tieneEdiciones = usuario.getEdiciones() != null && !usuario.getEdiciones().isEmpty();
+           boolean tieneRegistros = usuario.getRegistros() != null && !usuario.getRegistros().isEmpty();
         %>
 
         <% if (tieneEdiciones) { %>
@@ -168,5 +227,29 @@
       <% } %>
     </main>
   </div>
+
+  <script>
+    const btnEditar = document.getElementById("btnEditar");
+    const btnGuardar = document.getElementById("btnGuardar");
+    const btnCancelar = document.getElementById("btnCancelar");
+
+    if (btnEditar) {
+      btnEditar.addEventListener("click", () => {
+        document.querySelectorAll(".view-mode").forEach(e => e.style.display = "none");
+        document.querySelectorAll(".edit-mode").forEach(e => e.style.display = "inline");
+        btnEditar.style.display = "none";
+        btnGuardar.style.display = "inline";
+        btnCancelar.style.display = "inline";
+      });
+
+      btnCancelar.addEventListener("click", () => {
+        document.querySelectorAll(".view-mode").forEach(e => e.style.display = "inline");
+        document.querySelectorAll(".edit-mode").forEach(e => e.style.display = "none");
+        btnEditar.style.display = "inline";
+        btnGuardar.style.display = "none";
+        btnCancelar.style.display = "none";
+      });
+    }
+  </script>
 </body>
 </html>
