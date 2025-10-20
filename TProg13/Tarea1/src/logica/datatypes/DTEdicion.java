@@ -37,7 +37,7 @@ public class DTEdicion {
 
     public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
 
-                     LocalDate fechaAlta, String organizador, String ciudad, String pais, String imagen, DTEstado estado,DTEvento evento) {
+                     LocalDate fechaAlta, String organizador, String ciudad, String pais, String imagen, DTEstado estado, DTEvento evento) {
         this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais, imagen, evento);
 
         this.estado = estado;

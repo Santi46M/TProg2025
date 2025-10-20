@@ -7,9 +7,12 @@ String ctx = request.getContextPath();
   String rol = (String) session.getAttribute("rol");
 
   @SuppressWarnings("unchecked")
-  java.util.List<String> categorias = (java.util.List<String>) request.getAttribute("categorias");
-  if (categorias == null) {
-      categorias = logica.controladores.ControladorEvento.listarCategorias();
+  java.util.List<logica.datatypes.DTCategorias> dtCategorias = (java.util.List<logica.datatypes.DTCategorias>) request.getAttribute("dtCategorias");
+  java.util.List<String> categorias = new java.util.ArrayList<>();
+  if (dtCategorias != null) {
+      for (logica.datatypes.DTCategorias dtCat : dtCategorias) {
+          categorias.addAll(dtCat.getCategorias());
+      }
   }
 %>
 <aside class="card aside-inicio">

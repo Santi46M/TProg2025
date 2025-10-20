@@ -76,19 +76,18 @@
             <legend>Categorías <span class="req">*</span></legend>
             <div class="checkbox-grid-ev">
               <% 
-                java.util.List<String> cats = (java.util.List<String>) request.getAttribute("categorias");
-                if (cats == null) { cats = logica.controladores.ControladorEvento.listarCategorias(); }
-                if (cats != null && !cats.isEmpty()) {
-                  for (String c : cats) {
+                java.util.List<logica.datatypes.DTCategorias> dtCats = (java.util.List<logica.datatypes.DTCategorias>) request.getAttribute("dtCategorias");
+                if (dtCats != null && !dtCats.isEmpty()) {
+                  for (logica.datatypes.DTCategorias dtCat : dtCats) {
+                    for (String c : dtCat.getCategorias()) {
               %>
-                    <label><span><%= c %></span><input type="checkbox" class="cat" value="<%= c %>"></label>
-              <%
+                        <label><span><%= c %></span><input type="checkbox" class="cat" value="<%= c %>"></label>
+              <%      }
                   }
                 } else {
               %>
-                    <label><span>(Sin categorías)</span></label>
-              <%
-                }
+                        <label><span>(Sin categorías)</span></label>
+              <%    }
               %>
             </div>
             <input type="hidden" id="categorias" name="categorias" value="">
