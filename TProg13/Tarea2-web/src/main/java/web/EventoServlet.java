@@ -59,6 +59,9 @@ public class EventoServlet extends HttpServlet {
             req.setAttribute("evDesc", ev.getDescripcion());
             req.setAttribute("evFecha", formatFecha(ev.getFecha()));
             req.setAttribute("evCategorias", ev.getCategorias());
+            req.setAttribute("rol", getRol(req));
+            System.out.println("Entra a EventoServelt");
+   
 
             // URL de imagen 
             String evImagenUrl = resolveImagenUrl(req, ev);
@@ -334,4 +337,11 @@ public class EventoServlet extends HttpServlet {
         if (ctype.contains("webp")) return ".webp";
         return null;
     }
+    private String getRol(HttpServletRequest req) {
+        HttpSession sAux = req.getSession(false);
+        if (sAux == null) return null;
+        Object rol = sAux.getAttribute("rol");
+        return (rol != null) ? rol.toString() : null;
+    }
+
 }

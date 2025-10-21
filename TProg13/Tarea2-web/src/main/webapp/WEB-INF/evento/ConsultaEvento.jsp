@@ -38,6 +38,7 @@
   }
 
   List<DTEdicion> ediciones = (List<DTEdicion>) request.getAttribute("evEdiciones");
+  String rolUsuario = (String) request.getAttribute("rol");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -109,6 +110,20 @@
               <div class="event-meta" style="margin-top:.5rem;">
                 <strong>Fecha alta:</strong> <%= (evFecha != null ? evFecha : "—") %>
               </div>
+              
+              
+               <% if ("ORGANIZADOR".equalsIgnoreCase(rolUsuario)){ %> 
+              <%
+  					System.out.println(">>> Entró al JSP de ConsultaEvento");
+  					System.out.println("Rol: " + rolUsuario);
+				%>
+
+                <form action="<%= ctx %>/evento/FinalizarEvento" method="post" style="margin-top:1rem;">
+  					<input type="hidden" name="nombreEvento" value="<%= evNombre %>" />
+  					<button type="submit" class="btn btn-finalizar-evento">Finalizar evento</button>
+				</form>
+				
+			<%} %> 
             </div>
           </div>
         </div>

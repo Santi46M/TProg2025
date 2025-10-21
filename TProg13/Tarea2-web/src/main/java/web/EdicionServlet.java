@@ -72,6 +72,10 @@ public class EdicionServlet extends HttpServlet {
       req.setAttribute("tiposRegistro", edicionObj.getTiposRegistro());
       req.setAttribute("patrocinios", edicionObj.getPatrocinios());
       req.setAttribute("evNombre", evento);
+      req.setAttribute("rol", getRol(req));
+      System.out.println("Rol del usuario en sesión: " + getRol(req));
+      System.out.println("Entra a EdicionServelt");
+
 
       // URL de imagen de edición 
       String edImagenUrl = resolveImagenUrlEdicion(req, edicionObj.getImagen());
@@ -88,6 +92,7 @@ public class EdicionServlet extends HttpServlet {
 
       java.util.List<DTRegistro> registrosList = new java.util.ArrayList<>();
       if (esOrganizador) {
+    	  
         if (edicionObj.getRegistros() != null)
           registrosList.addAll(edicionObj.getRegistros());
       } else if (nickSesion != null) {
