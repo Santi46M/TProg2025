@@ -124,6 +124,8 @@ public class EventoServlet extends HttpServlet {
                 return;
             default:
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                
+
         }
     }
 
@@ -227,6 +229,15 @@ public class EventoServlet extends HttpServlet {
             resp.sendRedirect(ctx(req) + "/evento/ConsultaEvento?nombre=" + nombreEnc);
             return;
         }
+        
+        if ("/FinalizarEvento".equals(path)) {
+        	String nombreEvento = trim(req.getParameter("nombreEvento"));
+        	System.out.println("Finalizando evento en EventoServlet: " + nombreEvento);
+        	controladorEv.finalizarEvento(nombreEvento);
+
+			resp.sendRedirect(ctx(req) + "/inicio");
+			return;
+		}
 
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }

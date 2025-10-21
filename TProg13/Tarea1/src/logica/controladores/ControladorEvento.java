@@ -173,6 +173,9 @@ public class ControladorEvento implements IControladorEvento {
         Collection<Eventos> eventos = ManejadorEvento.getInstancia().obtenerEventos().values();
 
         for (Eventos ev : eventos) {
+        	if (!ev.getVigente()) {
+        						continue;
+        	}
             List<String> cats = extraerNombresCategorias(ev.getCategorias());
             boolean match = cats.stream().anyMatch(c -> normalizar(c).equals(needle));
             if (!match) continue;
@@ -269,8 +272,22 @@ public class ControladorEvento implements IControladorEvento {
     }
 
 
-
-
+    public boolean esEventoVigente(String nombreEvento) {
+		ManejadorEvento manejador = ManejadorEvento.getInstancia();
+		Eventos evento = manejador.obtenerEvento(nombreEvento);
+		if (evento != null) {
+			return evento.getVigente();
+		}
+		return false;
+	}
+    public void finalizarEvento(String nombreEvento) {
+		ManejadorEvento manejador = ManejadorEvento.getInstancia();
+		Eventos evento = manejador.obtenerEvento(nombreEvento);
+		if (evento != null) {
+			System.out.println("Finalizando evento: " + nombreEvento);
+			evento.setVigente(false);
+		}
+	}
 
     public Eventos consultaEvento(String nombreEvento) {
         ManejadorEvento manejador = ManejadorEvento.getInstancia();
@@ -351,6 +368,24 @@ asist.addRegistro(idRegistro, nuevoRegistro);
         List<DTEvento> lista = new ArrayList<>();
         for (Eventos eventIter : eventos.values()) {
             lista.add(new DTEvento(
+                eventIter.getNombre(),
+                eventIter.getSigla(),
+                eventIter.getDescripcion(),
+                eventIter.getFecha(),
+                new ArrayList<>(eventIter.getCategorias().keySet()),
+                new ArrayList<>(eventIter.getEdiciones().keySet())
+            ));
+        }
+        return lista;
+    }
+    public List<DTEvento> listarEventosVigentes() {
+        Map<String, Eventos> eventos = manejador.obtenerEventos();
+        List<DTEvento> lista = new ArrayList<>();
+        for (Eventos eventIter : eventos.values()) {
+            if (!eventIter.getVigente()) {
+				continue;
+			}
+        	lista.add(new DTEvento(
                 eventIter.getNombre(),
                 eventIter.getSigla(),
                 eventIter.getDescripcion(),

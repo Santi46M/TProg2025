@@ -114,7 +114,8 @@ public class EdicionServlet extends HttpServlet {
     switch (path) {
       case "/alta": {
         if (!requiereOrganizador(req, resp)) return;
-        var listaEventos = ce().listarEventos();
+//        var listaEventos = ce().listarEventos();
+        var listaEventos = ce().listarEventosVigentes();
         req.setAttribute("listaEventos", listaEventos);
         if (listaEventos == null || listaEventos.isEmpty()) {
           req.setAttribute("sinEventos", true);

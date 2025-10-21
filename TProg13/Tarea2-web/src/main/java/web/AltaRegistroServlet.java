@@ -144,8 +144,8 @@ public class AltaRegistroServlet extends HttpServlet {
 
         if (nick != null) {
             // Recorremos todos los eventos 
-            List<DTEvento> eventos = ce().listarEventos();
-
+//            List<DTEvento> eventos = ce().listarEventos();
+        	List<DTEvento> eventos = ce().listarEventosVigentes();
             for (DTEvento ev : eventos) {
                 String nombreEvento = ev.getNombre();
                 List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);

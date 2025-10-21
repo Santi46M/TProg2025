@@ -113,10 +113,6 @@
               
               
                <% if ("ORGANIZADOR".equalsIgnoreCase(rolUsuario)){ %> 
-              <%
-  					System.out.println(">>> Entró al JSP de ConsultaEvento");
-  					System.out.println("Rol: " + rolUsuario);
-				%>
 
                 <form action="<%= ctx %>/evento/FinalizarEvento" method="post" style="margin-top:1rem;">
   					<input type="hidden" name="nombreEvento" value="<%= evNombre %>" />

@@ -27,7 +27,8 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
 
         if (!requiereAsistente(req, resp)) return;
 
-        List<DTEvento> eventos = ce().listarEventos();
+//        List<DTEvento> eventos = ce().listarEventos();
+        List<DTEvento> eventos = ce().listarEventosVigentes();
         req.setAttribute("eventos", eventos);
 
         // ediciones ACEPTADAS y NO finalizadas

@@ -13,6 +13,7 @@ public class Eventos{
 	private Map<String, Categoria> categorias;
 	private Map<String, Ediciones> ediciones;
 	private String imagen;
+	private Boolean vigente;
 
 	public Eventos(String nombre, String sigla, String descripcion, LocalDate fecha, Map<String, Categoria> categorias, String imagen) {
 		this.nombre = nombre;
@@ -22,6 +23,7 @@ public class Eventos{
 		this.categorias = categorias;
         this.ediciones = new HashMap<>(); 
         this.imagen = imagen;
+        this.vigente = true;
 	} 
 	
 	//Definimos los getters
@@ -90,5 +92,14 @@ public class Eventos{
     public Categoria obtenerCategoria(String nombreCategoria) {
         return categorias.get(nombreCategoria);
     }
+    
+    public Boolean getVigente() {
+		return vigente;
+	}
+    
+    public void setVigente(Boolean vigente) {
+    	System.out.println("Cambiando vigente de evento " + this.nombre + " a " + vigente);
+		this.vigente = vigente;
+	}
 
 }

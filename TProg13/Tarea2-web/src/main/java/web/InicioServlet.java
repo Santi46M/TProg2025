@@ -23,7 +23,8 @@ public class InicioServlet extends HttpServlet {
       throws ServletException, IOException {
 
     IControladorEvento controladorEv = ce();
-    List<DTEvento> eventos = controladorEv.listarEventos();
+//    List<DTEvento> eventos = controladorEv.listarEventos();
+    List<DTEvento> eventos = controladorEv.listarEventosVigentes();
 
     if (eventos == null || eventos.isEmpty()) {
       getServletContext().setAttribute("datosPrecargados", Boolean.FALSE);
@@ -36,6 +37,7 @@ public class InicioServlet extends HttpServlet {
     if (eventos != null) {
       for (DTEvento e : eventos) {
         String nombre = e.getNombre();
+        System.out.println("Nombre del evento" + nombre);
         String raw = null;
 
         //  intentar desde el DTO

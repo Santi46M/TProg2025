@@ -98,4 +98,7 @@ public interface IControladorEvento {
     	    excepciones.PatrocinioYaExisteException,
     	    IllegalArgumentException;
     public List<DTTipoRegistro> listarTiposRegistroDeEdicion(String evento, String edicion);
+    public boolean esEventoVigente(String nombreEvento);
+    public void finalizarEvento(String nombreEvento);
+    public List<DTEvento> listarEventosVigentes();
 }

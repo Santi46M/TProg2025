@@ -304,7 +304,9 @@ public class AltaEdicionEvento extends JInternalFrame {
 	    logica.controladores.ControladorEvento controlador = new logica.controladores.ControladorEvento();
 	    java.util.List<logica.datatypes.DTEvento> eventos;
 	    try {
-	        eventos = controlador.listarEventos();
+//	        eventos = controlador.listarEventos();
+	    	eventos = controlador.listarEventosVigentes();
+	        
 	    } catch (IllegalStateException | NullPointerException ex) {
 	        eventos = java.util.Collections.emptyList();
 	    }

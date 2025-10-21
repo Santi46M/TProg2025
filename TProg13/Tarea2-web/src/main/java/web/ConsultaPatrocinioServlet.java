@@ -99,7 +99,8 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
                 HttpSession s = req.getSession(false);
                 String nick = (s == null) ? null : (String) s.getAttribute("nick");
 
-                List<DTEvento> todos = ctl().listarEventos();
+//                List<DTEvento> todos = ctl().listarEventos();
+                List<DTEvento> todos = ctl().listarEventosVigentes();
                 List<String> eventosOrganizador   = new ArrayList<>();
                 List<String> edicionesOrganizador = new ArrayList<>();
 
