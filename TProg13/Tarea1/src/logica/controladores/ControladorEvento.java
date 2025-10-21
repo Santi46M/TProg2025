@@ -735,4 +735,122 @@ asist.addRegistro(idRegistro, nuevoRegistro);
         }
         return lista;
     }
+	
+	public List<logica.datatypes.DTTipoRegistro> listarTiposRegistroDeEdicion(String evento, String edicion) {
+	    if (evento == null || evento.isEmpty() || edicion == null || edicion.isEmpty()) {
+	        throw new IllegalArgumentException("Evento y edición son obligatorios.");
+	    }
+
+	    logica.manejadores.ManejadorEvento me = logica.manejadores.ManejadorEvento.getInstancia();
+
+	    logica.clases.Eventos ev = me.obtenerEvento(evento);
+	    if (ev == null) {
+	        throw new IllegalArgumentException("Evento inexistente: " + evento);
+	    }
+
+	    // Tu API: ev.obtenerEdicion(String nombreEdicion)
+	    logica.clases.Ediciones ed = ev.obtenerEdicion(edicion);
+	    if (ed == null) {
+	        throw new IllegalArgumentException("Edición inexistente: " + edicion);
+	    }
+
+	    java.util.List<logica.datatypes.DTTipoRegistro> res = new java.util.ArrayList<>();
+	    java.util.Collection<logica.clases.TipoRegistro> tipos = ed.getTiposRegistro(); // <- devuelve Collection
+	    if (tipos != null) {
+	        for (logica.clases.TipoRegistro t : tipos) {
+	            if (t == null) continue;
+	            res.add(new logica.datatypes.DTTipoRegistro(
+	                t.getNombre(),
+	                t.getDescripcion(),
+	                t.getCosto(),
+	                t.getCupo()
+	            ));
+	        }
+	    }
+	    return res; 
+	}
+	
+	public logica.datatypes.DTPatrocinio altaPatrocinioDT(
+	        String siglaEdicion,
+	        String nombreInstitucion,
+	        logica.enumerados.DTNivel nivel,
+	        String nombreTipoRegistro,
+	        int aporte,
+	        java.time.LocalDate fechaPatrocinio,
+	        int cantidadRegistros,
+	        String codigoPatrocinio
+	) throws excepciones.ValorPatrocinioExcedidoException,
+	         excepciones.PatrocinioYaExisteException,
+	         IllegalArgumentException {
+
+	    // Validaciones básicas
+	    if (siglaEdicion == null || siglaEdicion.isEmpty())
+	        throw new IllegalArgumentException("Sigla de edición obligatoria.");
+	    if (nombreInstitucion == null || nombreInstitucion.isEmpty())
+	        throw new IllegalArgumentException("Institución obligatoria.");
+	    if (nombreTipoRegistro == null || nombreTipoRegistro.isEmpty())
+	        throw new IllegalArgumentException("Tipo de registro obligatorio.");
+	    if (codigoPatrocinio == null || codigoPatrocinio.isEmpty())
+	        throw new IllegalArgumentException("Código de patrocinio obligatorio.");
+	    if (aporte < 0 || cantidadRegistros < 0)
+	        throw new IllegalArgumentException("Aporte y cantidad deben ser no negativos.");
+
+	    // Manejadores
+	    logica.manejadores.ManejadorEvento me = logica.manejadores.ManejadorEvento.getInstancia();
+	    logica.manejadores.ManejadorUsuario mu = logica.manejadores.ManejadorUsuario.getInstancia();
+	    logica.manejadores.ManejadorAuxiliar mx = logica.manejadores.ManejadorAuxiliar.getInstancia();
+
+	    // Resolver edición por SIGLA
+	    logica.clases.Ediciones ed = me.obtenerEdicion(siglaEdicion);
+	    if (ed == null) {
+	        throw new IllegalArgumentException("Edición inexistente: " + siglaEdicion);
+	    }
+
+	    // Resolver institución por nombre
+	    logica.clases.Institucion inst = mu.findInstitucion(nombreInstitucion);
+	    if (inst == null) {
+	        throw new IllegalArgumentException("Institución inexistente: " + nombreInstitucion);
+	    }
+
+	    // Resolver tipo de registro por nombre
+	    logica.clases.TipoRegistro tipo = ed.obtenerTipoRegistro(nombreTipoRegistro);
+	    if (tipo == null) {
+	        throw new IllegalArgumentException("Tipo de registro inexistente: " + nombreTipoRegistro);
+	    }
+
+	    // Duplicados: misma institución en la misma edición o código repetido
+	    for (logica.clases.Patrocinio p : mx.listarPatrocinios()) {
+	        if (p.getInstitucion().equals(inst) && p.getEdicion().equals(ed)) {
+	            throw new excepciones.PatrocinioYaExisteException(inst.getNombre(), ed.getNombre());
+	        }
+	        if (p.getCodigoPatrocinio().equals(codigoPatrocinio)) {
+	            throw new excepciones.PatrocinioYaExisteException(inst.getNombre(), ed.getNombre()); // tratamos código duplicado como conflicto
+	        }
+	    }
+
+	    // Regla 20%: costo registros <= 20% del aporte
+	    float valorRegistros = cantidadRegistros * tipo.getCosto();
+	    if (valorRegistros > (aporte * 0.2f)) {
+	        throw new excepciones.ValorPatrocinioExcedidoException();
+	    }
+
+	    // Crear y persistir
+	    logica.clases.Patrocinio pat = new logica.clases.Patrocinio(
+	            ed, inst, nivel, tipo, aporte, fechaPatrocinio, cantidadRegistros, codigoPatrocinio
+	    );
+	    mx.agregarPatrocinio(pat);
+	    ed.getPatrocinios().add(pat);
+
+	    // Retornar DTO
+	    return new logica.datatypes.DTPatrocinio(
+	            codigoPatrocinio,
+	            aporte,
+	            fechaPatrocinio,
+	            nivel,
+	            cantidadRegistros,
+	            inst.getNombre(),
+	            ed.getSigla(),
+	            tipo.getNombre()
+	    );
+}
 }

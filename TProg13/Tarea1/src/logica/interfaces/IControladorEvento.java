@@ -18,6 +18,7 @@ import logica.clases.Usuario;
 import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
+import logica.datatypes.DTPatrocinio;
 import logica.datatypes.DTRegistro;
 import logica.datatypes.DTTipoRegistro;
 import logica.enumerados.DTNivel;
@@ -82,4 +83,18 @@ public interface IControladorEvento {
     public DTTipoRegistro consultaTipoRegistro(String nombreEvento, String nombreEdicion, String nombreTipoRegistro);
     public DTEdicion obtenerEdicionPorSiglaDT(String sigla);
     public List<DTCategorias> listarDTCategorias();
+    DTPatrocinio altaPatrocinioDT(
+    	    String siglaEdicion,
+    	    String nombreInstitucion,
+    	    logica.enumerados.DTNivel nivel,
+    	    String nombreTipoRegistro,
+    	    int aporte,
+    	    java.time.LocalDate fechaPatrocinio,
+    	    int cantidadRegistros,
+    	    String codigoPatrocinio
+    	) throws
+    	    excepciones.ValorPatrocinioExcedidoException,
+    	    excepciones.PatrocinioYaExisteException,
+    	    IllegalArgumentException;
+    public List<DTTipoRegistro> listarTiposRegistroDeEdicion(String evento, String edicion);
 }
