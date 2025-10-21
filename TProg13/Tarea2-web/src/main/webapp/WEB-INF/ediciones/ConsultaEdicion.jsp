@@ -21,6 +21,40 @@
   // (no duplicar ctx en la JSP)
   String edImagenUrl = (String) request.getAttribute("edImagenUrl");
   boolean hasAnyImg = (edImagenUrl != null && !edImagenUrl.isBlank());
+  String edVideoRaw = (edicion != null) ? edicion.getVideo() : null;
+  String edVideoEmbed = null;
+  boolean hasVideo = false;
+  if (edVideoRaw != null && !edVideoRaw.isBlank()) {
+    String lower = edVideoRaw.toLowerCase();
+    try {
+      if (lower.contains("youtube.com/watch") || lower.contains("youtube.com/watch?")) {
+        int idx = edVideoRaw.indexOf("v=");
+        if (idx >= 0) {
+          String id = edVideoRaw.substring(idx + 2);
+          int amp = id.indexOf('&');
+          if (amp > 0) id = id.substring(0, amp);
+          edVideoEmbed = "https://www.youtube.com/embed/" + id;
+        }
+      } else if (lower.contains("youtu.be/")) {
+        int slash = edVideoRaw.lastIndexOf('/');
+        if (slash >= 0) {
+          String id = edVideoRaw.substring(slash + 1);
+          int q = id.indexOf('?'); if (q > 0) id = id.substring(0, q);
+          edVideoEmbed = "https://www.youtube.com/embed/" + id;
+        }
+      } else if (lower.contains("vimeo.com/")) {
+        int slash = edVideoRaw.lastIndexOf('/');
+        if (slash >= 0) {
+          String id = edVideoRaw.substring(slash + 1);
+          int q = id.indexOf('?'); if (q > 0) id = id.substring(0, q);
+          edVideoEmbed = "https://player.vimeo.com/video/" + id;
+        }
+      } else if (lower.startsWith("http://") || lower.startsWith("https://")) {
+        edVideoEmbed = edVideoRaw; // fallback: try direct URL
+      }
+    } catch (Exception ignore) { edVideoEmbed = edVideoRaw; }
+    hasVideo = (edVideoEmbed != null && !edVideoEmbed.isBlank());
+  }
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -62,6 +96,13 @@
         <% if (hasAnyImg) { %>
           <div class="img-frame">
             <img src="<%= edImagenUrl %>" alt="Imagen de la edición <%= (edicion != null ? edicion.getNombre() : "") %>">
+          </div>
+        <% } %>
+
+        <% if (hasVideo) { %>
+          <div class="img-frame video-frame" style="max-width:900px; margin: 0.5rem auto 1rem;">
+            <iframe width="100%" height="420" src="<%= edVideoEmbed %>" title="Video de la edición" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <p style="text-align:center; font-size:0.9rem; margin-top:0.5rem;"><a href="<%= edVideoRaw %>" target="_blank">Ver en nueva pestaña</a></p>
           </div>
         <% } %>
 

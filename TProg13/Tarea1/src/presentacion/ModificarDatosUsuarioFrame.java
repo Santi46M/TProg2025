@@ -180,7 +180,7 @@ public class ModificarDatosUsuarioFrame extends JInternalFrame {
                 }
             }
             try {
-                ICU.modificarDatosUsuario(nickname, nombre, descripcion, sitioWeb, apellido, fechaNac, institucion);
+                ICU.modificarDatosUsuario(nickname, nombre, descripcion, sitioWeb, apellido, fechaNac, institucion, null);
                 JOptionPane.showMessageDialog(this, "Datos actualizados correctamente para " + nickname);
                 this.dispose();
             } catch (IllegalStateException | NullPointerException ex) {

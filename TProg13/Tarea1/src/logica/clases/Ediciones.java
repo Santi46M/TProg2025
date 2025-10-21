@@ -25,6 +25,7 @@ public class Ediciones {
     private Set<Patrocinio> patrocinios = new HashSet<>();
     private Map<String, Registro> registros = new HashMap<>();
     private String imagen;
+    private String video;
 
     public Ediciones(Eventos evento, String nombre, String sigla,
                      LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
@@ -39,20 +40,22 @@ public class Ediciones {
         this.ciudad = ciudad;
         this.pais = pais;
         this.estado = DTEstado.Ingresada;
+        this.video = null;
     }
     public Ediciones(Eventos evento, String nombre, String sigla,
             LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
             Usuario organizador, String ciudad, String pais, DTEstado estadoEdicion) {
-    	this.evento = evento;
-    	this.nombre = nombre;
-    	this.sigla = sigla;
-    	this.fechaInicio = fechaInicio;
-    	this.fechaFin = fechaFin;
-    	this.fechaAlta = fechaAlta;
-    	this.organizador = organizador;
-    	this.ciudad = ciudad;
-    	this.pais = pais;
-    	this.estado = estadoEdicion;
+     this.evento = evento;
+     this.nombre = nombre;
+     this.sigla = sigla;
+     this.fechaInicio = fechaInicio;
+     this.fechaFin = fechaFin;
+     this.fechaAlta = fechaAlta;
+     this.organizador = organizador;
+     this.ciudad = ciudad;
+     this.pais = pais;
+     this.estado = estadoEdicion;
+     this.video = null;
     }
     
     public Ediciones(Eventos evento, String nombre, String sigla,
@@ -69,14 +72,29 @@ public class Ediciones {
         this.pais = pais;
         this.estado = DTEstado.Ingresada;
         this.imagen = imagen;
+        this.video = null;
+    }
+
+    // New constructor accepting imagen and video
+    public Ediciones(Eventos evento, String nombre, String sigla,
+            LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta,
+            Usuario organizador, String ciudad, String pais, String imagen, String video) {
+        this.evento = evento;
+        this.nombre = nombre;
+        this.sigla = sigla;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
+        this.fechaAlta = fechaAlta;
+        this.organizador = organizador;
+        this.ciudad = ciudad;
+        this.pais = pais;
+        this.estado = DTEstado.Ingresada;
+        this.imagen = imagen;
+        this.video = video;
     }
 
     public Eventos getEvento() {
         return evento;
-    }
-
-    public void setEvento(Eventos evento) {
-        this.evento = evento;
     }
 
     public String getNombre() {
@@ -198,6 +216,14 @@ public class Ediciones {
     }
     public void setImagen(String imagen) {
         this.imagen = imagen;
+    }
+
+    public String getVideo() {
+        return video;
+    }
+
+    public void setVideo(String video) {
+        this.video = video;
     }
 
 }
