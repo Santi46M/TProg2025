@@ -12,9 +12,10 @@
 
   Map<String,String> fotos = (Map<String,String>) request.getAttribute("fotos");
   String usrImagenUrl = (String) request.getAttribute("usrImagenUrl");
-  String rolSesion = (String) session.getAttribute("rol");
-  boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rolSesion);
-  boolean esAsistente = "ASISTENTE".equalsIgnoreCase(rolSesion);
+  Boolean esPerfilOrganizadorAttr = (Boolean) request.getAttribute("esPerfilOrganizador");
+  boolean esPerfilOrganizador = (esPerfilOrganizadorAttr != null)
+      ? esPerfilOrganizadorAttr.booleanValue()
+      : (usuario != null && (usuario.getDesc() != null || usuario.getLink() != null));
 %>
 
 <!DOCTYPE html>
@@ -37,6 +38,7 @@
       padding:6px; box-sizing:border-box; margin-bottom:.25rem;
     }
     .perfil-header .no-avatar { width:96px; height:96px; font-size:.82rem; padding:8px; margin:0; }
+    .hint { font-size:.85rem; color:#6b7280; }
   </style>
 </head>
 
@@ -101,15 +103,21 @@
           <% } %>
 
           <div id="datosUsuario">
-            <form id="formEditarUsuario" action="<%= ctx %>/usuario/modificar" method="post">
+            <!-- IMPORTANTE: enctype para permitir subir imagen -->
+            <form id="formEditarUsuario" action="<%= ctx %>/usuario/modificar" method="post" enctype="multipart/form-data">
               <input type="hidden" name="nick" value="<%= usuario.getNickname() %>">
 
               <p><strong>Nickname:</strong> <span><%= usuario.getNickname() %></span></p>
               <p><strong>Email:</strong> <span><%= usuario.getEmail()%></span></p>
 
+              <!-- Campo de imagen (solo visible en modo edición) -->
+              <div class="edit-mode" style="display:none; margin:.25rem 0;">
+                <label for="imagen"><strong>Foto:</strong></label>
+                <input type="file" id="imagen" name="imagen" accept="image/*">
+                <div class="hint">Formatos: JPG/PNG/WebP. Tamaño máx: 5 MB.</div>
+              </div>
 
-
-              <% if (!esOrganizador) { %>
+              <% if (!esPerfilOrganizador) { %>
                 <!-- 🔹 CAMPOS DE ASISTENTE -->
                 <p><strong>Nombre:</strong>
                   <span class="view-mode"><%= usuario.getNombre() %></span>
@@ -135,7 +143,7 @@
                        String instImg = (instFotos != null && instName != null) ? instFotos.get(instName) : null;
                     %>
                     <% if (instName == null) { %>
-                      —
+                      — 
                     <% } else { %>
                       <span style="display:inline-flex;align-items:center;gap:0.4em;">
                         <% if (instImg != null) { %>
@@ -263,6 +271,9 @@
         btnEditar.style.display = "inline";
         btnGuardar.style.display = "none";
         btnCancelar.style.display = "none";
+        // limpiar file input si se canceló
+        const fi = document.getElementById("imagen");
+        if (fi) fi.value = "";
       });
     }
   </script>

@@ -329,21 +329,36 @@ manejador.addUsuario(nuevoUsuario);
         return obtenerDatosRegistros(registroSeleccionadoId);
     }
 
-    public void modificarDatosUsuario(String nickname, String nombre, String descripcion, String link, String apellido, LocalDate fechaNacimiento, String institucion) throws UsuarioNoExisteException, UsuarioTipoIncorrectoException {
+    @Override
+    public void modificarDatosUsuario(String nickname, String nombre, String descripcion, String link,
+                                      String apellido, LocalDate fechaNacimiento, String institucion,
+                                      String imagen)
+            throws UsuarioNoExisteException, UsuarioTipoIncorrectoException {
+
         Usuario user = manejador.findUsuario(nickname);
         if (user == null) {
             throw new UsuarioNoExisteException(nickname);
         }
+
+        // nombre aplica a ambos roles
         user.setNombre(nombre);
+
+        // actualizar imagen si viene no vacía
+        if (imagen != null && !imagen.isBlank()) {
+            user.setImagen(imagen);
+        }
+
         if (user instanceof Organizador) {
             Organizador orgUser = (Organizador) user;
             orgUser.setDesc(descripcion);
             orgUser.setLink(link);
+
         } else if (user instanceof Asistente) {
             Asistente asisUser = (Asistente) user;
             asisUser.setApellido(apellido);
             asisUser.setFechaDeNacimiento(fechaNacimiento);
-            if (institucion != null && !institucion.isEmpty()) {
+
+            if (institucion != null && !institucion.isBlank()) {
                 Institucion inst = manejador.findInstitucion(institucion);
                 asisUser.setInstitucion(inst);
             }

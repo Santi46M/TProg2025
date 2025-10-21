@@ -1,12 +1,13 @@
 package web;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
+import java.nio.file.*;
 import java.time.LocalDate;
 import java.util.*;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
@@ -19,6 +20,11 @@ import excepciones.UsuarioNoExisteException;
 import excepciones.UsuarioTipoIncorrectoException;
 
 @WebServlet(urlPatterns = {"/usuario/ConsultaUsuario", "/usuario/modificar"})
+@MultipartConfig(
+    fileSizeThreshold = 256 * 1024,
+    maxFileSize       = 5L * 1024 * 1024,
+    maxRequestSize    = 10L * 1024 * 1024
+)
 public class ConsultaUsuarioServlet extends HttpServlet {
 
     // =====================================================
@@ -53,7 +59,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             try {
                 usuariosSet = ctrlUsuario.obtenerUsuariosDT();
             } catch (UsuarioNoExisteException e) {
-                e.printStackTrace(); // solo para debug
+                e.printStackTrace(); // solo debug
                 request.setAttribute("error", "No se pudo obtener la lista de usuarios.");
             }
 
@@ -68,7 +74,6 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
             for (DTDatosUsuario u : usuarios) {
                 if (u == null) continue;
-
                 String nombreSeguro = nvl(u.getNombre(), u.getNickname());
                 nombres.put(u.getNickname(), nombreSeguro);
 
@@ -79,8 +84,9 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             request.setAttribute("fotos", fotos);
             request.setAttribute("nombres", nombres);
 
-
-            Map<String,String> instFotos = buildInstitutionImageMap(ctrlUsuario.getInstituciones(), request.getContextPath(), getServletContext());
+            Map<String,String> instFotos = buildInstitutionImageMap(
+                ctrlUsuario.getInstituciones(), request.getContextPath(), getServletContext()
+            );
             request.setAttribute("instFotos", instFotos);
 
         } else {
@@ -90,7 +96,8 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 request.setAttribute("usuario", usuario);
                 request.setAttribute("usuarioNombreSeguro",
                         nvl(usuario.getNombre(), usuario.getNickname()));
-
+                boolean esPerfilOrganizador = (usuario.getDesc() != null) || (usuario.getLink() != null);
+                request.setAttribute("esPerfilOrganizador", esPerfilOrganizador);
                 // foto
                 String url = resolveUserImageUrl(
                         usuario.getImagen(),
@@ -114,14 +121,15 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                         }
                     }
                 }
-
                 request.setAttribute("edicionToEvento", edicionToEvento);
 
-                // Cargar instituciones para el dropdown
+                // instituciones para dropdown
                 request.setAttribute("instituciones", ctrlUsuario.getInstituciones());
 
-                // Prepare institution images mapping (best-effort guess)
-                Map<String,String> instFotos = buildInstitutionImageMap(ctrlUsuario.getInstituciones(), request.getContextPath(), getServletContext());
+                // imágenes de instituciones
+                Map<String,String> instFotos = buildInstitutionImageMap(
+                    ctrlUsuario.getInstituciones(), request.getContextPath(), getServletContext()
+                );
                 request.setAttribute("instFotos", instFotos);
 
             } catch (UsuarioNoExisteException e) {
@@ -135,7 +143,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
     }
 
     // =====================================================
-    // POST → Modificación de usuario
+    // POST → Modificación de usuario (incluye imagen)
     // =====================================================
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -145,7 +153,6 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         String path = request.getServletPath();
         IControladorUsuario ctrlUsuario = fabrica.getInstance().getIControladorUsuario();
 
-        // === POST /usuario/modificar ===
         if ("/usuario/modificar".equals(path)) {
 
             HttpSession sAux = request.getSession(false);
@@ -156,7 +163,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 return;
             }
 
-            // Leer parámetros del formulario
+            // Parámetros de texto
             String nombre      = request.getParameter("nombre");
             String apellido    = request.getParameter("apellido");
             String email       = request.getParameter("email");
@@ -165,19 +172,62 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             String nacStr      = request.getParameter("fechaNac");
             String password    = request.getParameter("password");
             String link        = request.getParameter("link");
-            
 
             LocalDate fechaNac = null;
             if (nacStr != null && !nacStr.isBlank()) {
-                try {
-                    fechaNac = LocalDate.parse(nacStr);
-                } catch (Exception ignored) {}
+                try { fechaNac = LocalDate.parse(nacStr); } catch (Exception ignored) {}
+            }
+
+            // Archivo (imagen)
+            String imagenRelGuardada = null;
+            Part imagenPart = null;
+            try { imagenPart = request.getPart("imagen"); } catch (IllegalStateException ise) { /* > max size */ }
+
+            if (imagenPart != null && imagenPart.getSize() > 0) {
+                String contentType = imagenPart.getContentType(); // image/png, etc.
+                if (contentType == null || !contentType.toLowerCase(Locale.ROOT).startsWith("image/")) {
+                    request.setAttribute("error", "El archivo de imagen no es válido (solo imágenes).");
+                    doGet(request, response);
+                    return;
+                }
+
+                String ext = guessExt(contentType);
+                if (ext == null) ext = ".png";
+
+                String base = nick.replaceAll("[^a-zA-Z0-9_-]", "_");
+                String fileName = base + "_" + System.currentTimeMillis() + ext;
+
+                ServletContext sc = getServletContext();
+                String relDir = "/img/usuarios";
+                String absDir = sc.getRealPath(relDir);
+                if (absDir == null) {
+                    // fallback: carpeta /img
+                    relDir = "/img";
+                    absDir = sc.getRealPath(relDir);
+                }
+                if (absDir == null) {
+                    request.setAttribute("error", "No se pudo guardar la imagen (ruta no resuelta).");
+                    doGet(request, response);
+                    return;
+                }
+
+                Path dir = Path.of(absDir);
+                try { Files.createDirectories(dir); } catch (Exception ignored) {}
+
+                Path destino = dir.resolve(fileName);
+                try (InputStream in = imagenPart.getInputStream()) {
+                    Files.copy(in, destino, StandardCopyOption.REPLACE_EXISTING);
+                }
+                imagenRelGuardada = relDir + "/" + fileName; // lo que guardamos en el modelo
             }
 
             try {
-                ctrlUsuario.modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaNac, institucion);
+                // Actualizar datos + IMAGEN (nueva sobrecarga)
+                ctrlUsuario.modificarDatosUsuario(
+                        nick, nombre, descripcion, link, apellido, fechaNac, institucion, imagenRelGuardada
+                );
 
-                // Si se ingresó nueva contraseña, actualizarla
+                // Contraseña por su método específico (¡no tocamos esto!)
                 if (password != null && !password.isBlank()) {
                     ctrlUsuario.modificarContrasenia(nick, password);
                 }
@@ -195,14 +245,14 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         }
     }
 
-    // Helper to guess institution image URLs by name and checking common locations
+    // ==== Helpers auxiliares (sin cambios relevantes) ====
+
     private Map<String,String> buildInstitutionImageMap(Set<String> instituciones, String ctx, ServletContext sc) {
         Map<String,String> map = new HashMap<>();
         if (instituciones == null || instituciones.isEmpty()) return map;
         String[] exts = new String[]{".png",".jpg",".jpeg",".webp",".gif"};
         for (String inst : instituciones) {
             if (inst == null || inst.isBlank()) continue;
-            // Candidate filenames: sanitized name, original name, lowercase
             String safe = inst.replaceAll("[^a-zA-Z0-9]", "_");
             List<String> candidates = new ArrayList<>();
             for (String ext: exts) {
@@ -211,11 +261,10 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 candidates.add("/img/" + safe + ext);
                 candidates.add("/img/" + inst + ext);
             }
-            // also try without extension
             candidates.add("/img/instituciones/" + safe);
             candidates.add("/img/instituciones/" + inst);
             for (String candRel : candidates) {
-                Boolean ex = exists(sc, candRel);
+                Boolean ex = exists(getServletContext(), candRel);
                 if (Boolean.TRUE.equals(ex)) {
                     map.put(inst, ctx + candRel);
                     break;
@@ -225,12 +274,9 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         return map;
     }
 
-    // === Helpers ===
     private static String trim(String s) { return (s == null) ? null : s.trim(); }
     private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
-    private static String nvl(String s, String alt) {
-        return (s == null || s.trim().isEmpty()) ? alt : s;
-    }
+    private static String nvl(String s, String alt) { return (s == null || s.trim().isEmpty()) ? alt : s; }
     private static boolean isTrue(String v) {
         if (v == null) return false;
         String s = v.trim().toLowerCase(Locale.ROOT);
@@ -259,7 +305,6 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             if (Boolean.TRUE.equals(exUsr)) return ctx + relUsr;
             return null;
         }
-
         return ctx + relImg;
     }
 
@@ -267,5 +312,14 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         String abs = sc.getRealPath(rel);
         if (abs == null) return null;
         return Files.exists(Path.of(abs));
+    }
+
+    private static String guessExt(String contentType) {
+        String ct = (contentType == null) ? "" : contentType.toLowerCase(Locale.ROOT);
+        if (ct.contains("png")) return ".png";
+        if (ct.contains("jpeg") || ct.contains("jpg")) return ".jpg";
+        if (ct.contains("webp")) return ".webp";
+        if (ct.contains("gif")) return ".gif";
+        return null;
     }
 }

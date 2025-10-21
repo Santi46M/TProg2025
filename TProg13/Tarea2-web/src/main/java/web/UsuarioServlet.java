@@ -9,38 +9,30 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Enumeration;
-import java.util.Map;
 
 import logica.fabrica;
 import logica.interfaces.IControladorUsuario;
 import logica.datatypes.DTDatosUsuario;
 import excepciones.UsuarioYaExisteException;
 import excepciones.UsuarioNoExisteException;
-import excepciones.UsuarioTipoIncorrectoException;
 
 @WebServlet(urlPatterns = {"/usuario/AltaUsuario"})
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024,  
-    maxFileSize = 10 * 1024 * 1024,   
-    maxRequestSize = 20 * 1024 * 1024 
+    fileSizeThreshold = 1024 * 1024,   // 1 MB en memoria
+    maxFileSize = 10 * 1024 * 1024,    // 10 MB por archivo
+    maxRequestSize = 20 * 1024 * 1024  // 20 MB total
 )
 public class UsuarioServlet extends HttpServlet {
 
-  private static final String JSP_LOGIN    = "/WEB-INF/auth/login.jsp";
-  private static final String JSP_ALTA     = "/WEB-INF/usuario/AltaUsuario.jsp";
-  private static final String JSP_CONSULTA = "/WEB-INF/usuario/ConsultaUsuario.jsp";
-//  private static final String JSP_MODIF    = "/WEB-INF/usuario/ModificarUsuario.jsp";
+  private static final String JSP_LOGIN = "/WEB-INF/auth/login.jsp";
+  private static final String JSP_ALTA  = "/WEB-INF/usuario/AltaUsuario.jsp";
 
-  private static final String IMG_REL_BASE_USR = "/img/usuarios"; //  carpeta para las imágenes de usuario nuevas
+  // carpeta relativa (servida por el app) para imágenes de usuarios
+  private static final String IMG_REL_BASE_USR = "/img/usuarios";
 
   private final IControladorUsuario controladorUs = fabrica.getInstance().getIControladorUsuario();
 
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
-
-  private String nickEnSesion(HttpServletRequest req) {
-    HttpSession sAux = req.getSession(false);
-    return sAux == null ? null : (String) sAux.getAttribute("nick");
-  }
 
   private void cargarInstituciones(HttpServletRequest req) {
     java.util.Collection<String> instituciones = controladorUs.getInstituciones();
@@ -57,59 +49,13 @@ public class UsuarioServlet extends HttpServlet {
       return;
     }
 
-    switch (path) {
-      case "/usuario/AltaUsuario":
-        cargarInstituciones(req);
-        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-        return;
-
-      case "/usuario/ConsultaUsuario": {
-    	  String nick = req.getParameter("nick");
-    	  if (nick == null || nick.isBlank()) {
-    	    nick = nickEnSesion(req);
-    	    if (nick == null) {
-    	      req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
-    	      return;
-    	    }
-    	  }
-
-    	  try {
-    	    // 🔹 Cargar instituciones para el desplegable
-    	    cargarInstituciones(req);
-
-    	    // 🔹 Obtener los datos del usuario
-    	    DTDatosUsuario dto = controladorUs.obtenerDatosUsuario(nick);
-
-    	    // 🔹 Pasar el usuario como atributo "usuario" (así lo usa tu JSP)
-    	    req.setAttribute("usuario", dto);
-
-    	    req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
-    	  } catch (UsuarioNoExisteException e) {
-    	    req.setAttribute("error", e.getMessage());
-    	    req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
-    	  }
-    	  return;
-    	}
-
-
-//      case "/modificar": {
-//    	cargarInstituciones(req);
-//        String nick = nickEnSesion(req);
-//        if (nick == null) { req.getRequestDispatcher(JSP_LOGIN).forward(req, resp); return; }
-//        try {
-//          DTDatosUsuario dto = controladorUs.obtenerDatosUsuario(nick);
-//          req.setAttribute("dto", dto);
-//          req.getRequestDispatcher(JSP_MODIF).forward(req, resp);
-//        } catch (UsuarioNoExisteException e) {
-//          req.setAttribute("error", e.getMessage());
-//          req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
-//        }
-//        return;
-//      }
-
-      default:
-        resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+    if ("/usuario/AltaUsuario".equals(path)) {
+      cargarInstituciones(req);
+      req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+      return;
     }
+
+    resp.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
 
   @Override
@@ -117,137 +63,134 @@ public class UsuarioServlet extends HttpServlet {
       throws ServletException, IOException {
 
     String path = req.getServletPath();
-    System.out.println("POST en: " + path);
+    if (!"/usuario/AltaUsuario".equals(path)) {
+      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+      return;
+    }
 
-    if ("/usuario/AltaUsuario".equals(path)) {
+    // === manejo de imagen (opcional) ===
+    Part imagenPart = null;
+    try { imagenPart = req.getPart("imagen"); } catch (Exception ignore) {}
+    String nombreArchivo = null;
 
-      Part imagenPart = null;
-      try { imagenPart = req.getPart("imagen"); } catch (Exception ignore) {}
-      String nombreArchivo = null;
-
-      if (imagenPart != null && imagenPart.getSize() > 0) {
-        String ctype = imagenPart.getContentType();
-        if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
-          req.setAttribute("error", "El archivo subido no es una imagen válida.");
-          cargarInstituciones(req);
-          req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-          return;
-        }
-
-        // Ruta física dentro del webapp 
-        String baseImg = getServletContext().getRealPath(IMG_REL_BASE_USR);
-        if (baseImg == null) {
-          String root = getServletContext().getRealPath("/");
-          if (root != null) {
-            baseImg = Path.of(root, "img", "usuarios").toString();
-          }
-        }
-        if (baseImg == null) {
-          throw new ServletException("No se pudo resolver la ruta física de /img/usuarios. " +
-              "Verificá deploy 'exploded' y carpeta webapp/img/usuarios.");
-        }
-
-        Files.createDirectories(Path.of(baseImg));
-
-        String nickParam = req.getParameter("nick");
-        String original = getSafeFilename(imagenPart);
-        String ext = getExtension(original);
-        if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
-        if (ext == null || ext.isBlank()) ext = ".jpg";
-
-        String finalName = (nickParam == null || nickParam.isBlank() ? "avatar" : nickParam) + ext;
-        Path destino = Path.of(baseImg, finalName);
-
-        try (var in = imagenPart.getInputStream()) {
-          Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-        }
-
-        nombreArchivo = finalName; // guardamos el nombre
-        System.out.println("✅ Imagen guardada: " + destino.toAbsolutePath()
-            + " | URL esperada: " + ctx(req) + IMG_REL_BASE_USR + "/" + finalName);
+    if (imagenPart != null && imagenPart.getSize() > 0) {
+      String ctype = imagenPart.getContentType();
+      if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
+        req.setAttribute("error", "El archivo subido no es una imagen válida.");
+        cargarInstituciones(req);
+        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+        return;
       }
 
-      // === Leer parámetros ===
-      String rol         = req.getParameter("rol");
-      String nick        = req.getParameter("nick");
-      String nombre      = req.getParameter("nombreA");
-      String pass1       = req.getParameter("pass");
-      String pass2       = req.getParameter("pass2");
-      String organizacion= req.getParameter("nombreO");
-      String apellido    = req.getParameter("apellidoA");
-      String correo      = req.getParameter("email");
-      String descripcion = req.getParameter("descO");
-      String link        = req.getParameter("webO");
-      String institucion = req.getParameter("instIdA");
-      String nacStr      = req.getParameter("nacA");
+      // Ruta física dentro del webapp (requiere deploy “exploded”)
+      String baseImg = getServletContext().getRealPath(IMG_REL_BASE_USR);
+      if (baseImg == null) {
+        String root = getServletContext().getRealPath("/");
+        if (root != null) baseImg = Path.of(root, "img", "usuarios").toString();
+      }
+      if (baseImg == null) {
+        throw new ServletException("No se pudo resolver la ruta física de /img/usuarios.");
+      }
 
-      if (pass1 == null || pass2 == null || pass1.isBlank() || pass2.isBlank() || !pass1.equals(pass2)) {
-        req.setAttribute("error", "Las contraseñas no coinciden o están vacías.");
+      Files.createDirectories(Path.of(baseImg));
+
+      String nickParam = req.getParameter("nick");
+      String original = getSafeFilename(imagenPart);
+      String ext = getExtension(original);
+      if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
+      if (ext == null || ext.isBlank()) ext = ".jpg";
+
+      String finalName = (nickParam == null || nickParam.isBlank() ? "avatar" : nickParam) + ext;
+      Path destino = Path.of(baseImg, finalName);
+
+      try (var in = imagenPart.getInputStream()) {
+        Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+      }
+
+      nombreArchivo = finalName; // se guarda en BD/modelo (tu controlador lo recibe)
+      System.out.println("✅ Imagen guardada: " + destino.toAbsolutePath()
+          + " | URL: " + ctx(req) + IMG_REL_BASE_USR + "/" + finalName);
+    }
+
+    // === leer params ===
+    String rol          = req.getParameter("rol");
+    String nick         = req.getParameter("nick");
+    String nombre       = req.getParameter("nombreA");
+    String pass1        = req.getParameter("pass");
+    String pass2        = req.getParameter("pass2");
+    String organizacion = req.getParameter("nombreO");
+    String apellido     = req.getParameter("apellidoA");
+    String correo       = req.getParameter("email");
+    String descripcion  = req.getParameter("descO");
+    String link         = req.getParameter("webO");
+    String institucion  = req.getParameter("instIdA");
+    String nacStr       = req.getParameter("nacA");
+
+    // validaciones básicas
+    if (pass1 == null || pass2 == null || pass1.isBlank() || pass2.isBlank() || !pass1.equals(pass2)) {
+      req.setAttribute("error", "Las contraseñas no coinciden o están vacías.");
+      cargarInstituciones(req);
+      forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+      return;
+    }
+    if (nick == null || correo == null || rol == null || nick.isBlank() || correo.isBlank()) {
+      req.setAttribute("error", "Faltan datos obligatorios.");
+      cargarInstituciones(req);
+      forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+      return;
+    }
+
+    // validación específica por rol
+    LocalDate fechaNac = null;
+    boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rol);
+
+    if (!esOrganizador) {
+      if (nacStr == null || nacStr.isBlank()) {
+        req.setAttribute("error", "Debe ingresar una fecha de nacimiento.");
         cargarInstituciones(req);
         forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
         return;
       }
-
-      if (nick == null || correo == null || rol == null || nick.isBlank() || correo.isBlank()) {
-        req.setAttribute("error", "Faltan datos obligatorios.");
+      try {
+        fechaNac = LocalDate.parse(nacStr);
+        if (fechaNac.isAfter(LocalDate.now())) throw new IllegalArgumentException();
+      } catch (Exception e) {
+        req.setAttribute("error", "Formato de fecha inválido o futura.");
         cargarInstituciones(req);
         forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
         return;
       }
-
-      //  Validación específica por rol 
-      LocalDate fechaNac = null;
-      if ("ASISTENTE".equalsIgnoreCase(rol)) {
-        if (nacStr == null || nacStr.isBlank()) {
-          req.setAttribute("error", "Debe ingresar una fecha de nacimiento.");
-          cargarInstituciones(req);
-          forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-          return;
-        }
-        try {
-          fechaNac = LocalDate.parse(nacStr);
-          if (fechaNac.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("La fecha de nacimiento no puede ser futura.");
-          }
-        } catch (Exception e) {
-          req.setAttribute("error", "Formato de fecha inválido o futura.");
-          cargarInstituciones(req);
-          forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-          return;
-        }
-      } else {
-        if (organizacion == null || organizacion.isBlank() || descripcion == null || descripcion.isBlank()) {
-          req.setAttribute("error", "Debe completar los campos obligatorios del organizador.");
-          cargarInstituciones(req);
-          forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-          return;
-        }
+    } else {
+      if (organizacion == null || organizacion.isBlank() || descripcion == null || descripcion.isBlank()) {
+        req.setAttribute("error", "Debe completar los campos obligatorios del organizador.");
+        cargarInstituciones(req);
+        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+        return;
       }
+    }
 
-      // === Crear usuario ===
-      boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rol);
+    // nombre final para alta (org usa 'organizacion', asistente usa 'nombre')
+    String nombreFinal = esOrganizador ? organizacion : nombre;
 
-   // nombre final según el rol
-   //arreglo de consultaUsuario
-   String nombreFinal = esOrganizador ? organizacion : nombre;
+    try {
+      // Alta (la firma incluye imagen como último parámetro)
+      controladorUs.altaUsuario(
+          nick,
+          nombreFinal,
+          correo,
+          descripcion,
+          link,
+          apellido,
+          fechaNac,
+          institucion,
+          esOrganizador,
+          pass1,
+          nombreArchivo
+      );
 
-   try {
-     controladorUs.altaUsuario(
-         nick,
-         nombreFinal,   
-         correo,
-         descripcion,
-         link,
-         apellido,
-         fechaNac,
-         institucion,
-         esOrganizador,
-         pass1,
-         nombreArchivo
-     );
-
+      // login directo post-alta
       HttpSession sAux = req.getSession(true);
-      DTDatosUsuario usuarioLogueado = null;
+      DTDatosUsuario usuarioLogueado;
       try {
         usuarioLogueado = controladorUs.obtenerDatosUsuario(nick);
       } catch (UsuarioNoExisteException e) {
@@ -261,6 +204,7 @@ public class UsuarioServlet extends HttpServlet {
       sAux.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
       sAux.setAttribute("estado_sesion", "LOGIN_CORRECTO");
 
+      // debug (opcional)
       Enumeration<String> names = sAux.getAttributeNames();
       while (names.hasMoreElements()) {
         String nAux = names.nextElement();
@@ -275,45 +219,6 @@ public class UsuarioServlet extends HttpServlet {
       cargarInstituciones(req);
       forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
     }
-
-    return;
-    }
-
-    //  Modificar usuario para la siguiente tarea 
-    if ("/usuario/ConsultaUsuario".equals(path)) {
-    		cargarInstituciones(req);
-    	  String nick = nickEnSesion(req);
-    	  if (nick == null) {
-    	    req.getRequestDispatcher(JSP_LOGIN).forward(req, resp);
-    	    return;
-    	  }
-
-    	  // Obtener parámetros del formulario
-    	  String nombre      = req.getParameter("nombre");
-    	  String apellido    = req.getParameter("apellido");
-    	  String email       = req.getParameter("email");
-    	  String institucion = req.getParameter("institucion");
-    	  String descripcion = req.getParameter("descripcion");
-    	  String nacStr      = req.getParameter("fechaNac");
-    	  LocalDate fechaNac = null;
-    	  if (nacStr != null && !nacStr.isBlank()) {
-    	    try { fechaNac = LocalDate.parse(nacStr); } catch (Exception ignored) {}
-    	  }
-
-    	  try {
-    	    // Llamar al método del controlador (ajustá según tu interfaz)
-    	    controladorUs.modificarDatosUsuario(nick, nombre, apellido, email, institucion, fechaNac, descripcion);
-
-    	    // Redirigir al perfil actualizado
-    	    resp.sendRedirect(ctx(req) + "/usuario/ConsultaUsuario?nick=" +
-    	        java.net.URLEncoder.encode(nick, java.nio.charset.StandardCharsets.UTF_8));
-
-    	  } catch (UsuarioNoExisteException | UsuarioTipoIncorrectoException e) {
-    	    req.setAttribute("error", e.getMessage());
-    	    req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
-    	  }
-    	}
-
   }
 
   private void forwardConDatos(HttpServletRequest req, HttpServletResponse resp,
