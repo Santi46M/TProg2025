@@ -3,11 +3,12 @@
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/layoutMenu.css">
 
 <%
-String ctx = request.getContextPath();
+  String ctx = request.getContextPath();
   String rol = (String) session.getAttribute("rol");
 
   @SuppressWarnings("unchecked")
-  java.util.List<logica.datatypes.DTCategorias> dtCategorias = (java.util.List<logica.datatypes.DTCategorias>) request.getAttribute("dtCategorias");
+  java.util.List<logica.datatypes.DTCategorias> dtCategorias =
+      (java.util.List<logica.datatypes.DTCategorias>) request.getAttribute("dtCategorias");
   java.util.List<String> categorias = new java.util.ArrayList<>();
   if (dtCategorias != null) {
       for (logica.datatypes.DTCategorias dtCat : dtCategorias) {
@@ -15,6 +16,7 @@ String ctx = request.getContextPath();
       }
   }
 %>
+
 <aside class="card aside-inicio">
   <h3>Menú</h3>
 
@@ -34,6 +36,12 @@ String ctx = request.getContextPath();
       <li>
         <form action="<%=ctx%>/registro/alta" method="get" style="display:inline">
           <button type="submit" class="linklike">Crear Registro</button>
+        </form>
+      </li>
+      <li>
+        <!-- NUEVO: un botón simple que abre la pantalla de Alta Patrocinio -->
+        <form action="<%=ctx%>/edicion/patrocinio/alta" method="get" style="display:inline">
+          <button type="submit" class="linklike">Crear Patrocinio</button>
         </form>
       </li>
     </ul>
@@ -64,10 +72,9 @@ String ctx = request.getContextPath();
   </ul>
 
   <h4>
-   <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline">
-  <input type="hidden" name="listar" value="1">
-  <button type="submit" class="linklike">Listar Usuarios</button>
-</form>
-
+    <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline">
+      <input type="hidden" name="listar" value="1">
+      <button type="submit" class="linklike">Listar Usuarios</button>
+    </form>
   </h4>
 </aside>

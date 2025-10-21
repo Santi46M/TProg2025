@@ -95,24 +95,37 @@ public class ControladorEvento implements IControladorEvento {
 		altaTipoRegistro(edicion, nombre, descripcion, costo, cupo);
 	}
 
-    public void altaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException {
-        ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
-        for (Patrocinio p : manejadorAux.listarPatrocinios()) {
-            if (p.getInstitucion().equals(institucion) && p.getEdicion().equals(edicion)) {
-                throw new PatrocinioYaExisteException(institucion.getNombre(), edicion.getNombre());
-            }
-            if (p.getCodigoPatrocinio().equals(codigoPatrocinio)) {
-                return;
-            }
-        }
-        float valorRegistros = cantidadRegistros * tipoRegistro.getCosto();
-        if (valorRegistros > (aporte * 0.2)) {
-            throw new ValorPatrocinioExcedidoException();
-        }
-        Patrocinio pat = new Patrocinio(edicion, institucion, nivel, tipoRegistro, aporte, fechaPatrocinio, cantidadRegistros, codigoPatrocinio);
-        manejadorAux.agregarPatrocinio(pat);
-        edicion.getPatrocinios().add(pat);
-    }
+    public void altaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel,
+            TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio,
+            int cantidadRegistros, String codigoPatrocinio)
+throws ValorPatrocinioExcedidoException {
+
+if (edicion == null || institucion == null || nivel == null || tipoRegistro == null
+|| codigoPatrocinio == null || codigoPatrocinio.isBlank() || aporte <= 0 || cantidadRegistros < 0) {
+throw new RuntimeException("Datos de patrocinio inválidos.");
+}
+
+ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
+for (Patrocinio p : manejadorAux.listarPatrocinios()) {
+if (p.getInstitucion().equals(institucion) && p.getEdicion().equals(edicion)) {
+throw new PatrocinioYaExisteException(institucion.getNombre(), edicion.getNombre());
+}
+if (p.getCodigoPatrocinio().equalsIgnoreCase(codigoPatrocinio)) {
+throw new RuntimeException("El código de patrocinio ya existe: " + codigoPatrocinio);
+}
+}
+
+float valorRegistros = cantidadRegistros * tipoRegistro.getCosto();
+if (valorRegistros > (aporte * 0.2f)) { // 20%
+throw new ValorPatrocinioExcedidoException();
+}
+
+Patrocinio pat = new Patrocinio(edicion, institucion, nivel, tipoRegistro, aporte,
+                     fechaPatrocinio, cantidadRegistros, codigoPatrocinio);
+manejadorAux.agregarPatrocinio(pat);
+edicion.getPatrocinios().add(pat);
+}
+
 
     public void altaCategoria(String nombre) {
         ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
@@ -735,4 +748,116 @@ asist.addRegistro(idRegistro, nuevoRegistro);
         }
         return lista;
     }
+	
+	@Override
+	public List<DTTipoRegistro> listarTiposRegistroDeEdicion(String evento, String edicion) {
+	    if (evento == null || edicion == null) {
+	        throw new IllegalArgumentException("Evento y edición son obligatorios.");
+	    }
+
+	    Eventos ev = ManejadorEvento.getInstancia().obtenerEvento(evento);
+	    if (ev == null) {
+	        throw new IllegalArgumentException("Evento inexistente: " + evento);
+	    }
+
+	    Ediciones ed = ev.obtenerEdicion(edicion);
+	    if (ed == null) {
+	        throw new IllegalArgumentException("Edición inexistente para ese evento: " + edicion);
+	    }
+
+	    List<DTTipoRegistro> res = new ArrayList<>();
+	    // getTiposRegistro() -> Collection<TipoRegistro>
+	    Collection<TipoRegistro> tipos = ed.getTiposRegistro();
+	    if (tipos != null) {
+	        for (TipoRegistro t : tipos) {
+	            if (t == null) continue;
+	            res.add(new DTTipoRegistro(
+	                t.getNombre(),
+	                t.getDescripcion(),
+	                t.getCosto(),
+	                t.getCupo()
+	            ));
+	        }
+	    }
+	    return res; 
+	}
+	
+	public DTPatrocinio altaPatrocinioDT(
+	        String siglaEdicion,
+	        String nombreInstitucion,
+	        DTNivel nivel,
+	        String nombreTipoRegistro,
+	        int aporte,
+	        LocalDate fechaPatrocinio,
+	        int cantidadRegistros,
+	        String codigoPatrocinio
+	) throws ValorPatrocinioExcedidoException,
+	         excepciones.PatrocinioYaExisteException,
+	         IllegalArgumentException {
+
+	    // --- Validaciones básicas ---
+	    if (siglaEdicion == null || nombreInstitucion == null || nivel == null ||
+	        nombreTipoRegistro == null || fechaPatrocinio == null || codigoPatrocinio == null) {
+	        throw new IllegalArgumentException("Campos obligatorios faltantes.");
+	    }
+	    if (aporte < 0) throw new IllegalArgumentException("El aporte no puede ser negativo.");
+	    if (cantidadRegistros < 0) throw new IllegalArgumentException("La cantidad de registros no puede ser negativa.");
+
+	    // --- 1) Resolver edición por sigla ---
+	    // Tenés declarado en la interfaz: Ediciones obtenerEdicionPorSigla(String sigla);
+	    Ediciones ed = this.obtenerEdicionPorSigla(siglaEdicion);
+	    if (ed == null) {
+	        // Fallback defensivo si tu implementación aún no resuelve por sigla global:
+	        // usar encontrarEventoPorSigla(sigla) -> evento -> evento.obtenerEdicion(sigla)
+	        String nombreEvento = this.encontrarEventoPorSigla(siglaEdicion);
+	        if (nombreEvento != null) {
+	            Eventos ev = ManejadorEvento.getInstancia().obtenerEvento(nombreEvento);
+	            if (ev != null) {
+	                ed = ev.obtenerEdicion(siglaEdicion); // tu método en Eventos
+	            }
+	        }
+	    }
+	    if (ed == null) throw new IllegalArgumentException("Edición inexistente: " + siglaEdicion);
+
+	    // --- 2) Resolver institución por nombre ---
+	    Institucion inst = logica.manejadores.ManejadorUsuario.getInstancia()
+	    		.findInstitucion(nombreInstitucion); 
+	    if (inst == null) throw new IllegalArgumentException("Institución inexistente: " + nombreInstitucion);
+
+	    // Resolver TipoRegistro dentro de la edición 
+	    TipoRegistro tipo = null;
+	    java.util.Collection<TipoRegistro> tipos = ed.getTiposRegistro();
+	    if (tipos != null) {
+	        for (TipoRegistro t : tipos) {
+	            if (t != null && nombreTipoRegistro.equals(t.getNombre())) {
+	                tipo = t;
+	                break;
+	            }
+	        }
+	    }
+	    if (tipo == null) throw new IllegalArgumentException("Tipo de registro inexistente: " + nombreTipoRegistro);
+
+	    // --- 4) (Opcional) Duplicados claros antes de delegar ---
+	    // Si tu altaPatrocinio original ya valida y lanza/gestiona duplicados, podés omitir este bloque.
+	    // Si querés ser explícito:
+	    for (logica.clases.Patrocinio p : ed.getPatrocinios()) {
+	        if (p == null) continue;
+	        if (codigoPatrocinio.equals(p.getCodigoPatrocinio())) {
+	            throw new excepciones.PatrocinioYaExisteException(inst.getNombre(), ed.getNombre());
+	        }
+	        if (p.getInstitucion() != null && p.getInstitucion().equals(inst)) {
+	            throw new excepciones.PatrocinioYaExisteException(inst.getNombre(), ed.getNombre());
+	        }
+	    }
+
+	    this.altaPatrocinio(ed, inst, nivel, tipo, aporte, fechaPatrocinio, cantidadRegistros, codigoPatrocinio);
+
+	    DTPatrocinio dto = this.obtenerDTPatrocinio(codigoPatrocinio);
+	    if (dto == null) {
+	        throw new IllegalStateException("Patrocinio creado pero no disponible para consulta (código: " + codigoPatrocinio + ")");
+	    }
+	    return dto;
+	}
+
+
 }

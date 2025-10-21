@@ -8,6 +8,7 @@ import excepciones.CupoTipoRegistroInvalidoException;
 import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.FechasCruzadasException;
+import excepciones.PatrocinioYaExisteException;
 import excepciones.TipoRegistroYaExisteException;
 import excepciones.ValorPatrocinioExcedidoException;
 import logica.clases.Ediciones;
@@ -18,6 +19,7 @@ import logica.clases.Usuario;
 import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
+import logica.datatypes.DTPatrocinio;
 import logica.datatypes.DTRegistro;
 import logica.datatypes.DTTipoRegistro;
 import logica.enumerados.DTNivel;
@@ -26,7 +28,6 @@ import logica.enumerados.DTNivel;
 public interface IControladorEvento {
 	public void altaEvento(String nombre, String desc, LocalDate fechaDeAlta, String sigla, DTCategorias categorias, String imagen) throws EventoYaExisteException;
 	public void altaTipoRegistro(Ediciones edicion, String nombre, String descripcion, float costo, int cupo) throws TipoRegistroYaExisteException, CupoTipoRegistroInvalidoException, CostoTipoRegistroInvalidoException;
-	public void altaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException;
 	public void altaCategoria(String nombre);
     public void altaEdicionEvento(Eventos evento, Usuario organizador, String nombre, String sigla, String desc, LocalDate fechaInicio, LocalDate fechaFin, LocalDate fechaAlta, String ciudad, String pais, String imagen)throws EdicionYaExisteException, EventoYaExisteException, FechasCruzadasException;
     public DTEdicion consultaEdicionEvento(String siglaEvento, String siglaEdicion);
@@ -82,4 +83,9 @@ public interface IControladorEvento {
     public DTTipoRegistro consultaTipoRegistro(String nombreEvento, String nombreEdicion, String nombreTipoRegistro);
     public DTEdicion obtenerEdicionPorSiglaDT(String sigla);
     public List<DTCategorias> listarDTCategorias();
+    List<DTTipoRegistro> listarTiposRegistroDeEdicion(String evento, String edicion);
+    DTPatrocinio altaPatrocinioDT(String siglaEdicion, String nombreInstitucion, DTNivel nivel, String nombreTipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException, PatrocinioYaExisteException, IllegalArgumentException;
+	public void altaPatrocinio(Ediciones edicion, Institucion institucion, DTNivel nivel, TipoRegistro tipoRegistro, int aporte, LocalDate fechaPatrocinio, int cantidadRegistros, String codigoPatrocinio) throws ValorPatrocinioExcedidoException;
+
 }
+

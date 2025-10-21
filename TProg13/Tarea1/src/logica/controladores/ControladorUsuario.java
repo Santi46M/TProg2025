@@ -12,6 +12,7 @@ import java.util.Set;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import logica.clases.Asistente;
 import logica.clases.Categoria;
@@ -389,4 +390,5 @@ manejador.addUsuario(nuevoUsuario);
         // Si llegó acá → es válido
         return true;
     }
+    
 	}
