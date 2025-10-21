@@ -125,7 +125,7 @@ class DTEventoTest {
 
         List<String> res = ev.getEdicionesAceptadas(List.of(
             ed("A", DTEstado.Aceptada),
-            ed("B", DTEstado.CREADA)
+            ed("B", DTEstado.Ingresada)
         ));
 
         assertTrue(res.isEmpty(), "No hay aceptadas cuyos nombres estén en this.ediciones");

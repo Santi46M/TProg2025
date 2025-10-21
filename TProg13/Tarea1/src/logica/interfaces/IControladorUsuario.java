@@ -26,6 +26,8 @@ public interface IControladorUsuario {
     
     // Crear institución
     public void altaInstitucion(String nombre, String descripcion, String link)throws InstitucionYaExisteException;
+    // Overload: allow optional imagen filename for institution logo
+    public void altaInstitucion(String nombre, String descripcion, String link, String imagen) throws InstitucionYaExisteException;
 
     // Listados
     public Map<String, Usuario> listarUsuarios();

@@ -14,6 +14,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import logica.clases.TipoRegistro;
+
 @DisplayName("ControladorEvento – Altas/Listados/Consultas (sin catch genéricos)")
 class ControladorEventoTest {
 
@@ -228,7 +230,7 @@ class ControladorEventoTest {
 
     @Test
     @DisplayName("altaRegistroEdicionEvento + consultaRegistro (camino feliz)")
-    void registroYConsultaRegistro() throws Exception {
+    void registroYConsultaRegistro() throws Throwable {
         altaCategoriaIdempotente(controladorEv, "Tec");
 
         Object cats = categoriasDTO("Tec");
@@ -268,7 +270,12 @@ class ControladorEventoTest {
         assertNotNull(dtr);
     }
 
-    @Test
+    private Object resolverTipoRegistro(Object edicion, String string) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Test
     @DisplayName("altaEdicionEvento inválida → debe lanzar IllegalArgumentException")
     void altaEdicionEventoFechasInvalidas() throws Throwable {
         Object cats = categoriasDTO("Tec");
@@ -314,7 +321,7 @@ class ControladorEventoTest {
 
     @Test
     @DisplayName("consultaRegistro: devuelve DTRegistro con datos consistentes (camino feliz)")
-    void consultaRegistro_detalleOk() throws Exception {
+    void consultaRegistro_detalleOk() throws Throwable {
         // 1) Alta evento + edición + tipo + asistente + registro
         Object cats = categoriasDTO("Tec");
         String ev = "Expo_" + System.nanoTime();
@@ -378,7 +385,7 @@ class ControladorEventoTest {
 
     @Test
     @DisplayName("consultaRegistro: si el usuario NO es Asistente → UsuarioNoEsAsistente")
-    void consultaRegistro_usuarioNoAsistente() throws Exception {
+    void consultaRegistro_usuarioNoAsistente() throws Throwable {
         // Preparamos un registro válido con una asistente
         Object cats = categoriasDTO("Tec");
         String ev = "Conf_" + System.nanoTime();

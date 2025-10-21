@@ -91,11 +91,28 @@ manejador.addUsuario(nuevoUsuario);
 
 
     public void altaInstitucion(String nombre, String descripcion, String link) throws InstitucionYaExisteException {
+        // Delegate to new overload without image
+        altaInstitucion(nombre, descripcion, link, null);
+    }
+    
+    // New overload that accepts an optional imagen filename
+    public void altaInstitucion(String nombre, String descripcion, String link, String imagen) throws InstitucionYaExisteException {
         if (manejador.findInstitucion(nombre) != null) {
             throw new InstitucionYaExisteException("La institución " + nombre + " ya existe");        
-            }
+        }
 
         Institucion nuevaInstitucion = new Institucion(nombre, descripcion, link);
+        if (imagen != null) {
+            imagen = imagen.trim();
+            if (imagen.isEmpty()) imagen = null;
+        }
+        if (imagen != null) {
+            // store only filename portion
+            imagen = imagen.replace("\\", "/");
+            int last = imagen.lastIndexOf('/');
+            if (last >= 0 && last < imagen.length() - 1) imagen = imagen.substring(last + 1);
+            nuevaInstitucion.setImagen(imagen);
+        }
         manejador.addInstitucion(nuevaInstitucion);
     }
 

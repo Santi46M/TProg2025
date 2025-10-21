@@ -15,10 +15,55 @@ final class TestUtils {
 
     /* ---------- Invocación flexible ---------- */
 
-    static Method findMethod(Object objeto, String... names) {
-        for (String name : names) {
-            for (Method method : objeto.getClass().getMethods()) {
+    /**
+     * Flexible finder that supports two common usages from tests:
+     *  - findMethod(target, "name1", "name2", ...)
+     *  - findMethod(target, "methodName", Class<?>... paramTypes) or
+     *    findMethod(target, "methodName", new Class<?>[0])
+     */
+    static Method findMethod(Object target, Object... namesOrTypes) {
+        if (target == null || namesOrTypes == null || namesOrTypes.length == 0) return null;
+
+        // Case A: (target, methodName, Class<?>... paramTypes) OR (target, methodName, Class<?>[])
+        if (namesOrTypes.length >= 2) {
+            // If the second argument is a Class array (common call: new Class<?>[0])
+            if (namesOrTypes[1] instanceof Class<?>[]) {
+                String name = String.valueOf(namesOrTypes[0]);
+                Class<?>[] params = (Class<?>[]) namesOrTypes[1];
+                try {
+                    Method m = target.getClass().getMethod(name, params);
+                    m.setAccessible(true);
+                    return m;
+                } catch (NoSuchMethodException e) {
+                    return null;
+                }
+            }
+
+            // Or if all remaining args are Class objects (varargs style)
+            boolean allClasses = true;
+            for (int i = 1; i < namesOrTypes.length; i++) {
+                if (!(namesOrTypes[i] instanceof Class<?>)) { allClasses = false; break; }
+            }
+            if (allClasses) {
+                String name = String.valueOf(namesOrTypes[0]);
+                Class<?>[] params = new Class<?>[namesOrTypes.length - 1];
+                for (int i = 1; i < namesOrTypes.length; i++) params[i - 1] = (Class<?>) namesOrTypes[i];
+                try {
+                    Method m = target.getClass().getMethod(name, params);
+                    m.setAccessible(true);
+                    return m;
+                } catch (NoSuchMethodException e) {
+                    return null;
+                }
+            }
+        }
+
+        // Case B: treat all arguments as alternative method NAMES (strings)
+        for (Object o : namesOrTypes) {
+            String name = String.valueOf(o);
+            for (Method method : target.getClass().getMethods()) {
                 if (method.getName().equals(name)) {
+                    method.setAccessible(true);
                     return method;
                 }
             }
@@ -131,7 +176,7 @@ final class TestUtils {
     }
 
     // Lanza la excepción original (sin envolver) para poder usar assertThrows con su tipo real.
-    static Object invokeUnwrapped(Object target, String[] names, Object... args) throws Throwable {
+    static Object invokeUnwrapped(Object target, String[] names, Object... args) throws Exception {
         Method method = findMethod(target, names);
         if (method == null) {
             String all = Arrays.stream(target.getClass().getMethods()).map(Method::getName).toList().toString();
@@ -139,17 +184,11 @@ final class TestUtils {
                                      " en " + target.getClass().getName() + ". Públicos: " + all);
         }
         try { return method.invoke(target, args); 
-        } catch (InvocationTargetException e) { throw e.getTargetException(); 
-        } catch (IllegalAccessException | IllegalArgumentException e) { throw e; }
-    }
-
-    static Method findMethod(Object target, String name, Class<?>... paramTypes) {
-        try {
-            Method method = target.getClass().getMethod(name, paramTypes);
-            method.setAccessible(true);
-            return method;
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
+        } catch (InvocationTargetException e) {
+            Throwable t = e.getTargetException();
+            if (t instanceof Exception) throw (Exception) t;
+            if (t instanceof Error) throw (Error) t;
+            throw new RuntimeException(t);
+        } catch (IllegalAccessException | IllegalArgumentException e) { throw new RuntimeException(e); }
     }
 }

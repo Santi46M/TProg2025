@@ -129,19 +129,32 @@
                 </p>
 
                 <p><strong>Institución:</strong>
-                  <span class="view-mode"><%= (usuario.getInstitucion() != null ? usuario.getInstitucion() : "—") %></span>
-                  <select class="edit-mode" name="institucion" style="display:none;">
-                    <option value="">— Seleccione —</option>
-                    <%
-                      Collection<String> instituciones = (Collection<String>) request.getAttribute("instituciones");
-                      if (instituciones != null) {
-                        for (String inst : instituciones) {
-                          String selected = (usuario.getInstitucion() != null && usuario.getInstitucion().equals(inst)) ? "selected" : "";
+                  <span class="view-mode">
+                    <% String instName = (usuario.getInstitucion() != null ? usuario.getInstitucion() : null);
+                       Map<String,String> instFotos = (Map<String,String>) request.getAttribute("instFotos");
+                       String instImg = (instFotos != null && instName != null) ? instFotos.get(instName) : null;
                     %>
-                        <option value="<%= inst %>" <%= selected %>><%= inst %></option>
-                    <% } } %>
-                  </select>
-                </p>
+                    <% if (instName == null) { %>
+                      —
+                    <% } else { %>
+                      <% if (instImg != null) { %>
+                        <img src="<%= instImg %>" alt="Logo <%= instName %>" style="width:48px;height:48px;object-fit:cover;border-radius:6px;margin-right:.5rem;vertical-align:middle;"> 
+                      <% } %>
+                      <span><%= instName %></span>
+                    <% } %>
+                  </span>
+                   <select class="edit-mode" name="institucion" style="display:none;">
+                     <option value="">— Seleccione —</option>
+                     <%
+                       Collection<String> instituciones = (Collection<String>) request.getAttribute("instituciones");
+                       if (instituciones != null) {
+                         for (String inst : instituciones) {
+                           String selected = (usuario.getInstitucion() != null && usuario.getInstitucion().equals(inst)) ? "selected" : "";
+                     %>
+                         <option value="<%= inst %>" <%= selected %>><%= inst %></option>
+                     <% } } %>
+                   </select>
+                 </p>
 
               <% } else { %>
                 <!-- 🔹 CAMPOS DE ORGANIZADOR -->

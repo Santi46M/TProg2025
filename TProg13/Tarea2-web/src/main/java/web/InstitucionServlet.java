@@ -82,14 +82,27 @@ public class InstitucionServlet extends HttpServlet {
                 return;
             }
             try {
-                // Alta de institución usando el controlador real
-                controladorUsuario.altaInstitucion(nombre, desc, web);
-                // Imagen solo se guarda en el filesystem, no en la lógica
+                // Alta de institución: llamamos de forma tolerante para mantener compatibilidad
+                try {
+                    java.lang.reflect.Method m4 = controladorUsuario.getClass().getMethod("altaInstitucion", String.class, String.class, String.class, String.class);
+                    m4.invoke(controladorUsuario, nombre, desc, web, imagenFileName);
+                } catch (NoSuchMethodException ns) {
+                    // Fallback a la firma antigua (sin imagen)
+                    java.lang.reflect.Method m3 = controladorUsuario.getClass().getMethod("altaInstitucion", String.class, String.class, String.class);
+                    m3.invoke(controladorUsuario, nombre, desc, web);
+                }
+                // Imagen ya fue guardada en filesystem bajo imagenFileName (si no es null)
                 resp.sendRedirect(ctx(req) + "/inicio");
                 return;
-            } catch (InstitucionYaExisteException e) {
-                req.setAttribute("error", "duplicado");
-                req.setAttribute("nombreInstitucionDuplicado", nombre);
+            } catch (java.lang.reflect.InvocationTargetException ite) {
+                Throwable t = ite.getTargetException();
+                if (t instanceof InstitucionYaExisteException) {
+                    req.setAttribute("error", "duplicado");
+                    req.setAttribute("nombreInstitucionDuplicado", nombre);
+                    req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+                    return;
+                }
+                req.setAttribute("error", "Error inesperado: " + t.getMessage());
                 req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                 return;
             } catch (Exception e) {

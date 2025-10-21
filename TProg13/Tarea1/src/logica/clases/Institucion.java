@@ -4,6 +4,7 @@ public class Institucion {
     private String nombre;
     private String descripcion;
     private String link;
+    private String imagen; // nombre de archivo relativo (p.ej. logo.png)
 
     public Institucion(String nombre, String descripcion, String link) {
         this.nombre = nombre;
@@ -33,5 +34,13 @@ public class Institucion {
 
     public void setLink(String link) {
         this.link = link;
+    }
+
+    public String getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(String imagen) {
+        this.imagen = imagen;
     }
 }

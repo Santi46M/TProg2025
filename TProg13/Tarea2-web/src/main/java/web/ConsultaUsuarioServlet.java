@@ -79,6 +79,10 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             request.setAttribute("fotos", fotos);
             request.setAttribute("nombres", nombres);
 
+
+            Map<String,String> instFotos = buildInstitutionImageMap(ctrlUsuario.getInstituciones(), request.getContextPath(), getServletContext());
+            request.setAttribute("instFotos", instFotos);
+
         } else {
             // === PERFIL INDIVIDUAL ===
             try {
@@ -115,6 +119,10 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
                 // Cargar instituciones para el dropdown
                 request.setAttribute("instituciones", ctrlUsuario.getInstituciones());
+
+                // Prepare institution images mapping (best-effort guess)
+                Map<String,String> instFotos = buildInstitutionImageMap(ctrlUsuario.getInstituciones(), request.getContextPath(), getServletContext());
+                request.setAttribute("instFotos", instFotos);
 
             } catch (UsuarioNoExisteException e) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -185,6 +193,36 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         } else {
             doGet(request, response);
         }
+    }
+
+    // Helper to guess institution image URLs by name and checking common locations
+    private Map<String,String> buildInstitutionImageMap(Set<String> instituciones, String ctx, ServletContext sc) {
+        Map<String,String> map = new HashMap<>();
+        if (instituciones == null || instituciones.isEmpty()) return map;
+        String[] exts = new String[]{".png",".jpg",".jpeg",".webp",".gif"};
+        for (String inst : instituciones) {
+            if (inst == null || inst.isBlank()) continue;
+            // Candidate filenames: sanitized name, original name, lowercase
+            String safe = inst.replaceAll("[^a-zA-Z0-9]", "_");
+            List<String> candidates = new ArrayList<>();
+            for (String ext: exts) {
+                candidates.add("/img/instituciones/" + safe + ext);
+                candidates.add("/img/instituciones/" + inst + ext);
+                candidates.add("/img/" + safe + ext);
+                candidates.add("/img/" + inst + ext);
+            }
+            // also try without extension
+            candidates.add("/img/instituciones/" + safe);
+            candidates.add("/img/instituciones/" + inst);
+            for (String candRel : candidates) {
+                Boolean ex = exists(sc, candRel);
+                if (Boolean.TRUE.equals(ex)) {
+                    map.put(inst, ctx + candRel);
+                    break;
+                }
+            }
+        }
+        return map;
     }
 
     // === Helpers ===
