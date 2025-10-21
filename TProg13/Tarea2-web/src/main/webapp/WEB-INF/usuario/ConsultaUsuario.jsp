@@ -137,10 +137,12 @@
                     <% if (instName == null) { %>
                       —
                     <% } else { %>
-                      <% if (instImg != null) { %>
-                        <img src="<%= instImg %>" alt="Logo <%= instName %>" style="width:48px;height:48px;object-fit:cover;border-radius:6px;margin-right:.5rem;vertical-align:middle;"> 
-                      <% } %>
-                      <span><%= instName %></span>
+                      <span style="display:inline-flex;align-items:center;gap:0.4em;">
+                        <% if (instImg != null) { %>
+                          <img src="<%= instImg %>" alt="Logo <%= instName %>" style="width:24px;height:24px;object-fit:cover;border-radius:4px;vertical-align:middle;" />
+                        <% } %>
+                        <span><%= instName %></span>
+                      </span>
                     <% } %>
                   </span>
                    <select class="edit-mode" name="institucion" style="display:none;">

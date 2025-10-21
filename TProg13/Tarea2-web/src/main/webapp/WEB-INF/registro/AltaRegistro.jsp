@@ -24,8 +24,8 @@
  <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
   <!-- Contenido principal -->
-  <main class="container">
-    <section class="form-card-altaTipoRegistro">
+  <main class="container" style="flex:2; min-width:0;">
+    <section class="form-card-altaEvento form-card--wide">
       <h2>Alta de Tipo de Registro</h2>
 
       <% if (request.getAttribute("error") != null) { %>

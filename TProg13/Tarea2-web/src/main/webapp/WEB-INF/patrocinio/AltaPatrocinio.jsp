@@ -30,27 +30,19 @@
   <link rel="stylesheet" href="<%= ctx %>/css/layoutMenu.css">
   <!-- Estilos específicos de esta vista -->
   <link rel="stylesheet" href="<%= ctx %>/css/AltaPatrocinio.css">
+  <link rel="stylesheet" href="<%= ctx %>/css/AltaEvento.css">
 </head>
 <body>
 
-  <!-- Header global -->
   <jsp:include page="/WEB-INF/templates/header.jsp" />
 
-  <!-- Contenedor centrado con padding para que el menú no quede “cortado” -->
-  <div class="page-wrapper">
-    <div class="layout-container">
-      <!-- Menú lateral -->
-      <jsp:include page="/WEB-INF/templates/menu.jsp" />
+  <div class="container row" style="margin-top:1rem;">
+    <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
-      <!-- Contenido principal -->
-      <main class="card main-card">
-        <h2 class="page-title">Alta de Patrocinio</h2>
-
-        <% if (error != null) { %>
-          <div class="alert-error"><%= error %></div>
-        <% } %>
-
-        <!-- Form SOLO para seleccionar Evento (auto-submit) -->
+    <main class="container" style="flex:2; min-width:0;">
+      <section class="form-card-altaEvento form-card--wide">
+        <h2 style="text-align:center;">Alta de Patrocinio</h2>
+        <!-- Selectores de evento y edición (dentro del card principal) -->
         <form method="get" action="<%= ctx %>/edicion/patrocinio/alta" class="inline-form">
           <div class="form-row">
             <label class="form-label">Evento</label>
@@ -65,7 +57,6 @@
           <noscript><button type="submit" class="btn">Continuar</button></noscript>
         </form>
 
-        <!-- Form SOLO para seleccionar Edición (auto-submit). Requiere evento seleccionado -->
         <form method="get" action="<%= ctx %>/edicion/patrocinio/alta" class="inline-form">
           <input type="hidden" name="evento" value="<%= eventoSel == null ? "" : eventoSel %>"/>
           <div class="form-row">
@@ -81,7 +72,9 @@
           <noscript><button type="submit" class="btn">Continuar</button></noscript>
         </form>
 
-        <!-- Form de ALTA: solo se muestra cuando ya hay evento+edición válidos -->
+        <% if (error != null) { %>
+          <div class="alert alert-error" style="margin-bottom:1rem;"><%= error %></div>
+        <% } %>
         <% if (eventoSel != null && !eventoSel.isEmpty() && edicionSel != null && !edicionSel.isEmpty()) { %>
         <form method="post" action="<%= ctx %>/edicion/patrocinio/alta" class="card form-card">
           <!-- Preservo selección -->
@@ -89,7 +82,7 @@
           <input type="hidden" name="edicion" value="<%= edicionSel %>"/>
 
           <div class="form-grid">
-            <div class="form-field">
+            <div class="form-group-altaEvento">
               <label class="form-label">Institución</label>
               <select name="institucion" required class="form-select">
                 <option value="" disabled selected>Seleccione...</option>
@@ -99,7 +92,7 @@
               </select>
             </div>
 
-            <div class="form-field">
+            <div class="form-group-altaEvento">
               <label class="form-label">Nivel</label>
               <select name="nivel" required class="form-select">
                 <option value="" disabled selected>Seleccione...</option>
@@ -109,7 +102,7 @@
               </select>
             </div>
 
-            <div class="form-field form-field--full">
+            <div class="form-group-altaEvento">
               <label class="form-label">Tipo de registro</label>
               <select name="tipoRegistro" required class="form-select">
                 <option value="" disabled selected>Seleccione...</option>
@@ -121,34 +114,35 @@
               </select>
             </div>
 
-            <div class="form-field">
+            <div class="form-group-altaEvento">
               <label class="form-label">Aporte (monto)</label>
               <input type="number" min="0" step="1" name="aporte" required class="form-input"/>
             </div>
 
-            <div class="form-field">
+            <div class="form-group-altaEvento">
               <label class="form-label">Fecha del patrocinio</label>
               <input type="date" name="fechaPatrocinio" required class="form-input"/>
             </div>
 
-            <div class="form-field">
+            <div class="form-group-altaEvento">
               <label class="form-label">Cant. registros gratuitos</label>
               <input type="number" min="0" step="1" name="cantidadRegistros" required class="form-input"/>
             </div>
 
-            <div class="form-field">
+            <div class="form-group-altaEvento">
               <label class="form-label">Código del patrocinio</label>
               <input type="text" name="codigoPatrocinio" maxlength="40" required class="form-input"/>
             </div>
           </div>
 
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Crear patrocinio</button>
+          <div class="form-actions-altaEvento actions">
+            <button type="submit" class="btn-guardar-altaEvento">Crear patrocinio</button>
           </div>
         </form>
         <% } %>
-      </main>
-    </div>
+      </section>
+    </main>
   </div>
+
 </body>
 </html>

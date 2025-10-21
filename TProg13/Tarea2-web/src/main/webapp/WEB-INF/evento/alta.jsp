@@ -11,12 +11,6 @@
   <link rel="stylesheet" href="<%=ctx%>/css/AltaEvento.css">
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
-  <style>
-    /* Centrado del contenido principal */
-    main.container { display: flex; justify-content: center; }
-    .form-card-altaEvento.form-card--wide { max-width: 880px; width: 100%; margin: 0 auto; }
-    .helper-note { color:#555; font-size:.9rem; }
-  </style>
 </head>
 <body>
 

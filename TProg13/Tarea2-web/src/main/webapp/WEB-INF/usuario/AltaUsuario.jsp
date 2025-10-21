@@ -26,9 +26,8 @@
 <body>
 
 <jsp:include page="/WEB-INF/templates/header.jsp" />
-<div class="container row layout-alta-usuario" style="display:flex; align-items:flex-start;">
+<div class="container row" style="display:flex; align-items:flex-start;">
   <jsp:include page="/WEB-INF/templates/menu.jsp" />
-  
   
   <main class="form-wrapper-alta-usuario" style="flex:2; min-width:0;">
     <h1 class="titulo-alta-usuario">Crear cuenta</h1>
