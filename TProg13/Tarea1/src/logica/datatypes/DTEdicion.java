@@ -15,6 +15,7 @@ public class DTEdicion {
     private String ciudad;
     private String pais;
     private String imagen;
+    private String video;
     private DTEstado estado;
     private List<DTTipoRegistro> tiposRegistro = new ArrayList<>();
     private List<DTPatrocinio> patrocinios = new ArrayList<>();
@@ -32,6 +33,7 @@ public class DTEdicion {
         this.ciudad = ciudad;
         this.pais = pais;
         this.imagen = imagen;
+        this.video = null;
         this.evento = evento;
     }
 
@@ -69,6 +71,8 @@ public class DTEdicion {
     public String getCiudad() { return ciudad; }
     public String getPais() { return pais; }
     public String getImagen() { return imagen; }
+    public String getVideo() { return video; }
+    public void setVideo(String video) { this.video = video; }
     public DTEstado getEstado() { return estado; }
     public DTEvento getEvento() { return evento; }
 

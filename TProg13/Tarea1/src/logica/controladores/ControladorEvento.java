@@ -149,7 +149,7 @@ public class ControladorEvento implements IControladorEvento {
         if (evento == null) return null;
         Ediciones edicion = evento.obtenerEdicion(siglaEdicion);
         if (edicion == null || edicion.getEstado() == DTEstado.Ingresada || edicion.getEstado() == DTEstado.Rechazada) return null;
-        return new DTEdicion(
+        DTEdicion dto = new DTEdicion(
             edicion.getNombre(),
             edicion.getSigla(),
             edicion.getFechaInicio(),
@@ -162,6 +162,8 @@ public class ControladorEvento implements IControladorEvento {
             edicion.getEstado(),
             dtEvento
         );
+        dto.setVideo(edicion.getVideo());
+        return dto;
     }
     
     public List<DTEvento> listarEventosPorCategoria(String categoriaBuscada) {
@@ -410,7 +412,7 @@ asist.addRegistro(idRegistro, nuevoRegistro);
         Ediciones edicionIter = manejador.obtenerEdicion(edicionSeleccionadaSigla);
         if (edicionIter == null) return null;
         DTEvento dtEvento = consultaDTEvento(edicionIter.getEvento().getNombre());
-        return new DTEdicion(
+        DTEdicion dto = new DTEdicion(
             edicionIter.getNombre(),
             edicionIter.getSigla(),
             edicionIter.getFechaInicio(),
@@ -418,10 +420,12 @@ asist.addRegistro(idRegistro, nuevoRegistro);
             edicionIter.getFechaAlta(),
             edicionIter.getOrganizador() != null ? edicionIter.getOrganizador().getNickname() : null,
             edicionIter.getCiudad(),
-            edicionIter.getImagen(),
             edicionIter.getPais(),
+            edicionIter.getImagen(),
             dtEvento
         );
+        dto.setVideo(edicionIter.getVideo());
+        return dto;
     }
 
     @Override
@@ -466,7 +470,7 @@ asist.addRegistro(idRegistro, nuevoRegistro);
             ));
         }
 
-        return new DTEdicion(
+        DTEdicion dto = new DTEdicion(
             edicion.getNombre(),
             edicion.getSigla(),
             edicion.getFechaInicio(),
@@ -482,6 +486,8 @@ asist.addRegistro(idRegistro, nuevoRegistro);
             registrosDTO,
             dtEvento
         );
+        dto.setVideo(edicion.getVideo());
+        return dto;
     }
 
 
@@ -643,7 +649,8 @@ asist.addRegistro(idRegistro, nuevoRegistro);
             java.time.LocalDate fechaAlta,
             String ciudad,
             String pais,
-            String imagen
+            String imagen,
+            String video
     ) throws excepciones.EdicionYaExisteException,
              excepciones.EventoYaExisteException,
              excepciones.FechasCruzadasException {
@@ -672,18 +679,18 @@ asist.addRegistro(idRegistro, nuevoRegistro);
         if (manejador.existeEvento(evento.getNombre())) {
             if (!manejador.existeEdicion(nombre)) {
                 logica.clases.Ediciones nuevaEdicion =
-                    new logica.clases.Ediciones(evento, nombre, sigla, fechaInicio, fechaFin, fechaAlta, usuario, ciudad, pais, imagen);
+                    new logica.clases.Ediciones(evento, nombre, sigla, fechaInicio, fechaFin, fechaAlta, usuario, ciudad, pais, imagen, video);
 
-                evento.agregarEdicion(nuevaEdicion);
-                manejador.agregarEdicion(nuevaEdicion);
-                mUsuario.findOrganizador(usuario.getNickname()).agregarEdicion(nuevaEdicion);
-            } else {
-                throw new excepciones.EdicionYaExisteException("El nombre de la edición " + nombre + " ya está en uso.");
-            }
-        } else {
-            // Mantengo tu else tal cual
-            throw new excepciones.EventoYaExisteException(evento.getNombre());
-        }
+                 evento.agregarEdicion(nuevaEdicion);
+                 manejador.agregarEdicion(nuevaEdicion);
+                 mUsuario.findOrganizador(usuario.getNickname()).agregarEdicion(nuevaEdicion);
+             } else {
+                 throw new excepciones.EdicionYaExisteException("El nombre de la edición " + nombre + " ya está en uso.");
+             }
+         } else {
+             // Mantengo tu else tal cual
+             throw new excepciones.EventoYaExisteException(evento.getNombre());
+         }
     }
 
     @Override

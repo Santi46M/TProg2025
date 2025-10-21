@@ -74,7 +74,8 @@ public interface IControladorEvento {
             java.time.LocalDate fechaAlta,
             String ciudad,
             String pais,
-            String imagen
+            String imagen,
+            String video
     ) throws excepciones.EdicionYaExisteException,
          excepciones.EventoYaExisteException,
          excepciones.FechasCruzadasException;

@@ -18,6 +18,9 @@ public class DTDatosUsuario {
 
     // NUEVO: imagen del usuario
     private String imagen;
+    // NUEVO: seguidores y seguidos (nicknames)
+    private Set<String> seguidores;
+    private Set<String> seguidos;
 
     // Constructor básico para todos
     public DTDatosUsuario(String nickname, String nombre, String email) {
@@ -27,6 +30,8 @@ public class DTDatosUsuario {
         this.registros = new HashSet<>();
         this.ediciones = new HashSet<>();
         this.imagen = null; // por defecto
+        this.seguidores = new HashSet<>();
+        this.seguidos = new HashSet<>();
     }
     
     // Constructor conveniente con imagen (opcional)
@@ -49,6 +54,12 @@ public class DTDatosUsuario {
 
     // NUEVO: getter de imagen
     public String getImagen() { return imagen; }
+
+    // NUEVO: seguidores/seguidos
+    public Set<String> getSeguidores() { return seguidores; }
+    public Set<String> getSeguidos() { return seguidos; }
+    public void setSeguidores(Set<String> s) { this.seguidores = s == null ? new HashSet<>() : s; }
+    public void setSeguidos(Set<String> s) { this.seguidos = s == null ? new HashSet<>() : s; }
 
     // --- Setters opcionales ---
     public void setApellido(String apellido) { this.apellido = apellido; }

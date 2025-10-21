@@ -1,4 +1,4 @@
- package web;
+package web;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -153,6 +153,7 @@ public class EdicionServlet extends HttpServlet {
       String finStr = trim(req.getParameter("fechaFin"));
       String ciudad = trim(req.getParameter("ciudad"));
       String pais   = trim(req.getParameter("pais"));
+      String videoUrl = trim(req.getParameter("videoUrl"));
 
       Part imagen = null;
       try { imagen = req.getPart("imagen"); } catch (Exception ignore) {}
@@ -225,12 +226,13 @@ public class EdicionServlet extends HttpServlet {
 
         DTEvento evObj = ce().consultaDTEvento(evento);
 
+        // Call controller API with video URL (logic module updated to accept video param)
         ce().altaEdicionEventoDTO(evObj, org, nombre, nombre, desc, ini, fin,
-                               LocalDate.now(), ciudad, pais, imagenFileName);
+                                   LocalDate.now(), ciudad, pais, imagenFileName, videoUrl);
 
-        String evEnc = URLEncoder.encode(evento, StandardCharsets.UTF_8);
-        String edEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8);
-        resp.sendRedirect(ctx(req) + "/edicion/ConsultaEdicion?evento=" + evEnc + "&edicion=" + edEnc);
+         String evEnc = URLEncoder.encode(evento, StandardCharsets.UTF_8);
+         String edEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8);
+         resp.sendRedirect(ctx(req) + "/edicion/ConsultaEdicion?evento=" + evEnc + "&edicion=" + edEnc);
 
       } catch (EdicionYaExisteException | EventoYaExisteException | FechasCruzadasException ex) {
         req.setAttribute("error", ex.getMessage());

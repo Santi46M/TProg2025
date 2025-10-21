@@ -101,6 +101,12 @@
           <small class="helper-note">Formatos sugeridos: JPG/PNG. Tamaño máx. 2&nbsp;MB.</small>
         </div>
 
+        <div class="form-group-altaEvento">
+          <label for="videoUrl">Video (URL opcional)</label>
+          <input type="url" id="videoUrl" name="videoUrl" placeholder="https://..." pattern="https?://.+" title="Ingrese una URL válida (empieza con http:// o https://)">
+          <small class="helper-note">Pegá la URL del video (YouTube, Vimeo, etc.). No es obligatoria.</small>
+        </div>
+
         <p class="form-hint-altaEvento">Los campos marcados con <span class="req">*</span> son obligatorios.</p>
 
         <div class="form-actions-altaEvento">
@@ -127,6 +133,17 @@
             if (file && file.size > MAX_BYTES) {
               alert('La imagen supera 2 MB. Elegí un archivo más liviano.');
               this.value = '';
+            }
+          });
+
+          // validación básica de URL de video (opcional)
+          const videoInput = document.getElementById('videoUrl');
+          form.addEventListener('submit', function (e) {
+            const val = videoInput && videoInput.value && videoInput.value.trim();
+            if (val && !/^https?:\/\/.+/i.test(val)) {
+              e.preventDefault();
+              alert('La URL del video no es válida. Debe comenzar con http:// o https://');
+              videoInput.focus();
             }
           });
         })();

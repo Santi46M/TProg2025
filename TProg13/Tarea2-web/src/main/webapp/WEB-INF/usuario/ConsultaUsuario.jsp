@@ -12,10 +12,19 @@
 
   Map<String,String> fotos = (Map<String,String>) request.getAttribute("fotos");
   String usrImagenUrl = (String) request.getAttribute("usrImagenUrl");
+
+  // Rol real del perfil consultado (lo setea el servlet)
   Boolean esPerfilOrganizadorAttr = (Boolean) request.getAttribute("esPerfilOrganizador");
   boolean esPerfilOrganizador = (esPerfilOrganizadorAttr != null)
       ? esPerfilOrganizadorAttr.booleanValue()
       : (usuario != null && (usuario.getDesc() != null || usuario.getLink() != null));
+
+  // follow flags
+  Boolean esSuPropioPerfilAttr = (Boolean) request.getAttribute("esSuPropioPerfil");
+  boolean esSuPropioPerfil = (esSuPropioPerfilAttr != null) ? esSuPropioPerfilAttr.booleanValue()
+                        : (usuario != null && nickSesion != null && nickSesion.equals(usuario.getNickname()));
+  Boolean yaLoSigoAttr = (Boolean) request.getAttribute("yaLoSigo");
+  boolean yaLoSigo = (yaLoSigoAttr != null) ? yaLoSigoAttr.booleanValue() : false;
 %>
 
 <!DOCTYPE html>
@@ -38,6 +47,8 @@
       padding:6px; box-sizing:border-box; margin-bottom:.25rem;
     }
     .perfil-header .no-avatar { width:96px; height:96px; font-size:.82rem; padding:8px; margin:0; }
+    .follow-bar { display:flex; align-items:center; gap:.75rem; margin:.5rem 0; }
+    .btn-link { background:none; border:none; color:#007bff; text-decoration:underline; cursor:pointer; padding:0; }
     .hint { font-size:.85rem; color:#6b7280; }
   </style>
 </head>
@@ -78,7 +89,7 @@
               <h3>
                 <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
                   <input type="hidden" name="nick" value="<%=u.getNickname()%>" />
-                  <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;display:flex;align-items:center;font-size:1.1em;font-weight:600;">
+                  <button type="submit" class="btn-link">
                     <i class='bx bxs-id-card' style="font-size:1.2em;margin-right:0.3em;"></i>
                     <span><%=u.getNickname()%></span>
                   </button>
@@ -95,22 +106,32 @@
         ============================ -->
         <h1>Perfil de <%= usuario.getNickname() %></h1>
 
-        <div class="perfil-header">
-          <% if (usrImagenUrl != null && !usrImagenUrl.isBlank()) { %>
-            <img class="avatar" src="<%= usrImagenUrl %>" alt="Avatar de <%= usuario.getNickname() %>">
-          <% } else { %>
-            <div class="no-avatar" aria-label="Sin imagen">sin imagen</div>
-          <% } %>
+<div class="perfil-header">
+  <% if (usrImagenUrl != null && !usrImagenUrl.isBlank()) { %>
+    <img class="avatar" src="<%= usrImagenUrl %>" alt="Avatar de <%= usuario.getNickname() %>">
+  <% } else { %>
+    <div class="no-avatar" aria-label="Sin imagen">sin imagen</div>
+  <% } %>
 
-          <div id="datosUsuario">
-            <!-- IMPORTANTE: enctype para permitir subir imagen -->
-            <form id="formEditarUsuario" action="<%= ctx %>/usuario/modificar" method="post" enctype="multipart/form-data">
-              <input type="hidden" name="nick" value="<%= usuario.getNickname() %>">
+  <div id="datosUsuario">
+    <p><strong>Nickname:</strong> <span><%= usuario.getNickname() %></span></p>
+    <p><strong>Email:</strong> <span><%= usuario.getEmail()%></span></p>
 
-              <p><strong>Nickname:</strong> <span><%= usuario.getNickname() %></span></p>
-              <p><strong>Email:</strong> <span><%= usuario.getEmail()%></span></p>
+    <!-- === BARRA SEGUIR / DEJAR SEGUIR (FORM SEPARADO, NO ANIDADO) === -->
+    <div class="follow-bar" style="margin:.5rem 0;">
+      <% if (!esSuPropioPerfil && nickSesion != null) { %>
+        <form action="<%= ctx %>/<%= (!yaLoSigo ? "usuario/seguir" : "usuario/dejarSeguir") %>" method="post" style="display:inline;">
+          <input type="hidden" name="a" value="<%= usuario.getNickname() %>">
+          <button type="submit" class="btn"><%= (!yaLoSigo ? "Seguir" : "Dejar de seguir") %></button>
+        </form>
+      <% } %>
+    </div>
 
-              <!-- Campo de imagen (solo visible en modo edición) -->
+    <!-- === FORM DE EDICIÓN (SEPARADO) === -->
+    <form id="formEditarUsuario" action="<%= ctx %>/usuario/modificar" method="post" enctype="multipart/form-data">
+      <input type="hidden" name="nick" value="<%= usuario.getNickname() %>">
+
+              <!-- Campo de imagen (en edición) -->
               <div class="edit-mode" style="display:none; margin:.25rem 0;">
                 <label for="imagen"><strong>Foto:</strong></label>
                 <input type="file" id="imagen" name="imagen" accept="image/*">
@@ -179,8 +200,8 @@
                 </p>
               <% } %>
 
-              <% boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname()); %>
-              <% if (esSuPropioPerfil) { %>
+              <% boolean esSuPropioPerfil2 = esSuPropioPerfil; %>
+              <% if (esSuPropioPerfil2) { %>
                 <p><strong>Contraseña:</strong>
                   <span class="view-mode">••••••••</span>
                   <input class="edit-mode" type="password" name="password" placeholder="Nueva contraseña" style="display:none;">
@@ -214,7 +235,7 @@
                 <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
                   <input type="hidden" name="evento" value="<%= eventoNombre %>" />
                   <input type="hidden" name="edicion" value="<%= e.getNombre() %>" />
-                  <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;">
+                  <button type="submit" class="btn-link">
                     <strong><%= e.getNombre() %></strong>
                   </button>
                 </form>
@@ -235,7 +256,7 @@
                 <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
                   <input type="hidden" name="evento" value="<%= eventoNombre %>" />
                   <input type="hidden" name="edicion" value="<%= r.getEdicion() %>" />
-                  <button type="submit" class="link-btn" style="background:none;border:none;padding:0;color:#007bff;text-decoration:underline;cursor:pointer;">
+                  <button type="submit" class="btn-link">
                     <strong><%= r.getEdicion() %></strong>
                   </button>
                 </form>
@@ -271,7 +292,6 @@
         btnEditar.style.display = "inline";
         btnGuardar.style.display = "none";
         btnCancelar.style.display = "none";
-        // limpiar file input si se canceló
         const fi = document.getElementById("imagen");
         if (fi) fi.value = "";
       });

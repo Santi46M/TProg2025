@@ -1,15 +1,15 @@
 package web;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.*;
-import java.time.LocalDate;
-import java.util.*;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
+import java.util.*;
 
 import logica.fabrica;
 import logica.datatypes.DTDatosUsuario;
@@ -19,13 +19,21 @@ import logica.interfaces.IControladorEvento;
 import excepciones.UsuarioNoExisteException;
 import excepciones.UsuarioTipoIncorrectoException;
 
-@WebServlet(urlPatterns = {"/usuario/ConsultaUsuario", "/usuario/modificar"})
+@WebServlet(urlPatterns = {
+        "/usuario/ConsultaUsuario",
+        "/usuario/modificar",
+        "/usuario/seguir",
+        "/usuario/dejarSeguir"
+})
 @MultipartConfig(
     fileSizeThreshold = 256 * 1024,
     maxFileSize       = 5L * 1024 * 1024,
     maxRequestSize    = 10L * 1024 * 1024
 )
 public class ConsultaUsuarioServlet extends HttpServlet {
+
+    private IControladorUsuario cu() { return fabrica.getInstance().getIControladorUsuario(); }
+    private IControladorEvento  ce() { return fabrica.getInstance().getIControladorEvento(); }
 
     // =====================================================
     // GET → Consulta de usuario o listado
@@ -50,7 +58,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             }
         }
 
-        IControladorUsuario ctrlUsuario = fabrica.getInstance().getIControladorUsuario();
+        IControladorUsuario ctrlUsuario = cu();
 
         if (forzarListado || isBlank(nick)) {
             // === LISTA DE USUARIOS ===
@@ -59,7 +67,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             try {
                 usuariosSet = ctrlUsuario.obtenerUsuariosDT();
             } catch (UsuarioNoExisteException e) {
-                e.printStackTrace(); // solo debug
+                e.printStackTrace();
                 request.setAttribute("error", "No se pudo obtener la lista de usuarios.");
             }
 
@@ -74,6 +82,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
             for (DTDatosUsuario u : usuarios) {
                 if (u == null) continue;
+
                 String nombreSeguro = nvl(u.getNombre(), u.getNickname());
                 nombres.put(u.getNickname(), nombreSeguro);
 
@@ -84,9 +93,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             request.setAttribute("fotos", fotos);
             request.setAttribute("nombres", nombres);
 
-            Map<String,String> instFotos = buildInstitutionImageMap(
-                ctrlUsuario.getInstituciones(), request.getContextPath(), getServletContext()
-            );
+            Map<String,String> instFotos = buildInstitutionImageMap(ctrlUsuario.getInstituciones(), request.getContextPath(), getServletContext());
             request.setAttribute("instFotos", instFotos);
 
         } else {
@@ -96,8 +103,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 request.setAttribute("usuario", usuario);
                 request.setAttribute("usuarioNombreSeguro",
                         nvl(usuario.getNombre(), usuario.getNickname()));
-                boolean esPerfilOrganizador = (usuario.getDesc() != null) || (usuario.getLink() != null);
-                request.setAttribute("esPerfilOrganizador", esPerfilOrganizador);
+
                 // foto
                 String url = resolveUserImageUrl(
                         usuario.getImagen(),
@@ -107,10 +113,8 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 if (url != null) request.setAttribute("usrImagenUrl", url);
 
                 // mapa edicion -> evento
-                IControladorEvento ctrlEvento = fabrica.getInstance().getIControladorEvento();
-                List<DTEvento> eventos = ctrlEvento.listarEventos();
+                List<DTEvento> eventos = ce().listarEventos();
                 Map<String, String> edicionToEvento = new HashMap<>();
-
                 if (eventos != null) {
                     for (DTEvento ev : eventos) {
                         if (ev == null || ev.getEdiciones() == null) continue;
@@ -123,14 +127,29 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 }
                 request.setAttribute("edicionToEvento", edicionToEvento);
 
-                // instituciones para dropdown
+                // instituciones para el dropdown
                 request.setAttribute("instituciones", ctrlUsuario.getInstituciones());
 
-                // imágenes de instituciones
-                Map<String,String> instFotos = buildInstitutionImageMap(
-                    ctrlUsuario.getInstituciones(), request.getContextPath(), getServletContext()
-                );
+                // imágenes instituciones
+                Map<String,String> instFotos = buildInstitutionImageMap(ctrlUsuario.getInstituciones(), request.getContextPath(), getServletContext());
                 request.setAttribute("instFotos", instFotos);
+
+                // === Rol real del perfil consultado (organizador/asistente)
+                boolean esPerfilOrganizador = (usuario.getDesc() != null) || (usuario.getLink() != null);
+                request.setAttribute("esPerfilOrganizador", esPerfilOrganizador);
+
+                // === Follow/unfollow flags
+                String nickSesion = nickEnSesion(request);
+                boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname());
+                request.setAttribute("esSuPropioPerfil", esSuPropioPerfil);
+
+                boolean yaLoSigo = false;
+                if (!esSuPropioPerfil && nickSesion != null) {
+                    try {
+                        yaLoSigo = ctrlUsuario.sigueA(nickSesion, usuario.getNickname()); // implementar en lógica
+                    } catch (Exception ignore) {}
+                }
+                request.setAttribute("yaLoSigo", yaLoSigo);
 
             } catch (UsuarioNoExisteException e) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -143,7 +162,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
     }
 
     // =====================================================
-    // POST → Modificación de usuario (incluye imagen)
+    // POST → Modificación de usuario / seguir / dejar de seguir
     // =====================================================
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -151,9 +170,10 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
         String path = request.getServletPath();
-        IControladorUsuario ctrlUsuario = fabrica.getInstance().getIControladorUsuario();
 
         if ("/usuario/modificar".equals(path)) {
+            // === Tu lógica de modificar (con imagen) ya implementada previamente ===
+            IControladorUsuario ctrlUsuario = cu();
 
             HttpSession sAux = request.getSession(false);
             String nick = (sAux != null) ? (String) sAux.getAttribute("nick") : null;
@@ -163,89 +183,112 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 return;
             }
 
-            // Parámetros de texto
+            // Texto
             String nombre      = request.getParameter("nombre");
             String apellido    = request.getParameter("apellido");
-            String email       = request.getParameter("email");
             String institucion = request.getParameter("institucion");
             String descripcion = request.getParameter("descripcion");
-            String nacStr      = request.getParameter("fechaNac");
             String password    = request.getParameter("password");
             String link        = request.getParameter("link");
+            String nacStr      = request.getParameter("fechaNac");
 
             LocalDate fechaNac = null;
             if (nacStr != null && !nacStr.isBlank()) {
                 try { fechaNac = LocalDate.parse(nacStr); } catch (Exception ignored) {}
             }
 
-            // Archivo (imagen)
+            // Imagen opcional
             String imagenRelGuardada = null;
             Part imagenPart = null;
             try { imagenPart = request.getPart("imagen"); } catch (IllegalStateException ise) { /* > max size */ }
 
             if (imagenPart != null && imagenPart.getSize() > 0) {
-                String contentType = imagenPart.getContentType(); // image/png, etc.
-                if (contentType == null || !contentType.toLowerCase(Locale.ROOT).startsWith("image/")) {
-                    request.setAttribute("error", "El archivo de imagen no es válido (solo imágenes).");
-                    doGet(request, response);
-                    return;
+                String contentType = imagenPart.getContentType();
+                if (contentType != null && contentType.toLowerCase(Locale.ROOT).startsWith("image/")) {
+                    String ext = guessExt(contentType);
+                    if (ext == null) ext = ".png";
+                    String base = nick.replaceAll("[^a-zA-Z0-9_-]", "_");
+                    String fileName = base + "_" + System.currentTimeMillis() + ext;
+
+                    ServletContext sc = getServletContext();
+                    String relDir = "/img/usuarios";
+                    String absDir = sc.getRealPath(relDir);
+                    if (absDir == null) {
+                        relDir = "/img";
+                        absDir = sc.getRealPath(relDir);
+                    }
+                    if (absDir != null) {
+                        Path dir = Path.of(absDir);
+                        try { Files.createDirectories(dir); } catch (Exception ignored) {}
+                        Path destino = dir.resolve(fileName);
+                        try (var in = imagenPart.getInputStream()) {
+                            Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                        }
+                        imagenRelGuardada = relDir + "/" + fileName;
+                    }
                 }
-
-                String ext = guessExt(contentType);
-                if (ext == null) ext = ".png";
-
-                String base = nick.replaceAll("[^a-zA-Z0-9_-]", "_");
-                String fileName = base + "_" + System.currentTimeMillis() + ext;
-
-                ServletContext sc = getServletContext();
-                String relDir = "/img/usuarios";
-                String absDir = sc.getRealPath(relDir);
-                if (absDir == null) {
-                    // fallback: carpeta /img
-                    relDir = "/img";
-                    absDir = sc.getRealPath(relDir);
-                }
-                if (absDir == null) {
-                    request.setAttribute("error", "No se pudo guardar la imagen (ruta no resuelta).");
-                    doGet(request, response);
-                    return;
-                }
-
-                Path dir = Path.of(absDir);
-                try { Files.createDirectories(dir); } catch (Exception ignored) {}
-
-                Path destino = dir.resolve(fileName);
-                try (InputStream in = imagenPart.getInputStream()) {
-                    Files.copy(in, destino, StandardCopyOption.REPLACE_EXISTING);
-                }
-                imagenRelGuardada = relDir + "/" + fileName; // lo que guardamos en el modelo
             }
 
             try {
-                // Actualizar datos + IMAGEN (nueva sobrecarga)
+                // Nueva sobrecarga con imagen
                 ctrlUsuario.modificarDatosUsuario(
                         nick, nombre, descripcion, link, apellido, fechaNac, institucion, imagenRelGuardada
                 );
-
-                // Contraseña por su método específico (¡no tocamos esto!)
                 if (password != null && !password.isBlank()) {
                     ctrlUsuario.modificarContrasenia(nick, password);
                 }
 
-                // Redirigir al perfil actualizado
                 response.sendRedirect(request.getContextPath() + "/usuario/ConsultaUsuario?nick=" +
-                        java.net.URLEncoder.encode(nick, java.nio.charset.StandardCharsets.UTF_8));
+                        enc(nick));
+                return;
 
             } catch (UsuarioNoExisteException | UsuarioTipoIncorrectoException e) {
                 request.setAttribute("error", e.getMessage());
-                doGet(request, response); // recargar vista con error
+                doGet(request, response);
+                return;
             }
-        } else {
-            doGet(request, response);
         }
+
+        // === Seguir / Dejar de seguir (SIN AJAX) ===
+        if ("/usuario/seguir".equals(path) || "/usuario/dejarSeguir".equals(path)) {
+            IControladorUsuario ctrlUsuario = cu();
+
+            String nickSesion = nickEnSesion(request);
+            if (nickSesion == null || nickSesion.isBlank()) {
+                response.sendRedirect(request.getContextPath() + "/auth/login");
+                return;
+            }
+
+            String objetivo = trim(request.getParameter("a")); // nick del perfil objetivo
+            if (isBlank(objetivo)) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Falta parámetro 'a'.");
+                return;
+            }
+
+            if (!nickSesion.equalsIgnoreCase(objetivo)) {
+                try {
+                    if ("/usuario/seguir".equals(path)) {
+                        ctrlUsuario.seguirUsuario(nickSesion, objetivo);       // implementar
+                    } else {
+                        ctrlUsuario.dejarSeguirUsuario(nickSesion, objetivo);  // implementar
+                    }
+                } catch (Exception ignore) {}
+            }
+
+            response.sendRedirect(request.getContextPath() + "/usuario/ConsultaUsuario?nick=" + enc(objetivo));
+            return;
+        }
+
+        // fallback
+        doGet(request, response);
     }
 
-    // ==== Helpers auxiliares (sin cambios relevantes) ====
+    // ==== Helpers ====
+
+    private String nickEnSesion(HttpServletRequest req) {
+        HttpSession sAux = req.getSession(false);
+        return sAux == null ? null : (String) sAux.getAttribute("nick");
+    }
 
     private Map<String,String> buildInstitutionImageMap(Set<String> instituciones, String ctx, ServletContext sc) {
         Map<String,String> map = new HashMap<>();
@@ -321,5 +364,9 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         if (ct.contains("webp")) return ".webp";
         if (ct.contains("gif")) return ".gif";
         return null;
+    }
+
+    private static String enc(String s) {
+        return java.net.URLEncoder.encode(s, java.nio.charset.StandardCharsets.UTF_8);
     }
 }
