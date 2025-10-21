@@ -27,6 +27,11 @@ String ctx = request.getContextPath();
         </form>
       </li>
       <li>
+        <form action="<%=ctx%>/institucion/alta" method="get" style="display:inline">
+          <button type="submit" class="linklike">Crear Institución</button>
+        </form>
+      </li>
+      <li>
         <form action="<%=ctx%>/edicion/alta" method="get" style="display:inline">
           <button type="submit" class="linklike">Crear Edición de Evento</button>
         </form>
