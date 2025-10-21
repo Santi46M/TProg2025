@@ -39,6 +39,11 @@
         </form>
       </li>
       <li>
+        <form action="<%=ctx%>/institucion/alta" method="get" style="display:inline">
+          <button type="submit" class="linklike">Crear Institución</button>
+        </form>
+      </li>
+      <li>
         <!-- NUEVO: un botón simple que abre la pantalla de Alta Patrocinio -->
         <form action="<%=ctx%>/edicion/patrocinio/alta" method="get" style="display:inline">
           <button type="submit" class="linklike">Crear Patrocinio</button>
