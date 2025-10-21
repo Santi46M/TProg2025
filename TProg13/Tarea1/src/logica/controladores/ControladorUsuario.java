@@ -201,7 +201,17 @@ manejador.addUsuario(nuevoUsuario);
         }
         dto.setImagen(img);
 
-        if (user instanceof Asistente) {
+        // populate seguidores/seguidos into DTO
+        try {
+            dto.setSeguidores(new java.util.HashSet<>(user.getSeguidores()));
+            dto.setSeguidos(new java.util.HashSet<>(user.getSeguidos()));
+        } catch (Exception ignored) {
+            // in case user's follower sets are not initialized
+            dto.setSeguidores(new java.util.HashSet<>());
+            dto.setSeguidos(new java.util.HashSet<>());
+        }
+
+         if (user instanceof Asistente) {
             Asistente asisUser = (Asistente) user;
             dto.setApellido(asisUser.getApellido());
             dto.setFechaNac(asisUser.getFechaDeNacimiento());
@@ -421,4 +431,52 @@ manejador.addUsuario(nuevoUsuario);
         // Si llegó acá → es válido
         return true;
     }
-	}
+	
+	// --- Seguimiento entre usuarios ---
+    @Override
+    public boolean sigueA(String seguidor, String seguido) {
+        if (seguidor == null || seguido == null) return false;
+        Usuario u = manejador.findUsuario(seguidor);
+        if (u == null) return false;
+        return u.sigueA(seguido);
+    }
+
+    @Override
+    public void seguirUsuario(String seguidor, String seguido) {
+        if (seguidor == null || seguido == null) throw new IllegalArgumentException("Nick inválido");
+        if (seguidor.equals(seguido)) return; // no follow self
+        Usuario s = manejador.findUsuario(seguidor);
+        Usuario t = manejador.findUsuario(seguido);
+        if (s == null || t == null) throw new IllegalArgumentException("Usuario inexistente");
+        if (s.sigueA(seguido)) return; // ya sigue
+        s.addSeguido(seguido);
+        t.addSeguidor(seguidor);
+    }
+
+    @Override
+    public void dejarSeguirUsuario(String seguidor, String seguido) {
+        if (seguidor == null || seguido == null) throw new IllegalArgumentException("Nick inválido");
+        Usuario s = manejador.findUsuario(seguidor);
+        Usuario t = manejador.findUsuario(seguido);
+        if (s == null || t == null) throw new IllegalArgumentException("Usuario inexistente");
+        if (!s.sigueA(seguido)) return;
+        s.removeSeguido(seguido);
+        t.removeSeguidor(seguidor);
+    }
+
+    @Override
+    public int contarSeguidores(String nick) {
+        if (nick == null) return 0;
+        Usuario u = manejador.findUsuario(nick);
+        if (u == null) return 0;
+        return u.contarSeguidores();
+    }
+
+    @Override
+    public int contarSeguidos(String nick) {
+        if (nick == null) return 0;
+        Usuario u = manejador.findUsuario(nick);
+        if (u == null) return 0;
+        return u.contarSeguidos();
+    }
+}

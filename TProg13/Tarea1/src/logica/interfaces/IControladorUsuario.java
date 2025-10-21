@@ -75,4 +75,11 @@ public interface IControladorUsuario {
     
     public boolean validarLogin(String nickOrEmail, String contrasena);
     public void modificarContrasenia(String nickname, String nuevaContrasena) throws UsuarioNoExisteException;
+
+    // --- Seguimiento entre usuarios ---
+    public boolean sigueA(String seguidor, String seguido);
+    public void seguirUsuario(String seguidor, String seguido);
+    public void dejarSeguirUsuario(String seguidor, String seguido);
+    public int contarSeguidores(String nick);
+    public int contarSeguidos(String nick);
 }

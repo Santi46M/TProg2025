@@ -66,16 +66,29 @@
   <link rel="stylesheet" href="<%=ctx%>/css/ConsultaEdicionBase.css">
   <link rel="stylesheet" href="<%=ctx%>/css/ConsultaEdicion.css">
   <style>
-    .page-consulta-edicion .ed-center{ max-width: 1200px !important; margin: 0 auto !important; padding: 0 1rem; }
+    /* Wider layout for edition view */
+    .page-consulta-edicion .ed-center{ max-width: 1400px !important; margin: 0 auto !important; padding: 0 1rem; }
     .page-consulta-edicion .event-card{ border-radius: 12px; overflow: hidden; }
-    .page-consulta-edicion .img-frame{ width:100% !important; max-width:900px !important; aspect-ratio:16/9; background:#f3f4f6; border-radius:14px; overflow:hidden; margin:.5rem auto 1rem; }
+    /* Larger media frame for images and embedded video */
+    .page-consulta-edicion .img-frame{ width:100% !important; max-width:1200px !important; aspect-ratio:16/9; background:#f3f4f6; border-radius:14px; overflow:hidden; margin:.5rem auto 1rem; }
     .page-consulta-edicion .img-frame img{ width:100%; height:100%; object-fit:cover; display:block; }
-    .page-consulta-edicion .event-info.event-text{ max-width:900px !important; margin:0 auto !important; }
+    /* Make the info column wider to match the larger media */
+    .page-consulta-edicion .event-info.event-text{ max-width:1100px !important; margin:0 auto !important; }
     .page-consulta-edicion .event-header{ text-align:center; }
     .page-consulta-edicion.no-img .event-info.event-text{ margin-top:.5rem !important; }
+    /* Larger iframe behavior: allow taller height while keeping responsive width */
+    .page-consulta-edicion .video-frame iframe { height: 640px; max-height: 80vh; }
+    @media (max-width: 1200px){
+      .page-consulta-edicion .img-frame{ max-width:100% !important; }
+      .page-consulta-edicion .event-info.event-text{ max-width:100% !important; }
+      .page-consulta-edicion .video-frame iframe { height: 420px; }
+    }
     @media (max-width: 900px){
       .page-consulta-edicion .img-frame{ max-width:100% !important; }
       .page-consulta-edicion .event-info.event-text{ max-width:100% !important; }
+    }
+    @media (max-width: 600px){
+      .page-consulta-edicion .video-frame iframe { height: 260px; }
     }
   </style>
 </head>
@@ -100,8 +113,8 @@
         <% } %>
 
         <% if (hasVideo) { %>
-          <div class="img-frame video-frame" style="max-width:900px; margin: 0.5rem auto 1rem;">
-            <iframe width="100%" height="420" src="<%= edVideoEmbed %>" title="Video de la edición" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <div class="img-frame video-frame" style="margin: 0.5rem auto 1rem;">
+            <iframe width="100%" src="<%= edVideoEmbed %>" title="Video de la edición" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             <p style="text-align:center; font-size:0.9rem; margin-top:0.5rem;"><a href="<%= edVideoRaw %>" target="_blank">Ver en nueva pestaña</a></p>
           </div>
         <% } %>
