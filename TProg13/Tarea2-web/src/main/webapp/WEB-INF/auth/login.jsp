@@ -12,6 +12,8 @@
   <title>Iniciar Sesión — Eventos.uy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="<%=ctx%>/css/style.css">
+  <!-- Include responsive login-specific CSS -->
+  <link rel="stylesheet" href="<%=ctx%>/css/InicioSesion.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 </head>
 <body>

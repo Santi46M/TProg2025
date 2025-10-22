@@ -10,6 +10,7 @@
 
   java.util.Map<String,String> imgUrls =
     (java.util.Map<String,String>) request.getAttribute("imgUrls");
+  //quisiera hacer responsive el index.jsp siguiendo los lineamientos de rwd
 %>
 <!DOCTYPE html>
 <html lang="es">

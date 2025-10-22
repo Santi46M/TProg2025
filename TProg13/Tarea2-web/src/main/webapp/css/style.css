@@ -711,3 +711,36 @@ input[type="submit"] {
 .input-full {
   margin-top: 1.5rem;
 }
+
+/* Small-screen adjustments for the login wrapper (global override) */
+@media (max-width: 480px) {
+  /* Ensure the wrapper doesn't hug the left edge and centers the card */
+  .wrapper-iniciar-sesion {
+    max-width: 480px;
+    margin: 0 auto;            /* horizontal centering */
+    padding: 0 1rem;          /* horizontal breathing room */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;  /* vertical centering inside viewport when used */
+    align-items: center;      /* center card horizontally inside wrapper */
+    min-height: calc(100vh - 72px); /* adjust to header/footer height if needed */
+  }
+
+  /* Keep the card constrained and centered inside the wrapper */
+  .form-iniciar-sesion {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  /* Stack action buttons and make them full-width for touch targets */
+  .acciones-iniciar-sesion {
+    flex-direction: column;
+    gap: .5rem;
+  }
+  .acciones-iniciar-sesion .btn,
+  .btn-iniciar-sesion,
+  .btn-cancelar-iniciar-sesion { width: 100%; }
+}
