@@ -1,8 +1,14 @@
 package logica.datatypes;
-import java.time.LocalDate;
 
+import java.io.Serializable;
+import java.time.LocalDate;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
 import logica.enumerados.DTNivel;
-public class DTPatrocinio {
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class DTPatrocinio implements Serializable {
+
     private String codigo;
     private int monto;
     private LocalDate fecha;
@@ -11,6 +17,9 @@ public class DTPatrocinio {
     private String institucion;
     private String siglaEdicion;
     private String tipoRegistro;
+
+    public DTPatrocinio() {
+    }
 
     public DTPatrocinio(String codigo, int monto, LocalDate fecha, DTNivel nivel, int cantRegistrosGratuitos, String institucion, String siglaEdicion, String tipoRegistro) {
         this.codigo = codigo;

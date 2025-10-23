@@ -1,6 +1,10 @@
 package logica.enumerados;
 
-public enum DTNivel {
+import java.io.Serializable;
+import jakarta.xml.bind.annotation.XmlType;
+
+@XmlType(name = "DTNivel")
+public enum DTNivel implements Serializable {
     ORO,
     PLATA,
     BRONCE,

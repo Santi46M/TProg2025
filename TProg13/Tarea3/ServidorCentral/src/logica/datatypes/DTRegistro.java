@@ -1,17 +1,24 @@
 package logica.datatypes;
 
+import java.io.Serializable;
 import java.time.LocalDate;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
 
-public class DTRegistro {
+@XmlAccessorType(XmlAccessType.FIELD)
+public class DTRegistro implements Serializable {
+
     private String identificador;
     private String usuario;
     private String edicion;
-    private String tipoRegistro; 
+    private String tipoRegistro;
     private LocalDate fechaRegistro;
     private float costo;
     private LocalDate fechaInicio;
 
-    
+    public DTRegistro() {
+    }
+
     public DTRegistro(String identificador, String usuario, String edicion, String tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
         this.identificador = identificador;
         this.usuario = usuario;
@@ -22,32 +29,11 @@ public class DTRegistro {
         this.fechaInicio = fechaInicio;
     }
 
-    
-    public String getId() {
-        return identificador;
-    }
-
-    public String getUsuario() {
-        return usuario;
-    }
-
-    public String getEdicion() {
-        return edicion;
-    }
-
-    public String getTipoRegistro() {
-        return tipoRegistro;
-    }
-
-    public LocalDate getFechaRegistro() {
-        return fechaRegistro;
-    }
-
-    public float getCosto() {
-        return costo;
-    }
-
-    public LocalDate getFechaInicio() {
-        return fechaInicio;
-    }
+    public String getId() { return identificador; }
+    public String getUsuario() { return usuario; }
+    public String getEdicion() { return edicion; }
+    public String getTipoRegistro() { return tipoRegistro; }
+    public LocalDate getFechaRegistro() { return fechaRegistro; }
+    public float getCosto() { return costo; }
+    public LocalDate getFechaInicio() { return fechaInicio; }
 }

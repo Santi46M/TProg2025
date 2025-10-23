@@ -1,11 +1,18 @@
 package logica.datatypes;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
 import logica.enumerados.DTEstado;
 
-public class DTEdicion {
+@XmlAccessorType(XmlAccessType.FIELD)
+public class DTEdicion implements Serializable {
+
     private String nombre;
     private String sigla;
     private LocalDate fechaInicio;
@@ -17,13 +24,30 @@ public class DTEdicion {
     private String imagen;
     private String video;
     private DTEstado estado;
+
+    @XmlElementWrapper(name = "tiposRegistro")
+    @XmlElement(name = "tipoRegistro")
     private List<DTTipoRegistro> tiposRegistro = new ArrayList<>();
+
+    @XmlElementWrapper(name = "patrocinios")
+    @XmlElement(name = "patrocinio")
     private List<DTPatrocinio> patrocinios = new ArrayList<>();
+
+    @XmlElementWrapper(name = "registros")
+    @XmlElement(name = "registro")
     private List<DTRegistro> registros = new ArrayList<>();
+
     private DTEvento evento;
+
+    public DTEdicion() {
+        this.tiposRegistro = new ArrayList<>();
+        this.patrocinios = new ArrayList<>();
+        this.registros = new ArrayList<>();
+    }
 
     public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
                      LocalDate fechaAlta, String organizador, String ciudad, String pais, String imagen, DTEvento evento) {
+        this();
         this.nombre = nombre;
         this.sigla = sigla;
         this.fechaInicio = fechaInicio;
@@ -38,10 +62,8 @@ public class DTEdicion {
     }
 
     public DTEdicion(String nombre, String sigla, LocalDate fechaInicio, LocalDate fechaFin,
-
                      LocalDate fechaAlta, String organizador, String ciudad, String pais, String imagen, DTEstado estado, DTEvento evento) {
         this(nombre, sigla, fechaInicio, fechaFin, fechaAlta, organizador, ciudad, pais, imagen, evento);
-
         this.estado = estado;
     }
 
@@ -75,10 +97,7 @@ public class DTEdicion {
     public void setVideo(String video) { this.video = video; }
     public DTEstado getEstado() { return estado; }
     public DTEvento getEvento() { return evento; }
-
     public List<DTTipoRegistro> getTiposRegistro() { return tiposRegistro; }
     public List<DTPatrocinio> getPatrocinios() { return patrocinios; }
-    public List<DTRegistro> getRegistros() {
-        return registros;
-    }
+    public List<DTRegistro> getRegistros() { return registros; }
 }

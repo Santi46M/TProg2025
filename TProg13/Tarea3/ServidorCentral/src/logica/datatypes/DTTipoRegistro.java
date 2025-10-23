@@ -1,10 +1,19 @@
 package logica.datatypes;
 
-public class DTTipoRegistro {
+import java.io.Serializable;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+public class DTTipoRegistro implements Serializable {
+
     private String nombre;
     private String descripcion;
     private float costo;
     private int cupo;
+
+    public DTTipoRegistro() {
+    }
 
     public DTTipoRegistro(String nombre, String descripcion, float costo, int cupo) {
         this.nombre = nombre;

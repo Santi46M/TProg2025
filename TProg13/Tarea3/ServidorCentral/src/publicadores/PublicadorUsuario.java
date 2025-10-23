@@ -6,6 +6,7 @@ import jakarta.jws.WebService;
 import jakarta.jws.soap.SOAPBinding;
 import jakarta.xml.ws.Endpoint;
 
+import java.time.LocalDate;
 import logica.datatypes.DTDatosUsuario;
 import logica.fabrica;
 import logica.interfaces.IControladorUsuario;
@@ -15,11 +16,6 @@ import excepciones.UsuarioTipoIncorrectoException;
 import excepciones.InstitucionYaExisteException;
 import excepciones.CategoriaYaExisteException;
 
-import java.time.LocalDate;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 @WebService
 @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
 public class PublicadorUsuario {
@@ -27,14 +23,11 @@ public class PublicadorUsuario {
     private Endpoint endpoint = null;
     private IControladorUsuario icu = fabrica.getInstance().getIControladorUsuario();
 
-    // ====== Publicación del servicio ======
     @WebMethod(exclude = true)
     public void publicar() {
         endpoint = Endpoint.publish("http://localhost:8090/publicadorUsuario", this);
         System.out.println("Servicio PublicadorUsuario disponible en: http://localhost:8090/publicadorUsuario?wsdl");
     }
-
-    // ====== Métodos expuestos ======
 
     @WebMethod
     public void altaUsuario(
@@ -60,18 +53,6 @@ public class PublicadorUsuario {
         return icu.obtenerDatosUsuario(nickname);
     }
 
-   /* @WebMethod
-    public Set<DTDatosUsuario> obtenerUsuariosDT() throws UsuarioNoExisteException {
-        return icu.obtenerUsuariosDT();
-    }*/
-
-  /*  @WebMethod
-    public Map<String, String> listarUsuarios() {
-        Map<String, logica.clases.Usuario> usuarios = icu.listarUsuarios();
-        return usuarios.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue().getNombre()));
-    }*/
-
     @WebMethod
     public boolean validarLogin(
         @WebParam(name = "nickOrEmail") String nickOrEmail,
@@ -88,11 +69,6 @@ public class PublicadorUsuario {
     ) throws InstitucionYaExisteException {
         icu.altaInstitucion(nombre, descripcion, link);
     }
-
-   /*z @WebMethod
-    public Set<String> listarInstituciones() {
-        return icu.getInstituciones();
-    } */
 
     @WebMethod
     public void altaCategoriaSinGUI(
@@ -115,7 +91,6 @@ public class PublicadorUsuario {
         icu.modificarDatosUsuario(nickname, nombre, descripcion, link, apellido, fechaNacimiento, institucion, imagen);
     }
 
-    // ====== Fin del servicio ======
     @WebMethod(exclude = true)
     public Endpoint getEndpoint() {
         return endpoint;
