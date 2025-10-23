@@ -126,3 +126,8 @@
   font-weight: bold;
   margin-top: .5rem;
 }
+
+input.ok    { border: 2px solid #22c55e !important; }
+input.error { border: 2px solid #ef4444 !important; }
+.hint.ok    { color: #15803d !important; }
+.hint.error { color: #b91c1c !important; }

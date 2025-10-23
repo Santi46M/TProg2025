@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Enumeration;
+import java.util.Set;
 
 import logica.fabrica;
 import logica.interfaces.IControladorUsuario;
@@ -16,7 +17,7 @@ import logica.datatypes.DTDatosUsuario;
 import excepciones.UsuarioYaExisteException;
 import excepciones.UsuarioNoExisteException;
 
-@WebServlet(urlPatterns = {"/usuario/AltaUsuario"})
+@WebServlet(urlPatterns = {"/usuario/AltaUsuario", "/usuario/validar"})
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024,   // 1 MB en memoria
     maxFileSize = 10 * 1024 * 1024,    // 10 MB por archivo
@@ -44,8 +45,14 @@ public class UsuarioServlet extends HttpServlet {
       throws ServletException, IOException {
 
     String path = req.getServletPath();
-    if (path == null || "/".equals(path)) {
+    if (path == null) {
       resp.sendRedirect(ctx(req) + "/");
+      return;
+    }
+
+    // NUEVO: endpoint de validación en vivo
+    if ("/usuario/validar".equals(path)) {
+      handleValidar(req, resp);
       return;
     }
 
@@ -57,6 +64,7 @@ public class UsuarioServlet extends HttpServlet {
 
     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
+
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -174,6 +182,9 @@ public class UsuarioServlet extends HttpServlet {
 
     try {
       // Alta (la firma incluye imagen como último parámetro)
+    	
+    	if (existeNickDT(nick)) { req.setAttribute("error","El nick ya existe."); cargarInstituciones(req); forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr); return; }
+    	if (existeEmailDT(correo)) { req.setAttribute("error","El email ya existe."); cargarInstituciones(req); forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr); return; }
       controladorUs.altaUsuario(
           nick,
           nombreFinal,
@@ -262,4 +273,61 @@ public class UsuarioServlet extends HttpServlet {
     if (ctype.contains("webp")) return ".webp";
     return ".jpg";
   }
+  
+  private boolean existeNickDT(String nick) {
+	  try {
+	    Set<DTDatosUsuario> usuarios = controladorUs.obtenerUsuariosDT();
+	    if (usuarios == null) return false;
+	    for (logica.datatypes.DTDatosUsuario u : usuarios) {
+	      if (u != null && u.getNickname() != null && u.getNickname().equals(nick)) return true;
+	    }
+	  } catch (excepciones.UsuarioNoExisteException ignore) { /* según tu impl puede lanzar o no */ }
+	  return false;
+	}
+
+	private boolean existeEmailDT(String email) {
+	  try {
+	    Set<DTDatosUsuario> usuarios = controladorUs.obtenerUsuariosDT();
+	    if (usuarios == null) return false;
+	    for (DTDatosUsuario u : usuarios) {
+	      if (u != null && u.getEmail() != null && u.getEmail().equalsIgnoreCase(email)) return true;
+	    }
+	  } catch (excepciones.UsuarioNoExisteException ignore) { }
+	  return false;
+	}
+
+	private void handleValidar(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+	  resp.setCharacterEncoding("UTF-8");
+	  resp.setContentType("text/plain; charset=UTF-8");
+	  resp.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+
+	  String nick  = safeTrim(req.getParameter("nick"));
+	  String email = safeTrim(req.getParameter("email"));
+
+	  if ((nick == null || nick.isEmpty()) && (email == null || email.isEmpty())) {
+	    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+	    resp.getWriter().write("ERROR");
+	    return;
+	  }
+
+	  try {
+	    if (nick != null && !nick.isEmpty()) {
+	      boolean exists = existeNickDT(nick);
+	      resp.getWriter().write(exists ? "NO" : "OK");
+	      return;
+	    }
+	    if (email != null && !email.isEmpty()) {
+	      boolean exists = existeEmailDT(email);
+	      resp.getWriter().write(exists ? "NO" : "OK");
+	      return;
+	    }
+	    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+	    resp.getWriter().write("ERROR");
+	  } catch (Exception e) {
+	    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	    resp.getWriter().write("ERROR");
+	  }
+	}
+
+	private static String safeTrim(String s){ return s == null ? null : s.trim(); }
 }

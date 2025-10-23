@@ -66,10 +66,12 @@
         <div class="input-group">
           <label for="nick">Nick*</label>
           <input id="nick" name="nick" value="<%= val(request, "nick") %>" required placeholder="Tu alias">
+          <small id="nick-msg" class="hint"></small>
         </div>
         <div class="input-group">
           <label for="email">Correo*</label>
           <input id="email" name="email" type="email" value="<%= val(request, "email") %>" required placeholder="tucorreo@ejemplo.com">
+          <small id="email-msg" class="hint"></small>
         </div>
       </div>
 
@@ -205,6 +207,130 @@
   });
 })();
 </script>
+
+<script>
+(function () {
+  var ctx = "<%=ctx%>";
+
+  var form     = document.getElementById('altaForm');
+  if (!form) return;
+
+  var nick     = document.getElementById('nick');
+  var email    = document.getElementById('email');
+  var nickMsg  = document.getElementById('nick-msg');
+  var emailMsg = document.getElementById('email-msg');
+
+  // --- helpers UI (sin tocar el botón submit) ---
+  function setChecking(input, msgEl) {
+    if (input) { input.classList.remove('ok','error'); }
+    if (msgEl) { msgEl.textContent = 'Verificando...'; msgEl.className = 'hint checking'; }
+  }
+  function setResult(input, msgEl, available) {
+    if (input) {
+      input.classList.remove('ok','error');
+      input.classList.add(available ? 'ok' : 'error');
+    }
+    if (msgEl) {
+      msgEl.textContent = available ? 'Disponible' : 'No disponible';
+      msgEl.className = 'hint ' + (available ? 'ok' : 'error');
+    }
+  }
+  function clearField(input, msgEl) {
+    if (input) input.classList.remove('ok','error');
+    if (msgEl) { msgEl.textContent = ''; msgEl.className = 'hint'; }
+  }
+  function parseOK(txt) { return /^OK$/i.test((txt || '').trim()); }
+
+  // --- fetch texto plano OK/NO (sin await) ---
+  function fetchPlain(url, onOk, onErr){
+    var full = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_=' + Date.now(); // cache-bust
+    fetch(full, { headers:{'Accept':'text/plain'}, credentials:'same-origin', cache:'no-store' })
+      .then(function(res){ return res.text().then(function(txt){ return { status: res.status, ok: res.ok, txt: txt }; }); })
+      .then(function(r){
+        console.debug('[VALIDAR]', full, '→', r.status, JSON.stringify(r.txt));
+        // aunque !ok, igual decidimos por el texto
+        if (typeof onOk === 'function') onOk(r.txt);
+      })
+      .catch(function(err){
+        console.error('[VALIDAR error]', err);
+        if (typeof onErr === 'function') onErr(err);
+      });
+  }
+
+  // --- validadores con debounce propio ---
+  var tNick, tEmail;
+
+  function validateNickAjax(){
+    if (!nick) return;
+    var v = (nick.value || '').trim();
+    if (!v) { clearField(nick, nickMsg); return; }
+    setChecking(nick, nickMsg);
+    fetchPlain(ctx + '/usuario/validar?nick=' + encodeURIComponent(v),
+      function(txt){
+        // si vino HTML por un filtro, lo marcamos como error visible
+        if ((txt || '').trim().charAt(0) === '<') {
+          nick.classList.add('error');
+          if (nickMsg) { nickMsg.textContent = 'No se pudo validar'; nickMsg.className = 'hint error'; }
+          return;
+        }
+        setResult(nick, nickMsg, parseOK(txt));
+      },
+      function(){
+        nick.classList.add('error');
+        if (nickMsg) { nickMsg.textContent = 'Error validando'; nickMsg.className = 'hint error'; }
+      }
+    );
+  }
+
+  function validateEmailAjax(){
+    if (!email) return;
+    var v = (email.value || '').trim();
+    if (!v) { clearField(email, emailMsg); return; }
+    setChecking(email, emailMsg);
+    fetchPlain(ctx + '/usuario/validar?email=' + encodeURIComponent(v),
+      function(txt){
+        if ((txt || '').trim().charAt(0) === '<') {
+          email.classList.add('error');
+          if (emailMsg) { emailMsg.textContent = 'No se pudo validar'; emailMsg.className = 'hint error'; }
+          return;
+        }
+        setResult(email, emailMsg, parseOK(txt));
+      },
+      function(){
+        email.classList.add('error');
+        if (emailMsg) { emailMsg.textContent = 'Error validando'; emailMsg.className = 'hint error'; }
+      }
+    );
+  }
+
+  function debounce(fn, ms, tokenRefName){
+    return function(){
+      var args = arguments, self = this;
+      clearTimeout(tokenRefName === 'nick' ? tNick : tEmail);
+      var t = setTimeout(function(){ fn.apply(self, args); }, ms || 350);
+      if (tokenRefName === 'nick') tNick = t; else tEmail = t;
+    };
+  }
+
+  // eventos (no bloqueamos el submit)
+  if (nick){
+    nick.addEventListener('input', debounce(validateNickAjax, 350, 'nick'));
+    nick.addEventListener('blur',  validateNickAjax);
+  }
+  if (email){
+    email.addEventListener('input', debounce(validateEmailAjax, 350, 'email'));
+    email.addEventListener('blur',  validateEmailAjax);
+  }
+
+  // si hay valores precargados (vuelta de POST), validar de entrada
+  if (nick && nick.value.trim())  validateNickAjax();
+  if (email && email.value.trim()) validateEmailAjax();
+})();
+</script>
+
+
+
+
 
 </body>
 </html>
