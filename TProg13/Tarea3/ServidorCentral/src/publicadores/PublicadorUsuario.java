@@ -7,7 +7,10 @@ import jakarta.jws.soap.SOAPBinding;
 import jakarta.xml.ws.Endpoint;
 
 import java.time.LocalDate;
+import java.util.Set;
+
 import logica.datatypes.DTDatosUsuario;
+import logica.datatypes.DTRegistro;
 import logica.fabrica;
 import logica.interfaces.IControladorUsuario;
 import excepciones.UsuarioYaExisteException;
@@ -117,6 +120,38 @@ public class PublicadorUsuario {
     public String[] listarInstituciones() {
         java.util.Set<String> instituciones = icu.getInstituciones();
         return instituciones.toArray(new String[0]);
+    }
+
+    /* =========================
+       NUEVOS MÉTODOS AGREGADOS
+       ========================= */
+
+    @WebMethod
+    public String[] getInstituciones() {
+        Set<String> instituciones = icu.getInstituciones();
+        return instituciones.toArray(new String[0]);
+    }
+
+    @WebMethod
+    public boolean esAsistente(
+        @WebParam(name = "nickname") String nickname
+    ) {
+        return icu.esAsistente(nickname);
+    }
+
+    @WebMethod
+    public boolean sigueA(
+        @WebParam(name = "seguidor") String seguidor,
+        @WebParam(name = "seguido") String seguido
+    ) {
+        return icu.sigueA(seguidor, seguido);
+    }
+
+    @WebMethod
+    public DTRegistro obtenerDatosRegistros(
+        @WebParam(name = "identificador") String identificador
+    ) {
+        return icu.obtenerDatosRegistros(identificador);
     }
 
     @WebMethod(exclude = true)
