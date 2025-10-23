@@ -90,6 +90,34 @@ public class PublicadorUsuario {
     ) throws UsuarioNoExisteException, UsuarioTipoIncorrectoException {
         icu.modificarDatosUsuario(nickname, nombre, descripcion, link, apellido, fechaNacimiento, institucion, imagen);
     }
+    
+    @WebMethod
+    public DTDatosUsuario[] obtenerUsuariosDT() throws UsuarioNoExisteException {
+        java.util.Set<DTDatosUsuario> usuarios = icu.obtenerUsuariosDT();
+        return usuarios.toArray(new DTDatosUsuario[0]);
+    }
+
+    @WebMethod
+    public void seguirUsuario(
+        @WebParam(name = "seguidor") String seguidor,
+        @WebParam(name = "seguido") String seguido
+    ) {
+        icu.seguirUsuario(seguidor, seguido);
+    }
+
+    @WebMethod
+    public void dejarSeguirUsuario(
+        @WebParam(name = "seguidor") String seguidor,
+        @WebParam(name = "seguido") String seguido
+    ) {
+        icu.dejarSeguirUsuario(seguidor, seguido);
+    }
+
+    @WebMethod
+    public String[] listarInstituciones() {
+        java.util.Set<String> instituciones = icu.getInstituciones();
+        return instituciones.toArray(new String[0]);
+    }
 
     @WebMethod(exclude = true)
     public Endpoint getEndpoint() {

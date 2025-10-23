@@ -13,29 +13,26 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/angus-activation.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/angus-mail.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/FastInfoset.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/gmbal-api-only.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/ha-api.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jakarta.activation-api.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jakarta.annotation-api.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jakarta.mail-api.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jakarta.xml.bind-api.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jakarta.xml.soap-api.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jakarta.xml.ws-api.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jaxb-core.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jaxb-impl.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jaxb-jxc.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jaxb-xjc.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jaxws-rt.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/jaxws-tools.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/management-api.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/mimepull.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/saaj-impl.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/stax-ex.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/stax2-api.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/streambuffer.jar"/>
-	<classpathentry kind="lib" path="/Users/nicorenault/git/tpgr13/TProg13/Tarea3/ClienteWeb/lib/woodstox-core.jar"/>
+	<classpathentry kind="lib" path="lib/gmbal-api-only.jar"/>
+	<classpathentry kind="lib" path="lib/ha-api.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta.activation-api.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta.annotation-api.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta.mail-api.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta.xml.bind-api.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta.xml.soap-api.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta.xml.ws-api.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-core.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-impl.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-jxc.jar"/>
+	<classpathentry kind="lib" path="lib/jaxb-xjc.jar"/>
+	<classpathentry kind="lib" path="lib/jaxws-rt.jar"/>
+	<classpathentry kind="lib" path="lib/jaxws-tools.jar"/>
+	<classpathentry kind="lib" path="lib/management-api.jar"/>
+	<classpathentry kind="lib" path="lib/mimepull.jar"/>
+	<classpathentry kind="lib" path="lib/saaj-impl.jar"/>
+	<classpathentry kind="lib" path="lib/stax2-api.jar"/>
+	<classpathentry kind="lib" path="lib/stax-ex.jar"/>
+	<classpathentry kind="lib" path="lib/streambuffer.jar"/>
+	<classpathentry kind="lib" path="lib/woodstox-core.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

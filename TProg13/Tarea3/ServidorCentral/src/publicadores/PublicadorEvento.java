@@ -126,6 +126,46 @@ public class PublicadorEvento {
     ) {
         return ice.obtenerEdicionPorSiglaDT(sigla);
     }
+    
+    @WebMethod
+    public DTEvento[] listarEventos() {
+        java.util.List<DTEvento> lista = ice.listarEventos();
+        return lista.toArray(new DTEvento[0]);
+    }
+
+
+
+    @WebMethod
+    public void altaTipoRegistro(
+        @WebParam(name = "dtEdicion") DTEdicion dtEdicion,
+        @WebParam(name = "nombre") String nombre,
+        @WebParam(name = "descripcion") String descripcion,
+        @WebParam(name = "costo") float costo,
+        @WebParam(name = "cupo") int cupo
+    ) throws excepciones.TipoRegistroYaExisteException,
+             excepciones.CupoTipoRegistroInvalidoException,
+             excepciones.CostoTipoRegistroInvalidoException {
+        ice.altaTipoRegistroDTO(dtEdicion, nombre, descripcion, costo, cupo);
+    }
+
+    @WebMethod
+    public DTRegistro consultaRegistro(
+        @WebParam(name = "nickname") String nickname,
+        @WebParam(name = "idRegistro") String idRegistro
+    ) throws excepciones.UsuarioNoExisteException {
+        logica.clases.Usuario user = logica.fabrica.getInstance().getIControladorUsuario()
+            .listarUsuarios().get(nickname);
+        return ice.consultaRegistro(user, idRegistro);
+    }
+
+    @WebMethod
+    public DTTipoRegistro[] listarTiposRegistroDeEdicion(
+        @WebParam(name = "nombreEvento") String nombreEvento,
+        @WebParam(name = "nombreEdicion") String nombreEdicion
+    ) {
+        java.util.List<DTTipoRegistro> lista = ice.listarTiposRegistroDeEdicion(nombreEvento, nombreEdicion);
+        return lista.toArray(new DTTipoRegistro[0]);
+    }
 
     @WebMethod(exclude = true)
     public Endpoint getEndpoint() {
