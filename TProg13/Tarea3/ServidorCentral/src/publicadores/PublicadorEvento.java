@@ -18,6 +18,12 @@ import logica.enumerados.DTNivel;
 import logica.fabrica;
 import logica.interfaces.IControladorEvento;
 
+// === imports extra para métodos nuevos que usan clases de dominio ===
+import logica.clases.Usuario;
+import logica.clases.Eventos;
+import logica.clases.Ediciones;
+import logica.clases.TipoRegistro;
+
 @WebService
 @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
 public class PublicadorEvento {
@@ -133,8 +139,6 @@ public class PublicadorEvento {
         return lista.toArray(new DTEvento[0]);
     }
 
-
-
     @WebMethod
     public void altaTipoRegistro(
         @WebParam(name = "dtEdicion") DTEdicion dtEdicion,
@@ -165,6 +169,93 @@ public class PublicadorEvento {
     ) {
         java.util.List<DTTipoRegistro> lista = ice.listarTiposRegistroDeEdicion(nombreEvento, nombreEdicion);
         return lista.toArray(new DTTipoRegistro[0]);
+    }
+
+    /* =========================
+       NUEVOS MÉTODOS AGREGADOS
+       ========================= */
+
+    @WebMethod
+    public DTEvento[] listarEventosVigentes() {
+        List<DTEvento> lista = ice.listarEventosVigentes();
+        return lista.toArray(new DTEvento[0]);
+    }
+
+    @WebMethod
+    public DTEdicion consultaEdicionEvento(
+        @WebParam(name = "siglaEvento") String siglaEvento,
+        @WebParam(name = "siglaEdicion") String siglaEdicion
+    ) {
+        return ice.consultaEdicionEvento(siglaEvento, siglaEdicion);
+    }
+
+    @WebMethod
+    public void altaRegistroEdicionEvento(
+        @WebParam(name = "idRegistro") String idRegistro,
+        @WebParam(name = "usuario") Usuario usuario,
+        @WebParam(name = "evento") Eventos evento,
+        @WebParam(name = "edicion") Ediciones edicion,
+        @WebParam(name = "tipoRegistro") TipoRegistro tipoRegistro,
+        @WebParam(name = "fechaRegistro") LocalDate fechaRegistro,
+        @WebParam(name = "costo") float costo,
+        @WebParam(name = "fechaInicio") LocalDate fechaInicio
+    ) {
+        ice.altaRegistroEdicionEvento(idRegistro, usuario, evento, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio);
+    }
+
+    @WebMethod
+    public DTCategorias[] listarDTCategorias() {
+        List<DTCategorias> lista = ice.listarDTCategorias();
+        return lista.toArray(new DTCategorias[0]);
+    }
+
+    @WebMethod
+    public DTEvento[] listarEventosPorCategoria(
+        @WebParam(name = "nombreCategoria") String nombreCategoria
+    ) {
+        List<DTEvento> lista = ice.listarEventosPorCategoria(nombreCategoria);
+        return lista.toArray(new DTEvento[0]);
+    }
+
+    @WebMethod
+    public String[] listarCategoriasConEventos() {
+        List<String> lista = ice.listarCategoriasConEventos();
+        return lista.toArray(new String[0]);
+    }
+
+    @WebMethod
+    public void actualizarImagenEvento(
+        @WebParam(name = "nombreEvento") String nombreEvento,
+        @WebParam(name = "imagenPath") String imagenPath
+    ) throws IllegalArgumentException {
+        ice.actualizarImagenEvento(nombreEvento, imagenPath);
+    }
+
+    @WebMethod
+    public void finalizarEvento(
+        @WebParam(name = "nombreEvento") String nombreEvento
+    ) {
+        ice.finalizarEvento(nombreEvento);
+    }
+
+    @WebMethod
+    public void altaTipoRegistroDTO(
+        @WebParam(name = "dtEdicion") DTEdicion dtEdicion,
+        @WebParam(name = "nombre") String nombre,
+        @WebParam(name = "descripcion") String descripcion,
+        @WebParam(name = "costo") float costo,
+        @WebParam(name = "cupo") int cupo
+    ) throws excepciones.TipoRegistroYaExisteException,
+             excepciones.CupoTipoRegistroInvalidoException,
+             excepciones.CostoTipoRegistroInvalidoException {
+        ice.altaTipoRegistroDTO(dtEdicion, nombre, descripcion, costo, cupo);
+    }
+
+    @WebMethod
+    public String encontrarEventoPorSigla(
+        @WebParam(name = "siglaEdicion") String siglaEdicion
+    ) {
+        return ice.encontrarEventoPorSigla(siglaEdicion);
     }
 
     @WebMethod(exclude = true)
