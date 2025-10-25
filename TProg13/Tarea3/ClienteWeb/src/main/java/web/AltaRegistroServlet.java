@@ -9,11 +9,14 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
-import logica.fabrica;
-import logica.interfaces.IControladorEvento;
-import logica.datatypes.DTEdicion;
-import logica.datatypes.DTEvento;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import publicadores.DtEdicion;
+import publicadores.DtEvento;
+import publicadores.DtEventoArray;
+import publicadores.StringArray;
 
 @WebServlet("/registro/*")
 public class AltaRegistroServlet extends HttpServlet {
@@ -21,7 +24,6 @@ public class AltaRegistroServlet extends HttpServlet {
     private static final String JSP_ALTA = "/WEB-INF/registro/AltaRegistro.jsp";
     private static final String JSP_OK   = "/WEB-INF/registro/AltaRegistroOK.jsp";
 
-    private IControladorEvento ce() { return fabrica.getInstance().getIControladorEvento(); }
     private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
     @Override
@@ -30,13 +32,17 @@ public class AltaRegistroServlet extends HttpServlet {
 
         req.setCharacterEncoding("UTF-8");
 
+        // === EXACTAS estas dos líneas para crear el port (versión Evento) ===
+        publicadores.PublicadorEventoService service = new publicadores.PublicadorEventoService();
+        publicadores.PublicadorEvento port = service.getPublicadorEventoPort();
+
         String path = req.getPathInfo();
         System.out.println("Entra al doGet de AltaRegistroServlet con path: " + path);
         if (path == null || "/".equals(path) || "/alta".equals(path)) {
             if (!requiereOrganizador(req, resp)) return;
 
-            // Cargar ediciones del organizador 
-            recargarDatosDT(req);
+            // Cargar ediciones del organizador desde el servicio remoto
+            recargarDatosDT(req, port);
 
             req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
             return;
@@ -50,6 +56,11 @@ public class AltaRegistroServlet extends HttpServlet {
             throws ServletException, IOException {
 
         req.setCharacterEncoding("UTF-8");
+
+        // === EXACTAS estas dos líneas para crear el port (versión Evento) ===
+        publicadores.PublicadorEventoService service = new publicadores.PublicadorEventoService();
+        publicadores.PublicadorEvento port = service.getPublicadorEventoPort();
+
         String path = req.getPathInfo();
         System.out.println("Entra al doPost de AltaRegistroServlet con path: " + path);
         String accion = req.getParameter("accion");
@@ -70,7 +81,7 @@ public class AltaRegistroServlet extends HttpServlet {
             if (isBlank(siglaEdicion) || isBlank(nombre) || isBlank(descripcion)
                     || isBlank(costoStr) || isBlank(cupoStr)) {
                 req.setAttribute("error", "Todos los campos son obligatorios.");
-                recargarDatosDT(req);
+                recargarDatosDT(req, port);
                 req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                 return;
             }
@@ -79,33 +90,74 @@ public class AltaRegistroServlet extends HttpServlet {
                 float costo = Float.parseFloat(costoStr);
                 int cupo    = Integer.parseInt(cupoStr);
 
-                DTEdicion dtSel = ce().obtenerEdicionPorSiglaDT(siglaEdicion);
-                
+                DtEdicion dtSel = port.obtenerEdicionPorSiglaDT(siglaEdicion);
                 if (dtSel == null) {
                     req.setAttribute("error", "No se encontró la edición seleccionada.");
-                    recargarDatosDT(req);
+                    recargarDatosDT(req, port);
                     req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                     return;
                 }
-                
-                if (dtSel.getFechaFin().isBefore(LocalDate.now())) {
-					req.setAttribute("error", "No se pueden agregar tipos de registro a una edición finalizada.");
-					recargarDatosDT(req);
-					
-					req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-					return;
-				}
-                
 
-                //  Alta
-                
-                ce().altaTipoRegistroDTO(dtSel, nombre, descripcion, costo, cupo);
+                // === Validación: no permitir agregar tipos a ediciones finalizadas ===
+                LocalDate fin = null;
+                Object f = dtSel.getFechaFin();
+                try {
+                	  if (f == null) {
+                	    fin = null;
 
-                // Redirigir a la consulta del TipoRegistro 
+                	  } else if (f instanceof publicadores.LocalDate) {
+                	    // Caso: wrapper LocalDate del stub
+                	    publicadores.LocalDate ld = (publicadores.LocalDate) f;
+
+                	    // 1) Intentá leer campos year/month/day directamente (si existen)
+                	    try {
+                	      int y = (int) ld.getClass().getMethod("getYear").invoke(ld);
+                	      int m = (int) ld.getClass().getMethod("getMonth").invoke(ld);
+                	      int d = (int) ld.getClass().getMethod("getDay").invoke(ld);
+                	      fin = LocalDate.of(y, m, d);
+                	    } catch (NoSuchMethodException ignore) {
+                	      // 2) Si no tiene getters de campos, probá obtener un 'value' con esos getters
+                	      Object val = ld.getClass().getMethod("getValue").invoke(ld); // p.ej. XML-ish
+                	      if (val != null) {
+                	        int y = (int) val.getClass().getMethod("getYear").invoke(val);
+                	        int m = (int) val.getClass().getMethod("getMonth").invoke(val);
+                	        int d = (int) val.getClass().getMethod("getDay").invoke(val);
+                	        fin = LocalDate.of(y, m, d);
+                	      }
+                	    }
+
+                	  } else if (f instanceof java.util.Date) {
+                	    // Caso: xs:date mapeado a java.util.Date
+                	    fin = ((java.util.Date) f).toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDate();
+
+                	  } else if (f instanceof CharSequence) {
+                	    // Caso: la fecha llega como "yyyy-MM-dd"
+                	    fin = LocalDate.parse(f.toString());
+
+                	  } else {
+                	    // Último recurso: intentar leer métodos getYear/getMonth/getDay() por reflexión del propio 'f'
+                	    int y = (int) f.getClass().getMethod("getYear").invoke(f);
+                	    int m = (int) f.getClass().getMethod("getMonth").invoke(f);
+                	    int d = (int) f.getClass().getMethod("getDay").invoke(f);
+                	    fin = LocalDate.of(y, m, d);
+                	  }
+                } catch (Exception ignore) { /* si no podemos convertir, no bloqueamos */ }
+
+                if (fin != null && fin.isBefore(LocalDate.now())) {
+                    req.setAttribute("error", "No se pueden agregar tipos de registro a una edición finalizada.");
+                    recargarDatosDT(req, port);
+                    req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+                    return;
+                }
+
+                // Alta remota del TipoRegistro
+                port.altaTipoRegistroDTO(dtSel, nombre, descripcion, costo, cupo);
+
+                // Redirigir a la consulta del TipoRegistro
                 String eventoNombre = null;
-                try { eventoNombre = ce().encontrarEventoPorSigla(siglaEdicion); } catch (Exception ignore) {}
+                try { eventoNombre = port.encontrarEventoPorSigla(siglaEdicion); } catch (Exception ignore) {}
                 if (isBlank(eventoNombre)) {
-                    try { eventoNombre = dtSel.getEvento().getNombre(); } catch (Exception ignore) {}
+                    try { eventoNombre = (dtSel.getEvento() != null ? dtSel.getEvento().getNombre() : null); } catch (Exception ignore) {}
                 }
 
                 String eventoEnc  = URLEncoder.encode(eventoNombre != null ? eventoNombre : "", StandardCharsets.UTF_8.name());
@@ -119,13 +171,13 @@ public class AltaRegistroServlet extends HttpServlet {
 
             } catch (NumberFormatException nfe) {
                 req.setAttribute("error", "Costo y cupo deben ser numéricos.");
-                recargarDatosDT(req);
+                recargarDatosDT(req, port);
                 req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                 return;
 
             } catch (Exception e) {
                 req.setAttribute("error", e.getMessage());
-                recargarDatosDT(req);
+                recargarDatosDT(req, port);
                 req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                 return;
             }
@@ -134,26 +186,55 @@ public class AltaRegistroServlet extends HttpServlet {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 
-    // Helpers  
+    // ===================== Helpers =====================
 
-    private void recargarDatosDT(HttpServletRequest req) {
+    /** Carga las ediciones del organizador logueado usando el servicio remoto. */
+    private void recargarDatosDT(HttpServletRequest req, publicadores.PublicadorEvento port) {
         HttpSession sAux = req.getSession(false);
         String nick = sAux == null ? null : (String) sAux.getAttribute("nick");
 
-        List<DTEdicion> ediciones = new ArrayList<>();
+        List<DtEdicion> ediciones = new ArrayList<>();
 
         if (nick != null) {
-            // Recorremos todos los eventos 
-//            List<DTEvento> eventos = ce().listarEventos();
-        	List<DTEvento> eventos = ce().listarEventosVigentes();
-            for (DTEvento ev : eventos) {
+            // 1) Listar eventos vigentes
+            // Según tu stub puede devolver array o wrapper. Primero probamos array:
+            List<DtEvento> eventos;
+            try {
+                DtEvento[] arr = port.listarEventosVigentes();
+                eventos = (arr == null) ? List.of() : Arrays.asList(arr);
+            } catch (Throwable t) {
+                // Si tu stub usa wrapper (p.ej. DtEventoArray con getItem()):
+                eventos = new ArrayList<>();
+                try {
+                    Object wrapper = port.listarEventosVigentes();
+                    var items = (List<DtEvento>) wrapper.getClass().getMethod("getItem").invoke(wrapper);
+                    if (items != null) eventos.addAll(items);
+                } catch (Exception ignore) {}
+            }
+
+            // 2) Por cada evento, listar nombres de ediciones y traer cada DtEdicion
+            for (DtEvento ev : eventos) {
+                if (ev == null) continue;
                 String nombreEvento = ev.getNombre();
-                List<String> nombresEd = ce().listarEdicionesEvento(nombreEvento);
+
+                List<String> nombresEd;
+                try {
+                	publicadores.StringArray arr = port.listarEdicionesEvento(nombreEvento);
+                	nombresEd = (arr == null || arr.getItem() == null) ? java.util.List.of()
+                	                                                   : new java.util.ArrayList<>(arr.getItem());
+                } catch (Throwable t) {
+                    nombresEd = new ArrayList<>();
+                    try {
+                        Object wrapper = port.listarEdicionesEvento(nombreEvento);
+                        var items = (List<String>) wrapper.getClass().getMethod("getItem").invoke(wrapper);
+                        if (items != null) nombresEd.addAll(items);
+                    } catch (Exception ignore) {}
+                }
 
                 for (String nomEd : nombresEd) {
-                    DTEdicion dt = ce().obtenerDtEdicion(nombreEvento, nomEd);
+                    DtEdicion dt = port.obtenerDtEdicion(nombreEvento, nomEd);
                     if (dt != null) {
-                        // Filtrar por organizador 
+                        // Filtrar por organizador (si coincide o si no viene)
                         String org = null;
                         try { org = dt.getOrganizador(); } catch (Exception ignore) {}
                         if (org == null || org.equals(nick)) {
@@ -167,7 +248,6 @@ public class AltaRegistroServlet extends HttpServlet {
         req.setAttribute("ediciones", ediciones);
     }
 
-    
     private boolean requiereOrganizador(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession sAux = req.getSession(false);
         String rol = sAux == null ? null : (String) sAux.getAttribute("rol");
