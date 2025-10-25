@@ -5,10 +5,11 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
-import logica.datatypes.DTRegistro;
-import logica.datatypes.DTDatosUsuario;
-import logica.interfaces.IControladorUsuario;
-import logica.fabrica;
+import publicadores.DtDatosUsuario;
+import publicadores.DtRegistro;
+import publicadores.PublicadorUsuario;
+import publicadores.PublicadorUsuarioService;
+import publicadores.UsuarioNoExisteException_Exception;
 
 @WebServlet("/registro/ConsultaRegistroEdicion")
 public class ConsultaRegistroEdicionServlet extends HttpServlet {
@@ -28,17 +29,30 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
             return;
         }
 
+        PublicadorUsuarioService service = new PublicadorUsuarioService();
+        PublicadorUsuario port = service.getPublicadorUsuarioPort();
+
         try {
-            IControladorUsuario ctrlUsr = fabrica.getInstance().getIControladorUsuario();
-
-            // Obtener usuario logueado en DT
-            DTDatosUsuario dtoUsuario = (DTDatosUsuario) session.getAttribute("usuario");
+            DtDatosUsuario dtoUsuario = (DtDatosUsuario) session.getAttribute("usuario_logueado");
             if (dtoUsuario == null) {
-                dtoUsuario = ctrlUsr.obtenerDatosUsuario(nick);
+                try {
+                    dtoUsuario = port.obtenerDatosUsuario(nick);
+                } catch (UsuarioNoExisteException_Exception e) {
+                    req.setAttribute("error", "No se pudo encontrar el usuario logueado.");
+                    req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
+                    return;
+                }
             }
+            req.setAttribute("usuario", dtoUsuario);
 
-            // Obtener DTRegistro  desde el controlador
-            DTRegistro dtRegistro = ctrlUsr.obtenerDatosRegistros(idRegistro);
+            DtRegistro dtRegistro = null;
+            try {
+                dtRegistro = port.obtenerDatosRegistro(idRegistro);
+            } catch (Exception e) {
+                req.setAttribute("error", "No se pudo obtener el registro: " + e.getMessage());
+                req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
+                return;
+            }
 
             if (dtRegistro == null) {
                 req.setAttribute("error", "No se encontró el registro solicitado.");
