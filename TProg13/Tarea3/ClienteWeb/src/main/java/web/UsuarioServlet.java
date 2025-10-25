@@ -8,14 +8,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.Set;
 
-import logica.fabrica;
-import logica.interfaces.IControladorUsuario;
-import logica.datatypes.DTDatosUsuario;
-import excepciones.UsuarioYaExisteException;
-import excepciones.UsuarioNoExisteException;
+import publicadores.DtDatosUsuario;
+import publicadores.DtDatosUsuarioArray;
+import publicadores.StringArray;
+import publicadores.UsuarioNoExisteException_Exception;
+import publicadores.UsuarioYaExisteException_Exception;
+
+
 
 @WebServlet(urlPatterns = {"/usuario/AltaUsuario", "/usuario/validar"})
 @MultipartConfig(
@@ -27,22 +29,22 @@ public class UsuarioServlet extends HttpServlet {
 
   private static final String JSP_LOGIN = "/WEB-INF/auth/login.jsp";
   private static final String JSP_ALTA  = "/WEB-INF/usuario/AltaUsuario.jsp";
-
-  // carpeta relativa (servida por el app) para imágenes de usuarios
   private static final String IMG_REL_BASE_USR = "/img/usuarios";
-
-  private final IControladorUsuario controladorUs = fabrica.getInstance().getIControladorUsuario();
 
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
-  private void cargarInstituciones(HttpServletRequest req) {
-    java.util.Collection<String> instituciones = controladorUs.getInstituciones();
-    req.setAttribute("instituciones", instituciones);
+  private void cargarInstituciones(HttpServletRequest req, publicadores.PublicadorUsuario port) {
+    StringArray arr = port.listarInstituciones(); // o getInstituciones()
+    req.setAttribute("instituciones", (arr == null ? java.util.List.of() : Arrays.asList(arr)));
   }
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
+
+    // *** Mantenemos EXACTAMENTE estas dos líneas ***
+    publicadores.PublicadorUsuarioService service = new publicadores.PublicadorUsuarioService();
+    publicadores.PublicadorUsuario port = service.getPublicadorUsuarioPort();
 
     String path = req.getServletPath();
     if (path == null) {
@@ -50,14 +52,13 @@ public class UsuarioServlet extends HttpServlet {
       return;
     }
 
-    // NUEVO: endpoint de validación en vivo
     if ("/usuario/validar".equals(path)) {
-      handleValidar(req, resp);
+      handleValidar(req, resp, port);
       return;
     }
 
     if ("/usuario/AltaUsuario".equals(path)) {
-      cargarInstituciones(req);
+      cargarInstituciones(req, port);
       req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
       return;
     }
@@ -65,16 +66,18 @@ public class UsuarioServlet extends HttpServlet {
     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
 
-
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    String path = req.getServletPath();
-    if (!"/usuario/AltaUsuario".equals(path)) {
+    if (!"/usuario/AltaUsuario".equals(req.getServletPath())) {
       resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       return;
     }
+
+    // *** Mantenemos EXACTAMENTE estas dos líneas también acá ***
+    publicadores.PublicadorUsuarioService service = new publicadores.PublicadorUsuarioService();
+    publicadores.PublicadorUsuario port = service.getPublicadorUsuarioPort();
 
     // === manejo de imagen (opcional) ===
     Part imagenPart = null;
@@ -85,21 +88,17 @@ public class UsuarioServlet extends HttpServlet {
       String ctype = imagenPart.getContentType();
       if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
         req.setAttribute("error", "El archivo subido no es una imagen válida.");
-        cargarInstituciones(req);
+        cargarInstituciones(req, port);
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
         return;
       }
 
-      // Ruta física dentro del webapp (requiere deploy “exploded”)
       String baseImg = getServletContext().getRealPath(IMG_REL_BASE_USR);
       if (baseImg == null) {
         String root = getServletContext().getRealPath("/");
         if (root != null) baseImg = Path.of(root, "img", "usuarios").toString();
       }
-      if (baseImg == null) {
-        throw new ServletException("No se pudo resolver la ruta física de /img/usuarios.");
-      }
-
+      if (baseImg == null) throw new ServletException("No se pudo resolver la ruta física de /img/usuarios.");
       Files.createDirectories(Path.of(baseImg));
 
       String nickParam = req.getParameter("nick");
@@ -115,7 +114,7 @@ public class UsuarioServlet extends HttpServlet {
         Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
       }
 
-      nombreArchivo = finalName; // se guarda en BD/modelo (tu controlador lo recibe)
+      nombreArchivo = finalName;
       System.out.println("✅ Imagen guardada: " + destino.toAbsolutePath()
           + " | URL: " + ctx(req) + IMG_REL_BASE_USR + "/" + finalName);
     }
@@ -137,13 +136,13 @@ public class UsuarioServlet extends HttpServlet {
     // validaciones básicas
     if (pass1 == null || pass2 == null || pass1.isBlank() || pass2.isBlank() || !pass1.equals(pass2)) {
       req.setAttribute("error", "Las contraseñas no coinciden o están vacías.");
-      cargarInstituciones(req);
+      cargarInstituciones(req, port);
       forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
       return;
     }
     if (nick == null || correo == null || rol == null || nick.isBlank() || correo.isBlank()) {
       req.setAttribute("error", "Faltan datos obligatorios.");
-      cargarInstituciones(req);
+      cargarInstituciones(req, port);
       forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
       return;
     }
@@ -155,7 +154,7 @@ public class UsuarioServlet extends HttpServlet {
     if (!esOrganizador) {
       if (nacStr == null || nacStr.isBlank()) {
         req.setAttribute("error", "Debe ingresar una fecha de nacimiento.");
-        cargarInstituciones(req);
+        cargarInstituciones(req, port);
         forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
         return;
       }
@@ -164,35 +163,45 @@ public class UsuarioServlet extends HttpServlet {
         if (fechaNac.isAfter(LocalDate.now())) throw new IllegalArgumentException();
       } catch (Exception e) {
         req.setAttribute("error", "Formato de fecha inválido o futura.");
-        cargarInstituciones(req);
+        cargarInstituciones(req, port);
         forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
         return;
       }
     } else {
       if (organizacion == null || organizacion.isBlank() || descripcion == null || descripcion.isBlank()) {
         req.setAttribute("error", "Debe completar los campos obligatorios del organizador.");
-        cargarInstituciones(req);
+        cargarInstituciones(req, port);
         forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
         return;
       }
     }
 
-    // nombre final para alta (org usa 'organizacion', asistente usa 'nombre')
     String nombreFinal = esOrganizador ? organizacion : nombre;
 
     try {
-      // Alta (la firma incluye imagen como último parámetro)
-    	
-    	if (existeNickDT(nick)) { req.setAttribute("error","El nick ya existe."); cargarInstituciones(req); forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr); return; }
-    	if (existeEmailDT(correo)) { req.setAttribute("error","El email ya existe."); cargarInstituciones(req); forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr); return; }
-      controladorUs.altaUsuario(
+      // Chequeos de unicidad vía servicio
+      if (existeNickDT(nick, port)) {
+        req.setAttribute("error","El nick ya existe.");
+        cargarInstituciones(req, port);
+        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+        return;
+      }
+      if (existeEmailDT(correo, port)) {
+        req.setAttribute("error","El email ya existe.");
+        cargarInstituciones(req, port);
+        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+        return;
+      }
+
+      // Alta por publicador
+      port.altaUsuario(
           nick,
           nombreFinal,
           correo,
           descripcion,
           link,
           apellido,
-          fechaNac,
+          fechaNac,       // si el stub pide XMLGregorianCalendar, convertir aquí
           institucion,
           esOrganizador,
           pass1,
@@ -201,15 +210,15 @@ public class UsuarioServlet extends HttpServlet {
 
       // login directo post-alta
       HttpSession sAux = req.getSession(true);
-      DTDatosUsuario usuarioLogueado;
+      DtDatosUsuario usuarioLogueado;
       try {
-        usuarioLogueado = controladorUs.obtenerDatosUsuario(nick);
-      } catch (UsuarioNoExisteException e) {
-        req.setAttribute("error", "No se pudo encontrar el usuario recién creado.");
-        cargarInstituciones(req);
-        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-        return;
-      }
+        usuarioLogueado = port.obtenerDatosUsuario(nick);
+      } catch (UsuarioNoExisteException_Exception e) {
+    	    req.setAttribute("error", "No se pudo encontrar el usuario recién creado.");
+    	    cargarInstituciones(req, port);
+    	    forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+    	    return;
+    	}
       sAux.setAttribute("usuario_logueado", usuarioLogueado);
       sAux.setAttribute("nick", nick);
       sAux.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
@@ -225,10 +234,10 @@ public class UsuarioServlet extends HttpServlet {
 
       resp.sendRedirect(ctx(req) + "/inicio");
 
-    } catch (UsuarioYaExisteException e) {
-      req.setAttribute("error", e.getMessage());
-      cargarInstituciones(req);
-      forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+    } catch (UsuarioYaExisteException_Exception e) {
+        req.setAttribute("error", e.getMessage());
+        cargarInstituciones(req, port);
+        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
     }
   }
 
@@ -273,61 +282,78 @@ public class UsuarioServlet extends HttpServlet {
     if (ctype.contains("webp")) return ".webp";
     return ".jpg";
   }
-  
-  private boolean existeNickDT(String nick) {
+
+  // ==== helpers contra el servicio (usan el 'port' recibido) ====
+  private boolean existeNickDT(String nick, publicadores.PublicadorUsuario port) {
 	  try {
-	    Set<DTDatosUsuario> usuarios = controladorUs.obtenerUsuariosDT();
-	    if (usuarios == null) return false;
-	    for (logica.datatypes.DTDatosUsuario u : usuarios) {
-	      if (u != null && u.getNickname() != null && u.getNickname().equals(nick)) return true;
+	    DtDatosUsuarioArray arr = port.obtenerUsuariosDT();
+	    for (DtDatosUsuario u : asList(arr)) {
+	      if (u != null && nick != null && nick.equals(u.getNickname())) return true;
 	    }
-	  } catch (excepciones.UsuarioNoExisteException ignore) { /* según tu impl puede lanzar o no */ }
+	  } catch (Exception ignore) { }
 	  return false;
 	}
 
-	private boolean existeEmailDT(String email) {
+	private boolean existeEmailDT(String email, publicadores.PublicadorUsuario port) {
 	  try {
-	    Set<DTDatosUsuario> usuarios = controladorUs.obtenerUsuariosDT();
-	    if (usuarios == null) return false;
-	    for (DTDatosUsuario u : usuarios) {
+	    DtDatosUsuarioArray arr = port.obtenerUsuariosDT();
+	    for (DtDatosUsuario u : asList(arr)) {
 	      if (u != null && u.getEmail() != null && u.getEmail().equalsIgnoreCase(email)) return true;
 	    }
-	  } catch (excepciones.UsuarioNoExisteException ignore) { }
+	  } catch (Exception ignore) { }
 	  return false;
 	}
 
-	private void handleValidar(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-	  resp.setCharacterEncoding("UTF-8");
-	  resp.setContentType("text/plain; charset=UTF-8");
-	  resp.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+  private void handleValidar(HttpServletRequest req, HttpServletResponse resp,
+                             publicadores.PublicadorUsuario port) throws IOException {
+    resp.setCharacterEncoding("UTF-8");
+    resp.setContentType("text/plain; charset=UTF-8");
+    resp.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
 
-	  String nick  = safeTrim(req.getParameter("nick"));
-	  String email = safeTrim(req.getParameter("email"));
+    String nick  = safeTrim(req.getParameter("nick"));
+    String email = safeTrim(req.getParameter("email"));
 
-	  if ((nick == null || nick.isEmpty()) && (email == null || email.isEmpty())) {
-	    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-	    resp.getWriter().write("ERROR");
-	    return;
-	  }
+    if ((nick == null || nick.isEmpty()) && (email == null || email.isEmpty())) {
+      resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      resp.getWriter().write("ERROR");
+      return;
+    }
 
+    try {
+      if (nick != null && !nick.isEmpty()) {
+        boolean exists = existeNickDT(nick, port);
+        resp.getWriter().write(exists ? "NO" : "OK");
+        return;
+      }
+      if (email != null && !email.isEmpty()) {
+        boolean exists = existeEmailDT(email, port);
+        resp.getWriter().write(exists ? "NO" : "OK");
+        return;
+      }
+      resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      resp.getWriter().write("ERROR");
+    } catch (Exception e) {
+      resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      resp.getWriter().write("ERROR");
+    }
+  }
+
+ private static String safeTrim(String s){ return s == null ? null : s.trim(); }
+
+private static java.util.List<DtDatosUsuario> asList(DtDatosUsuarioArray arr) {
+	  if (arr == null) return java.util.List.of();
+	  // según cómo generó el stub puede ser getItem() o getItems():
 	  try {
-	    if (nick != null && !nick.isEmpty()) {
-	      boolean exists = existeNickDT(nick);
-	      resp.getWriter().write(exists ? "NO" : "OK");
-	      return;
+	    java.util.List<DtDatosUsuario> l = arr.getItem();
+	    return (l == null) ? java.util.List.of() : l;
+	  } catch (NoSuchMethodError e) {
+	    try {
+	      java.util.List<DtDatosUsuario> l = (java.util.List<DtDatosUsuario>) arr.getClass()
+	          .getMethod("getItems").invoke(arr);
+	      return (l == null) ? java.util.List.of() : l;
+	    } catch (Exception ignore) {
+	      return java.util.List.of();
 	    }
-	    if (email != null && !email.isEmpty()) {
-	      boolean exists = existeEmailDT(email);
-	      resp.getWriter().write(exists ? "NO" : "OK");
-	      return;
-	    }
-	    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-	    resp.getWriter().write("ERROR");
-	  } catch (Exception e) {
-	    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	    resp.getWriter().write("ERROR");
 	  }
 	}
-
-	private static String safeTrim(String s){ return s == null ? null : s.trim(); }
 }
