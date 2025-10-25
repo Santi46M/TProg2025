@@ -201,7 +201,7 @@ public class UsuarioServlet extends HttpServlet {
           descripcion,
           link,
           apellido,
-          fechaNac,       // si el stub pide XMLGregorianCalendar, convertir aquí
+          fechaNac,       
           institucion,
           esOrganizador,
           pass1,

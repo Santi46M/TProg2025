@@ -5,19 +5,23 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
+import java.util.Date;
 
-import logica.fabrica;
-import logica.interfaces.IControladorEvento;
-import logica.interfaces.IControladorUsuario;
-import logica.datatypes.DTPatrocinio;
-import logica.datatypes.DTEvento;
-import logica.datatypes.DTEdicion;
-import logica.datatypes.DTTipoRegistro;
-import logica.enumerados.DTNivel;
+import publicadores.DtEdicion;
+import publicadores.DtEvento;
+import publicadores.DTNivel;
+import publicadores.DtPatrocinio;
+import publicadores.DtTipoRegistro;
+// Excepciones generadas por el stub
+import publicadores.PatrocinioYaExisteException_Exception;
+import publicadores.ValorPatrocinioExcedidoException_Exception;
 
 @WebServlet({
     "/edicion/ConsultaPatrocinio",   // legacy (consulta)
@@ -25,14 +29,6 @@ import logica.enumerados.DTNivel;
 })
 public class ConsultaPatrocinioServlet extends HttpServlet {
 
-    private IControladorEvento ctl() {
-        return fabrica.getInstance().getIControladorEvento();
-    }
-    private IControladorUsuario ctlUs() {
-        return fabrica.getInstance().getIControladorUsuario();
-    }
-
-    // --- Helper: requiere rol organizador ---
     private boolean requiereOrganizador(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession s = req.getSession(false);
         String rol = (s == null) ? null : (String) s.getAttribute("rol");
@@ -46,14 +42,21 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
     }
 
     private String encode(String s) {
-        try { return java.net.URLEncoder.encode(s, java.nio.charset.StandardCharsets.UTF_8); }
+        try { return URLEncoder.encode(s, StandardCharsets.UTF_8.name()); }
         catch (Exception e) { return s; }
     }
+    private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
+
+        // === PUERTOS (dos líneas por servicio, como pediste) ===
+        publicadores.PublicadorEventoService svcEv = new publicadores.PublicadorEventoService();
+        publicadores.PublicadorEvento portEv = svcEv.getPublicadorEventoPort();
+        publicadores.PublicadorUsuarioService svcUs = new publicadores.PublicadorUsuarioService();
+        publicadores.PublicadorUsuario portUs = svcUs.getPublicadorUsuarioPort();
 
         String servletPath = req.getServletPath();
         String pathInfo    = req.getPathInfo();
@@ -72,7 +75,7 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
                     return;
                 }
 
-                DTPatrocinio dto = ctl().obtenerDTPatrocinio(codigoPatrocinio);
+                DtPatrocinio dto = portEv.obtenerDTPatrocinio(codigoPatrocinio);
                 if (dto == null) {
                     resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Patrocinio no encontrado");
                     return;
@@ -88,61 +91,97 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
             case "/alta": {
                 if (!requiereOrganizador(req, resp)) return;
 
-                String eventoSel  = req.getParameter("evento");   // puede venir null
-                String edicionSel = req.getParameter("edicion");  // puede venir null
+                String eventoSel  = req.getParameter("evento");
+                String edicionSel = req.getParameter("edicion");
 
-                // 1) Instituciones (Set<String>)
-                Set<String> instituciones = ctlUs().getInstituciones();
+                // 1) Instituciones
+                List<String> instituciones = new ArrayList<>();
+                try {
+                    Object inst = portUs.listarInstituciones();
+                    if (inst instanceof String[]) {
+                        instituciones = Arrays.asList((String[]) inst);
+                    } else if (inst != null) {
+                        @SuppressWarnings("unchecked")
+                        List<String> items = (List<String>) inst.getClass().getMethod("getItem").invoke(inst);
+                        if (items != null) instituciones.addAll(items);
+                    }
+                } catch (Exception ignore) {}
                 req.setAttribute("instituciones", instituciones);
 
-                // 2) Filtrar eventos/ediciones por organizador usando SOLO DTOs
+                // 2) Eventos/ediciones del organizador
                 HttpSession s = req.getSession(false);
                 String nick = (s == null) ? null : (String) s.getAttribute("nick");
 
-//                List<DTEvento> todos = ctl().listarEventos();
-                List<DTEvento> todos = ctl().listarEventosVigentes();
+                List<DtEvento> todos = new ArrayList<>();
+                try {
+                    Object evRes = portEv.listarEventosVigentes();
+                    if (evRes instanceof DtEvento[]) {
+                        todos = (evRes == null) ? List.of() : Arrays.asList((DtEvento[]) evRes);
+                    } else if (evRes != null) {
+                        @SuppressWarnings("unchecked")
+                        List<DtEvento> items = (List<DtEvento>) evRes.getClass().getMethod("getItem").invoke(evRes);
+                        if (items != null) todos.addAll(items);
+                    }
+                } catch (Exception ignore) {}
+
                 List<String> eventosOrganizador   = new ArrayList<>();
                 List<String> edicionesOrganizador = new ArrayList<>();
 
-                if (todos != null && nick != null) {
-                    for (DTEvento ev : todos) {
+                if (!todos.isEmpty() && nick != null) {
+                    for (DtEvento ev : todos) {
+                        if (ev == null) continue;
                         String nombreEv = ev.getNombre();
-                        List<String> eds = ctl().listarEdicionesEvento(nombreEv);
+
+                        List<String> eds = new ArrayList<>();
+                        try {
+                            Object res = portEv.listarEdicionesEvento(nombreEv);
+                            if (res instanceof String[]) {
+                                eds = Arrays.asList((String[]) res);
+                            } else if (res != null) {
+                                @SuppressWarnings("unchecked")
+                                List<String> items = (List<String>) res.getClass().getMethod("getItem").invoke(res);
+                                if (items != null) eds.addAll(items);
+                            }
+                        } catch (Exception ignore) {}
+
                         boolean agregaEvento = false;
-                        if (eds != null) {
-                            for (String ed : eds) {
-                                DTEdicion edDTO = ctl().obtenerDtEdicion(nombreEv, ed);
-                                if (edDTO != null) {
-                                    // getOrganizador() devuelve el identificador del organizador (nick)
-                                    String orgNick = edDTO.getOrganizador();
-                                    if (orgNick != null && orgNick.equals(nick)) {
-                                        agregaEvento = true;
-                                        if (nombreEv.equals(eventoSel)) {
-                                            edicionesOrganizador.add(ed);
-                                        }
+                        for (String ed : eds) {
+                            DtEdicion edDTO = portEv.obtenerDtEdicion(nombreEv, ed);
+                            if (edDTO != null) {
+                                String orgNick = edDTO.getOrganizador();
+                                if (orgNick != null && orgNick.equals(nick)) {
+                                    agregaEvento = true;
+                                    if (nombreEv.equals(eventoSel)) {
+                                        edicionesOrganizador.add(ed);
                                     }
                                 }
                             }
                         }
-                        if (agregaEvento) {
-                            eventosOrganizador.add(nombreEv);
-                        }
+                        if (agregaEvento) eventosOrganizador.add(nombreEv);
                     }
                 }
 
-                // Si la edición seleccionada no pertenece al evento elegido (o cambió el evento), la descarto
                 if (edicionSel != null && !edicionSel.isEmpty()
-                        && (edicionesOrganizador == null || !edicionesOrganizador.contains(edicionSel))) {
+                        && (edicionesOrganizador.isEmpty() || !edicionesOrganizador.contains(edicionSel))) {
                     edicionSel = null;
                 }
 
-                // 3) Tipos de registro si ya hay selección válida
-                List<DTTipoRegistro> tipos =
-                    (eventoSel != null && !eventoSel.isEmpty() && edicionSel != null && !edicionSel.isEmpty())
-                        ? ctl().listarTiposRegistroDeEdicion(eventoSel, edicionSel)
-                        : java.util.Collections.emptyList();
+                // 3) Tipos de registro
+                List<DtTipoRegistro> tipos = new ArrayList<>();
+                if (eventoSel != null && !eventoSel.isEmpty() && edicionSel != null && !edicionSel.isEmpty()) {
+                    try {
+                        Object trRes = portEv.listarTiposRegistroDeEdicion(eventoSel, edicionSel);
+                        if (trRes instanceof DtTipoRegistro[]) {
+                            DtTipoRegistro[] arr = (DtTipoRegistro[]) trRes;
+                            tipos = (arr == null) ? List.of() : Arrays.asList(arr);
+                        } else if (trRes != null) {
+                            @SuppressWarnings("unchecked")
+                            List<DtTipoRegistro> items = (List<DtTipoRegistro>) trRes.getClass().getMethod("getItem").invoke(trRes);
+                            if (items != null) tipos.addAll(items);
+                        }
+                    } catch (Exception ignore) {}
+                }
 
-                // 4) Atributos para JSP
                 req.setAttribute("evento", eventoSel);
                 req.setAttribute("edicion", edicionSel);
                 req.setAttribute("eventosOrganizador", eventosOrganizador);
@@ -162,6 +201,10 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
+
+        // === PUERTO eventos ===
+        publicadores.PublicadorEventoService svcEv = new publicadores.PublicadorEventoService();
+        publicadores.PublicadorEvento portEv = svcEv.getPublicadorEventoPort();
 
         String servletPath = req.getServletPath();
         String pathInfo    = req.getPathInfo();
@@ -190,45 +233,51 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
             return;
         }
 
-        // Seguridad: validar que el usuario actual organiza esa edición (usando solo DTO)
+        // Validación organizador
         HttpSession s = req.getSession(false);
         String nick = (s == null) ? null : (String) s.getAttribute("nick");
 
-        DTEdicion edDTO = ctl().obtenerDtEdicion(evento, edicion);
+        DtEdicion edDTO = portEv.obtenerDtEdicion(evento, edicion);
         if (edDTO == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Edición inválida.");
             return;
         }
-        String orgNick = edDTO.getOrganizador(); // <- organizador como string (nick)
+        String orgNick = edDTO.getOrganizador();
         if (nick == null || orgNick == null || !nick.equals(orgNick)) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "No es organizador de la edición seleccionada.");
             return;
         }
 
-        // Para altaPatrocinioDT necesitamos la SIGLA de la edición (del DTO)
         String siglaEd = edDTO.getSigla();
 
         try {
             DTNivel nivel   = DTNivel.valueOf(nivelStr);
             int aporte      = Integer.parseInt(aporteStr);
             int cantidad    = Integer.parseInt(cantStr);
+
+            // Fecha como java.util.Date (00:00 en zona local)
             LocalDate fecha = LocalDate.parse(fechaStr); // yyyy-MM-dd
+            Date fechaDate = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-            ctl().altaPatrocinioDT(siglaEd, instit, nivel, tipo, aporte, fecha, cantidad, codigo);
+            // altaPatrocinioDT(siglaEd, instit, nivel, tipo, aporte, fecha(java.util.Date), cantidad, codigo)
+            portEv.altaPatrocinioDT(siglaEd, instit, nivel, tipo, aporte, fechaDate, cantidad, codigo);
 
-            String url = req.getContextPath() + "/edicion/patrocinio/consulta"
+            String url = ctx(req) + "/edicion/patrocinio/consulta"
                     + "?evento=" + encode(evento)
                     + "&edicion=" + encode(edicion)
                     + "&codigoPatrocinio=" + encode(codigo);
             resp.sendRedirect(url);
 
+        } catch (NumberFormatException e) {
+            req.setAttribute("error", "Costo/cantidad deben ser numéricos.");
+            recargarFormAlta(req, resp);
         } catch (IllegalArgumentException e) {
             req.setAttribute("error", "Valores inválidos: " + e.getMessage());
             recargarFormAlta(req, resp);
-        } catch (excepciones.PatrocinioYaExisteException e) {
+        } catch (PatrocinioYaExisteException_Exception e) {
             req.setAttribute("error", "Ya existe un patrocinio para esa institución/edición o el código ya está en uso.");
             recargarFormAlta(req, resp);
-        } catch (excepciones.ValorPatrocinioExcedidoException e) {
+        } catch (ValorPatrocinioExcedidoException_Exception e) {
             req.setAttribute("error", "La cantidad de registros gratuitos excede el 20% del aporte.");
             recargarFormAlta(req, resp);
         } catch (Exception e) {
@@ -239,56 +288,101 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
 
     private void recargarFormAlta(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        publicadores.PublicadorUsuarioService svcUs = new publicadores.PublicadorUsuarioService();
+        publicadores.PublicadorUsuario portUs = svcUs.getPublicadorUsuarioPort();
+        publicadores.PublicadorEventoService svcEv = new publicadores.PublicadorEventoService();
+        publicadores.PublicadorEvento portEv = svcEv.getPublicadorEventoPort();
+
         String eventoSel  = req.getParameter("evento");
         String edicionSel = req.getParameter("edicion");
 
         // Instituciones
-        Set<String> instituciones = ctlUs().getInstituciones();
+        List<String> instituciones = new ArrayList<>();
+        try {
+            Object inst = portUs.listarInstituciones();
+            if (inst instanceof String[]) {
+                instituciones = Arrays.asList((String[]) inst);
+            } else if (inst != null) {
+                @SuppressWarnings("unchecked")
+                List<String> items = (List<String>) inst.getClass().getMethod("getItem").invoke(inst);
+                if (items != null) instituciones.addAll(items);
+            }
+        } catch (Exception ignore) {}
         req.setAttribute("instituciones", instituciones);
 
-        // Reconstruir eventos/ediciones del organizador SOLO con DTOs
+        // Eventos/ediciones del organizador
         HttpSession s = req.getSession(false);
         String nick = (s == null) ? null : (String) s.getAttribute("nick");
 
-        List<DTEvento> todos = ctl().listarEventos();
+        List<DtEvento> todos = new ArrayList<>();
+        try {
+            Object evRes = portEv.listarEventos();
+            if (evRes instanceof DtEvento[]) {
+                todos = (evRes == null) ? List.of() : Arrays.asList((DtEvento[]) evRes);
+            } else if (evRes != null) {
+                @SuppressWarnings("unchecked")
+                List<DtEvento> items = (List<DtEvento>) evRes.getClass().getMethod("getItem").invoke(evRes);
+                if (items != null) todos.addAll(items);
+            }
+        } catch (Exception ignore) {}
+
         List<String> eventosOrganizador   = new ArrayList<>();
         List<String> edicionesOrganizador = new ArrayList<>();
 
-        if (todos != null && nick != null) {
-            for (DTEvento ev : todos) {
+        if (!todos.isEmpty() && nick != null) {
+            for (DtEvento ev : todos) {
+                if (ev == null) continue;
                 String nombreEv = ev.getNombre();
-                List<String> eds = ctl().listarEdicionesEvento(nombreEv);
+
+                List<String> eds = new ArrayList<>();
+                try {
+                    Object res = portEv.listarEdicionesEvento(nombreEv);
+                    if (res instanceof String[]) {
+                        eds = Arrays.asList((String[]) res);
+                    } else if (res != null) {
+                        @SuppressWarnings("unchecked")
+                        List<String> items = (List<String>) res.getClass().getMethod("getItem").invoke(res);
+                        if (items != null) eds.addAll(items);
+                    }
+                } catch (Exception ignore) {}
+
                 boolean agregaEvento = false;
-                if (eds != null) {
-                    for (String ed : eds) {
-                        DTEdicion edDTO = ctl().obtenerDtEdicion(nombreEv, ed);
-                        if (edDTO != null) {
-                            String orgNick = edDTO.getOrganizador();
-                            if (orgNick != null && orgNick.equals(nick)) {
-                                agregaEvento = true;
-                                if (nombreEv.equals(eventoSel)) {
-                                    edicionesOrganizador.add(ed);
-                                }
+                for (String ed : eds) {
+                    DtEdicion edDTO = portEv.obtenerDtEdicion(nombreEv, ed);
+                    if (edDTO != null) {
+                        String orgNick = edDTO.getOrganizador();
+                        if (orgNick != null && orgNick.equals(nick)) {
+                            agregaEvento = true;
+                            if (nombreEv.equals(eventoSel)) {
+                                edicionesOrganizador.add(ed);
                             }
                         }
                     }
                 }
-                if (agregaEvento) {
-                    eventosOrganizador.add(nombreEv);
-                }
+                if (agregaEvento) eventosOrganizador.add(nombreEv);
             }
         }
 
-        // Invalidar edición si no pertenece al evento seleccionado
         if (edicionSel != null && !edicionSel.isEmpty()
-                && (edicionesOrganizador == null || !edicionesOrganizador.contains(edicionSel))) {
+                && (edicionesOrganizador.isEmpty() || !edicionesOrganizador.contains(edicionSel))) {
             edicionSel = null;
         }
 
-        List<DTTipoRegistro> tipos =
-            (eventoSel != null && !eventoSel.isEmpty() && edicionSel != null && !edicionSel.isEmpty())
-                ? ctl().listarTiposRegistroDeEdicion(eventoSel, edicionSel)
-                : java.util.Collections.emptyList();
+        List<DtTipoRegistro> tipos = new ArrayList<>();
+        if (eventoSel != null && !eventoSel.isEmpty() && edicionSel != null && !edicionSel.isEmpty()) {
+            try {
+                Object trRes = portEv.listarTiposRegistroDeEdicion(eventoSel, edicionSel);
+                if (trRes instanceof DtTipoRegistro[]) {
+                    DtTipoRegistro[] arr = (DtTipoRegistro[]) trRes;
+                    tipos = (arr == null) ? List.of() : Arrays.asList(arr);
+                } else if (trRes != null) {
+                    @SuppressWarnings("unchecked")
+                    List<DtTipoRegistro> items = (List<DtTipoRegistro>) trRes.getClass().getMethod("getItem").invoke(trRes);
+                    if (items != null) tipos.addAll(items);
+                }
+            } catch (Exception ignore) {}
+        }
 
         req.setAttribute("evento", eventoSel);
         req.setAttribute("edicion", edicionSel);
