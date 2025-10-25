@@ -1,8 +1,8 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="publicadores.DtPatrocinio" %>
 <%
   String ctx = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
-  logica.datatypes.DTPatrocinio patrocinio = (logica.datatypes.DTPatrocinio) request.getAttribute("patrocinio");
+  DtPatrocinio patrocinio = (DtPatrocinio) request.getAttribute("patrocinio");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -26,7 +26,7 @@
           <div class="event-meta" style="margin-bottom:.7em;"><strong>Institución:</strong> <span style="font-weight:500;"><%= patrocinio.getInstitucion() %></span></div>
           <div class="event-meta" style="margin-bottom:.7em;"><strong>Nivel:</strong> <span style="font-weight:500;"><%= String.valueOf(patrocinio.getNivel()) %></span></div>
           <div class="event-meta" style="margin-bottom:.7em;"><strong>Tipo de Registro:</strong> <span style="font-weight:500;"><%= patrocinio.getTipoRegistro() %></span></div>
-          <div class="event-meta" style="margin-bottom:.7em;"><strong>Aporte:</strong> <span style="font-weight:500;">$<%= patrocinio.getMonto() %></span></div>
+          <div class="event-meta" style="margin-bottom:.7em;"><strong>Aporte:</strong> <span style="font-weight:500;"><%= patrocinio.getMonto() %></span></div>
           <div class="event-meta" style="margin-bottom:.7em;"><strong>Fecha de Patrocinio:</strong> <span style="font-weight:500;"><%= patrocinio.getFecha() %></span></div>
           <div class="event-meta" style="margin-bottom:.7em;"><strong>Cantidad de Registros Gratuitos:</strong> <span style="font-weight:500;"><%= patrocinio.getCantRegistrosGratuitos() %></span></div>
           <div class="event-meta" style="margin-bottom:.7em;"><strong>Código de Patrocinio:</strong> <span style="font-weight:500;"><%= patrocinio.getCodigo() %></span></div>

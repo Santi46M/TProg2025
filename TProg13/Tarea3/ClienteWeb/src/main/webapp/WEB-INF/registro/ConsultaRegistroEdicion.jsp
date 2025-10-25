@@ -1,9 +1,8 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.*, logica.datatypes.DTRegistro" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="java.util.*, publicadores.DtRegistro" %>
 <%
   String ctx = request.getContextPath();
   String nickSesion = (String) session.getAttribute("nick");
-  DTRegistro registro = (DTRegistro) request.getAttribute("registro");
+  DtRegistro registro = (DtRegistro) request.getAttribute("registro");
   String error = (String) request.getAttribute("error");
 %>
 <!DOCTYPE html>

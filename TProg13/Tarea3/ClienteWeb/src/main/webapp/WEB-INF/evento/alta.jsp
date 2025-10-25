@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="publicadores.DtCategorias, java.util.List, java.util.ArrayList" %>
 <%
   String ctx  = request.getContextPath();
 %>
@@ -70,14 +70,39 @@
             <legend>Categorías <span class="req">*</span></legend>
             <div class="checkbox-grid-ev">
               <% 
-                java.util.List<logica.datatypes.DTCategorias> dtCats = (java.util.List<logica.datatypes.DTCategorias>) request.getAttribute("dtCategorias");
-                if (dtCats != null && !dtCats.isEmpty()) {
-                  for (logica.datatypes.DTCategorias dtCat : dtCats) {
-                    for (String c : dtCat.getCategorias()) {
+                java.util.List<Object> dtCatsRaw = (java.util.List<Object>) request.getAttribute("dtCategorias");
+                java.util.List<String> cats = new ArrayList<>();
+                if (dtCatsRaw != null && !dtCatsRaw.isEmpty()) {
+                  for (Object o : dtCatsRaw) {
+                    try {
+                      if (o instanceof DtCategorias) {
+                        DtCategorias d = (DtCategorias) o;
+                        if (d.getCategorias() != null) cats.addAll(d.getCategorias().getCategoria());
+                      } else {
+                        // fallback: try reflection to obtain getCategorias() -> getCategoria()
+                        java.lang.reflect.Method m = o.getClass().getMethod("getCategorias");
+                        Object res = m.invoke(o);
+                        if (res != null) {
+                          java.lang.reflect.Method gm = res.getClass().getMethod("getCategoria");
+                          Object list = gm.invoke(res);
+                          if (list instanceof java.util.Collection) {
+                            for (Object s : (java.util.Collection) list) {
+                              if (s != null) cats.add(s.toString());
+                            }
+                          }
+                        }
+                      }
+                    } catch (Exception e) {
+                      // ignore per-item errors
+                    }
+                  }
+                }
+
+                if (cats != null && !cats.isEmpty()) {
+                  for (String c : cats) {
               %>
                         <label><span><%= c %></span><input type="checkbox" class="cat" value="<%= c %>"></label>
-              <%      }
-                  }
+              <%    }
                 } else {
               %>
                         <label><span>(Sin categorías)</span></label>

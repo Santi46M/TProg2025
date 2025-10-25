@@ -1,4 +1,3 @@
-package publicadores;
 
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;

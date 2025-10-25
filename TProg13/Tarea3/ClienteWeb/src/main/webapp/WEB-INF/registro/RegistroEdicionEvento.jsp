@@ -1,11 +1,11 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.*,logica.datatypes.*" %>
+<%@ page import="java.util.*, publicadores.DtEvento, publicadores.DtEdicion, publicadores.DtTipoRegistro, publicadores.DtRegistro" %>
 <%
   String ctx = request.getContextPath();
-  List<DTEvento> eventos = (List<DTEvento>) request.getAttribute("eventos");
-  Map<String, List<DTEdicion>> mapa = (Map<String, List<DTEdicion>>) request.getAttribute("edicionesPorEvento");
-  DTEdicion edSel = (DTEdicion) request.getAttribute("edicionSeleccionada");
-  List<DTTipoRegistro> tipos = (List<DTTipoRegistro>) request.getAttribute("tiposRegistro");
+  List<DtEvento> eventos = (List<DtEvento>) request.getAttribute("eventos");
+  Map<String, List<DtEdicion>> mapa = (Map<String, List<DtEdicion>>) request.getAttribute("edicionesPorEvento");
+  DtEdicion edSel = (DtEdicion) request.getAttribute("edicionSeleccionada");
+  List<DtTipoRegistro> tipos = (List<DtTipoRegistro>) request.getAttribute("tiposRegistro");
   Map<String, Integer> cuposDisponibles = (Map<String, Integer>) request.getAttribute("cuposDisponibles");
 
   String eventoSel = request.getParameter("evento");
@@ -13,18 +13,18 @@
   Boolean yaRegistrado = (Boolean) request.getAttribute("yaRegistrado");
   if (yaRegistrado == null) yaRegistrado = false;
 
-  boolean cerrada = false;
-  if (edSel != null && edSel.getFechaFin() != null) {
-    cerrada = java.time.LocalDate.now().isAfter(edSel.getFechaFin());
-  }
+  // Do not attempt to compare generated LocalDate with java.time.LocalDate here.
+  // Use a servlet-provided boolean 'cerrada' if available; otherwise default to false.
+  Boolean cerradaAttr = (Boolean) request.getAttribute("cerrada");
+  boolean cerrada = (cerradaAttr != null) ? cerradaAttr.booleanValue() : false;
 %>
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" pageEncoding="UTF-8"/>
   <title>Registrarse a una Edición de Evento</title>
-  <link rel="stylesheet" href="<%=ctx%>/css/style.css"/>
-  <link rel="stylesheet" href="<%=ctx%>/css/RegistroEdicionEvento.css"/>
+  <link rel="stylesheet" href="<%=ctx%>/css/style.css">
+  <link rel="stylesheet" href="<%=ctx%>/css/RegistroEdicionEvento.css">
 </head>
 <body>
 
@@ -48,7 +48,7 @@
           <select id="selectEvento" name="evento" required>
             <option value="">-- Seleccione un evento --</option>
             <% if (eventos != null) {
-                 for (DTEvento ev : eventos) {
+                 for (DtEvento ev : eventos) {
                    String sel = ev.getNombre().equals(eventoSel) ? "selected" : "";
             %>
               <option value="<%=ev.getNombre()%>" <%=sel%>><%=ev.getNombre()%></option>
@@ -97,7 +97,7 @@
           <form action="<%=ctx%>/registro/inscripcion" method="post" id="formInscripcion">
             <input type="hidden" name="evento" value="<%= eventoSel %>"/>
             <input type="hidden" name="edicion" value="<%= edSel.getNombre() %>"/>
-            <% for (DTTipoRegistro tr : tipos) { %>
+            <% for (DtTipoRegistro tr : tipos) { %>
               <label style="display:block; margin:.25rem 0;">
                 <input type="radio" name="tipo" value="<%= tr.getNombre() %>" required/>
                 <strong><%= tr.getNombre() %></strong> — <em><%= tr.getDescripcion() %></em> — $<%= tr.getCosto() %>
@@ -123,13 +123,13 @@
   const data = {
     <% if (mapa != null && !mapa.isEmpty()) {
          int i = 0;
-         for (Map.Entry<String, List<DTEdicion>> entry : mapa.entrySet()) {
+         for (Map.Entry<String, List<DtEdicion>> entry : mapa.entrySet()) {
            if (i++ > 0) out.print(",");
            String ev = entry.getKey().replace("\"","\\\"");
            out.print("\""+ev+"\":[");
-           List<DTEdicion> eds = entry.getValue();
+           List<DtEdicion> eds = entry.getValue();
            for (int j=0; j<eds.size(); j++) {
-             DTEdicion ed = eds.get(j);
+             DtEdicion ed = eds.get(j);
              out.print("{\"nombre\":\""+ed.getNombre().replace("\"","\\\"")+"\",\"sigla\":\""+ed.getSigla().replace("\"","\\\"")+"\"}");
              if (j < eds.size()-1) out.print(",");
            }

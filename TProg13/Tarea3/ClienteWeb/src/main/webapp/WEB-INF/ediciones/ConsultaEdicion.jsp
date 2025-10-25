@@ -1,19 +1,19 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.*" %>
-<%@ page import="logica.datatypes.*" %>
+<%@ page import="publicadores.DtEdicion, publicadores.DtRegistro, publicadores.DtTipoRegistro, publicadores.DtPatrocinio" %>
 <%
   String ctx  = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
   String rol  = (String) session.getAttribute("rol");
 
-  DTEdicion edicion = (DTEdicion) request.getAttribute("edicion");
+  DtEdicion edicion = (DtEdicion) request.getAttribute("edicion");
   String organizador = (String) request.getAttribute("organizador");
   @SuppressWarnings("unchecked")
-  List<DTRegistro> registros = (List<DTRegistro>) request.getAttribute("registros");
+  List<DtRegistro> registros = (List<DtRegistro>) request.getAttribute("registros");
   @SuppressWarnings("unchecked")
-  List<DTTipoRegistro> tiposRegistro = (List<DTTipoRegistro>) request.getAttribute("tiposRegistro");
+  List<DtTipoRegistro> tiposRegistro = (List<DtTipoRegistro>) request.getAttribute("tiposRegistro");
   @SuppressWarnings("unchecked")
-  List<DTPatrocinio> patrocinios = (List<DTPatrocinio>) request.getAttribute("patrocinios");
+  List<DtPatrocinio> patrocinios = (List<DtPatrocinio>) request.getAttribute("patrocinios");
 
   // nombre del evento 
   String evNombre = (String) request.getAttribute("evNombre");
@@ -134,7 +134,7 @@
 
           <% if (registros != null && !registros.isEmpty()) { %>
             <% if ("ASISTENTE".equals(rol) && registros.size() == 1) {
-                 DTRegistro registro = registros.get(0);
+                 DtRegistro registro = registros.get(0);
             %>
               <h3>Tu registro en esta edición</h3>
               <p><strong>Tipo:</strong> <%= registro.getTipoRegistro() %></p>
@@ -150,7 +150,7 @@
               <ul class="lista-asistentes">
                 <%
                   int i = 0;
-                  for (DTRegistro registro : registros) {
+                  for (DtRegistro registro : registros) {
                     String id = "detalle-" + i++;
                 %>
                   <li class="asistente-item">
@@ -178,7 +178,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <% for (DTRegistro r : registros) { %>
+                  <% for (DtRegistro r : registros) { %>
                     <tr>
                       <td><%= r.getUsuario() %></td>
                       <td><%= r.getTipoRegistro() %></td>
@@ -208,7 +208,7 @@
     <h3>Tipos de Registro</h3>
     <% if (tiposRegistro != null && !tiposRegistro.isEmpty()) { %>
       <ul>
-        <% for (DTTipoRegistro tr : tiposRegistro) { %>
+        <% for (DtTipoRegistro tr : tiposRegistro) { %>
           <li>
             <strong><%= tr.getNombre() %></strong>
             <form action="<%=ctx%>/registro/ConsultaTipoRegistro" method="get" style="display:inline;">
@@ -227,30 +227,9 @@
     <h3>Patrocinios</h3>
     <% if (patrocinios != null && !patrocinios.isEmpty()) { %>
       <ul>
-        <% for (DTPatrocinio p : patrocinios) { %>
+        <% for (DtPatrocinio p : patrocinios) { %>
           <li>
             <strong><%= p.getInstitucion() %></strong>
             <form action="<%=ctx%>/edicion/ConsultaPatrocinio" method="get" style="display:inline;">
               <input type="hidden" name="evento" value="<%= (evNombre != null ? evNombre : "") %>" />
-              <input type="hidden" name="edicion" value="<%= (edicion != null ? edicion.getNombre() : "") %>" />
-              <input type="hidden" name="codigoPatrocinio" value="<%= p.getCodigo() %>" />
-              <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
-            </form>
-          </li>
-        <% } %>
-      </ul>
-    <% } else { %>
-      <p>No hay patrocinios asociados.</p>
-    <% } %>
-  </aside>
-</div>
-
-<script>
-  function toggleDetalles(id) {
-    const detalle = document.getElementById(id);
-    if (detalle) detalle.classList.toggle('oculto');
-  }
-</script>
-
-</body>
-</html>
+              <input type="hidden" name="edicion" value="<%= (edicion != null

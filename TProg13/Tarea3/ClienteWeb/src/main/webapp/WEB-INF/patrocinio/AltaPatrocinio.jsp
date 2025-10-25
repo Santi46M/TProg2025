@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="java.util.*" %>
-<%@ page import="logica.datatypes.DTTipoRegistro" %>
+<%@ page import="publicadores.DtTipoRegistro" %>
 
 <%
   String ctx = request.getContextPath();
@@ -15,7 +15,7 @@
   @SuppressWarnings("unchecked")
   Set<String> instituciones = (Set<String>) request.getAttribute("instituciones");
   @SuppressWarnings("unchecked")
-  List<DTTipoRegistro> tipos = (List<DTTipoRegistro>) request.getAttribute("tiposRegistro");
+  List<DtTipoRegistro> tipos = (List<DtTipoRegistro>) request.getAttribute("tiposRegistro");
 
   String error = (String) request.getAttribute("error");
 %>
@@ -106,7 +106,7 @@
               <label class="form-label">Tipo de registro</label>
               <select name="tipoRegistro" required class="form-select">
                 <option value="" disabled selected>Seleccione...</option>
-                <% if (tipos != null) for (DTTipoRegistro t : tipos) { %>
+                <% if (tipos != null) for (DtTipoRegistro t : tipos) { %>
                   <option value="<%= t.getNombre() %>">
                     <%= t.getNombre() %> — <%= t.getDescripcion() %> (costo: <%= t.getCosto() %>, cupo: <%= t.getCupo() %>)
                   </option>

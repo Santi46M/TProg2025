@@ -1,4 +1,4 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="publicadores.PublicadorEventoService, publicadores.DtCategorias, java.util.List, java.util.ArrayList" %>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/layoutMenu.css">
 
@@ -7,12 +7,64 @@
   String rol = (String) session.getAttribute("rol");
 
   @SuppressWarnings("unchecked")
-  java.util.List<logica.datatypes.DTCategorias> dtCategorias =
-      (java.util.List<logica.datatypes.DTCategorias>) request.getAttribute("dtCategorias");
+  java.util.List<Object> dtCategoriasRaw = (java.util.List<Object>) request.getAttribute("dtCategorias");
   java.util.List<String> categorias = new java.util.ArrayList<>();
-  if (dtCategorias != null) {
-      for (logica.datatypes.DTCategorias dtCat : dtCategorias) {
-          categorias.addAll(dtCat.getCategorias());
+
+  if (dtCategoriasRaw != null) {
+      for (Object o : dtCategoriasRaw) {
+          try {
+              // try to treat as generated DtCategorias
+              if (o instanceof DtCategorias) {
+                  DtCategorias dtCat = (DtCategorias) o;
+                  if (dtCat.getCategorias() != null) categorias.addAll(dtCat.getCategorias().getCategoria());
+              } else {
+                  // fallback: assume it's a legacy object with getCategorias() returning List<String>
+                  java.lang.reflect.Method m = o.getClass().getMethod("getCategorias");
+                  Object res = m.invoke(o);
+                  if (res instanceof java.util.Collection) {
+                      for (Object s : (java.util.Collection) res) {
+                          if (s != null) categorias.add(s.toString());
+                      }
+                  }
+              }
+          } catch (Exception e) {
+              // ignore per-item errors
+          }
+      }
+  }
+
+  // If no categories found, try calling webservice
+  if (categorias.isEmpty()) {
+      try {
+          PublicadorEventoService svc = new PublicadorEventoService();
+          publicadores.PublicadorEvento port = svc.getPublicadorEventoPort();
+          publicadores.DTCategoriasArray arr = null;
+          // There is no listarDTCategorias returning array in client, try listarDTCategorias via service (if exists)
+          try {
+              // Some generated client might not have array wrapper; attempt to call listarDTCategorias()
+              // Use reflection to call if present
+              java.lang.reflect.Method m = port.getClass().getMethod("listarDTCategorias");
+              Object res = m.invoke(port);
+              if (res instanceof java.util.List) {
+                  for (Object dt : (java.util.List) res) {
+                      try {
+                          java.lang.reflect.Method gm = dt.getClass().getMethod("getCategorias");
+                          Object cats = gm.invoke(dt);
+                          if (cats != null) {
+                              java.lang.reflect.Method g = cats.getClass().getMethod("getCategoria");
+                              Object list = g.invoke(cats);
+                              if (list instanceof java.util.Collection) {
+                                  for (Object it : (java.util.Collection) list) categorias.add(it.toString());
+                              }
+                          }
+                      } catch (Exception ignore) {}
+                  }
+              }
+          } catch (NoSuchMethodException nsme) {
+              // ignore
+          }
+      } catch (Exception ex) {
+          // ignore
       }
   }
 %>

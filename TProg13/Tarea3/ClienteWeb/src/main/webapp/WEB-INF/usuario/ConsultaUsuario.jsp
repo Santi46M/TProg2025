@@ -1,19 +1,52 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.*, java.net.URLEncoder, logica.datatypes.*" %>
-
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="java.util.*, java.net.URLEncoder, publicadores.PublicadorUsuarioService, publicadores.DtDatosUsuario, publicadores.DtDatosUsuarioArray, publicadores.DtEdicion, publicadores.DtRegistro" %>
 <%
   String ctx = request.getContextPath();
   String nickSesion = (String) session.getAttribute("nick");
 
-  Collection<DTDatosUsuario> usuarios = (Collection<DTDatosUsuario>) request.getAttribute("usuarios");
-  DTDatosUsuario usuario = (DTDatosUsuario) request.getAttribute("usuario");
+  Collection<DtDatosUsuario> usuarios = null;
+  DtDatosUsuario usuario = null;
   Map<String, String> edicionToEvento = (Map<String, String>) request.getAttribute("edicionToEvento");
   String error = (String) request.getAttribute("error");
 
   Map<String,String> fotos = (Map<String,String>) request.getAttribute("fotos");
   String usrImagenUrl = (String) request.getAttribute("usrImagenUrl");
 
-  // Rol real del perfil consultado (lo setea el servlet)
+  // Try to use attributes set by servlet first
+  Object attrUsuarios = request.getAttribute("usuarios");
+  Object attrUsuario = request.getAttribute("usuario");
+  if (attrUsuario instanceof DtDatosUsuario) {
+    usuario = (DtDatosUsuario) attrUsuario;
+  }
+
+  try {
+    if (attrUsuarios instanceof Collection) {
+      usuarios = (Collection<DtDatosUsuario>) attrUsuarios;
+    } else {
+      // fetch via webservice if not provided
+      PublicadorUsuarioService svc = new PublicadorUsuarioService();
+      publicadores.PublicadorUsuario port = svc.getPublicadorUsuarioPort();
+      DtDatosUsuarioArray arr = port.obtenerUsuariosDT();
+      if (arr != null && arr.getItem() != null) {
+        usuarios = new ArrayList<>();
+        usuarios.addAll(arr.getItem());
+      }
+    }
+
+    // if single usuario missing but nick param present, fetch
+    if (usuario == null) {
+      String nickParam = request.getParameter("nick");
+      if (nickParam != null && !nickParam.isBlank()) {
+        PublicadorUsuarioService svc2 = new PublicadorUsuarioService();
+        publicadores.PublicadorUsuario port2 = svc2.getPublicadorUsuarioPort();
+        try { usuario = port2.obtenerDatosUsuario(nickParam); } catch (Exception ignore) {}
+      }
+    }
+  } catch (Exception ex) {
+    ex.printStackTrace();
+    if (usuarios == null) usuarios = Collections.emptyList();
+  }
+
+  // Role real del perfil consultado (lo setea el servlet)
   Boolean esPerfilOrganizadorAttr = (Boolean) request.getAttribute("esPerfilOrganizador");
   boolean esPerfilOrganizador = (esPerfilOrganizadorAttr != null)
       ? esPerfilOrganizadorAttr.booleanValue()
@@ -76,7 +109,7 @@
           <% if (usuarios == null || usuarios.isEmpty()) { %>
             <p>No hay usuarios registrados.</p>
           <% } else {
-               for (DTDatosUsuario u : usuarios) {
+               for (DtDatosUsuario u : usuarios) {
                  String fotoUrl = (fotos == null) ? null : fotos.get(u.getNickname());
           %>
             <div class="card usuario-card">

@@ -1,9 +1,8 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.*, logica.datatypes.DTEvento, logica.datatypes.DTEdicion" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="java.util.*, publicadores.DtEvento, publicadores.DtEdicion" %>
 <%
   String ctx = request.getContextPath();
-  List<DTEvento> eventos = (List<DTEvento>) request.getAttribute("eventos");
-  List<DTEdicion> ediciones = (List<DTEdicion>) request.getAttribute("ediciones");
+  List<DtEvento> eventos = (List<DtEvento>) request.getAttribute("eventos");
+  List<DtEdicion> ediciones = (List<DtEdicion>) request.getAttribute("ediciones");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -39,9 +38,9 @@
           <select id="selectEdicion" name="edicion" required>
             <option value="">-- Seleccione una edición --</option>
             <% if (ediciones != null) {
-                 for (DTEdicion ed : ediciones) { %>
+                 for (DtEdicion ed : ediciones) { %>
                    <option value="<%= ed.getSigla() %>">
-                     <%= ed.getNombre() %> (<%= ed.getEvento().getNombre() %>)
+                     <%= ed.getNombre() %> (<%= ed.getEvento() != null ? ed.getEvento().getNombre() : "" %>)
                    </option>
             <%   }
                } %>

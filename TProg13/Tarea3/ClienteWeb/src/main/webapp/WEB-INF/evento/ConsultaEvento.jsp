@@ -1,20 +1,30 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="logica.datatypes.DTEvento" %>
-<%@ page import="logica.datatypes.DTEdicion" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Collections" %>
-<%@ page import="java.time.LocalDate" %>
-
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="publicadores.PublicadorEventoService, publicadores.DtEvento, publicadores.DtEdicion, publicadores.StringArray, publicadores.LocalDate, java.util.List, java.util.ArrayList, java.util.Collections" %>
 <%
   String ctx  = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
 
-  DTEvento ev = (DTEvento) request.getAttribute("evento");
+  // Prefer request-provided event if servlet set it; otherwise fetch using webservice
+  DtEvento ev = null;
+  Object reqEv = request.getAttribute("evento");
+  String paramNombre = request.getParameter("nombre");
+  try {
+    if (reqEv instanceof DtEvento) {
+      ev = (DtEvento) reqEv;
+    } else if (paramNombre != null && !paramNombre.isBlank()) {
+      PublicadorEventoService svc = new PublicadorEventoService();
+      publicadores.PublicadorEvento port = svc.getPublicadorEventoPort();
+      ev = port.consultaDTEvento(paramNombre);
+    }
+  } catch (Exception ex) {
+    ex.printStackTrace();
+  }
+
   String evNombre = (ev != null ? ev.getNombre() : null);
   String evSigla  = (ev != null ? ev.getSigla() : null);
   String evDesc   = (ev != null ? ev.getDescripcion() : null);
+  // use the generated LocalDate type (publicadores.LocalDate) to avoid type mismatch
   LocalDate evFecha  = (ev != null ? ev.getFecha() : null);
-  List<String> evCategorias = (ev != null ? ev.getCategorias() : Collections.emptyList());
+  List<String> evCategorias = (ev != null && ev.getCategorias() != null) ? ev.getCategorias().getCategoria() : Collections.emptyList();
 
   String raw = (String) request.getAttribute("evImagenUrl");
 
@@ -37,7 +47,26 @@
       hasImgCandidate = (evImagenUrl != null && !evImagenUrl.isBlank());
   }
 
-  List<DTEdicion> ediciones = (List<DTEdicion>) request.getAttribute("evEdiciones");
+  // ediciones: prefer request attribute, otherwise fetch via publicador
+  List<DtEdicion> ediciones = (List<DtEdicion>) request.getAttribute("evEdiciones");
+  try {
+    if ((ediciones == null || ediciones.isEmpty()) && ev != null) {
+      PublicadorEventoService svc2 = new PublicadorEventoService();
+      publicadores.PublicadorEvento port2 = svc2.getPublicadorEventoPort();
+      StringArray arr = port2.listarEdicionesEvento(ev.getNombre());
+      ediciones = new ArrayList<>();
+      if (arr != null && arr.getItem() != null) {
+        for (String nombreEd : arr.getItem()) {
+          DtEdicion dt = port2.obtenerDtEdicion(ev.getNombre(), nombreEd);
+          if (dt != null) ediciones.add(dt);
+        }
+      }
+    }
+  } catch (Exception ex) {
+    ex.printStackTrace();
+    if (ediciones == null) ediciones = Collections.emptyList();
+  }
+
   String rolUsuario = (String) request.getAttribute("rol");
 %>
 <!DOCTYPE html>
