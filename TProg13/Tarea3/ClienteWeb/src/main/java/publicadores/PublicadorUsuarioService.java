@@ -1,9 +1,8 @@
-
 package publicadores;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import jakarta.xml.namespace.QName;
+import javax.xml.namespace.QName;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebEndpoint;
 import jakarta.xml.ws.WebServiceClient;
