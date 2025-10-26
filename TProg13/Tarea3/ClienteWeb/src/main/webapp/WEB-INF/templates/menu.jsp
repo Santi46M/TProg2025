@@ -1,4 +1,6 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="publicadores.PublicadorEventoService, publicadores.DtCategorias, java.util.List, java.util.ArrayList" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
+         import="publicadores.PublicadorEventoService, publicadores.PublicadorEvento, publicadores.DtEventoArray, publicadores.DtEvento,
+                 java.util.List, java.util.ArrayList, java.util.HashSet, java.util.Set" %>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/style.css">
 <link rel="stylesheet" href="<%=request.getContextPath()%>/css/layoutMenu.css">
 
@@ -6,67 +8,47 @@
   String ctx = request.getContextPath();
   String rol = (String) session.getAttribute("rol");
 
+  // 1) Intentar usar lo que dejó el filtro: List<String>
   @SuppressWarnings("unchecked")
-  java.util.List<Object> dtCategoriasRaw = (java.util.List<Object>) request.getAttribute("dtCategorias");
-  java.util.List<String> categorias = new java.util.ArrayList<>();
+  List<Object> dtCategoriasRaw = (List<Object>) request.getAttribute("dtCategorias");
+  Set<String> categoriasSet = new HashSet<>();
 
   if (dtCategoriasRaw != null) {
       for (Object o : dtCategoriasRaw) {
-          try {
-              // try to treat as generated DtCategorias
-              if (o instanceof DtCategorias) {
-                  DtCategorias dtCat = (DtCategorias) o;
-                  if (dtCat.getCategorias() != null) categorias.addAll(dtCat.getCategorias().getCategoria());
-              } else {
-                  // fallback: assume it's a legacy object with getCategorias() returning List<String>
-                  java.lang.reflect.Method m = o.getClass().getMethod("getCategorias");
-                  Object res = m.invoke(o);
-                  if (res instanceof java.util.Collection) {
-                      for (Object s : (java.util.Collection) res) {
-                          if (s != null) categorias.add(s.toString());
-                      }
-                  }
-              }
-          } catch (Exception e) {
-              // ignore per-item errors
+          if (o instanceof String) {
+              String s = (String) o;
+              if (s != null && !s.isBlank()) categoriasSet.add(s);
           }
       }
   }
 
-  // If no categories found, try calling webservice
-  if (categorias.isEmpty()) {
+  // 2) Si quedó vacío, traer categorías desde el servicio (listarEventos → DtEventoArray → DtEvento.Categorias.getCategoria())
+  if (categoriasSet.isEmpty()) {
       try {
           PublicadorEventoService svc = new PublicadorEventoService();
-          publicadores.PublicadorEvento port = svc.getPublicadorEventoPort();
-          // no array wrapper type assumed here; use reflection/fallback below
-          // There is no listarDTCategorias returning array in client, try listarDTCategorias via service (if exists)
-          try {
-              // Some generated client might not have array wrapper; attempt to call listarDTCategorias()
-              // Use reflection to call if present
-              java.lang.reflect.Method m = port.getClass().getMethod("listarDTCategorias");
-              Object res = m.invoke(port);
-              if (res instanceof java.util.List) {
-                  for (Object dt : (java.util.List) res) {
-                      try {
-                          java.lang.reflect.Method gm = dt.getClass().getMethod("getCategorias");
-                          Object cats = gm.invoke(dt);
-                          if (cats != null) {
-                              java.lang.reflect.Method g = cats.getClass().getMethod("getCategoria");
-                              Object list = g.invoke(cats);
-                              if (list instanceof java.util.Collection) {
-                                  for (Object it : (java.util.Collection) list) categorias.add(it.toString());
-                              }
-                          }
-                      } catch (Exception ignore) {}
+          PublicadorEvento port = svc.getPublicadorEventoPort();
+
+          DtEventoArray arr = null;
+          try { arr = port.listarEventos(); } catch (Exception ignore) { }
+
+          if (arr != null && arr.getItem() != null) {
+              for (DtEvento ev : arr.getItem()) {
+                  if (ev == null) continue;
+                  DtEvento.Categorias c = ev.getCategorias();
+                  if (c == null) continue;
+                  List<String> cats = c.getCategoria(); // list “viva” del stub
+                  if (cats != null) {
+                      for (String s : cats) if (s != null && !s.isBlank()) categoriasSet.add(s);
                   }
               }
-          } catch (NoSuchMethodException nsme) {
-              // ignore
           }
-      } catch (Exception ex) {
-          // ignore
+      } catch (Exception ignore) {
+          // si falla, dejamos vacío y mostramos "(Sin categorías)"
       }
   }
+
+  // 3) Pasar a lista para iterar
+  List<String> categorias = new ArrayList<>(categoriasSet);
 %>
 
 <aside class="card aside-inicio">
@@ -96,7 +78,6 @@
         </form>
       </li>
       <li>
-        <!-- NUEVO: un botón simple que abre la pantalla de Alta Patrocinio -->
         <form action="<%=ctx%>/edicion/patrocinio/alta" method="get" style="display:inline">
           <button type="submit" class="linklike">Crear Patrocinio</button>
         </form>

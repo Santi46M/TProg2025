@@ -22,58 +22,44 @@ public class CategoriasFilter implements Filter {
 
         if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
             try {
-                // create the publicador port (defensive)
+                // Crear el port EXACTAMENTE con estas dos líneas
                 publicadores.PublicadorEventoService service = new publicadores.PublicadorEventoService();
-                publicadores.PublicadorEvento port = null;
-                try { port = service.getPublicadorEventoPort(); } catch (Exception ignore) { }
+                publicadores.PublicadorEvento port = service.getPublicadorEventoPort();
 
+                // 1) Traer eventos
                 List<DtEvento> eventos = new ArrayList<>();
+                DtEventoArray arr = null;
+                try {
+                    arr = port.listarEventos();
+                } catch (Exception ignore) { /* si falla, dejamos lista vacía */ }
 
-                if (port != null) {
-                    try {
-                        // Preferred typed wrapper
-                        DtEventoArray arr = port.listarEventos();
-                        if (arr != null && arr.getItem() != null) {
-                            eventos.addAll(arr.getItem());
-                        }
-                    } catch (Throwable t) {
-                        // Fallback: try reflective access to listarEventos
-                        try {
-                            Object raw = port.getClass().getMethod("listarEventos").invoke(port);
-                            if (raw instanceof DtEvento[]) {
-                                DtEvento[] darr = (DtEvento[]) raw;
-                                for (DtEvento d : darr) eventos.add(d);
-                            } else if (raw != null) {
-                                try {
-                                    @SuppressWarnings("unchecked")
-                                    List<DtEvento> items = (List<DtEvento>) raw.getClass().getMethod("getItem").invoke(raw);
-                                    if (items != null) eventos.addAll(items);
-                                } catch (Exception ignore) {}
-                            }
-                        } catch (Exception ignore) { }
-                    }
+                if (arr != null && arr.getItem() != null) {
+                    eventos.addAll(arr.getItem());
                 }
 
-                // From events, extract unique category names
+                // 2) Extraer categorías únicas
                 Set<String> cats = new HashSet<>();
                 for (DtEvento ev : eventos) {
                     if (ev == null) continue;
-                    try {
-                        DtEvento.Categorias c = ev.getCategorias();
-                        if (c != null && c.getCategoria() != null) {
-                            for (String s : c.getCategoria()) if (s != null) cats.add(s);
+                    DtEvento.Categorias c = ev.getCategorias();
+                    if (c == null) continue;
+                    List<String> lista = c.getCategoria(); // nunca null por contrato, pero igual chequeamos
+                    if (lista != null) {
+                        for (String s : lista) {
+                            if (s != null && !s.isBlank()) cats.add(s);
                         }
-                    } catch (Exception ignore) {}
+                    }
                 }
 
-                // Expose as a simple list of category names (menu.jsp handles multiple shapes)
-                List<String> dtCategorias = new ArrayList<>(cats);
-                request.setAttribute("dtCategorias", dtCategorias);
+                // 3) Exponer como lista simple para el menú/JSP
+                request.setAttribute("dtCategorias", new ArrayList<>(cats));
+
             } catch (Exception e) {
-                // If anything fails, expose an empty list and continue
-                request.setAttribute("dtCategorias", List.of());
+                // Si algo revienta, no bloqueamos la request
+                request.setAttribute("dtCategorias", java.util.List.of());
             }
         }
+
         chain.doFilter(request, response);
     }
 
