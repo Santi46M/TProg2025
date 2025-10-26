@@ -153,7 +153,7 @@ public class DtEvento {
      *     {@link LocalDate }
      *     
      */
-    public LocalDate getFecha() {
+    public publicadores.LocalDate getFecha() {
         return fecha;
     }
 
