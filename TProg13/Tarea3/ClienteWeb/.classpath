@@ -37,5 +37,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/stax-ex.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/streambuffer.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/woodstox-core.jar"/>
+	<classpathentry kind="lib" path="lib/jakarta.xml.ws-api-3.0.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

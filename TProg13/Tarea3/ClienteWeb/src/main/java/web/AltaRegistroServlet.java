@@ -150,15 +150,12 @@ public class AltaRegistroServlet extends HttpServlet {
                     return;
                 }
 
-                // Alta remota del TipoRegistro
-                port.altaTipoRegistroDTO(dtSel, nombre, descripcion, costo, cupo);
+                // Alta remota del TipoRegistro (usar el método generado)
+                port.altaTipoRegistro(dtSel, nombre, descripcion, costo, cupo);
 
                 // Redirigir a la consulta del TipoRegistro
                 String eventoNombre = null;
-                try { eventoNombre = port.encontrarEventoPorSigla(siglaEdicion); } catch (Exception ignore) {}
-                if (isBlank(eventoNombre)) {
-                    try { eventoNombre = (dtSel.getEvento() != null ? dtSel.getEvento().getNombre() : null); } catch (Exception ignore) {}
-                }
+                try { eventoNombre = (dtSel.getEvento() != null ? dtSel.getEvento().getNombre() : null); } catch (Exception ignore) {}
 
                 String eventoEnc  = URLEncoder.encode(eventoNombre != null ? eventoNombre : "", StandardCharsets.UTF_8.name());
                 String edicionEnc = URLEncoder.encode(dtSel.getNombre(), StandardCharsets.UTF_8.name());
@@ -196,26 +193,55 @@ public class AltaRegistroServlet extends HttpServlet {
         List<DtEdicion> ediciones = new ArrayList<>();
 
         if (nick != null) {
-            // 1) Listar eventos vigentes
-            // Según tu stub puede devolver array o wrapper. Primero probamos array:
-            List<DtEvento> eventos;
+            // 1) Listar eventos (usar el publicador generado: listarEventos() -> DtEventoArray)
+            List<DtEvento> eventos = new ArrayList<>();
             try {
-                DtEvento[] arr = port.listarEventosVigentes();
-                eventos = (arr == null) ? List.of() : Arrays.asList(arr);
-            } catch (Throwable t) {
-                // Si tu stub usa wrapper (p.ej. DtEventoArray con getItem()):
-                eventos = new ArrayList<>();
                 try {
-                    Object wrapper = port.listarEventosVigentes();
-                    var items = (List<DtEvento>) wrapper.getClass().getMethod("getItem").invoke(wrapper);
-                    if (items != null) eventos.addAll(items);
+                    // Prefer direct typed wrapper
+                    DtEventoArray arr = port.listarEventos();
+                    if (arr != null && arr.getItem() != null) {
+                        eventos.addAll(arr.getItem());
+                    }
+                } catch (NoSuchMethodError | NoClassDefFoundError nsmd) {
+                    // Fallback: some stubs might expose a raw array; try reflectively
+                    try {
+                        Object raw = port.getClass().getMethod("listarEventos").invoke(port);
+                        if (raw instanceof DtEvento[]) {
+                            DtEvento[] darr = (DtEvento[]) raw;
+                            eventos.addAll(Arrays.asList(darr));
+                        } else {
+                            // If wrapper object has getItem(), call it reflectively
+                            try {
+                                var items = (List<DtEvento>) raw.getClass().getMethod("getItem").invoke(raw);
+                                if (items != null) eventos.addAll(items);
+                            } catch (Exception ignore) {}
+                        }
+                    } catch (Exception ignore) {
+                        // leave eventos empty
+                    }
+                }
+            } catch (Throwable t) {
+                // final safety: try a reflective call named listarEventos (different signatures)
+                try {
+                    Object wrapper = port.getClass().getMethod("listarEventos").invoke(port);
+                    if (wrapper instanceof DtEventoArray) {
+                        DtEventoArray arr = (DtEventoArray) wrapper;
+                        if (arr.getItem() != null) eventos.addAll(arr.getItem());
+                    } else if (wrapper instanceof DtEvento[]) {
+                        eventos.addAll(Arrays.asList((DtEvento[]) wrapper));
+                    } else {
+                        try {
+                            var items = (List<DtEvento>) wrapper.getClass().getMethod("getItem").invoke(wrapper);
+                            if (items != null) eventos.addAll(items);
+                        } catch (Exception ignore) {}
+                    }
                 } catch (Exception ignore) {}
             }
 
-            // 2) Por cada evento, listar nombres de ediciones y traer cada DtEdicion
-            for (DtEvento ev : eventos) {
-                if (ev == null) continue;
-                String nombreEvento = ev.getNombre();
+             // 2) Por cada evento, listar nombres de ediciones y traer cada DtEdicion
+             for (DtEvento ev : eventos) {
+                 if (ev == null) continue;
+                 String nombreEvento = ev.getNombre();
 
                 List<String> nombresEd;
                 try {

@@ -20,7 +20,6 @@ import publicadores.DTNivel;
 import publicadores.DtPatrocinio;
 import publicadores.DtTipoRegistro;
 // Excepciones generadas por el stub
-import publicadores.PatrocinioYaExisteException_Exception;
 import publicadores.ValorPatrocinioExcedidoException_Exception;
 
 @WebServlet({
@@ -114,15 +113,25 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
 
                 List<DtEvento> todos = new ArrayList<>();
                 try {
-                    Object evRes = portEv.listarEventosVigentes();
-                    if (evRes instanceof DtEvento[]) {
-                        todos = (evRes == null) ? List.of() : Arrays.asList((DtEvento[]) evRes);
-                    } else if (evRes != null) {
-                        @SuppressWarnings("unchecked")
-                        List<DtEvento> items = (List<DtEvento>) evRes.getClass().getMethod("getItem").invoke(evRes);
-                        if (items != null) todos.addAll(items);
+                    // Prefer typed wrapper listarEventos() -> DtEventoArray
+                    try {
+                        publicadores.DtEventoArray arr = portEv.listarEventos();
+                        if (arr != null && arr.getItem() != null) todos.addAll(arr.getItem());
+                    } catch (Throwable t) {
+                        // Fallback: reflective handling of different stubs
+                        Object evRes = portEv.getClass().getMethod("listarEventos").invoke(portEv);
+                        if (evRes instanceof DtEvento[]) {
+                            DtEvento[] darr = (DtEvento[]) evRes;
+                            if (darr != null) todos.addAll(Arrays.asList(darr));
+                        } else if (evRes != null) {
+                            try {
+                                @SuppressWarnings("unchecked")
+                                List<DtEvento> items = (List<DtEvento>) evRes.getClass().getMethod("getItem").invoke(evRes);
+                                if (items != null) todos.addAll(items);
+                            } catch (Exception ignore) {}
+                        }
                     }
-                } catch (Exception ignore) {}
+                 } catch (Exception ignore) {}
 
                 List<String> eventosOrganizador   = new ArrayList<>();
                 List<String> edicionesOrganizador = new ArrayList<>();
@@ -259,30 +268,65 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
             LocalDate fecha = LocalDate.parse(fechaStr); // yyyy-MM-dd
             Date fechaDate = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-            // altaPatrocinioDT(siglaEd, instit, nivel, tipo, aporte, fecha(java.util.Date), cantidad, codigo)
-            portEv.altaPatrocinioDT(siglaEd, instit, nivel, tipo, aporte, fechaDate, cantidad, codigo);
+            // altaPatrocinioDT may expect different date types depending on the generated stub.
+            // Invoke reflectively and adapt the date argument.
+            try {
+                java.lang.reflect.Method meth = null;
+                for (java.lang.reflect.Method m : portEv.getClass().getMethods()) {
+                    if (m.getName().equals("altaPatrocinioDT") && m.getParameterCount() == 8) { meth = m; break; }
+                }
+                if (meth == null) throw new NoSuchMethodException("altaPatrocinioDT not found on publicador port");
 
-            String url = ctx(req) + "/edicion/patrocinio/consulta"
-                    + "?evento=" + encode(evento)
-                    + "&edicion=" + encode(edicion)
-                    + "&codigoPatrocinio=" + encode(codigo);
-            resp.sendRedirect(url);
+                Class<?>[] ptypes = meth.getParameterTypes();
+                Object fechaArg = null;
+                // ptypes: [String, String, DTNivel, String, int, <dateType>, int, String]
+                Class<?> dateType = ptypes[5];
+                if (dateType.isAssignableFrom(java.util.Date.class)) {
+                    fechaArg = fechaDate;
+                } else if (dateType.getName().equals("javax.xml.datatype.XMLGregorianCalendar")) {
+                    try {
+                        javax.xml.datatype.DatatypeFactory df = javax.xml.datatype.DatatypeFactory.newInstance();
+                        javax.xml.datatype.XMLGregorianCalendar xgc = df.newXMLGregorianCalendarDate(
+                                fecha.getYear(), fecha.getMonthValue(), fecha.getDayOfMonth(), javax.xml.datatype.DatatypeConstants.FIELD_UNDEFINED);
+                        fechaArg = xgc;
+                    } catch (Exception ex) { fechaArg = null; }
+                } else if (dateType.getName().equals("publicadores.LocalDate") || dateType.getSimpleName().equals("LocalDate")) {
+                    // Create stub LocalDate via ObjectFactory (may be empty)
+                    publicadores.ObjectFactory of = new publicadores.ObjectFactory();
+                    fechaArg = of.createLocalDate();
+                } else {
+                    // last resort: try assignable from String (ISO)
+                    if (dateType.isAssignableFrom(String.class)) fechaArg = fechaStr;
+                }
+
+                Object[] args = new Object[] { siglaEd, instit, nivel, tipo, aporte, fechaArg, cantidad, codigo };
+                meth.invoke(portEv, args);
+            } catch (java.lang.reflect.InvocationTargetException ite) {
+                // unwrap target exception and rethrow known publicador exceptions
+                Throwable t = ite.getTargetException();
+                if (t instanceof ValorPatrocinioExcedidoException_Exception) throw (ValorPatrocinioExcedidoException_Exception) t;
+                // Unknown target exception: wrap and rethrow for outer handler
+                throw new RuntimeException(t);
+            }
+            
+             String url = ctx(req) + "/edicion/patrocinio/consulta"
+                     + "?evento=" + encode(evento)
+                     + "&edicion=" + encode(edicion)
+                     + "&codigoPatrocinio=" + encode(codigo);
+             resp.sendRedirect(url);
 
         } catch (NumberFormatException e) {
-            req.setAttribute("error", "Costo/cantidad deben ser numéricos.");
-            recargarFormAlta(req, resp);
+             req.setAttribute("error", "Costo/cantidad deben ser numéricos.");
+             recargarFormAlta(req, resp);
         } catch (IllegalArgumentException e) {
-            req.setAttribute("error", "Valores inválidos: " + e.getMessage());
-            recargarFormAlta(req, resp);
-        } catch (PatrocinioYaExisteException_Exception e) {
-            req.setAttribute("error", "Ya existe un patrocinio para esa institución/edición o el código ya está en uso.");
-            recargarFormAlta(req, resp);
+             req.setAttribute("error", "Valores inválidos: " + e.getMessage());
+             recargarFormAlta(req, resp);
         } catch (ValorPatrocinioExcedidoException_Exception e) {
-            req.setAttribute("error", "La cantidad de registros gratuitos excede el 20% del aporte.");
-            recargarFormAlta(req, resp);
+             req.setAttribute("error", "La cantidad de registros gratuitos excede el 20% del aporte.");
+             recargarFormAlta(req, resp);
         } catch (Exception e) {
-            req.setAttribute("error", "Error inesperado: " + e.getClass().getSimpleName());
-            recargarFormAlta(req, resp);
+             req.setAttribute("error", "Error inesperado: " + e.getClass().getSimpleName());
+             recargarFormAlta(req, resp);
         }
     }
 

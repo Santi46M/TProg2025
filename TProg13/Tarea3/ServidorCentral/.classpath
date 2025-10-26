@@ -31,5 +31,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/stax-ex.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/streambuffer.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/woodstox-core.jar"/>
+	<classpathentry kind="lib" path="C:/Users/santi/git/tpgr13/TProg13/Tarea1/lib/jcalendar-1.4.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

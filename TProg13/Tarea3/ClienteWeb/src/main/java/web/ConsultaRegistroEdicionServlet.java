@@ -9,6 +9,8 @@ import publicadores.DtDatosUsuario;
 import publicadores.DtRegistro;
 import publicadores.PublicadorUsuario;
 import publicadores.PublicadorUsuarioService;
+import publicadores.PublicadorEvento;
+import publicadores.PublicadorEventoService;
 import publicadores.UsuarioNoExisteException_Exception;
 
 @WebServlet("/registro/ConsultaRegistroEdicion")
@@ -31,6 +33,9 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
 
         PublicadorUsuarioService service = new PublicadorUsuarioService();
         PublicadorUsuario port = service.getPublicadorUsuarioPort();
+        // PublicadorEvento is the correct service to obtain registro details
+        PublicadorEventoService evSvc = new PublicadorEventoService();
+        PublicadorEvento evPort = evSvc.getPublicadorEventoPort();
 
         try {
             DtDatosUsuario dtoUsuario = (DtDatosUsuario) session.getAttribute("usuario_logueado");
@@ -47,7 +52,8 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
 
             DtRegistro dtRegistro = null;
             try {
-                dtRegistro = port.obtenerDatosRegistro(idRegistro);
+                // consultaRegistro requiere nickname + idRegistro
+                dtRegistro = evPort.consultaRegistro(nick, idRegistro);
             } catch (Exception e) {
                 req.setAttribute("error", "No se pudo obtener el registro: " + e.getMessage());
                 req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);

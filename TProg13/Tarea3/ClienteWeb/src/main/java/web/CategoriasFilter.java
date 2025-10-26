@@ -7,9 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
-import publicadores.DtCategorias;
+import publicadores.DtEvento;
+import publicadores.DtEventoArray;
 
 @WebFilter("/*")
 public class CategoriasFilter implements Filter {
@@ -20,32 +22,55 @@ public class CategoriasFilter implements Filter {
 
         if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
             try {
-                // === EXACTAS estas dos líneas para crear el port de eventos ===
+                // create the publicador port (defensive)
                 publicadores.PublicadorEventoService service = new publicadores.PublicadorEventoService();
-                publicadores.PublicadorEvento port = service.getPublicadorEventoPort();
+                publicadores.PublicadorEvento port = null;
+                try { port = service.getPublicadorEventoPort(); } catch (Exception ignore) { }
 
-                // Puede devolver DTCategorias[] o un wrapper con getItem()
-                List<DtCategorias> dtCategorias = new ArrayList<>();
-                Object res = port.listarDTCategorias();
+                List<DtEvento> eventos = new ArrayList<>();
 
-                if (res instanceof DtCategorias[]) {
-                    DtCategorias[] arr = (DtCategorias[]) res;
-                    dtCategorias = (arr == null) ? List.of() : Arrays.asList(arr);
-                } else if (res != null) {
+                if (port != null) {
                     try {
-                        // Wrapper JAX-WS típico con método getItem()
-                        @SuppressWarnings("unchecked")
-                        List<DtCategorias> items = (List<DtCategorias>) res.getClass()
-                                .getMethod("getItem").invoke(res);
-                        if (items != null) dtCategorias.addAll(items);
-                    } catch (ReflectiveOperationException ignore) {
-                        // Si no hay getItem, dejamos la lista vacía
+                        // Preferred typed wrapper
+                        DtEventoArray arr = port.listarEventos();
+                        if (arr != null && arr.getItem() != null) {
+                            eventos.addAll(arr.getItem());
+                        }
+                    } catch (Throwable t) {
+                        // Fallback: try reflective access to listarEventos
+                        try {
+                            Object raw = port.getClass().getMethod("listarEventos").invoke(port);
+                            if (raw instanceof DtEvento[]) {
+                                DtEvento[] darr = (DtEvento[]) raw;
+                                for (DtEvento d : darr) eventos.add(d);
+                            } else if (raw != null) {
+                                try {
+                                    @SuppressWarnings("unchecked")
+                                    List<DtEvento> items = (List<DtEvento>) raw.getClass().getMethod("getItem").invoke(raw);
+                                    if (items != null) eventos.addAll(items);
+                                } catch (Exception ignore) {}
+                            }
+                        } catch (Exception ignore) { }
                     }
                 }
 
+                // From events, extract unique category names
+                Set<String> cats = new HashSet<>();
+                for (DtEvento ev : eventos) {
+                    if (ev == null) continue;
+                    try {
+                        DtEvento.Categorias c = ev.getCategorias();
+                        if (c != null && c.getCategoria() != null) {
+                            for (String s : c.getCategoria()) if (s != null) cats.add(s);
+                        }
+                    } catch (Exception ignore) {}
+                }
+
+                // Expose as a simple list of category names (menu.jsp handles multiple shapes)
+                List<String> dtCategorias = new ArrayList<>(cats);
                 request.setAttribute("dtCategorias", dtCategorias);
             } catch (Exception e) {
-                // Si falla el servicio, no bloqueamos la navegación
+                // If anything fails, expose an empty list and continue
                 request.setAttribute("dtCategorias", List.of());
             }
         }

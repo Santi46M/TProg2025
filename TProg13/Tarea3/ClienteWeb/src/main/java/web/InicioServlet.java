@@ -18,22 +18,39 @@ import publicadores.PublicadorEvento;
 @WebServlet({"/inicio"})
 public class InicioServlet extends HttpServlet {
 
-    // ✅ mantenemos los publicadores
+    // ✅ mantenemos el publicador service pero no el puerto en timepo de carga de clase
     private final PublicadorEventoService service = new PublicadorEventoService();
-    private final PublicadorEvento port = service.getPublicadorEventoPort();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // ✅ ahora obtenemos los eventos a través del publicador, no del controlador local
-        List<DtEvento> eventos = new ArrayList<>();
+        // obtain port lazily and defensively
+        PublicadorEvento port = null;
         try {
-            // reemplaza esta llamada si tu WSDL usa otro método (por ejemplo listarEventosVigentes o listarEventos)
-            eventos = port.listarEventosVigentes().getItem();
+            port = service.getPublicadorEventoPort();
         } catch (Exception e) {
+            // could be WebServiceException if WSDL not reachable; continue with empty list
+            System.err.println("Warning: no se pudo obtener el publicador de eventos: " + e.getMessage());
             e.printStackTrace();
         }
+
+         // ✅ ahora obtenemos los eventos a través del publicador, no del controlador local
+         List<DtEvento> eventos = new ArrayList<>();
+         try {
+            // reemplaza esta llamada si tu WSDL usa otro método (por ejemplo listarEventosVigentes o listarEventos)
+            if (port != null) {
+                // generated interface provides listarEventos() -> DtEventoArray
+                publicadores.DtEventoArray arr = port.listarEventos();
+                if (arr != null && arr.getItem() != null) {
+                    eventos = arr.getItem();
+                }
+            } else {
+                // port unavailable: leave eventos empty
+            }
+         } catch (Exception e) {
+             e.printStackTrace();
+         }
 
         if (eventos == null || eventos.isEmpty()) {
             getServletContext().setAttribute("datosPrecargados", Boolean.FALSE);
@@ -54,8 +71,10 @@ public class InicioServlet extends HttpServlet {
                 // si no vino, hacemos una consulta puntual al publicador
                 if (raw == null || raw.isBlank()) {
                     try {
-                        DtEvento eventIter = port.consultaDTEvento(nombre);
-                        if (eventIter != null) raw = eventIter.getImagen();
+                        if (port != null) {
+                            DtEvento eventIter = port.consultaDTEvento(nombre);
+                            if (eventIter != null) raw = eventIter.getImagen();
+                        }
                     } catch (Exception ex) {
                         System.err.println("Error consultando imagen para evento " + nombre);
                     }

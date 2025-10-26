@@ -8,10 +8,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-// Suponiendo que existen estas interfaces y excepciones:
-import logica.fabrica;
-import logica.interfaces.IControladorUsuario;
-import excepciones.InstitucionYaExisteException;
+import publicadores.PublicadorUsuarioService;
+import publicadores.PublicadorUsuario;
+import publicadores.InstitucionYaExisteException_Exception;
 
 @WebServlet("/institucion/*")
 @MultipartConfig(maxFileSize = 2 * 1024 * 1024, maxRequestSize = 4 * 1024 * 1024)
@@ -19,8 +18,12 @@ public class InstitucionServlet extends HttpServlet {
     private static final String JSP_ALTA = "/WEB-INF/institucion/altaInstitucion.jsp";
     private static final String UPLOAD_PUBLIC_DIR = "/img/instituciones";
 
-    private final IControladorUsuario controladorUsuario = fabrica.getInstance().getIControladorUsuario();
     private String ctx(HttpServletRequest req) { return req.getContextPath(); }
+
+    private PublicadorUsuario obtenerPort() {
+        PublicadorUsuarioService svc = new PublicadorUsuarioService();
+        return svc.getPublicadorUsuarioPort();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -81,28 +84,16 @@ public class InstitucionServlet extends HttpServlet {
                 req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                 return;
             }
+            // Call publicador
+            PublicadorUsuario port = obtenerPort();
             try {
-                // Alta de institución: llamamos de forma tolerante para mantener compatibilidad
-                try {
-                    java.lang.reflect.Method m4 = controladorUsuario.getClass().getMethod("altaInstitucion", String.class, String.class, String.class, String.class);
-                    m4.invoke(controladorUsuario, nombre, desc, web, imagenFileName);
-                } catch (NoSuchMethodException ns) {
-                    // Fallback a la firma antigua (sin imagen)
-                    java.lang.reflect.Method m3 = controladorUsuario.getClass().getMethod("altaInstitucion", String.class, String.class, String.class);
-                    m3.invoke(controladorUsuario, nombre, desc, web);
-                }
-                // Imagen ya fue guardada en filesystem bajo imagenFileName (si no es null)
+                port.altaInstitucion(nombre, desc, web);
+                // image file saved locally; publicador doesn't expose image attach in client stub
                 resp.sendRedirect(ctx(req) + "/inicio");
                 return;
-            } catch (java.lang.reflect.InvocationTargetException ite) {
-                Throwable t = ite.getTargetException();
-                if (t instanceof InstitucionYaExisteException) {
-                    req.setAttribute("error", "duplicado");
-                    req.setAttribute("nombreInstitucionDuplicado", nombre);
-                    req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-                    return;
-                }
-                req.setAttribute("error", "Error inesperado: " + t.getMessage());
+            } catch (InstitucionYaExisteException_Exception ex) {
+                req.setAttribute("error", "duplicado");
+                req.setAttribute("nombreInstitucionDuplicado", nombre);
                 req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
                 return;
             } catch (Exception e) {

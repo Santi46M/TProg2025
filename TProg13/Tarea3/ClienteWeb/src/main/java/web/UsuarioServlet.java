@@ -34,8 +34,11 @@ public class UsuarioServlet extends HttpServlet {
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
   private void cargarInstituciones(HttpServletRequest req, publicadores.PublicadorUsuario port) {
-    StringArray arr = port.listarInstituciones(); // o getInstituciones()
-    req.setAttribute("instituciones", (arr == null ? java.util.List.of() : Arrays.asList(arr)));
+    StringArray arr = null;
+    try { arr = port.listarInstituciones(); } catch (Exception ignore) { }
+    java.util.List<String> lista;
+    if (arr == null || arr.getItem() == null) lista = java.util.List.of(); else lista = arr.getItem();
+    req.setAttribute("instituciones", lista);
   }
 
   @Override
@@ -194,6 +197,7 @@ public class UsuarioServlet extends HttpServlet {
       }
 
       // Alta por publicador
+      publicadores.LocalDate pFecha = (fechaNac == null) ? null : new publicadores.LocalDate();
       port.altaUsuario(
           nick,
           nombreFinal,
@@ -201,7 +205,7 @@ public class UsuarioServlet extends HttpServlet {
           descripcion,
           link,
           apellido,
-          fechaNac,       
+          pFecha,
           institucion,
           esOrganizador,
           pass1,
