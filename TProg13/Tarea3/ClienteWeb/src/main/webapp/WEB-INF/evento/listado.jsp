@@ -1,10 +1,9 @@
- <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.net.URLEncoder, java.nio.charset.StandardCharsets" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="java.net.URLEncoder, java.nio.charset.StandardCharsets, publicadores.DtEvento, java.util.List" %>
 <%
 String ctx = request.getContextPath();
 
-  java.util.List<logica.datatypes.DTEvento> lista =
-      (java.util.List<logica.datatypes.DTEvento>) request.getAttribute("lista");
+  java.util.List<publicadores.DtEvento> lista =
+      (java.util.List<publicadores.DtEvento>) request.getAttribute("lista");
 
   java.util.List<String> categorias =
       (java.util.List<String>) request.getAttribute("categorias");
@@ -36,12 +35,12 @@ String ctx = request.getContextPath();
       </p>
 
       <div class="cards-grid">
-        <% if (lista != null) for (var ev : lista) {
+        <% if (lista != null) for (publicadores.DtEvento ev : lista) {
              String nombre = ev.getNombre();
              String sigla  = ev.getSigla();
              String desc   = (ev.getDescripcion() == null ? "" : ev.getDescripcion());
-             java.util.List<String> evCats = ev.getCategorias();
-             java.util.List<String> evEds  = ev.getEdiciones();
+             java.util.List<String> evCats = (ev.getCategorias() != null) ? ev.getCategorias().getCategoria() : null;
+             java.util.List<String> evEds  = (ev.getEdiciones() != null) ? ev.getEdiciones().getEdicion() : null;
 
              String img = ev.getImagen();
              boolean hasImg = (img != null && !img.isBlank());

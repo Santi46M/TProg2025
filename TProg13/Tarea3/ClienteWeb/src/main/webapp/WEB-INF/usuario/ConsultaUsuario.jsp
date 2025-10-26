@@ -1,19 +1,52 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.util.*, java.net.URLEncoder, logica.datatypes.*" %>
-
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="java.util.*, java.net.URLEncoder, publicadores.PublicadorUsuarioService, publicadores.DtDatosUsuario, publicadores.DtDatosUsuarioArray, publicadores.DtEdicion, publicadores.DtRegistro" %>
 <%
   String ctx = request.getContextPath();
   String nickSesion = (String) session.getAttribute("nick");
 
-  Collection<DtDatosUsuario> usuarios = (Collection<DtDatosUsuario>) request.getAttribute("usuarios");
-  DTDatosUsuario usuario = (DTDatosUsuario) request.getAttribute("usuario");
+  Collection<DtDatosUsuario> usuarios = null;
+  DtDatosUsuario usuario = null;
   Map<String, String> edicionToEvento = (Map<String, String>) request.getAttribute("edicionToEvento");
   String error = (String) request.getAttribute("error");
 
   Map<String,String> fotos = (Map<String,String>) request.getAttribute("fotos");
   String usrImagenUrl = (String) request.getAttribute("usrImagenUrl");
 
-  // Rol real del perfil consultado (lo setea el servlet)
+  // Try to use attributes set by servlet first
+  Object attrUsuarios = request.getAttribute("usuarios");
+  Object attrUsuario = request.getAttribute("usuario");
+  if (attrUsuario instanceof DtDatosUsuario) {
+    usuario = (DtDatosUsuario) attrUsuario;
+  }
+
+  try {
+    if (attrUsuarios instanceof Collection) {
+      usuarios = (Collection<DtDatosUsuario>) attrUsuarios;
+    } else {
+      // fetch via webservice if not provided
+      PublicadorUsuarioService svc = new PublicadorUsuarioService();
+      publicadores.PublicadorUsuario port = svc.getPublicadorUsuarioPort();
+      DtDatosUsuarioArray arr = port.obtenerUsuariosDT();
+      if (arr != null && arr.getItem() != null) {
+        usuarios = new ArrayList<>();
+        usuarios.addAll(arr.getItem());
+      }
+    }
+
+    // if single usuario missing but nick param present, fetch
+    if (usuario == null) {
+      String nickParam = request.getParameter("nick");
+      if (nickParam != null && !nickParam.isBlank()) {
+        PublicadorUsuarioService svc2 = new PublicadorUsuarioService();
+        publicadores.PublicadorUsuario port2 = svc2.getPublicadorUsuarioPort();
+        try { usuario = port2.obtenerDatosUsuario(nickParam); } catch (Exception ignore) {}
+      }
+    }
+  } catch (Exception ex) {
+    ex.printStackTrace();
+    if (usuarios == null) usuarios = Collections.emptyList();
+  }
+
+  // Role real del perfil consultado (lo setea el servlet)
   Boolean esPerfilOrganizadorAttr = (Boolean) request.getAttribute("esPerfilOrganizador");
   boolean esPerfilOrganizador = (esPerfilOrganizadorAttr != null)
       ? esPerfilOrganizadorAttr.booleanValue()
@@ -76,7 +109,7 @@
           <% if (usuarios == null || usuarios.isEmpty()) { %>
             <p>No hay usuarios registrados.</p>
           <% } else {
-               for (DTDatosUsuario u : usuarios) {
+               for (DtDatosUsuario u : usuarios) {
                  String fotoUrl = (fotos == null) ? null : fotos.get(u.getNickname());
           %>
             <div class="card usuario-card">
@@ -159,7 +192,7 @@
 
                 <p><strong>Institución:</strong>
                   <span class="view-mode">
-                    <% String instName = (usuario.getInstitucion() != null ? usuario.getInstitucion() : null);
+                    <% String instName = (usuario.getNombreInstitucion() != null ? usuario.getNombreInstitucion() : null);
                        Map<String,String> instFotos = (Map<String,String>) request.getAttribute("instFotos");
                        String instImg = (instFotos != null && instName != null) ? instFotos.get(instName) : null;
                     %>
@@ -180,7 +213,7 @@
                        Collection<String> instituciones = (Collection<String>) request.getAttribute("instituciones");
                        if (instituciones != null) {
                          for (String inst : instituciones) {
-                           String selected = (usuario.getInstitucion() != null && usuario.getInstitucion().equals(inst)) ? "selected" : "";
+                           String selected = (usuario.getNombreInstitucion() != null && usuario.getNombreInstitucion().equals(inst)) ? "selected" : "";
                      %>
                          <option value="<%= inst %>" <%= selected %>><%= inst %></option>
                      <% } } %>
@@ -217,14 +250,14 @@
           </div>
         </div>
 
-        <% boolean tieneEdiciones = usuario.getEdiciones() != null && !usuario.getEdiciones().isEmpty();
-           boolean tieneRegistros = usuario.getRegistros() != null && !usuario.getRegistros().isEmpty();
+        <% boolean tieneEdiciones = usuario.getEdiciones() != null && !usuario.getEdiciones().getEdicion().isEmpty();
+           boolean tieneRegistros = usuario.getRegistros() != null && !usuario.getRegistros().getRegistro().isEmpty();
         %>
 
         <% if (tieneEdiciones) { %>
           <h2>Ediciones de eventos</h2>
           <ul class="lista-ediciones">
-            <% for (DTEdicion e : usuario.getEdiciones()) {
+            <% for (DtEdicion e : usuario.getEdiciones().getEdicion()) {
                  String estado = (e.getEstado() != null) ? e.getEstado().toString() : "Sin estado";
                  boolean mostrar = "Aceptada".equalsIgnoreCase(estado) ||
                                    (esSuPropioPerfil && ("Ingresada".equalsIgnoreCase(estado) || "Rechazada".equalsIgnoreCase(estado)));
@@ -249,7 +282,7 @@
         <% if (esSuPropioPerfil && tieneRegistros) { %>
           <h2>Eventos registrados</h2>
           <ul class="lista-eventos">
-            <% for (DTRegistro r : usuario.getRegistros()) {
+            <% for (DtRegistro r : usuario.getRegistros().getRegistro()) {
                  String eventoNombre = (edicionToEvento != null) ? edicionToEvento.get(r.getEdicion()) : "";
             %>
               <li>
@@ -263,7 +296,7 @@
                 <span>| <strong>Tipo:</strong> <%= r.getTipoRegistro() %></span>
                 <span>| <strong>Fecha registro:</strong> <%= r.getFechaRegistro() %></span>
                 <span>| <strong>Costo:</strong> $<%= r.getCosto() %></span>
-                <a class="btn" href="<%= ctx %>/registro/ConsultaRegistroEdicion?idRegistro=<%= URLEncoder.encode(r.getId(), "UTF-8") %>">Ver detalles</a>
+                <a class="btn" href="<%= ctx %>/registro/ConsultaRegistroEdicion?idRegistro=<%= URLEncoder.encode(r.getIdentificador(), "UTF-8") %>">Ver detalles</a>
               </li>
             <% } %>
           </ul>
