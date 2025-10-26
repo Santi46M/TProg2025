@@ -11,7 +11,11 @@
 	<classpathentry exported="true" kind="lib" path="lib/angus-activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/angus-mail.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/FastInfoset.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/gmbal-api-only.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/gmbal-api-only.jar">
+		<attributes>
+			<attribute name="org.eclipse.jst.component.dependency" value="/WEB-INF/lib"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="lib/ha-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.activation-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jakarta.annotation-api.jar"/>
