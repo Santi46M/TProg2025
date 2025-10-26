@@ -8,6 +8,7 @@ import jakarta.xml.ws.Endpoint;
 
 import java.time.LocalDate;
 import java.util.Set;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 import logica.datatypes.DTDatosUsuario;
 import logica.datatypes.DTRegistro;
@@ -40,13 +41,21 @@ public class PublicadorUsuario {
         @WebParam(name = "descripcion") String descripcion,
         @WebParam(name = "link") String link,
         @WebParam(name = "apellido") String apellido,
-        @WebParam(name = "fechaNacimiento") LocalDate fechaNacimiento,
+        @WebParam(name = "fechaNacimiento") XMLGregorianCalendar fechaNacimiento,
         @WebParam(name = "institucion") String institucion,
         @WebParam(name = "esOrganizador") boolean esOrganizador,
         @WebParam(name = "contrasena") String contrasena,
         @WebParam(name = "imagen") String imagen
     ) throws UsuarioYaExisteException {
-        icu.altaUsuario(nickname, nombre, correo, descripcion, link, apellido, fechaNacimiento, institucion, esOrganizador, contrasena, imagen);
+        // convert XMLGregorianCalendar -> java.time.LocalDate (allow null)
+        LocalDate ld = null;
+        if (fechaNacimiento != null) {
+            int y = fechaNacimiento.getYear();
+            int m = fechaNacimiento.getMonth();
+            int d = fechaNacimiento.getDay();
+            ld = LocalDate.of(y, m, d);
+        }
+        icu.altaUsuario(nickname, nombre, correo, descripcion, link, apellido, ld, institucion, esOrganizador, contrasena, imagen);
     }
 
     @WebMethod
@@ -87,11 +96,18 @@ public class PublicadorUsuario {
         @WebParam(name = "descripcion") String descripcion,
         @WebParam(name = "link") String link,
         @WebParam(name = "apellido") String apellido,
-        @WebParam(name = "fechaNacimiento") LocalDate fechaNacimiento,
+        @WebParam(name = "fechaNacimiento") XMLGregorianCalendar fechaNacimiento,
         @WebParam(name = "institucion") String institucion,
         @WebParam(name = "imagen") String imagen
     ) throws UsuarioNoExisteException, UsuarioTipoIncorrectoException {
-        icu.modificarDatosUsuario(nickname, nombre, descripcion, link, apellido, fechaNacimiento, institucion, imagen);
+        LocalDate ld = null;
+        if (fechaNacimiento != null) {
+            int y = fechaNacimiento.getYear();
+            int m = fechaNacimiento.getMonth();
+            int d = fechaNacimiento.getDay();
+            ld = LocalDate.of(y, m, d);
+        }
+        icu.modificarDatosUsuario(nickname, nombre, descripcion, link, apellido, ld, institucion, imagen);
     }
     
     @WebMethod

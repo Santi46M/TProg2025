@@ -198,7 +198,12 @@ public class UsuarioServlet extends HttpServlet {
 
       // Alta por publicador
       // Ensure we never pass nulls to the SOAP client: use empty strings and a LocalDate instance.
-      publicadores.LocalDate pFecha = new publicadores.LocalDate(); // always non-null for the stub
+      // Use the generated publicadores.LocalDate wrapper (we patched it to carry an ISO date string).
+      // Send null when there's no date (organizer case) and send an ISO string when fechaNac is present.
+      publicadores.LocalDate pFecha = null;
+      if (fechaNac != null) {
+        pFecha = new publicadores.LocalDate(fechaNac.toString());
+      }
 
       // helper to send non-null trimmed strings
       java.util.function.Function<String,String> sendNonNull = s -> (s == null) ? "" : s.trim();

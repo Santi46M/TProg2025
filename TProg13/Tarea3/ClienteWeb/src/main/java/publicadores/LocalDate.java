@@ -1,4 +1,3 @@
-
 package publicadores;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -28,5 +27,27 @@ import jakarta.xml.bind.annotation.XmlType;
 @XmlType(name = "localDate")
 public class LocalDate {
 
+    @jakarta.xml.bind.annotation.XmlValue
+    protected String value;
+
+    public LocalDate() {
+    }
+
+    public LocalDate(String value) {
+        this.value = value;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return value;
+    }
 
 }
