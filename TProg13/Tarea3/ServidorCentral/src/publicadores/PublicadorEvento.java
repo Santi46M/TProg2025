@@ -45,12 +45,19 @@ public class PublicadorEvento {
     public void altaEvento(
         @WebParam(name = "nombre") String nombre,
         @WebParam(name = "descripcion") String descripcion,
-        @WebParam(name = "fechaAlta") LocalDate fechaAlta,
+        @WebParam(name = "fechaAlta") String fechaAlta,
         @WebParam(name = "sigla") String sigla,
         @WebParam(name = "categorias") DTCategorias categorias,
         @WebParam(name = "imagen") String imagen
     ) throws EventoYaExisteException {
-        ice.altaEvento(nombre, descripcion, fechaAlta, sigla, categorias, imagen);
+        java.time.LocalDate fecha;
+        if (fechaAlta == null || fechaAlta.isBlank()) {
+            fecha = java.time.LocalDate.now();
+        } else {
+            fecha = java.time.LocalDate.parse(fechaAlta);
+        }
+
+        ice.altaEvento(nombre, descripcion, fecha, sigla, categorias, imagen);
     }
 
     @WebMethod

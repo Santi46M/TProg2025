@@ -186,6 +186,12 @@ public class EventoServlet extends HttpServlet {
             String desc = trim(req.getParameter("desc"));
             String sigla = trim(req.getParameter("sigla"));
             String cats = trim(req.getParameter("categorias"));
+            
+            System.out.println("Intentando crear evento:");
+            System.out.println("Nombre: " + nombre);
+            System.out.println("Sigla: " + sigla);
+            System.out.println("Descripción: " + desc);
+            System.out.println("Categorías: " + cats);
 
             List<String> categoriasList = new ArrayList<>();
             if (!isBlank(cats)) {
@@ -246,6 +252,8 @@ public class EventoServlet extends HttpServlet {
             try {
                 // Note: generated stub expects publicadores.LocalDate, use its empty instance
                 publicadores.LocalDate fechaAlta = new publicadores.LocalDate();
+                
+                
                 PublicadorEvento port = obtenerPort();
                 port.altaEvento(nombre, desc, fechaAlta, sigla, dtCategorias, sigla);
 

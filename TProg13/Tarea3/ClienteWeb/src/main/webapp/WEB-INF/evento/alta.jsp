@@ -19,7 +19,6 @@
   <div class="container row" style="margin-top:1rem;">
     <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
-    <!-- Main -->
     <main class="container">
       <section class="form-card-altaEvento form-card--wide">
         <header class="form-header">
@@ -27,7 +26,6 @@
           <p class="form-subtitle">Completá los datos básicos del evento y asociá al menos una categoría.</p>
         </header>
 
-        <%-- Mensajes --%>
         <%
           String duplicado = (String) request.getAttribute("nombreEventoDuplicado");
           boolean hayError = request.getAttribute("error") != null;
@@ -38,7 +36,6 @@
         </div>
         <p id="error-categorias" class="helper-error hidden" aria-live="polite"></p>
 
-        <!-- para permitir subir archivo -->
         <form id="form-alta-evento" method="post" action="<%=ctx%>/evento/alta" enctype="multipart/form-data" novalidate>
           <div class="grid-2">
             <div class="form-group-altaEvento">
@@ -59,7 +56,6 @@
             <textarea id="desc" name="desc" rows="4"></textarea>
           </div>
 
-          <!-- Imagen -->
           <div class="form-group-altaEvento">
             <label for="imagen">Imagen del evento (opcional)</label>
             <input type="file" id="imagen" name="imagen" accept="image/*">
@@ -69,44 +65,58 @@
           <fieldset class="form-group-altaEvento" id="fs-categorias">
             <legend>Categorías <span class="req">*</span></legend>
             <div class="checkbox-grid-ev">
-              <% 
+              <%
+                java.util.Set<String> categoriasSet = new java.util.HashSet<>();
+                @SuppressWarnings("unchecked")
                 java.util.List<Object> dtCatsRaw = (java.util.List<Object>) request.getAttribute("dtCategorias");
-                java.util.List<String> cats = new ArrayList<>();
-                if (dtCatsRaw != null && !dtCatsRaw.isEmpty()) {
+                if (dtCatsRaw != null) {
                   for (Object o : dtCatsRaw) {
                     try {
-                      if (o instanceof DtCategorias) {
-                        DtCategorias d = (DtCategorias) o;
-                        if (d.getCategorias() != null) cats.addAll(d.getCategorias().getCategoria());
-                      } else {
-                        // fallback: try reflection to obtain getCategorias() -> getCategoria()
-                        java.lang.reflect.Method m = o.getClass().getMethod("getCategorias");
-                        Object res = m.invoke(o);
-                        if (res != null) {
-                          java.lang.reflect.Method gm = res.getClass().getMethod("getCategoria");
-                          Object list = gm.invoke(res);
-                          if (list instanceof java.util.Collection) {
-                            for (Object s : (java.util.Collection) list) {
-                              if (s != null) cats.add(s.toString());
-                            }
-                          }
+                      java.lang.reflect.Method m1 = o.getClass().getMethod("getCategorias");
+                      Object catObj = m1.invoke(o);
+                      if (catObj != null) {
+                        java.lang.reflect.Method m2 = catObj.getClass().getMethod("getCategoria");
+                        Object list = m2.invoke(catObj);
+                        if (list instanceof java.util.Collection) {
+                          for (Object s : (java.util.Collection<?>) list)
+                            if (s != null && !s.toString().isBlank())
+                              categoriasSet.add(s.toString());
                         }
                       }
-                    } catch (Exception e) {
-                      // ignore per-item errors
-                    }
+                    } catch (Exception ignore) {}
                   }
                 }
-
-                if (cats != null && !cats.isEmpty()) {
+                if (categoriasSet.isEmpty()) {
+                  try {
+                    publicadores.PublicadorEventoService svc = new publicadores.PublicadorEventoService();
+                    publicadores.PublicadorEvento port = svc.getPublicadorEventoPort();
+                    publicadores.DtEventoArray arr = port.listarEventos();
+                    if (arr != null && arr.getItem() != null) {
+                      for (publicadores.DtEvento ev : arr.getItem()) {
+                        if (ev == null || ev.getCategorias() == null) continue;
+                        java.util.List<String> catsEv = ev.getCategorias().getCategoria();
+                        if (catsEv != null)
+                          for (String s : catsEv)
+                            if (s != null && !s.isBlank())
+                              categoriasSet.add(s);
+                      }
+                    }
+                  } catch (Exception e) {
+                    e.printStackTrace();
+                  }
+                }
+                java.util.List<String> cats = new java.util.ArrayList<>(categoriasSet);
+                if (!cats.isEmpty()) {
                   for (String c : cats) {
               %>
-                        <label><span><%= c %></span><input type="checkbox" class="cat" value="<%= c %>"></label>
-              <%    }
+                    <label><span><%= c %></span><input type="checkbox" class="cat" value="<%= c %>"></label>
+              <%
+                  }
                 } else {
               %>
-                        <label><span>(Sin categorías)</span></label>
-              <%    }
+                    <label><span>(Sin categorías)</span></label>
+              <%
+                }
               %>
             </div>
             <input type="hidden" id="categorias" name="categorias" value="">
@@ -124,6 +134,7 @@
             </button>
           </div>
         </form>
+
         <script>
           (function () {
             const form = document.getElementById('form-alta-evento');
@@ -135,9 +146,7 @@
             });
 
             form.addEventListener('submit', function (e) {
-              // detectar si el submit fue por Cancelar
               if (e.submitter && e.submitter.name === 'accion' && e.submitter.value === 'cancelar') {
-                
                 return;
               }
               const checks = Array.from(document.querySelectorAll('.cat'));
@@ -154,9 +163,8 @@
               document.getElementById('categorias').value = sel.join(',');
             });
 
-            // verificación básica de tamaño de imagen 
             const inputImg = document.getElementById('imagen');
-            const MAX_BYTES = 2 * 1024 * 1024; // 2MB
+            const MAX_BYTES = 2 * 1024 * 1024;
             inputImg.addEventListener('change', function () {
               const file = this.files && this.files[0];
               if (file && file.size > MAX_BYTES) {

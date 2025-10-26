@@ -60,6 +60,7 @@ public class ControladorEvento implements IControladorEvento {
         if (manejador.existeEvento(nombre)) {
             throw new EventoYaExisteException(nombre);
         }
+        if (fechaDeAlta == null) fechaDeAlta = LocalDate.now();
         ManejadorAuxiliar manejadorAux = ManejadorAuxiliar.getInstancia();
         Map<String, Categoria> categoriasMap = new java.util.HashMap<>();
         for (String nombreCat : categorias.getCategorias()) {
