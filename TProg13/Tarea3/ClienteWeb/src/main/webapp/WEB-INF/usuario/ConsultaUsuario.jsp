@@ -5,7 +5,7 @@
   String ctx = request.getContextPath();
   String nickSesion = (String) session.getAttribute("nick");
 
-  Collection<DTDatosUsuario> usuarios = (Collection<DTDatosUsuario>) request.getAttribute("usuarios");
+  Collection<DtDatosUsuario> usuarios = (Collection<DtDatosUsuario>) request.getAttribute("usuarios");
   DTDatosUsuario usuario = (DTDatosUsuario) request.getAttribute("usuario");
   Map<String, String> edicionToEvento = (Map<String, String>) request.getAttribute("edicionToEvento");
   String error = (String) request.getAttribute("error");
