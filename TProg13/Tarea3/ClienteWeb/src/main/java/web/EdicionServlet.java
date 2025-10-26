@@ -11,16 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
 
-import logica.fabrica;
-import logica.interfaces.IControladorEvento;
-import excepciones.EdicionYaExisteException;
-import excepciones.EventoYaExisteException;
-import excepciones.FechasCruzadasException;
-import logica.datatypes.DTDatosUsuario;
-import logica.datatypes.DTEdicion;
-import logica.datatypes.DTRegistro;
-import logica.datatypes.DTEvento;
+import publicadores.DtEdicion;
+import publicadores.DtEvento;
+import publicadores.DtRegistro;
+import publicadores.DtDatosUsuario;
+import publicadores.StringArray;
 
 @WebServlet("/edicion/*")
 @MultipartConfig
@@ -33,12 +31,11 @@ public class EdicionServlet extends HttpServlet {
   //carpeta pública bajo /img
   private static final String UPLOAD_PUBLIC_DIR_ED = "/img/ediciones";
 
-  private IControladorEvento ce() { return fabrica.getInstance().getIControladorEvento(); }
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
-  private DTDatosUsuario getUsuario(HttpServletRequest req) {
+  private DtDatosUsuario getUsuario(HttpServletRequest req) {
     HttpSession sAux = req.getSession(false);
-    return sAux == null ? null : (DTDatosUsuario) sAux.getAttribute("usuario_logueado");
+    return sAux == null ? null : (DtDatosUsuario) sAux.getAttribute("usuario_logueado");
   }
   private String getRol(HttpServletRequest req) {
     HttpSession sAux = req.getSession(false);
@@ -49,6 +46,10 @@ public class EdicionServlet extends HttpServlet {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
+
+    // Create remote service port (PublicadorEvento)
+    publicadores.PublicadorEventoService service = new publicadores.PublicadorEventoService();
+    publicadores.PublicadorEvento port = service.getPublicadorEventoPort();
 
     String path = req.getPathInfo();
 
@@ -61,7 +62,7 @@ public class EdicionServlet extends HttpServlet {
         return;
       }
 
-      DTEdicion edicionObj = ce().obtenerDtEdicion(evento, edicion);
+      DtEdicion edicionObj = port.obtenerDtEdicion(evento, edicion);
       if (edicionObj == null) {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Edición no encontrada: " + edicion);
         return;
@@ -90,15 +91,15 @@ public class EdicionServlet extends HttpServlet {
           && edicionObj.getOrganizador() != null
           && nickSesion.equals(edicionObj.getOrganizador());
 
-      java.util.List<DTRegistro> registrosList = new java.util.ArrayList<>();
+      java.util.List<DtRegistro> registrosList = new java.util.ArrayList<>();
       if (esOrganizador) {
-    	  
+
         if (edicionObj.getRegistros() != null)
           registrosList.addAll(edicionObj.getRegistros());
       } else if (nickSesion != null) {
-        DTDatosUsuario usuarioLogueado = getUsuario(req);
+        DtDatosUsuario usuarioLogueado = getUsuario(req);
         if (usuarioLogueado != null && usuarioLogueado.getRegistros() != null) {
-          for (DTRegistro r : usuarioLogueado.getRegistros()) {
+          for (DtRegistro r : usuarioLogueado.getRegistros()) {
             if (r.getEdicion() != null && r.getEdicion().equals(edicionObj.getNombre())) {
               registrosList.add(r);
             }
@@ -115,7 +116,20 @@ public class EdicionServlet extends HttpServlet {
       case "/alta": {
         if (!requiereOrganizador(req, resp)) return;
 //        var listaEventos = ce().listarEventos();
-        var listaEventos = ce().listarEventosVigentes();
+        // obtener lista de eventos vigentes desde el publicador
+        java.util.List<DtEvento> listaEventos = new ArrayList<>();
+        try {
+          DtEvento[] arr = port.listarEventosVigentes();
+          if (arr != null) listaEventos = Arrays.asList(arr);
+        } catch (Throwable t) {
+          // stub may return a wrapper
+          try {
+            Object wrapper = port.listarEventosVigentes();
+            var items = (List<DtEvento>) wrapper.getClass().getMethod("getItem").invoke(wrapper);
+            if (items != null) listaEventos = new ArrayList<>(items);
+          } catch (Exception ignore) {}
+        }
+
         req.setAttribute("listaEventos", listaEventos);
         if (listaEventos == null || listaEventos.isEmpty()) {
           req.setAttribute("sinEventos", true);
@@ -129,7 +143,7 @@ public class EdicionServlet extends HttpServlet {
           resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Falta parámetro 'evento'");
           return;
         }
-        req.setAttribute("listaEdiciones", listarEdicionesEventoCompleto(evento));
+        req.setAttribute("listaEdiciones", listarEdicionesEventoCompleto(evento, port));
         req.getRequestDispatcher(JSP_LISTADO).forward(req, resp);
         return;
       }
@@ -142,6 +156,11 @@ public class EdicionServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
     req.setCharacterEncoding("UTF-8");
+
+    // Create remote service port (PublicadorEvento)
+    publicadores.PublicadorEventoService service = new publicadores.PublicadorEventoService();
+    publicadores.PublicadorEvento port = service.getPublicadorEventoPort();
+
     String path = req.getPathInfo();
 
     if ("/alta".equals(path)) {
@@ -162,7 +181,10 @@ public class EdicionServlet extends HttpServlet {
       if (isBlank(evento) || isBlank(nombre) || isBlank(desc) ||
           isBlank(iniStr) || isBlank(finStr) || isBlank(ciudad) || isBlank(pais)) {
         req.setAttribute("error", "Todos los campos obligatorios deben completarse.");
-        req.setAttribute("listaEventos", ce().listarEventos());
+        // cargar lista de eventos desde publicador
+        List<DtEvento> listaEventos = new ArrayList<>();
+        try { DtEvento[] arr = port.listarEventosVigentes(); if (arr != null) listaEventos = Arrays.asList(arr); } catch (Throwable t) { }
+        req.setAttribute("listaEventos", listaEventos);
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
         return;
       }
@@ -173,7 +195,9 @@ public class EdicionServlet extends HttpServlet {
         fin = LocalDate.parse(finStr);
       } catch (Exception e) {
         req.setAttribute("error", "Formato de fecha inválido.");
-        req.setAttribute("listaEventos", ce().listarEventos());
+        List<DtEvento> listaEventos = new ArrayList<>();
+        try { DtEvento[] arr = port.listarEventosVigentes(); if (arr != null) listaEventos = Arrays.asList(arr); } catch (Throwable t) { }
+        req.setAttribute("listaEventos", listaEventos);
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
         return;
       }
@@ -184,7 +208,9 @@ public class EdicionServlet extends HttpServlet {
           String ctype = imagen.getContentType();
           if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
             req.setAttribute("error", "El archivo subido no es una imagen válida.");
-            req.setAttribute("listaEventos", ce().listarEventos());
+            List<DtEvento> listaEventos = new ArrayList<>();
+            try { DtEvento[] arr = port.listarEventosVigentes(); if (arr != null) listaEventos = Arrays.asList(arr); } catch (Throwable t) { }
+            req.setAttribute("listaEventos", listaEventos);
             req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
             return;
           }
@@ -212,32 +238,46 @@ public class EdicionServlet extends HttpServlet {
         }
       } catch (Exception ex) {
         req.setAttribute("error", "Error al procesar la imagen: " + ex.getMessage());
-        req.setAttribute("listaEventos", ce().listarEventos());
+        List<DtEvento> listaEventos = new ArrayList<>();
+        try { DtEvento[] arr = port.listarEventosVigentes(); if (arr != null) listaEventos = Arrays.asList(arr); } catch (Throwable t) { }
+        req.setAttribute("listaEventos", listaEventos);
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
         return;
       }
 
       try {
-        DTDatosUsuario org = getUsuario(req);
+        DtDatosUsuario org = getUsuario(req);
         if (org == null || !"ORGANIZADOR".equals(getRol(req))) {
           req.setAttribute("error", "Debés iniciar sesión como organizador.");
           req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
           return;
         }
 
-        DTEvento evObj = ce().consultaDTEvento(evento);
+        DtEvento evObj = port.consultaDTEvento(evento);
 
-        // Call controller API with video URL (logic module updated to accept video param)
-        ce().altaEdicionEventoDTO(evObj, org, nombre, nombre, desc, ini, fin,
-                                   LocalDate.now(), ciudad, pais, imagenFileName, videoUrl);
+        // Call remote publicador API with video URL
+        try {
+          port.altaEdicionEventoDTO(evObj, org, nombre, nombre, desc, ini, fin,
+                                     LocalDate.now(), ciudad, pais, imagenFileName, videoUrl);
+        } catch (publicadores.EdicionYaExisteException_Exception | publicadores.EventoYaExisteException_Exception | publicadores.FechasCruzadasException_Exception ex) {
+          throw ex;
+        }
 
          String evEnc = URLEncoder.encode(evento, StandardCharsets.UTF_8);
          String edEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8);
          resp.sendRedirect(ctx(req) + "/edicion/ConsultaEdicion?evento=" + evEnc + "&edicion=" + edEnc);
 
-      } catch (EdicionYaExisteException | EventoYaExisteException | FechasCruzadasException ex) {
+      } catch (publicadores.EdicionYaExisteException_Exception | publicadores.EventoYaExisteException_Exception | publicadores.FechasCruzadasException_Exception ex) {
         req.setAttribute("error", ex.getMessage());
-        req.setAttribute("listaEventos", ce().listarEventos());
+        List<DtEvento> listaEventos = new ArrayList<>();
+        try { DtEvento[] arr = port.listarEventosVigentes(); if (arr != null) listaEventos = Arrays.asList(arr); } catch (Throwable t) { }
+        req.setAttribute("listaEventos", listaEventos);
+        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+      } catch (Exception ex) {
+        req.setAttribute("error", ex.getMessage());
+        List<DtEvento> listaEventos = new ArrayList<>();
+        try { DtEvento[] arr = port.listarEventosVigentes(); if (arr != null) listaEventos = Arrays.asList(arr); } catch (Throwable t) { }
+        req.setAttribute("listaEventos", listaEventos);
         req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
       }
       return;
@@ -246,14 +286,26 @@ public class EdicionServlet extends HttpServlet {
     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
 
-  private java.util.List<DTEdicion> listarEdicionesEventoCompleto(String nombreEvento) {
-    java.util.List<DTEdicion> lista = new ArrayList<>();
+  private java.util.List<DtEdicion> listarEdicionesEventoCompleto(String nombreEvento, publicadores.PublicadorEvento port) {
+    java.util.List<DtEdicion> lista = new ArrayList<>();
     try {
-      DTEvento evento = ce().consultaDTEvento(nombreEvento);
+      DtEvento evento = port.consultaDTEvento(nombreEvento);
       if (evento == null) return lista;
-      if (evento.getEdiciones() != null && !evento.getEdiciones().isEmpty()) {
-        for (String edicionName : evento.getEdiciones()) {
-          DTEdicion ed = ce().obtenerDtEdicion(nombreEvento, edicionName);
+      java.util.List<String> nombres = new ArrayList<>();
+      try {
+        StringArray arr = port.listarEdicionesEvento(nombreEvento);
+        if (arr != null && arr.getItem() != null) nombres.addAll(arr.getItem());
+      } catch (Throwable t) {
+        try {
+          Object wrapper = port.listarEdicionesEvento(nombreEvento);
+          var items = (List<String>) wrapper.getClass().getMethod("getItem").invoke(wrapper);
+          if (items != null) nombres.addAll(items);
+        } catch (Exception ignore) {}
+      }
+
+      if (nombres != null && !nombres.isEmpty()) {
+        for (String edicionName : nombres) {
+          DtEdicion ed = port.obtenerDtEdicion(nombreEvento, edicionName);
           if (ed != null) lista.add(ed);
         }
       }
