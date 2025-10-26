@@ -13,7 +13,7 @@
   @SuppressWarnings("unchecked")
   List<String> edicionesOrganizador = (List<String>) request.getAttribute("edicionesOrganizador");
   @SuppressWarnings("unchecked")
-  Set<String> instituciones = (Set<String>) request.getAttribute("instituciones");
+  List<String> instituciones = (List<String>) request.getAttribute("instituciones");
   @SuppressWarnings("unchecked")
   List<DtTipoRegistro> tipos = (List<DtTipoRegistro>) request.getAttribute("tiposRegistro");
 
