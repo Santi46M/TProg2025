@@ -12,13 +12,14 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
-import logica.fabrica;
-import logica.interfaces.IControladorEvento;
-import logica.datatypes.DTCategorias;
-import logica.datatypes.DTEdicion;
-import logica.datatypes.DTEvento;
-import excepciones.EventoYaExisteException;
+import publicadores.PublicadorEventoService;
+import publicadores.PublicadorEvento;
+import publicadores.DtCategorias;
+import publicadores.DtEdicion;
+import publicadores.DtEvento;
+import publicadores.EventoYaExisteException_Exception;
 
 @WebServlet("/evento/*")
 @MultipartConfig(maxFileSize = 2 * 1024 * 1024, maxRequestSize = 4 * 1024 * 1024)
@@ -32,8 +33,14 @@ public class EventoServlet extends HttpServlet {
     // carpeta pública donde se guardan subidas
     private static final String UPLOAD_PUBLIC_DIR = "/img/eventos";
 
-    private final IControladorEvento controladorEv = fabrica.getInstance().getIControladorEvento();
+    // no usar la lógica local; se consumen los publicadores
     private String ctx(HttpServletRequest req) { return req.getContextPath(); }
+    
+    // Helper para obtener el port de publicador
+    private PublicadorEvento obtenerPort() {
+        PublicadorEventoService service = new PublicadorEventoService();
+        return service.getPublicadorEventoPort();
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -47,7 +54,8 @@ public class EventoServlet extends HttpServlet {
                 return;
             }
 
-            DTEvento ev = controladorEv.consultaDTEvento(nombre);
+            PublicadorEvento port = obtenerPort();
+            DTEvento ev = port.consultaDTEvento(nombre);
             if (ev == null) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Evento no encontrado: " + nombre);
                 return;
@@ -68,7 +76,8 @@ public class EventoServlet extends HttpServlet {
             req.setAttribute("evImagenUrl", evImagenUrl);
 
             // EDICIONES 
-            List<String> claves = controladorEv.listarEdicionesEvento(nombre); // puede ser nombres o siglas
+            String[] clavesArr = port.listarEdicionesEvento(nombre);
+            List<String> claves = (clavesArr == null) ? List.of() : Arrays.asList(clavesArr);
             List<DTEdicion> ediciones = new ArrayList<>();
             String siglaEvento = ev.getSigla();
 
@@ -77,13 +86,13 @@ public class EventoServlet extends HttpServlet {
 
                 // Intento por SIGLA 
                 try {
-                    dtEd = controladorEv.consultaEdicionEvento(siglaEvento, clave);
+                    dtEd = port.consultaEdicionEvento(siglaEvento, clave);
                 } catch (Exception ignore) {}
 
                 //  si no vino nada, pruebo por NOMBRE de edición 
                 if (dtEd == null) {
                     try {
-                        dtEd = controladorEv.obtenerDtEdicion(nombre, clave);
+                        dtEd = port.obtenerDtEdicion(nombre, clave);
                     } catch (Exception ignore) {}
                 }
 
@@ -101,7 +110,9 @@ public class EventoServlet extends HttpServlet {
         switch (path) {
         case "/alta":
             if (!requiereOrganizador(req, resp)) return;
-            List<DTCategorias> dtCategorias = controladorEv.listarDTCategorias();
+            PublicadorEvento portAlta = obtenerPort();
+            DTCategorias[] dtCatsArr = portAlta.listarDTCategorias();
+            List<DTCategorias> dtCategorias = (dtCatsArr == null) ? List.of() : Arrays.asList(dtCatsArr);
             req.setAttribute("dtCategorias", dtCategorias);
             req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
             return;
@@ -110,16 +121,19 @@ public class EventoServlet extends HttpServlet {
                 req.getRequestDispatcher(JSP_REGISTRO).forward(req, resp);
                 return;
             case "/listado":
-                List<DTEvento> lista;
+                PublicadorEvento portList = obtenerPort();
+                DTEvento[] listaArr;
                 String cat = trim(req.getParameter("categoria"));
                 if (!isBlank(cat)) {
-                    lista = controladorEv.listarEventosPorCategoria(cat);
+                    listaArr = portList.listarEventosPorCategoria(cat);
                     req.setAttribute("categoriaSeleccionada", cat);
                 } else {
-                    lista = controladorEv.listarEventos();
+                    listaArr = portList.listarEventos();
                 }
+                List<DTEvento> lista = (listaArr == null) ? List.of() : Arrays.asList(listaArr);
                 req.setAttribute("lista", lista);
-                req.setAttribute("categorias", controladorEv.listarCategoriasConEventos());
+                String[] cats = portList.listarCategoriasConEventos();
+                req.setAttribute("categorias", (cats == null) ? List.of() : Arrays.asList(cats));
                 req.getRequestDispatcher(JSP_LISTAR).forward(req, resp);
                 return;
             default:
@@ -198,18 +212,22 @@ public class EventoServlet extends HttpServlet {
                 return;
             }
 
-            DTCategorias dtCategorias = new DTCategorias(categoriasList);
+            // construir DTCategorias para el publicador
+            PublicadorEvento port = obtenerPort();
+            DTCategorias dtCategorias = new DTCategorias();
+            if (dtCategorias.getItems() == null) dtCategorias.setItems(new ArrayList<>());
+            dtCategorias.getItems().addAll(categoriasList);
             try {
-                controladorEv.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
+                port.altaEvento(nombre, desc, LocalDate.now(), sigla, dtCategorias, sigla);
 
                 if (imagenFileName != null) {
-                    try { controladorEv.actualizarImagenEvento(nombre, imagenFileName); }
+                    try { port.actualizarImagenEvento(nombre, imagenFileName); }
                     catch (IllegalArgumentException ex) { System.err.println("No se pudo asociar imagen al evento: " + ex.getMessage()); }
                 }
 
                 String nombreEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8.name());
                 resp.sendRedirect(ctx(req) + "/evento/ConsultaEvento?nombre=" + nombreEnc);
-            } catch (EventoYaExisteException e) {
+            } catch (EventoYaExisteException_Exception e) {
                 req.setAttribute("error", "duplicado");
                 req.setAttribute("nombreEventoDuplicado", nombre);
                 req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
@@ -233,7 +251,8 @@ public class EventoServlet extends HttpServlet {
         if ("/FinalizarEvento".equals(path)) {
         	String nombreEvento = trim(req.getParameter("nombreEvento"));
         	System.out.println("Finalizando evento en EventoServlet: " + nombreEvento);
-        	controladorEv.finalizarEvento(nombreEvento);
+        	PublicadorEvento portFin = obtenerPort();
+        	portFin.finalizarEvento(nombreEvento);
 
 			resp.sendRedirect(ctx(req) + "/inicio");
 			return;
