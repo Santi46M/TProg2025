@@ -197,19 +197,46 @@ public class UsuarioServlet extends HttpServlet {
       }
 
       // Alta por publicador
-      publicadores.LocalDate pFecha = (fechaNac == null) ? null : new publicadores.LocalDate();
+      // Ensure we never pass nulls to the SOAP client: use empty strings and a LocalDate instance.
+      publicadores.LocalDate pFecha = new publicadores.LocalDate(); // always non-null for the stub
+
+      // helper to send non-null trimmed strings
+      java.util.function.Function<String,String> sendNonNull = s -> (s == null) ? "" : s.trim();
+
+      String svcNombre = sendNonNull.apply(nombreFinal);
+      String svcCorreo = sendNonNull.apply(correo);
+      String svcDescripcion = sendNonNull.apply(descripcion);
+      String svcLink = sendNonNull.apply(link);
+      String svcApellido = sendNonNull.apply(apellido);
+      String svcInstitucion = sendNonNull.apply(institucion);
+      String svcImagen = (nombreArchivo == null) ? "" : nombreArchivo;
+
+      // For role-specific unused fields, send empty string (do NOT send null)
+      if (esOrganizador) {
+        // organizador: assistant-specific fields should be empty
+        svcApellido = "";
+        // fecha not used by organizer but keep a non-null object
+      } else {
+        // asistente: organizer-specific fields should be empty
+        svcDescripcion = "";
+        svcLink = "";
+      }
+
+      // Debug: print sanitized parameters to confirm none are null
+      System.out.println("DEBUG altaUsuario params: nickname='" + nick + "', nombre='" + svcNombre + "', correo='" + svcCorreo + "', descripcion='" + svcDescripcion + "', link='" + svcLink + "', apellido='" + svcApellido + "', fechaNacimiento='" + pFecha + "', institucion='" + svcInstitucion + "', esOrganizador='" + esOrganizador + "', imagen='" + svcImagen + "'");
+
       port.altaUsuario(
           nick,
-          nombreFinal,
-          correo,
-          descripcion,
-          link,
-          apellido,
+          svcNombre,
+          svcCorreo,
+          svcDescripcion,
+          svcLink,
+          svcApellido,
           pFecha,
-          institucion,
+          svcInstitucion,
           esOrganizador,
           pass1,
-          nombreArchivo
+          svcImagen
       );
 
       // login directo post-alta
@@ -343,6 +370,13 @@ public class UsuarioServlet extends HttpServlet {
   }
 
  private static String safeTrim(String s){ return s == null ? null : s.trim(); }
+
+// Convert empty (or whitespace-only) string to null for SOAP service compatibility
+private static String emptyToNull(String s) {
+  if (s == null) return null;
+  String t = s.trim();
+  return t.isEmpty() ? null : t;
+}
 
 private static java.util.List<DtDatosUsuario> asList(DtDatosUsuarioArray arr) {
 	  if (arr == null) return java.util.List.of();
