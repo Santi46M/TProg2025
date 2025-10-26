@@ -38,5 +38,9 @@
 	<classpathentry kind="lib" path="/Tarea3/ClienteWeb/src/main/webapp/WEB-INF/lib/jakarta.xml.ws-api-4.0.2.jar"/>
 	<classpathentry kind="lib" path="/Tarea3/ClienteWeb/src/main/webapp/WEB-INF/lib/jaxws-rt-4.0.2.jar"/>
 	<classpathentry kind="lib" path="/TProg13/Tarea3/ClienteWeb/src/main/webapp/WEB-INF/lib/istack-commons-runtime-4.0.1.jar"/>
+	<classpathentry kind="lib" path="/Tarea3/ClienteWeb/src/main/webapp/WEB-INF/lib/stax-ex-1.8.3.jar"/>
+	<classpathentry kind="lib" path="/Tarea3/ClienteWeb/src/main/webapp/WEB-INF/lib/jaxb-runtime-4.0.2.jar"/>
+	<classpathentry kind="lib" path="/Tarea3/ClienteWeb/src/main/webapp/WEB-INF/lib/jaxb-core-4.0.2.jar"/>
+	<classpathentry kind="lib" path="/Tarea3/ClienteWeb/src/main/webapp/WEB-INF/lib/jakarta.activation-api-2.1.2.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
