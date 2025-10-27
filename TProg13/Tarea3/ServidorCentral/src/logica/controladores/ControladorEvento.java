@@ -609,11 +609,18 @@ asist.addRegistro(idRegistro, nuevoRegistro);
     
     
     public DTEdicion obtenerEdicionPorSiglaDT(String sigla) {
-        String nombreEvento = obtenerEdicionPorSigla(sigla).getEvento().getNombre();
-        String nombreEdicion = obtenerEdicionPorSigla(sigla).getNombre();
-    	return obtenerDtEdicion(nombreEvento, nombreEdicion);
-        	 
+        Ediciones ed = obtenerEdicionPorSigla(sigla);
+        
+        if (ed == null) {
+            System.out.println(" No se encontró ninguna edición con sigla: " + sigla);
+            return null;
+        }
+        
+        String nombreEvento = ed.getEvento().getNombre();
+        String nombreEdicion = ed.getNombre();
+        return obtenerDtEdicion(nombreEvento, nombreEdicion);
     }
+
     
     @Override
     public String encontrarEventoPorSigla(String siglaEdicion) {

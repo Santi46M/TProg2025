@@ -73,25 +73,18 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             if (claves.isEmpty()) continue;
 
             List<DtEdicion> visibles = new ArrayList<>();
-            for (String clave : claves) {
+            for (String nombreEdicion : claves) {
                 DtEdicion ed = null;
                 try {
-                    // try by sigla
-                    ed = port.obtenerEdicionPorSiglaDT(clave);
-                } catch (Exception ignore) { ed = null; }
-                if (ed == null) {
-                    try { ed = port.obtenerDtEdicion(nombreEv, clave); } catch (Exception ignore) { }
-                }
+                    // Ya sabemos que listarEdicionesEvento devuelve NOMBRES, no siglas
+                    ed = port.obtenerDtEdicion(nombreEv, nombreEdicion);
+                } catch (Exception ignore) { }
+
                 if (ed != null && esAceptada(ed.getEstado())) {
-                    // check not finished
-                    try {
-                        java.time.LocalDate fin = null;
-                        Object f = ed.getFechaFin();
-                        // ed.getFechaFin() returns publicadores.LocalDate wrapper; we can't easily convert, so skip strict check
-                        visibles.add(ed);
-                    } catch (Exception ignore) { visibles.add(ed); }
+                    visibles.add(ed);
                 }
             }
+
             if (!visibles.isEmpty()) edicionesPorEvento.put(nombreEv, visibles);
         }
         req.setAttribute("edicionesPorEvento", edicionesPorEvento);
@@ -323,10 +316,10 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
         if (res == null || !res.valido() || isBlank(edicionParam)) return null;
 
         DtEdicion ed = null;
-        try { ed = port.obtenerEdicionPorSiglaDT(edicionParam); } catch (Exception ignore) {}
-        if (ed == null) {
-            try { ed = port.obtenerDtEdicion(res.nombreEvento, edicionParam); } catch (Exception ignore) {}
-        }
+        try { ed = port.obtenerDtEdicion(res.nombreEvento, edicionParam); } catch (Exception ignore) {}
+//        if (ed == null) {
+//            try { ed = port.obtenerDtEdicion(res.nombreEvento, edicionParam); } catch (Exception ignore) {}
+//        }
         return ed;
     }
 
