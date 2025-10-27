@@ -27,7 +27,7 @@ List<DtEdicion> edicionesRegistradas = (List<DtEdicion>) request.getAttribute("e
             <div class="card-body d-flex flex-column">
               <h5 class="card-title text-primary"><%= ed.getNombre() %></h5>
               <ul class="list-unstyled flex-grow-1">
-                <li><strong>Evento:</strong> <%= ed.getEvento() %></li>
+				<li><strong>Evento:</strong> <%= ed.getEvento() != null ? ed.getEvento().getNombre() : "" %></li>
                 <li><strong>Sigla:</strong> <%= ed.getSigla() %></li>
                 <li><strong>Fecha inicio:</strong> <%= ed.getFechaInicio() %></li>
                 <li><strong>Fecha fin:</strong> <%= ed.getFechaFin() %></li>

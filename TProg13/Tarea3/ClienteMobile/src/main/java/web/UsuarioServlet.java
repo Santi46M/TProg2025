@@ -80,14 +80,46 @@ public class UsuarioServlet extends HttpServlet {
         req.getRequestDispatcher("/WEB-INF/ediciones/ListarEdicionesUsuario.jsp").forward(req, resp);
         return;
       }
-      java.util.List<publicadores.DtEdicion> edicionesRegistradas = new java.util.ArrayList<>();
+      // Obtener todas las ediciones aceptadas (DtEdicion completos)
+      java.util.List<publicadores.DtEdicion> todasEdiciones = new java.util.ArrayList<>();
+      try {
+        publicadores.PublicadorEventoService eventoService = new publicadores.PublicadorEventoService();
+        publicadores.PublicadorEvento eventoPort = eventoService.getPublicadorEventoPort();
+        // Obtener todos los eventos
+        publicadores.DtEventoArray eventosArr = eventoPort.listarEventos();
+        java.util.List<String> nombresEventos = new java.util.ArrayList<>();
+        if (eventosArr != null && eventosArr.getItem() != null) {
+          for (publicadores.DtEvento evento : eventosArr.getItem()) {
+            if (evento != null && evento.getNombre() != null) {
+              nombresEventos.add(evento.getNombre());
+            }
+          }
+        }
+        for (String nombreEvento : nombresEventos) {
+          // Obtener nombres de ediciones para cada evento
+          StringArray edicionesArr = eventoPort.listarEdicionesEvento(nombreEvento);
+          java.util.List<String> nombresEdiciones = (edicionesArr != null && edicionesArr.getItem() != null) ? edicionesArr.getItem() : java.util.List.of();
+          for (String nombreEdicion : nombresEdiciones) {
+            publicadores.DtEdicion ed = eventoPort.obtenerDtEdicion(nombreEvento, nombreEdicion);
+            if (ed != null) todasEdiciones.add(ed);
+          }
+        }
+      } catch (Exception e) {
+        System.err.println("[UsuarioServlet] Error obteniendo todas las ediciones: " + e.getMessage());
+      }
+      // Filtrar solo las ediciones donde el usuario está registrado
+      java.util.List<String> edicionesRegistradasNombres = new java.util.ArrayList<>();
       if (usuario != null && usuario.getRegistros() != null && usuario.getRegistros().getRegistro() != null) {
         for (publicadores.DtRegistro reg : usuario.getRegistros().getRegistro()) {
           if (reg.getEdicion() != null) {
-            publicadores.DtEdicion ed = new publicadores.DtEdicion();
-            ed.setNombre(reg.getEdicion());
-            edicionesRegistradas.add(ed);
+            edicionesRegistradasNombres.add(reg.getEdicion());
           }
+        }
+      }
+      java.util.List<publicadores.DtEdicion> edicionesRegistradas = new java.util.ArrayList<>();
+      for (publicadores.DtEdicion ed : todasEdiciones) {
+        if (edicionesRegistradasNombres.contains(ed.getNombre())) {
+          edicionesRegistradas.add(ed);
         }
       }
       req.setAttribute("edicionesRegistradas", edicionesRegistradas);
