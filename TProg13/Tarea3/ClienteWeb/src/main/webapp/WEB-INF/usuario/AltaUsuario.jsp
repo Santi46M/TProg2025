@@ -114,8 +114,7 @@
           <div class="input-group">
             <label for="instIdA">Institución (opcional)</label>
             <select id="instIdA" name="instIdA">
-              <!-- Send a non-empty placeholder so servlet receives a non-null/non-empty value when none selected -->
-              <option value="SIN_INSTITUCION">-- Seleccione una institución --</option>
+              <option value="">-- Seleccione una institución --</option>
               <% 
                 Collection<String> instituciones = (Collection<String>) request.getAttribute("instituciones");
                 String instSel = val(request, "instIdA");

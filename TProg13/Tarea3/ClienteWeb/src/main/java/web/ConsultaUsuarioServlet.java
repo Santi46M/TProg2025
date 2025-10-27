@@ -46,13 +46,28 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             try {
                 DtDatosUsuarioArray arr = port.obtenerUsuariosDT();
                 usuarios = asList(arr);
+
+                // ✅ Construir mapa de fotos de usuarios
+                Map<String, String> fotos = new HashMap<>();
+                String ctx = request.getContextPath();
+                for (DtDatosUsuario u : usuarios) {
+                    if (u.getImagen() != null && !u.getImagen().isBlank()) {
+                        fotos.put(u.getNickname(), ctx + "/img/usuarios/" + u.getImagen());
+                    }
+                }
+                request.setAttribute("fotos", fotos);
+
             } catch (Exception e) {
                 request.setAttribute("error", "No se pudo obtener la lista de usuarios.");
             }
+
             request.setAttribute("usuarios", usuarios);
         } else {
             try {
                 DtDatosUsuario usuario = port.obtenerDatosUsuario(nick);
+                String ctx = request.getContextPath();
+                String imagenUrl = ctx + "/img/usuarios/" + usuario.getImagen(); 
+                request.setAttribute("usrImagenUrl", imagenUrl);
                 request.setAttribute("usuario", usuario);
                 String nickSesion = nickEnSesion(request);
                 boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname());
