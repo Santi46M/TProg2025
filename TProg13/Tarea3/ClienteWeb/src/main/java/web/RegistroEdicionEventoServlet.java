@@ -168,7 +168,7 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             return;
         }
 
-        // obtener usuario via publicador
+        // 🔹 Obtener usuario via publicador
         PublicadorUsuario portU = obtenerPortUsuario();
         DtDatosUsuario dtUsuario = null;
         try {
@@ -183,11 +183,15 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             return;
         }
 
+        // 🔹 Resolver evento / edición
         PublicadorEvento port = obtenerPortEvento();
 
-        // Resolver evento/edicion
         List<DtEvento> eventos = new ArrayList<>();
-        try { DtEventoArray arr = port.listarEventos(); if (arr != null && arr.getItem() != null) eventos.addAll(arr.getItem()); } catch (Exception ignore) {}
+        try {
+            DtEventoArray arr = port.listarEventos();
+            if (arr != null && arr.getItem() != null) eventos.addAll(arr.getItem());
+        } catch (Exception ignore) {}
+
         ResEvento res = resolverEvento(eventos, eventoParam);
         DtEdicion edSel = resolverEdicion(res, edicionParam, port);
 
@@ -197,20 +201,25 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             return;
         }
 
-        // Tipo de registro
+        // 🔹 Tipo de registro seleccionado
         DtTipoRegistro tipoSel = null;
-        try { if (edSel.getTiposRegistro() != null && edSel.getTiposRegistro().getTipoRegistro() != null) {
-            for (DtTipoRegistro t : edSel.getTiposRegistro().getTipoRegistro()) {
-                if (t != null && t.getNombre() != null && t.getNombre().equalsIgnoreCase(tipoNom)) { tipoSel = t; break; }
+        try {
+            if (edSel.getTiposRegistro() != null && edSel.getTiposRegistro().getTipoRegistro() != null) {
+                for (DtTipoRegistro t : edSel.getTiposRegistro().getTipoRegistro()) {
+                    if (t != null && t.getNombre() != null && t.getNombre().equalsIgnoreCase(tipoNom)) {
+                        tipoSel = t;
+                        break;
+                    }
+                }
             }
-        } } catch (Exception ignore) {}
+        } catch (Exception ignore) {}
         if (tipoSel == null) {
             req.setAttribute("error", "El tipo de registro seleccionado no es válido.");
             doGet(req, resp);
             return;
         }
 
-        // calcular costo
+        // 🔹 Calcular costo (considerando patrocinio)
         float costo = tipoSel.getCosto();
         if (!isBlank(codigoPatrocinio)) {
             boolean valido = false;
@@ -218,65 +227,45 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
                 if (edSel.getPatrocinios() != null && edSel.getPatrocinios().getPatrocinio() != null) {
                     for (DtPatrocinio p : edSel.getPatrocinios().getPatrocinio()) {
                         if (p != null && p.getCodigo() != null && p.getCodigo().equalsIgnoreCase(codigoPatrocinio)
-                                && p.getTipoRegistro() != null && p.getTipoRegistro().equalsIgnoreCase(tipoNom)) { valido = true; break; }
+                                && p.getTipoRegistro() != null && p.getTipoRegistro().equalsIgnoreCase(tipoNom)) {
+                            valido = true;
+                            break;
+                        }
                     }
                 }
             } catch (Exception ignore) {}
-            if (valido) costo = 0f; else { req.setAttribute("error", "El código de patrocinio no es válido."); doGet(req, resp); return; }
+            if (valido) {
+                costo = 0f;
+            } else {
+                req.setAttribute("error", "El código de patrocinio no es válido.");
+                doGet(req, resp);
+                return;
+            }
         }
 
+        // 🔹 Registrar inscripción usando el nuevo método del web service
         try {
             String idRegistro = UUID.randomUUID().toString();
             LocalDate fechaRegistro = LocalDate.now();
 
-            // Try to call publicador altaRegistroEdicionEvento reflectively (best-effort)
-            boolean invoked = false;
-            try {
-                java.lang.reflect.Method[] methods = port.getClass().getMethods();
-                for (java.lang.reflect.Method m : methods) {
-                    if (!"altaRegistroEdicionEvento".equals(m.getName())) continue;
-                    Class<?>[] pts = m.getParameterTypes();
-                    Object[] args = new Object[pts.length];
-                    for (int i = 0; i < pts.length; i++) {
-                        Class<?> p = pts[i];
-                        if (p == String.class) {
-                            // map reasonable strings by position
-                            if (i == 0) args[i] = idRegistro;
-                            else if (i == 1) args[i] = nick;
-                            else if (i == 2) args[i] = res != null ? res.nombreEvento : "";
-                            else if (i == 3) args[i] = edicionParam;
-                            else if (i == 4) args[i] = tipoNom;
-                            else args[i] = "";
-                        } else if (p.getSimpleName().equals("LocalDate") || p.getName().endsWith(".LocalDate")) {
-                            // use publicadores.LocalDate placeholder when webservice expects generated LocalDate
-                            try { args[i] = new publicadores.LocalDate(); } catch (Exception ex) { args[i] = null; }
-                        } else if (p == float.class || p == Float.class) {
-                            args[i] = costo;
-                        } else if (p == int.class || p == Integer.class) {
-                            args[i] = 0;
-                        } else {
-                            // try to construct simple wrapper objects when possible or leave null
-                            args[i] = null;
-                        }
-                    }
-                    try {
-                        m.setAccessible(true);
-                        m.invoke(port, args);
-                        invoked = true;
-                        break;
-                    } catch (Throwable invokeEx) {
-                        // continue trying other overloads
-                        invoked = false;
-                    }
-                }
-            } catch (Exception ex) { invoked = false; }
+            // El método altaRegistroEdicionEventoDT espera fechas como String (yyyy-MM-dd)
+            String fechaRegistroStr = fechaRegistro.toString();
+            String fechaInicioStr   = fechaRegistroStr; // Si querés usar otra fecha, ajustalo
 
-            if (!invoked) {
-                // No local fallback in ClienteWeb; fail with clear message
-                throw new RuntimeException("No se pudo invocar altaRegistroEdicionEvento en el publicador.");
-            }
+            // 🔸 Llamada directa al nuevo método sin reflexión
+            port.altaRegistroEdicionEventoDT(
+                idRegistro,                         // idRegistro
+                nick,                               // nicknameUsuario
+                res != null ? res.nombreEvento : "",// nombreEvento
+                edicionParam,                       // nombreEdicion
+                tipoNom,                            // nombreTipoRegistro
+                fechaRegistroStr,                   // fechaRegistroStr
+                costo,                              // costo
+                fechaInicioStr                      // fechaInicioStr
+            );
 
             resp.sendRedirect(req.getContextPath() + "/inicio");
+
         } catch (Exception e) {
             req.setAttribute("error", e.getMessage());
             doGet(req, resp);

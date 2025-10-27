@@ -362,7 +362,82 @@ asist.addRegistro(idRegistro, nuevoRegistro);
 // (sin cambios)
 }
 }
+    public void altaRegistroEdicionEventoDT(
+            String idRegistro,
+            String nicknameUsuario,
+            String nombreEvento,
+            String nombreEdicion,
+            String nombreTipoRegistro,
+            LocalDate fechaRegistro,
+            float costo,
+            LocalDate fechaInicio
+    ) {
+        ManejadorUsuario manejadorUsuario = ManejadorUsuario.getInstancia();
+        ManejadorEvento manejadorEvento = ManejadorEvento.getInstancia();
 
+        Usuario usuario = manejadorUsuario.findUsuario(nicknameUsuario);
+        if (usuario == null) {
+            throw new RuntimeException("No se encontró el usuario con nickname: " + nicknameUsuario);
+        }
+
+        Eventos evento = manejadorEvento.obtenerEventos().get(nombreEvento);
+        if (evento == null) {
+            throw new RuntimeException("No se encontró el evento '" + nombreEvento + "'.");
+        }
+
+        Ediciones edicion = evento.obtenerEdicion(nombreEdicion);
+        if (edicion == null) {
+            throw new RuntimeException("No se encontró la edición '" + nombreEdicion + "' del evento.");
+        }
+
+        TipoRegistro tipoRegistro = edicion.obtenerTipoRegistro(nombreTipoRegistro);
+        if (tipoRegistro == null) {
+            throw new RuntimeException("No se encontró el tipo de registro '" + nombreTipoRegistro + "' en la edición.");
+        }
+
+        // ===== NUEVO: bloquear si la edición ya terminó =====
+        LocalDate hoy = (fechaRegistro != null) ? fechaRegistro : LocalDate.now();
+        LocalDate fin = edicion.getFechaFin();
+        if (fin != null && hoy.isAfter(fin)) {
+            throw new RuntimeException("La edición '" + edicion.getNombre() + "' ya finalizó el " + fin + ".");
+        }
+        // =====================================================
+
+        if (tipoRegistro.getCupo() <= 0) {
+            throw new excepciones.CupoTipoRegistroInvalidoException(tipoRegistro.getCupo());
+        }
+
+        boolean yaRegistrado = false;
+        for (Registro reg : manejadorEvento.obtenerRegistros().values()) {
+            if (reg.getUsuario().equals(usuario) && reg.getEdicion().equals(edicion)) {
+                yaRegistrado = true;
+                break;
+            }
+        }
+
+        int cantidadRegistrados = 0;
+        for (Registro reg : manejadorEvento.obtenerRegistros().values()) {
+            if (reg.getTipoRegistro().equals(tipoRegistro) && reg.getEdicion().equals(edicion)) {
+                cantidadRegistrados++;
+            }
+        }
+
+        if (yaRegistrado) {
+            throw new RuntimeException("El usuario ya está registrado a esta edición.");
+        }
+        if (cantidadRegistrados >= tipoRegistro.getCupo()) {
+            throw new excepciones.CupoTipoRegistroInvalidoException(tipoRegistro.getCupo());
+        }
+
+        Registro nuevoRegistro = new Registro(idRegistro, usuario, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio);
+        manejadorEvento.agregarRegistro(nuevoRegistro);
+        edicion.agregarRegistro(idRegistro, nuevoRegistro);
+
+        if (usuario.esAsistente(usuario)) {
+            Asistente asist = (Asistente) usuario;
+            asist.addRegistro(idRegistro, nuevoRegistro);
+        }
+    }
 
     public List<DTEvento> listarEventos() {
         Map<String, Eventos> eventos = manejador.obtenerEventos();

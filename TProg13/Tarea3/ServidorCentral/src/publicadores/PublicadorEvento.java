@@ -209,6 +209,27 @@ public class PublicadorEvento {
     ) {
         ice.altaRegistroEdicionEvento(idRegistro, usuario, evento, edicion, tipoRegistro, fechaRegistro, costo, fechaInicio);
     }
+    @WebMethod
+    public void altaRegistroEdicionEventoDT(
+        @WebParam(name = "idRegistro") String idRegistro,
+        @WebParam(name = "nicknameUsuario") String nicknameUsuario,
+        @WebParam(name = "nombreEvento") String nombreEvento,
+        @WebParam(name = "nombreEdicion") String nombreEdicion,
+        @WebParam(name = "nombreTipoRegistro") String nombreTipoRegistro,
+        @WebParam(name = "fechaRegistro") String fechaRegistroStr,
+        @WebParam(name = "costo") float costo,
+        @WebParam(name = "fechaInicio") String fechaInicioStr
+    ) {
+        LocalDate fechaRegistro = (fechaRegistroStr == null || fechaRegistroStr.isBlank())
+                ? LocalDate.now()
+                : LocalDate.parse(fechaRegistroStr);
+
+        LocalDate fechaInicio = (fechaInicioStr == null || fechaInicioStr.isBlank())
+                ? fechaRegistro
+                : LocalDate.parse(fechaInicioStr);
+
+        ice.altaRegistroEdicionEventoDT(idRegistro, nicknameUsuario, nombreEvento, nombreEdicion, nombreTipoRegistro, fechaRegistro, costo, fechaInicio);
+    }
 
     @WebMethod
     public DTCategorias[] listarDTCategorias() {

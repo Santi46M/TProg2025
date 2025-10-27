@@ -101,4 +101,14 @@ public interface IControladorEvento {
     public boolean esEventoVigente(String nombreEvento);
     public void finalizarEvento(String nombreEvento);
     public List<DTEvento> listarEventosVigentes();
+    public void altaRegistroEdicionEventoDT(
+            String idRegistro,
+            String nicknameUsuario,
+            String nombreEvento,
+            String nombreEdicion,
+            String nombreTipoRegistro,
+            LocalDate fechaRegistro,
+            float costo,
+            LocalDate fechaInicio
+    );
 }
