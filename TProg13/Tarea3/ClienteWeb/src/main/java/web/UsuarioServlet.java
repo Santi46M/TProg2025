@@ -104,18 +104,20 @@ public class UsuarioServlet extends HttpServlet {
       if (baseImg == null) throw new ServletException("No se pudo resolver la ruta física de /img/usuarios.");
       Files.createDirectories(Path.of(baseImg));
 
-      String nickParam = req.getParameter("nick");
+      // nombre original del archivo
       String original = getSafeFilename(imagenPart);
       String ext = getExtension(original);
       if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
       if (ext == null || ext.isBlank()) ext = ".jpg";
 
-      String finalName = (nickParam == null || nickParam.isBlank() ? "avatar" : nickParam) + ext;
+      // ✅ Usar directamente el nombre original
+      String finalName = original;
       Path destino = Path.of(baseImg, finalName);
 
       try (var in = imagenPart.getInputStream()) {
         Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
       }
+      
 
       nombreArchivo = finalName;
       System.out.println("✅ Imagen guardada: " + destino.toAbsolutePath()

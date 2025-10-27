@@ -141,7 +141,8 @@
 
 <div class="perfil-header">
   <% if (usrImagenUrl != null && !usrImagenUrl.isBlank()) { %>
-    <img class="avatar" src="<%= usrImagenUrl %>" alt="Avatar de <%= usuario.getNickname() %>">
+    <img class="avatar" src="<%= request.getContextPath() %>/img/usuarios/<%= usuario.getImagen() %>" 
+     alt="Avatar de <%= usuario.getNickname() %>">
   <% } else { %>
     <div class="no-avatar" aria-label="Sin imagen">sin imagen</div>
   <% } %>
