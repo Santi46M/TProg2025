@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.util.List;
 
 import publicadores.DtDatosUsuario;
 import publicadores.DtRegistro;
@@ -23,9 +24,10 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         HttpSession session = req.getSession(false);
         String nick = (session != null) ? (String) session.getAttribute("nick") : null;
-        String idRegistro = req.getParameter("idRegistro");
+        String edicion = req.getParameter("edicion");
+        String usuario = req.getParameter("usuario");
 
-        if (idRegistro == null || idRegistro.isBlank() || nick == null) {
+        if (edicion == null || edicion.isBlank() || usuario == null || usuario.isBlank() || nick == null) {
             req.setAttribute("error", "Registro no especificado o sesión no iniciada.");
             req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
             return;
@@ -33,7 +35,6 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
 
         PublicadorUsuarioService service = new PublicadorUsuarioService();
         PublicadorUsuario port = service.getPublicadorUsuarioPort();
-        // PublicadorEvento is the correct service to obtain registro details
         PublicadorEventoService evSvc = new PublicadorEventoService();
         PublicadorEvento evPort = evSvc.getPublicadorEventoPort();
 
@@ -52,23 +53,29 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
 
             DtRegistro dtRegistro = null;
             try {
-                // consultaRegistro requiere nickname + idRegistro
-                dtRegistro = evPort.consultaRegistro(nick, idRegistro);
+                // Buscar el registro por edición y usuario
+                List<DtRegistro> registros = dtoUsuario.getRegistros() != null ? dtoUsuario.getRegistros().getRegistro() : java.util.List.of();
+                for (DtRegistro r : registros) {
+                    if (r.getEdicion() != null && r.getEdicion().equals(edicion)) {
+                        dtRegistro = r;
+                        break;
+                    }
+                }
             } catch (Exception e) {
                 req.setAttribute("error", "No se pudo obtener el registro: " + e.getMessage());
                 req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
                 return;
             }
-
             if (dtRegistro == null) {
-                req.setAttribute("error", "No se encontró el registro solicitado.");
-            } else {
-                req.setAttribute("registro", dtRegistro);
+                req.setAttribute("error", "No se encontró el registro para la edición seleccionada.");
+                req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
+                return;
             }
+            req.setAttribute("registro", dtRegistro);
+            req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
         } catch (Exception e) {
-            req.setAttribute("error", "Error al consultar el registro: " + e.getMessage());
+            req.setAttribute("error", "Error inesperado: " + e.getMessage());
+            req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
         }
-
-        req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
     }
 }

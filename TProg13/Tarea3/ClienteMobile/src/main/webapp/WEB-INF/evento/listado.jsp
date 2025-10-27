@@ -74,9 +74,9 @@ String ctx = request.getContextPath();
 
             <div class="event-footer">
               <span class="event-meta"></span>
-              <form action="<%=ctx%>/evento/ConsultaEvento" method="get" style="display:inline;">
-                <input type="hidden" name="nombre" value="<%= nombre %>" />
-                <button type="submit" class="btn">Ver detalle</button>
+              <form action="<%=ctx%>/evento/ediciones/ListadoEdiciones" method="get" style="display:inline;">
+                <input type="hidden" name="evento" value="<%= nombre %>" />
+                <button type="submit" class="btn">Ver ediciones</button>
               </form>
             </div>
           </article>

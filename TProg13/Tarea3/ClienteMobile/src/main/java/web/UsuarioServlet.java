@@ -19,7 +19,7 @@ import publicadores.UsuarioYaExisteException_Exception;
 
 
 
-@WebServlet(urlPatterns = {"/usuario/AltaUsuario", "/usuario/validar"})
+@WebServlet(urlPatterns = {"/usuario/AltaUsuario", "/usuario/validar", "/usuario/edicionesRegistradas", "/usuario/listarRegistros"})
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024,   // 1 MB en memoria
     maxFileSize = 10 * 1024 * 1024,    // 10 MB por archivo
@@ -63,6 +63,58 @@ public class UsuarioServlet extends HttpServlet {
     if ("/usuario/AltaUsuario".equals(path)) {
       cargarInstituciones(req, port);
       req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+      return;
+    }
+
+    if ("/usuario/edicionesRegistradas".equals(path)) {
+      String nick = (String) req.getSession().getAttribute("nick");
+      if (nick == null || nick.isBlank()) {
+        resp.sendRedirect(ctx(req) + "/login");
+        return;
+      }
+      DtDatosUsuario usuario = null;
+      try {
+        usuario = port.obtenerDatosUsuario(nick);
+      } catch (Exception e) {
+        req.setAttribute("error", "No se pudo obtener el usuario.");
+        req.getRequestDispatcher("/WEB-INF/ediciones/ListarEdicionesUsuario.jsp").forward(req, resp);
+        return;
+      }
+      java.util.List<publicadores.DtEdicion> edicionesRegistradas = new java.util.ArrayList<>();
+      if (usuario != null && usuario.getRegistros() != null && usuario.getRegistros().getRegistro() != null) {
+        for (publicadores.DtRegistro reg : usuario.getRegistros().getRegistro()) {
+          if (reg.getEdicion() != null) {
+            publicadores.DtEdicion ed = new publicadores.DtEdicion();
+            ed.setNombre(reg.getEdicion());
+            edicionesRegistradas.add(ed);
+          }
+        }
+      }
+      req.setAttribute("edicionesRegistradas", edicionesRegistradas);
+      req.getRequestDispatcher("/WEB-INF/ediciones/ListarEdicionesUsuario.jsp").forward(req, resp);
+      return;
+    }
+
+    if ("/usuario/listarRegistros".equals(path)) {
+      String nick = (String) req.getSession().getAttribute("nick");
+      if (nick == null || nick.isBlank()) {
+        resp.sendRedirect(ctx(req) + "/login");
+        return;
+      }
+      DtDatosUsuario usuario = null;
+      try {
+        usuario = port.obtenerDatosUsuario(nick);
+      } catch (Exception e) {
+        req.setAttribute("error", "No se pudo obtener el usuario.");
+        req.getRequestDispatcher("/WEB-INF/ediciones/ListarRegistros.jsp").forward(req, resp);
+        return;
+      }
+      java.util.List<publicadores.DtRegistro> registrosUsuario = java.util.List.of();
+      if (usuario != null && usuario.getRegistros() != null && usuario.getRegistros().getRegistro() != null) {
+        registrosUsuario = usuario.getRegistros().getRegistro();
+      }
+      req.setAttribute("registrosUsuario", registrosUsuario);
+      req.getRequestDispatcher("/WEB-INF/ediciones/ListarRegistros.jsp").forward(req, resp);
       return;
     }
 

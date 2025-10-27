@@ -165,7 +165,40 @@ public class EventoServlet extends HttpServlet {
             default:
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
                 
-
+            case "/ediciones/ListadoEdiciones": {
+                String nombreEvento = trim(req.getParameter("evento"));
+                if (isBlank(nombreEvento)) {
+                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Falta parámetro 'evento'");
+                    return;
+                }
+                PublicadorEvento port = obtenerPort();
+                DtEvento ev = port.consultaDTEvento(nombreEvento);
+                if (ev == null) {
+                    resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Evento no encontrado: " + nombreEvento);
+                    return;
+                }
+                StringArray clavesArrObj = port.listarEdicionesEvento(nombreEvento);
+                List<String> claves = (clavesArrObj == null || clavesArrObj.getItem() == null) ? List.of() : clavesArrObj.getItem();
+                List<DtEdicion> ediciones = new ArrayList<>();
+                for (String clave : claves) {
+                    DtEdicion dtEd = null;
+                    try {
+                        if (clave != null) dtEd = port.obtenerEdicionPorSiglaDT(clave);
+                    } catch (Exception ignore) {}
+                    if (dtEd == null) {
+                        try {
+                            dtEd = port.obtenerDtEdicion(nombreEvento, clave);
+                        } catch (Exception ignore) {}
+                    }
+                    if (dtEd != null && esAceptada(dtEd.getEstado())) {
+                        ediciones.add(dtEd);
+                    }
+                }
+                req.setAttribute("evento", nombreEvento);
+                req.setAttribute("listaEdiciones", ediciones);
+                req.getRequestDispatcher("/WEB-INF/ediciones/ListadoEdiciones.jsp").forward(req, resp);
+                return;
+            }                                
         }
     }
 

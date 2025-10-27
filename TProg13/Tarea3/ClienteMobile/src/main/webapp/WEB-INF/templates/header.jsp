@@ -17,8 +17,8 @@
       <div id="menuOpciones" class="bg-white border rounded shadow-lg mt-2" style="display:none; position:absolute; top:60px; left:0; right:0; z-index:1000; min-width:220px; width:90vw; max-width:400px;">
         <ul class="list-unstyled mb-0 py-3">
           <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/evento/listado">Consulta Edición</a></li>
-          <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/registro/ConsultaRegistro">Consulta Registro</a></li>
-          <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/registro/Asistencia">Registro Asistencia a Edición</a></li>
+          <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/usuario/edicionesRegistradas">Consulta Registro</a></li>
+          <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/usuario/listarRegistros">Registro Asistencia a Edición</a></li>
         </ul>
       </div>
       <script>
