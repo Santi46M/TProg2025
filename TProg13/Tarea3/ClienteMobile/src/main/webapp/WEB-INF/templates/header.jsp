@@ -5,6 +5,8 @@
   //obtenemos el usuario logueado 
   String nick = (String) session.getAttribute("nick");
 %>
+<!-- Boxicons for hamburger icon -->
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 
 <header class="site-header">
   <div class="container d-flex justify-content-between align-items-center">
