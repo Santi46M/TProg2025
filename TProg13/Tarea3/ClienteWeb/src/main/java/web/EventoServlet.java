@@ -251,7 +251,9 @@ public class EventoServlet extends HttpServlet {
             dtCategorias.setCategorias(inner);
             try {
                 // Note: generated stub expects publicadores.LocalDate, use its empty instance
-                publicadores.LocalDate fechaAlta = new publicadores.LocalDate();
+//                publicadores.LocalDate fechaAlta = new publicadores.LocalDate();
+            	String fechaAlta = LocalDate.now().toString(); // o cualquier fecha válida
+
                 
                 
                 PublicadorEvento port = obtenerPort();
