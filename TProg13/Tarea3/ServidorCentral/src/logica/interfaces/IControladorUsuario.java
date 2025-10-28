@@ -82,4 +82,6 @@ public interface IControladorUsuario {
     public void dejarSeguirUsuario(String seguidor, String seguido);
     public int contarSeguidores(String nick);
     public int contarSeguidos(String nick);
+    
+    public void marcarAsistencia(String nickname, String registroId);
 }

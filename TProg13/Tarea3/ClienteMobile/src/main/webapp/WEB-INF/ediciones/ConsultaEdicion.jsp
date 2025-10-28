@@ -129,65 +129,84 @@
             <div class="event-meta"><strong>Ciudad:</strong> <%= edicion.getCiudad() %></div>
             <div class="event-meta"><strong>País:</strong> <%= edicion.getPais() %></div>
             <div class="event-meta"><strong>Estado:</strong> <%= (edicion.getEstado() != null ? edicion.getEstado() : "—") %></div>
+            <div class="event-meta"><strong>Organizador:</strong> <%= (organizador != null && !organizador.isBlank()) ? organizador : "No disponible" %></div>
+            <div class="event-meta"><strong>Tipos de Registro:</strong>
+              <% if (tiposRegistro != null && !tiposRegistro.isEmpty()) { %>
+                <ul>
+                  <% for (DtTipoRegistro tr : tiposRegistro) { %>
+                    <li>
+                      <strong><%= tr.getNombre() %></strong>
+                    </li>
+                  <% } %>
+                </ul>
+              <% } else { %>
+                No hay tipos de registro asociados.
+              <% } %>
+            </div>
+            <div class="event-meta"><strong>Patrocinios:</strong>
+              <% if (patrocinios != null && !patrocinios.isEmpty()) { %>
+                <ul>
+                  <% for (DtPatrocinio p : patrocinios) { %>
+                    <li>
+                      <strong><%= p.getInstitucion() %></strong>
+                    </li>
+                  <% } %>
+                </ul>
+              <% } else { %>
+                No hay patrocinios asociados.
+              <% } %>
+            </div>
           <% } %>
 
-          <% if (registros != null && !registros.isEmpty()) { %>
-            <% if ("ASISTENTE".equals(rol) && registros.size() == 1) {
-                 DtRegistro registro = registros.get(0);
-            %>
-              <h3>Tu registro en esta edición</h3>
-              <p><strong>Tipo:</strong> <%= registro.getTipoRegistro() %></p>
-              <p><strong>Fecha registro:</strong> <%= registro.getFechaRegistro() %></p>
-              <p><strong>Costo:</strong> $<%= registro.getCosto() %></p>
-
-            <% } else if ("ORGANIZADOR".equals(rol)
-                          && edicion != null
-                          && organizador != null
-                          && organizador.equals(nick)) { %>
-
-              <h3>Asistentes registrados</h3>
-              <ul class="lista-asistentes">
-                <%
-                  int i = 0;
-                  for (DtRegistro registro : registros) {
-                    String id = "detalle-" + i++;
-                %>
-                  <li class="asistente-item">
-                    <button class="asistente-btn" type="button" onclick="toggleDetalles('<%=id%>')">
-                      👤 <%= registro.getUsuario() %>
-                    </button>
-                    <div id="<%=id%>" class="asistente-detalle oculto">
-                      <p><strong>Tipo:</strong> <%= registro.getTipoRegistro() %></p>
-                      <p><strong>Fecha registro:</strong> <%= registro.getFechaRegistro() %></p>
-                      <p><strong>Costo:</strong> $<%= registro.getCosto() %></p>
-                    </div>
-                  </li>
-                <% } %>
-              </ul>
-
-            <% } else { %>
-              <h3>Registros de la edición</h3>
-              <table class="tabla-registros" style="width:100%; border-collapse:collapse; margin-bottom:1rem;">
-                <thead>
+          <% if (registros != null && !registros.isEmpty() && "ASISTENTE".equals(rol) && registros.size() == 1) {
+               DtRegistro registro = registros.get(0);
+          %>
+            <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="get" class="mt-3">
+              <input type="hidden" name="usuario" value="<%= nick %>" />
+              <input type="hidden" name="edicion" value="<%= edicion != null ? edicion.getNombre() : "" %>" />
+              <button type="submit" class="btn btn-primary w-100">Ver detalles de mi registro</button>
+            </form>
+          <% } else if (registros != null && !registros.isEmpty() && "ORGANIZADOR".equals(rol) && edicion != null && organizador != null && organizador.equals(nick)) { %>
+            <h3>Asistentes registrados</h3>
+            <ul class="lista-asistentes">
+              <% int i = 0;
+                 for (DtRegistro registro : registros) {
+                   String id = "detalle-" + i++;
+              %>
+                <li class="asistente-item">
+                  <button class="asistente-btn" type="button" onclick="toggleDetalles('<%=id%>')">
+                    👤 <%= registro.getUsuario() %>
+                  </button>
+                  <div id="<%=id%>" class="asistente-detalle oculto">
+                    <p><strong>Tipo:</strong> <%= registro.getTipoRegistro() %></p>
+                    <p><strong>Fecha registro:</strong> <%= registro.getFechaRegistro() %></p>
+                    <p><strong>Costo:</strong> $<%= registro.getCosto() %></p>
+                  </div>
+                </li>
+              <% } %>
+            </ul>
+          <% } else if (registros != null && !registros.isEmpty()) { %>
+            <h3>Registros de la edición</h3>
+            <table class="tabla-registros" style="width:100%; border-collapse:collapse; margin-bottom:1rem;">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Tipo</th>
+                  <th>Fecha registro</th>
+                  <th>Costo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% for (DtRegistro r : registros) { %>
                   <tr>
-                    <th>Usuario</th>
-                    <th>Tipo</th>
-                    <th>Fecha registro</th>
-                    <th>Costo</th>
+                    <td><%= r.getUsuario() %></td>
+                    <td><%= r.getTipoRegistro() %></td>
+                    <td><%= r.getFechaRegistro() %></td>
+                    <td>$<%= r.getCosto() %></td>
                   </tr>
-                </thead>
-                <tbody>
-                  <% for (DtRegistro r : registros) { %>
-                    <tr>
-                      <td><%= r.getUsuario() %></td>
-                      <td><%= r.getTipoRegistro() %></td>
-                      <td><%= r.getFechaRegistro() %></td>
-                      <td>$<%= r.getCosto() %></td>
-                    </tr>
-                  <% } %>
-                </tbody>
-              </table>
-            <% } %>
+                <% } %>
+              </tbody>
+            </table>
           <% } else { %>
             <p>No hay registros para esta edición.</p>
           <% } %>
@@ -195,53 +214,6 @@
       </section>
     </div>
   </main>
-
-  <aside class="card" style="min-width:300px; flex:1; margin-left:2rem; align-self:flex-start;">
-    <h3>Organizador</h3>
-    <% if (organizador != null && !organizador.isBlank()) { %>
-      <p><strong>Nombre:</strong> <%= organizador %></p>
-    <% } else { %>
-      <p>No disponible</p>
-    <% } %>
-
-    <h3>Tipos de Registro</h3>
-    <% if (tiposRegistro != null && !tiposRegistro.isEmpty()) { %>
-      <ul>
-        <% for (DtTipoRegistro tr : tiposRegistro) { %>
-          <li>
-            <strong><%= tr.getNombre() %></strong>
-            <form action="<%=ctx%>/registro/ConsultaTipoRegistro" method="get" style="display:inline;">
-              <input type="hidden" name="evento" value="<%= (evNombre != null ? evNombre : "") %>" />
-              <input type="hidden" name="edicion" value="<%= (edicion != null ? edicion.getNombre() : "") %>" />
-              <input type="hidden" name="tipoRegistro" value="<%= tr.getNombre() %>" />
-              <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
-            </form>
-          </li>
-        <% } %>
-      </ul>
-    <% } else { %>
-      <p>No hay tipos de registro asociados.</p>
-    <% } %>
-
-    <h3>Patrocinios</h3>
-    <% if (patrocinios != null && !patrocinios.isEmpty()) { %>
-      <ul>
-        <% for (DtPatrocinio p : patrocinios) { %>
-          <li>
-            <strong><%= p.getInstitucion() %></strong>
-            <form action="<%=ctx%>/edicion/ConsultaPatrocinio" method="get" style="display:inline;">
-              <input type="hidden" name="evento" value="<%= (evNombre != null ? evNombre : "") %>" />
-              <input type="hidden" name="edicion" value="<%= (edicion != null ? edicion.getNombre() : "") %>" />
-              <input type="hidden" name="codigoPatrocinio" value="<%= p.getCodigo() %>" />
-              <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
-            </form>
-          </li>
-        <% } %>
-      </ul>
-    <% } else { %>
-      <p>No hay patrocinios asociados.</p>
-    <% } %>
-  </aside>
 </div>
 
 <script>

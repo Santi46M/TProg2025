@@ -170,6 +170,14 @@ public class PublicadorUsuario {
         return icu.obtenerDatosRegistros(identificador);
     }
 
+    @WebMethod
+    public void marcarAsistencia(
+        @WebParam(name = "nickname") String nickname,
+        @WebParam(name = "registroId") String registroId
+    ) throws UsuarioNoExisteException, UsuarioTipoIncorrectoException, excepciones.RegistroNoExiste {
+        icu.marcarAsistencia(nickname, registroId);
+    }
+
     @WebMethod(exclude = true)
     public Endpoint getEndpoint() {
         return endpoint;

@@ -9,6 +9,7 @@ public class Asistente extends Usuario {
     private LocalDate fechaDeNacimiento;
     private Institucion institucion;
     private Map<String, Registro> registros;
+    private Map<String, Registro> asistencias = new HashMap<>();
     
     public Asistente(String nickname, String nombre, String email, String contraseña, String imagen, String apellido, LocalDate fechaDeNacimiento, Institucion institucion) {
     	
@@ -53,6 +54,14 @@ public class Asistente extends Usuario {
 
     public void setFechaDeNacimiento(LocalDate fechaDeNacimiento) {
         this.fechaDeNacimiento = fechaDeNacimiento;
+    }
+    
+    public Map<String, Registro> getAsistencias() {
+        return asistencias;
+    }
+
+    public void addAsistencia(String ident, Registro registro) {
+        this.asistencias.put(ident, registro);
     }
     // La necesitamos para que la clase usuario sea abstracta
     @Override

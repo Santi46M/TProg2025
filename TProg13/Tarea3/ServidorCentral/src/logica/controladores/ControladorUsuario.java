@@ -479,4 +479,11 @@ manejador.addUsuario(nuevoUsuario);
         if (u == null) return 0;
         return u.contarSeguidos();
     }
+
+    public void marcarAsistencia(String nickname, String registroId) {
+        Usuario user = manejador.findUsuario(nickname);
+        Asistente asistente = (Asistente) user;
+        Registro registro = asistente.getRegistros().get(registroId);
+        asistente.addAsistencia(registroId, registro);
+    }
 }

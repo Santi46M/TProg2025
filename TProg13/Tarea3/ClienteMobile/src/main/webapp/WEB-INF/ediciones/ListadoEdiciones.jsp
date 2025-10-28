@@ -4,47 +4,49 @@ String ctx = request.getContextPath();
 String evento = (String) request.getAttribute("evento");
 List<DtEdicion> listaEdiciones = (List<DtEdicion>) request.getAttribute("listaEdiciones");
 %>
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Ediciones de <%= (evento != null ? evento : "Evento") %></title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="<%=ctx%>/css/style.css">
-</head>
-<body>
-<jsp:include page="/WEB-INF/templates/header.jsp" />
-<div class="container py-4">
-  <h1 class="mb-4 text-center">Ediciones aceptadas de <%= (evento != null ? evento : "Evento") %></h1>
-  <% if (listaEdiciones == null || listaEdiciones.isEmpty()) { %>
-    <div class="alert alert-info text-center">No hay ediciones aceptadas para este evento.</div>
-  <% } else { %>
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-      <% for (DtEdicion ed : listaEdiciones) { %>
-        <div class="col d-flex">
-          <div class="card h-100 shadow-sm flex-fill">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title text-primary"><%= ed.getNombre() %></h5>
-              <ul class="list-unstyled flex-grow-1">
-                <li><strong>Sigla:</strong> <%= ed.getSigla() %></li>
-                <li><strong>Fecha inicio:</strong> <%= ed.getFechaInicio() %></li>
-                <li><strong>Fecha fin:</strong> <%= ed.getFechaFin() %></li>
-                <li><strong>Ciudad:</strong> <%= ed.getCiudad() %></li>
-                <li><strong>País:</strong> <%= ed.getPais() %></li>
-              </ul>
-              <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" class="mt-auto">
+<link rel="stylesheet" href="<%=ctx%>/css/style.css">
+<link rel="stylesheet" href="<%=ctx%>/css/listado.css">
+<jsp:include page="/WEB-INF/templates/header.jsp"/>
+
+<div class="container">
+  <div class="page-list">
+    <main class="content">
+      <h1 class="list-title">Ediciones aceptadas de <%= (evento != null ? evento : "Evento") %></h1>
+      <p class="list-sub">
+        <%
+          int n = (listaEdiciones == null) ? 0 : listaEdiciones.size();
+          out.print(n + (n==1 ? " resultado" : " resultados"));
+        %>
+      </p>
+      <div class="cards-grid">
+        <% if (listaEdiciones != null) for (DtEdicion ed : listaEdiciones) {
+             String nombre = ed.getNombre();
+             String sigla  = ed.getSigla();
+             String ciudad = ed.getCiudad();
+             String pais   = ed.getPais();
+             String img = ed.getImagen();
+             boolean hasImg = (img != null && !img.isBlank());
+        %>
+          <article class="card event-card list <%= hasImg ? "" : "no-cover" %>">
+            <% if (hasImg) { %>
+              <img class="event-cover" src="<%=ctx%>/img/<%=img%>" alt="Imagen de <%=nombre%>">
+            <% } %>
+            <h3 class="event-title"><%= nombre %></h3>
+            <p class="event-sub"><%= (sigla==null||sigla.isBlank()) ? "—" : sigla %></p>
+            <p class="event-desc">
+              <strong>Ciudad:</strong> <%= ciudad %> | <strong>País:</strong> <%= pais %>
+            </p>
+            <div class="event-footer">
+              <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
                 <input type="hidden" name="evento" value="<%= evento %>" />
-                <input type="hidden" name="edicion" value="<%= ed.getNombre() %>" />
-                <button type="submit" class="btn btn-primary w-100">Ver detalles</button>
+                <input type="hidden" name="edicion" value="<%= nombre %>" />
+                <button type="submit" class="btn">Ver detalles</button>
               </form>
             </div>
-          </div>
-        </div>
-      <% } %>
-    </div>
-  <% } %>
+          </article>
+        <% } %>
+      </div>
+    </main>
+  </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
