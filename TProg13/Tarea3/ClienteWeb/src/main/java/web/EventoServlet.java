@@ -73,7 +73,7 @@ public class EventoServlet extends HttpServlet {
             req.setAttribute("evFecha", formatFecha(ev.getFecha()));
             req.setAttribute("evCategorias", ev.getCategorias());
             req.setAttribute("rol", getRol(req));
-            System.out.println("Entra a EventoServelt");
+            
    
 
             // URL de imagen 
@@ -296,16 +296,20 @@ public class EventoServlet extends HttpServlet {
         
         if ("/FinalizarEvento".equals(path)) {
         	String nombreEvento = trim(req.getParameter("nombreEvento"));
-        	System.out.println("Finalizando evento en EventoServlet: " + nombreEvento);
+  
         	PublicadorEvento portFin = obtenerPort();
         	try {
         		Method m = portFin.getClass().getMethod("finalizarEvento", String.class);
         		m.invoke(portFin, nombreEvento);
+        		
         	} catch (NoSuchMethodException nsme) {
         		// no expuesto en el stub: ignorar
+        		
         	} catch (Exception ex) {
         		ex.printStackTrace();
+        		
         	}
+        	
 
 		resp.sendRedirect(ctx(req) + "/inicio");
 		return;
@@ -426,5 +430,7 @@ public class EventoServlet extends HttpServlet {
         Object rol = sAux.getAttribute("rol");
         return (rol != null) ? rol.toString() : null;
     }
+
+
 
 }

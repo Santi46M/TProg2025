@@ -10,7 +10,7 @@
   try {
       PublicadorEventoService svc = new PublicadorEventoService();
       publicadores.PublicadorEvento port = svc.getPublicadorEventoPort();
-      DtEventoArray arr = port.listarEventos();
+      DtEventoArray arr = port.listarEventosVigentes();
       if (arr != null && arr.getItem() != null) {
           eventos.addAll(arr.getItem());
       }

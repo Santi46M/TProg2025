@@ -41,7 +41,8 @@ public class InicioServlet extends HttpServlet {
             // reemplaza esta llamada si tu WSDL usa otro método (por ejemplo listarEventosVigentes o listarEventos)
             if (port != null) {
                 // generated interface provides listarEventos() -> DtEventoArray
-                publicadores.DtEventoArray arr = port.listarEventos();
+//                publicadores.DtEventoArray arr = port.listarEventos();
+            	publicadores.DtEventoArray arr = port.listarEventosVigentes();
                 if (arr != null && arr.getItem() != null) {
                     eventos = arr.getItem();
                 }
@@ -64,6 +65,7 @@ public class InicioServlet extends HttpServlet {
             for (DtEvento e : eventos) {
                 String nombre = e.getNombre();
                 String raw = null;
+                
 
                 // intentar obtener imagen directamente del DTO
                 try { raw = e.getImagen(); } catch (Exception ignore) {}
@@ -118,4 +120,5 @@ public class InicioServlet extends HttpServlet {
         req.setAttribute("imgUrls", imgUrls);
         req.getRequestDispatcher("/index.jsp").forward(req, resp);
     }
+
 }
