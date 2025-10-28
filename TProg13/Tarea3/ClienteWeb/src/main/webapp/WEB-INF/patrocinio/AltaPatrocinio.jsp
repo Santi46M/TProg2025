@@ -4,10 +4,8 @@
 
 <%
   String ctx = request.getContextPath();
-
   String eventoSel  = (String) request.getAttribute("evento");
   String edicionSel = (String) request.getAttribute("edicion");
-
   @SuppressWarnings("unchecked")
   List<String> eventosOrganizador   = (List<String>) request.getAttribute("eventosOrganizador");
   @SuppressWarnings("unchecked")
@@ -16,7 +14,6 @@
   List<String> instituciones = (List<String>) request.getAttribute("instituciones");
   @SuppressWarnings("unchecked")
   List<DtTipoRegistro> tipos = (List<DtTipoRegistro>) request.getAttribute("tiposRegistro");
-
   String error = (String) request.getAttribute("error");
 %>
 
@@ -32,120 +29,112 @@
 </head>
 <body>
 
-  <jsp:include page="/WEB-INF/templates/header.jsp" />
+<jsp:include page="/WEB-INF/templates/header.jsp" />
 
-  <div class="container row" style="margin-top:1rem;">
-    <jsp:include page="/WEB-INF/templates/menu.jsp" />
+<div class="container row" style="margin-top:1rem;">
+  <jsp:include page="/WEB-INF/templates/menu.jsp" />
+  <main class="container" style="flex:2; min-width:0;">
+    <section class="form-card-altaEvento form-card--wide">
+      <h2 style="text-align:center;">Alta de Patrocinio</h2>
 
-    <main class="container" style="flex:2; min-width:0;">
-      <section class="form-card-altaEvento form-card--wide">
-        <h2 style="text-align:center;">Alta de Patrocinio</h2>
+      <form method="get" action="<%= ctx %>/edicion/patrocinio/alta" class="inline-form">
+        <div class="form-row">
+          <label class="form-label">Evento</label>
+          <select name="evento" required onchange="this.form.submit()" class="form-select">
+            <option value="" <%= (eventoSel==null||eventoSel.isEmpty())?"selected":"" %> disabled>Seleccione evento...</option>
+            <% if (eventosOrganizador != null) {
+                 for (String ev : eventosOrganizador) { %>
+              <option value="<%= ev %>" <%= (ev.equals(eventoSel)?"selected":"") %>><%= ev %></option>
+            <% } } %>
+          </select>
+        </div>
+      </form>
 
-        <% if (error != null) { %>
-          <div class="alert alert-error" style="margin-bottom:1rem;"><%= error %></div>
-        <% } %>
+      <form method="get" action="<%= ctx %>/edicion/patrocinio/alta" class="inline-form">
+        <input type="hidden" name="evento" value="<%= eventoSel == null ? "" : eventoSel %>"/>
+        <div class="form-row">
+          <label class="form-label">Edición</label>
+          <select name="edicion" <%= (eventoSel==null||eventoSel.isEmpty())?"disabled":"" %> onchange="this.form.submit()" required class="form-select">
+            <option value="" <%= (edicionSel==null||edicionSel.isEmpty())?"selected":"" %> disabled>Seleccione edición...</option>
+            <% if (edicionesOrganizador != null) {
+                 for (String ed : edicionesOrganizador) { %>
+              <option value="<%= ed %>" <%= (ed.equals(edicionSel)?"selected":"") %>><%= ed %></option>
+            <% } } %>
+          </select>
+        </div>
+      </form>
 
-        <!-- Selección de evento -->
-        <form method="get" action="<%= ctx %>/edicion/patrocinio/alta" class="inline-form">
-          <div class="form-row">
-            <label class="form-label">Evento</label>
-            <select name="evento" required onchange="this.form.submit()" class="form-select">
-              <option value="" <%= (eventoSel==null||eventoSel.isEmpty())?"selected":"" %> disabled>Seleccione evento...</option>
-              <% if (eventosOrganizador != null) {
-                   for (String ev : eventosOrganizador) { %>
-                <option value="<%= ev %>" <%= (ev.equals(eventoSel)?"selected":"") %>><%= ev %></option>
-              <% } } %>
+      <% if (error != null) { %>
+        <div class="alert alert-error" style="margin-bottom:1rem;"><%= error %></div>
+      <% } %>
+
+      <% if (eventoSel != null && !eventoSel.isEmpty() && edicionSel != null && !edicionSel.isEmpty()) { %>
+      <form method="post" action="<%= ctx %>/edicion/patrocinio/alta" class="card form-card">
+        <input type="hidden" name="evento"  value="<%= eventoSel %>"/>
+        <input type="hidden" name="edicion" value="<%= edicionSel %>"/>
+
+        <div class="form-grid">
+          <div class="form-group-altaEvento">
+            <label class="form-label">Institución</label>
+            <select name="institucion" required class="form-select">
+              <option value="" disabled selected>Seleccione...</option>
+              <% if (instituciones != null) for (String inst : instituciones) { %>
+                <option value="<%= inst %>"><%= inst %></option>
+              <% } %>
             </select>
           </div>
-          <noscript><button type="submit" class="btn">Continuar</button></noscript>
-        </form>
 
-        <!-- Selección de edición -->
-        <form method="get" action="<%= ctx %>/edicion/patrocinio/alta" class="inline-form">
-          <input type="hidden" name="evento" value="<%= eventoSel == null ? "" : eventoSel %>"/>
-          <div class="form-row">
-            <label class="form-label">Edición</label>
-            <select name="edicion" <%= (eventoSel==null||eventoSel.isEmpty())?"disabled":"" %> onchange="this.form.submit()" required class="form-select">
-              <option value="" <%= (edicionSel==null||edicionSel.isEmpty())?"selected":"" %> disabled>Seleccione edición...</option>
-              <% if (edicionesOrganizador != null) {
-                   for (String ed : edicionesOrganizador) { %>
-                <option value="<%= ed %>" <%= (ed.equals(edicionSel)?"selected":"") %>><%= ed %></option>
-              <% } } %>
+          <div class="form-group-altaEvento">
+            <label class="form-label">Nivel</label>
+            <select name="nivel" required class="form-select">
+              <option value="" disabled selected>Seleccione...</option>
+              <option value="ORO">ORO</option>
+              <option value="PLATA">PLATA</option>
+              <option value="BRONCE">BRONCE</option>
             </select>
           </div>
-          <noscript><button type="submit" class="btn">Continuar</button></noscript>
-        </form>
 
-        <% if (eventoSel != null && !eventoSel.isEmpty() && edicionSel != null && !edicionSel.isEmpty()) { %>
-
-        <!-- Formulario principal -->
-        <form method="post" action="<%= ctx %>/edicion/patrocinio/alta" class="card form-card">
-          <input type="hidden" name="evento"  value="<%= eventoSel %>"/>
-          <input type="hidden" name="edicion" value="<%= edicionSel %>"/>
-
-          <div class="form-grid">
-            <div class="form-group-altaEvento">
-              <label class="form-label">Institución</label>
-              <select name="institucion" required class="form-select">
-                <option value="" disabled selected>Seleccione...</option>
-                <% if (instituciones != null) for (String inst : instituciones) { %>
-                  <option value="<%= inst %>"><%= inst %></option>
-                <% } %>
-              </select>
-            </div>
-
-            <div class="form-group-altaEvento">
-              <label class="form-label">Nivel</label>
-              <select name="nivel" required class="form-select">
-                <option value="" disabled selected>Seleccione...</option>
-                <option value="ORO">ORO</option>
-                <option value="PLATA">PLATA</option>
-                <option value="BRONCE">BRONCE</option>
-              </select>
-            </div>
-
-            <div class="form-group-altaEvento">
-              <label class="form-label">Tipo de registro</label>
-              <select name="tipoRegistro" required class="form-select">
-                <option value="" disabled selected>Seleccione...</option>
-                <% if (tipos != null) for (DtTipoRegistro t : tipos) { %>
-                  <option value="<%= t.getNombre() %>">
-                    <%= t.getNombre() %> — <%= t.getDescripcion() %> (costo: <%= t.getCosto() %>, cupo: <%= t.getCupo() %>)
-                  </option>
-                <% } %>
-              </select>
-            </div>
-
-            <div class="form-group-altaEvento">
-              <label class="form-label">Aporte (monto)</label>
-              <input type="number" min="0" step="1" name="aporte" inputmode="numeric" pattern="\\d+" required class="form-input"/>
-            </div>
-
-            <div class="form-group-altaEvento">
-              <label class="form-label">Fecha del patrocinio</label>
-              <input type="date" name="fechaPatrocinio" required class="form-input"/>
-            </div>
-
-            <div class="form-group-altaEvento">
-              <label class="form-label">Cant. registros gratuitos</label>
-              <input type="number" min="0" step="1" name="cantidadRegistros" inputmode="numeric" pattern="\\d+" required class="form-input"/>
-            </div>
-
-            <div class="form-group-altaEvento">
-              <label class="form-label">Código del patrocinio</label>
-              <input type="text" name="codigoPatrocinio" maxlength="40" required class="form-input"/>
-            </div>
+          <div class="form-group-altaEvento">
+            <label class="form-label">Tipo de registro</label>
+            <select name="tipoRegistro" required class="form-select">
+              <option value="" disabled selected>Seleccione...</option>
+              <% if (tipos != null) for (DtTipoRegistro t : tipos) { %>
+                <option value="<%= t.getNombre() %>">
+                  <%= t.getNombre() %> — <%= t.getDescripcion() %> (costo: <%= t.getCosto() %>, cupo: <%= t.getCupo() %>)
+                </option>
+              <% } %>
+            </select>
           </div>
 
-          <div class="form-actions-altaEvento actions">
-            <button type="submit" class="btn-guardar-altaEvento">Crear patrocinio</button>
+          <div class="form-group-altaEvento">
+            <label class="form-label">Aporte (monto)</label>
+            <input type="number" min="0" max="2147483647" step="1" name="aporte" required class="form-input"/>
           </div>
-        </form>
 
-        <% } %>
-      </section>
-    </main>
-  </div>
+          <div class="form-group-altaEvento">
+            <label class="form-label">Fecha del patrocinio</label>
+            <input type="date" name="fechaPatrocinio" required class="form-input"/>
+          </div>
+
+          <div class="form-group-altaEvento">
+            <label class="form-label">Cant. registros gratuitos</label>
+            <input type="number" min="0" max="2147483647" step="1" name="cantidadRegistros" required class="form-input"/>
+          </div>
+
+          <div class="form-group-altaEvento">
+            <label class="form-label">Código del patrocinio</label>
+            <input type="text" name="codigoPatrocinio" maxlength="40" required class="form-input"/>
+          </div>
+        </div>
+
+        <div class="form-actions-altaEvento actions">
+          <button type="submit" class="btn-guardar-altaEvento">Crear patrocinio</button>
+        </div>
+      </form>
+      <% } %>
+    </section>
+  </main>
+</div>
 
 </body>
 </html>
