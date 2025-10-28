@@ -10,13 +10,19 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import logica.enumerados.DTEstado;
 
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import logica.utils.LocalDateAdapter;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DTEdicion implements Serializable {
 
     private String nombre;
     private String sigla;
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate fechaInicio;
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate fechaFin;
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate fechaAlta;
     private String organizador;
     private String ciudad;

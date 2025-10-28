@@ -19,7 +19,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *       <sequence>
  *         <element name="codigo" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="monto" type="{http://www.w3.org/2001/XMLSchema}int"/>
- *         <element name="fecha" type="{http://publicadores/}localDate" minOccurs="0"/>
+ *         <element name="fecha" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="nivel" type="{http://publicadores/}DTNivel" minOccurs="0"/>
  *         <element name="cantRegistrosGratuitos" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         <element name="institucion" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
@@ -48,7 +48,7 @@ public class DtPatrocinio {
 
     protected String codigo;
     protected int monto;
-    protected LocalDate fecha;
+    protected String fecha;
     @XmlSchemaType(name = "string")
     protected DTNivel nivel;
     protected int cantRegistrosGratuitos;
@@ -101,10 +101,10 @@ public class DtPatrocinio {
      * 
      * @return
      *     possible object is
-     *     {@link LocalDate }
+     *     {@link String }
      *     
      */
-    public LocalDate getFecha() {
+    public String getFecha() {
         return fecha;
     }
 
@@ -113,10 +113,10 @@ public class DtPatrocinio {
      * 
      * @param value
      *     allowed object is
-     *     {@link LocalDate }
+     *     {@link String }
      *     
      */
-    public void setFecha(LocalDate value) {
+    public void setFecha(String value) {
         this.fecha = value;
     }
 

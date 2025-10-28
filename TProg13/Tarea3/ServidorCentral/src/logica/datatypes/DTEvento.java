@@ -9,6 +9,8 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import logica.enumerados.DTEstado;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import logica.utils.LocalDateAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DTEvento implements Serializable {
@@ -16,6 +18,7 @@ public class DTEvento implements Serializable {
     private String nombre;
     private String sigla;
     private String descripcion;
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate fecha;
 
     @XmlElementWrapper(name = "categorias")

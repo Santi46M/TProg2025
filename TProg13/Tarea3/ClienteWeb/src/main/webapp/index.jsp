@@ -77,7 +77,7 @@
 
             <h2><%= e.getNombre() %></h2>
             <p><strong>Descripción:</strong> <%= e.getDescripcion() == null ? "" : e.getDescripcion() %></p>
-            <p><strong>Fecha:</strong> <%= e.getFecha() == null ? "" : e.getFecha() %></p>
+            <p><strong>Fecha:</strong> <%= (e.getFecha() == null ? "" : e.getFecha().toString()) %></p>
 
             <div class="actions">
               <form action="<%=ctx%>/evento/ConsultaEvento" method="get" style="display:inline">

@@ -5,6 +5,9 @@ import java.time.LocalDate;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import logica.utils.LocalDateAdapter;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DTRegistro implements Serializable {
 
@@ -12,6 +15,7 @@ public class DTRegistro implements Serializable {
     private String usuario;
     private String edicion;
     private String tipoRegistro;
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate fechaRegistro;
     private float costo;
     private LocalDate fechaInicio;

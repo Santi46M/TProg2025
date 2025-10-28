@@ -9,6 +9,9 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import logica.utils.LocalDateAdapter;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DTDatosUsuario implements Serializable {
 
@@ -16,6 +19,7 @@ public class DTDatosUsuario implements Serializable {
     private String nombre;
     private String email;
     private String apellido;
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate fechaNac;
     private String nombreInstitucion;
     private String desc;

@@ -184,12 +184,14 @@
                   <input class="edit-mode" type="text" name="apellido" value="<%= usuario.getApellido() %>" style="display:none;">
                 </p>
 
-                <p><strong>Fecha de nacimiento:</strong>
-                  <span class="view-mode"><%= usuario.getFechaNac() != null ? usuario.getFechaNac() : "—" %></span>
-                  <input class="edit-mode" type="date" name="fechaNac" 
-                         value="<%= usuario.getFechaNac() != null ? usuario.getFechaNac() : "" %>" 
-                         style="display:none;">
-                </p>
+<%
+  String fn = (usuario.getFechaNac() != null) ? usuario.getFechaNac() : "";
+%>
+<p><strong>Fecha de nacimiento:</strong>
+  <span class="view-mode"><%= fn.isEmpty() ? "—" : fn %></span>
+  <input class="edit-mode" type="date" name="fechaNac"
+         value="<%= fn %>" style="display:none;">
+</p>
 
                 <p><strong>Institución:</strong>
                   <span class="view-mode">

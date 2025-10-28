@@ -24,59 +24,17 @@ import jakarta.xml.bind.annotation.XmlRegistry;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _CostoTipoRegistroInvalidoException_QNAME = new QName("http://publicadores/", "CostoTipoRegistroInvalidoException");
-    private final static QName _EdicionYaExisteException_QNAME = new QName("http://publicadores/", "EdicionYaExisteException");
-    private final static QName _EventoYaExisteException_QNAME = new QName("http://publicadores/", "EventoYaExisteException");
-    private final static QName _FechasCruzadasException_QNAME = new QName("http://publicadores/", "FechasCruzadasException");
-    private final static QName _TipoRegistroYaExisteException_QNAME = new QName("http://publicadores/", "TipoRegistroYaExisteException");
+    private final static QName _CategoriaYaExisteException_QNAME = new QName("http://publicadores/", "CategoriaYaExisteException");
+    private final static QName _InstitucionYaExisteException_QNAME = new QName("http://publicadores/", "InstitucionYaExisteException");
     private final static QName _UsuarioNoExisteException_QNAME = new QName("http://publicadores/", "UsuarioNoExisteException");
-    private final static QName _ValorPatrocinioExcedidoException_QNAME = new QName("http://publicadores/", "ValorPatrocinioExcedidoException");
+    private final static QName _UsuarioTipoIncorrectoException_QNAME = new QName("http://publicadores/", "UsuarioTipoIncorrectoException");
+    private final static QName _UsuarioYaExisteException_QNAME = new QName("http://publicadores/", "UsuarioYaExisteException");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: publicadores
      * 
      */
     public ObjectFactory() {
-    }
-
-    /**
-     * Create an instance of {@link Eventos }
-     * 
-     * @return
-     *     the new instance of {@link Eventos }
-     */
-    public Eventos createEventos() {
-        return new Eventos();
-    }
-
-    /**
-     * Create an instance of {@link Eventos.Categorias }
-     * 
-     * @return
-     *     the new instance of {@link Eventos.Categorias }
-     */
-    public Eventos.Categorias createEventosCategorias() {
-        return new Eventos.Categorias();
-    }
-
-    /**
-     * Create an instance of {@link DtDatosUsuario }
-     * 
-     * @return
-     *     the new instance of {@link DtDatosUsuario }
-     */
-    public DtDatosUsuario createDtDatosUsuario() {
-        return new DtDatosUsuario();
-    }
-
-    /**
-     * Create an instance of {@link DtCategorias }
-     * 
-     * @return
-     *     the new instance of {@link DtCategorias }
-     */
-    public DtCategorias createDtCategorias() {
-        return new DtCategorias();
     }
 
     /**
@@ -100,53 +58,33 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link CostoTipoRegistroInvalidoException }
+     * Create an instance of {@link DtDatosUsuario }
      * 
      * @return
-     *     the new instance of {@link CostoTipoRegistroInvalidoException }
+     *     the new instance of {@link DtDatosUsuario }
      */
-    public CostoTipoRegistroInvalidoException createCostoTipoRegistroInvalidoException() {
-        return new CostoTipoRegistroInvalidoException();
+    public DtDatosUsuario createDtDatosUsuario() {
+        return new DtDatosUsuario();
     }
 
     /**
-     * Create an instance of {@link EdicionYaExisteException }
+     * Create an instance of {@link CategoriaYaExisteException }
      * 
      * @return
-     *     the new instance of {@link EdicionYaExisteException }
+     *     the new instance of {@link CategoriaYaExisteException }
      */
-    public EdicionYaExisteException createEdicionYaExisteException() {
-        return new EdicionYaExisteException();
+    public CategoriaYaExisteException createCategoriaYaExisteException() {
+        return new CategoriaYaExisteException();
     }
 
     /**
-     * Create an instance of {@link EventoYaExisteException }
+     * Create an instance of {@link InstitucionYaExisteException }
      * 
      * @return
-     *     the new instance of {@link EventoYaExisteException }
+     *     the new instance of {@link InstitucionYaExisteException }
      */
-    public EventoYaExisteException createEventoYaExisteException() {
-        return new EventoYaExisteException();
-    }
-
-    /**
-     * Create an instance of {@link FechasCruzadasException }
-     * 
-     * @return
-     *     the new instance of {@link FechasCruzadasException }
-     */
-    public FechasCruzadasException createFechasCruzadasException() {
-        return new FechasCruzadasException();
-    }
-
-    /**
-     * Create an instance of {@link TipoRegistroYaExisteException }
-     * 
-     * @return
-     *     the new instance of {@link TipoRegistroYaExisteException }
-     */
-    public TipoRegistroYaExisteException createTipoRegistroYaExisteException() {
-        return new TipoRegistroYaExisteException();
+    public InstitucionYaExisteException createInstitucionYaExisteException() {
+        return new InstitucionYaExisteException();
     }
 
     /**
@@ -160,13 +98,33 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ValorPatrocinioExcedidoException }
+     * Create an instance of {@link UsuarioTipoIncorrectoException }
      * 
      * @return
-     *     the new instance of {@link ValorPatrocinioExcedidoException }
+     *     the new instance of {@link UsuarioTipoIncorrectoException }
      */
-    public ValorPatrocinioExcedidoException createValorPatrocinioExcedidoException() {
-        return new ValorPatrocinioExcedidoException();
+    public UsuarioTipoIncorrectoException createUsuarioTipoIncorrectoException() {
+        return new UsuarioTipoIncorrectoException();
+    }
+
+    /**
+     * Create an instance of {@link UsuarioYaExisteException }
+     * 
+     * @return
+     *     the new instance of {@link UsuarioYaExisteException }
+     */
+    public UsuarioYaExisteException createUsuarioYaExisteException() {
+        return new UsuarioYaExisteException();
+    }
+
+    /**
+     * Create an instance of {@link DtRegistro }
+     * 
+     * @return
+     *     the new instance of {@link DtRegistro }
+     */
+    public DtRegistro createDtRegistro() {
+        return new DtRegistro();
     }
 
     /**
@@ -200,73 +158,13 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link DtRegistro }
+     * Create an instance of {@link DtDatosUsuarioArray }
      * 
      * @return
-     *     the new instance of {@link DtRegistro }
+     *     the new instance of {@link DtDatosUsuarioArray }
      */
-    public DtRegistro createDtRegistro() {
-        return new DtRegistro();
-    }
-
-    /**
-     * Create an instance of {@link Categoria }
-     * 
-     * @return
-     *     the new instance of {@link Categoria }
-     */
-    public Categoria createCategoria() {
-        return new Categoria();
-    }
-
-    /**
-     * Create an instance of {@link publicadores.Ediciones }
-     * 
-     * @return
-     *     the new instance of {@link publicadores.Ediciones }
-     */
-    public publicadores.Ediciones createEdiciones() {
-        return new publicadores.Ediciones();
-    }
-
-    /**
-     * Create an instance of {@link TipoRegistro }
-     * 
-     * @return
-     *     the new instance of {@link TipoRegistro }
-     */
-    public TipoRegistro createTipoRegistro() {
-        return new TipoRegistro();
-    }
-
-    /**
-     * Create an instance of {@link DtCategoriasArray }
-     * 
-     * @return
-     *     the new instance of {@link DtCategoriasArray }
-     */
-    public DtCategoriasArray createDtCategoriasArray() {
-        return new DtCategoriasArray();
-    }
-
-    /**
-     * Create an instance of {@link DtTipoRegistroArray }
-     * 
-     * @return
-     *     the new instance of {@link DtTipoRegistroArray }
-     */
-    public DtTipoRegistroArray createDtTipoRegistroArray() {
-        return new DtTipoRegistroArray();
-    }
-
-    /**
-     * Create an instance of {@link DtEventoArray }
-     * 
-     * @return
-     *     the new instance of {@link DtEventoArray }
-     */
-    public DtEventoArray createDtEventoArray() {
-        return new DtEventoArray();
+    public DtDatosUsuarioArray createDtDatosUsuarioArray() {
+        return new DtDatosUsuarioArray();
     }
 
     /**
@@ -277,66 +175,6 @@ public class ObjectFactory {
      */
     public StringArray createStringArray() {
         return new StringArray();
-    }
-
-    /**
-     * Create an instance of {@link Eventos.Categorias.Entry }
-     * 
-     * @return
-     *     the new instance of {@link Eventos.Categorias.Entry }
-     */
-    public Eventos.Categorias.Entry createEventosCategoriasEntry() {
-        return new Eventos.Categorias.Entry();
-    }
-
-    /**
-     * Create an instance of {@link DtDatosUsuario.Registros }
-     * 
-     * @return
-     *     the new instance of {@link DtDatosUsuario.Registros }
-     */
-    public DtDatosUsuario.Registros createDtDatosUsuarioRegistros() {
-        return new DtDatosUsuario.Registros();
-    }
-
-    /**
-     * Create an instance of {@link DtDatosUsuario.Ediciones }
-     * 
-     * @return
-     *     the new instance of {@link DtDatosUsuario.Ediciones }
-     */
-    public DtDatosUsuario.Ediciones createDtDatosUsuarioEdiciones() {
-        return new DtDatosUsuario.Ediciones();
-    }
-
-    /**
-     * Create an instance of {@link DtDatosUsuario.Seguidores }
-     * 
-     * @return
-     *     the new instance of {@link DtDatosUsuario.Seguidores }
-     */
-    public DtDatosUsuario.Seguidores createDtDatosUsuarioSeguidores() {
-        return new DtDatosUsuario.Seguidores();
-    }
-
-    /**
-     * Create an instance of {@link DtDatosUsuario.Seguidos }
-     * 
-     * @return
-     *     the new instance of {@link DtDatosUsuario.Seguidos }
-     */
-    public DtDatosUsuario.Seguidos createDtDatosUsuarioSeguidos() {
-        return new DtDatosUsuario.Seguidos();
-    }
-
-    /**
-     * Create an instance of {@link DtCategorias.Categorias }
-     * 
-     * @return
-     *     the new instance of {@link DtCategorias.Categorias }
-     */
-    public DtCategorias.Categorias createDtCategoriasCategorias() {
-        return new DtCategorias.Categorias();
     }
 
     /**
@@ -390,68 +228,69 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link CostoTipoRegistroInvalidoException }{@code >}
+     * Create an instance of {@link DtDatosUsuario.Registros }
      * 
-     * @param value
-     *     Java instance representing xml element's value.
      * @return
-     *     the new instance of {@link JAXBElement }{@code <}{@link CostoTipoRegistroInvalidoException }{@code >}
+     *     the new instance of {@link DtDatosUsuario.Registros }
      */
-    @XmlElementDecl(namespace = "http://publicadores/", name = "CostoTipoRegistroInvalidoException")
-    public JAXBElement<CostoTipoRegistroInvalidoException> createCostoTipoRegistroInvalidoException(CostoTipoRegistroInvalidoException value) {
-        return new JAXBElement<>(_CostoTipoRegistroInvalidoException_QNAME, CostoTipoRegistroInvalidoException.class, null, value);
+    public DtDatosUsuario.Registros createDtDatosUsuarioRegistros() {
+        return new DtDatosUsuario.Registros();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link EdicionYaExisteException }{@code >}
+     * Create an instance of {@link DtDatosUsuario.Ediciones }
      * 
-     * @param value
-     *     Java instance representing xml element's value.
      * @return
-     *     the new instance of {@link JAXBElement }{@code <}{@link EdicionYaExisteException }{@code >}
+     *     the new instance of {@link DtDatosUsuario.Ediciones }
      */
-    @XmlElementDecl(namespace = "http://publicadores/", name = "EdicionYaExisteException")
-    public JAXBElement<EdicionYaExisteException> createEdicionYaExisteException(EdicionYaExisteException value) {
-        return new JAXBElement<>(_EdicionYaExisteException_QNAME, EdicionYaExisteException.class, null, value);
+    public DtDatosUsuario.Ediciones createDtDatosUsuarioEdiciones() {
+        return new DtDatosUsuario.Ediciones();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link EventoYaExisteException }{@code >}
+     * Create an instance of {@link DtDatosUsuario.Seguidores }
      * 
-     * @param value
-     *     Java instance representing xml element's value.
      * @return
-     *     the new instance of {@link JAXBElement }{@code <}{@link EventoYaExisteException }{@code >}
+     *     the new instance of {@link DtDatosUsuario.Seguidores }
      */
-    @XmlElementDecl(namespace = "http://publicadores/", name = "EventoYaExisteException")
-    public JAXBElement<EventoYaExisteException> createEventoYaExisteException(EventoYaExisteException value) {
-        return new JAXBElement<>(_EventoYaExisteException_QNAME, EventoYaExisteException.class, null, value);
+    public DtDatosUsuario.Seguidores createDtDatosUsuarioSeguidores() {
+        return new DtDatosUsuario.Seguidores();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link FechasCruzadasException }{@code >}
+     * Create an instance of {@link DtDatosUsuario.Seguidos }
      * 
-     * @param value
-     *     Java instance representing xml element's value.
      * @return
-     *     the new instance of {@link JAXBElement }{@code <}{@link FechasCruzadasException }{@code >}
+     *     the new instance of {@link DtDatosUsuario.Seguidos }
      */
-    @XmlElementDecl(namespace = "http://publicadores/", name = "FechasCruzadasException")
-    public JAXBElement<FechasCruzadasException> createFechasCruzadasException(FechasCruzadasException value) {
-        return new JAXBElement<>(_FechasCruzadasException_QNAME, FechasCruzadasException.class, null, value);
+    public DtDatosUsuario.Seguidos createDtDatosUsuarioSeguidos() {
+        return new DtDatosUsuario.Seguidos();
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link TipoRegistroYaExisteException }{@code >}
+     * Create an instance of {@link JAXBElement }{@code <}{@link CategoriaYaExisteException }{@code >}
      * 
      * @param value
      *     Java instance representing xml element's value.
      * @return
-     *     the new instance of {@link JAXBElement }{@code <}{@link TipoRegistroYaExisteException }{@code >}
+     *     the new instance of {@link JAXBElement }{@code <}{@link CategoriaYaExisteException }{@code >}
      */
-    @XmlElementDecl(namespace = "http://publicadores/", name = "TipoRegistroYaExisteException")
-    public JAXBElement<TipoRegistroYaExisteException> createTipoRegistroYaExisteException(TipoRegistroYaExisteException value) {
-        return new JAXBElement<>(_TipoRegistroYaExisteException_QNAME, TipoRegistroYaExisteException.class, null, value);
+    @XmlElementDecl(namespace = "http://publicadores/", name = "CategoriaYaExisteException")
+    public JAXBElement<CategoriaYaExisteException> createCategoriaYaExisteException(CategoriaYaExisteException value) {
+        return new JAXBElement<>(_CategoriaYaExisteException_QNAME, CategoriaYaExisteException.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link InstitucionYaExisteException }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link InstitucionYaExisteException }{@code >}
+     */
+    @XmlElementDecl(namespace = "http://publicadores/", name = "InstitucionYaExisteException")
+    public JAXBElement<InstitucionYaExisteException> createInstitucionYaExisteException(InstitucionYaExisteException value) {
+        return new JAXBElement<>(_InstitucionYaExisteException_QNAME, InstitucionYaExisteException.class, null, value);
     }
 
     /**
@@ -468,16 +307,29 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link ValorPatrocinioExcedidoException }{@code >}
+     * Create an instance of {@link JAXBElement }{@code <}{@link UsuarioTipoIncorrectoException }{@code >}
      * 
      * @param value
      *     Java instance representing xml element's value.
      * @return
-     *     the new instance of {@link JAXBElement }{@code <}{@link ValorPatrocinioExcedidoException }{@code >}
+     *     the new instance of {@link JAXBElement }{@code <}{@link UsuarioTipoIncorrectoException }{@code >}
      */
-    @XmlElementDecl(namespace = "http://publicadores/", name = "ValorPatrocinioExcedidoException")
-    public JAXBElement<ValorPatrocinioExcedidoException> createValorPatrocinioExcedidoException(ValorPatrocinioExcedidoException value) {
-        return new JAXBElement<>(_ValorPatrocinioExcedidoException_QNAME, ValorPatrocinioExcedidoException.class, null, value);
+    @XmlElementDecl(namespace = "http://publicadores/", name = "UsuarioTipoIncorrectoException")
+    public JAXBElement<UsuarioTipoIncorrectoException> createUsuarioTipoIncorrectoException(UsuarioTipoIncorrectoException value) {
+        return new JAXBElement<>(_UsuarioTipoIncorrectoException_QNAME, UsuarioTipoIncorrectoException.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link UsuarioYaExisteException }{@code >}
+     * 
+     * @param value
+     *     Java instance representing xml element's value.
+     * @return
+     *     the new instance of {@link JAXBElement }{@code <}{@link UsuarioYaExisteException }{@code >}
+     */
+    @XmlElementDecl(namespace = "http://publicadores/", name = "UsuarioYaExisteException")
+    public JAXBElement<UsuarioYaExisteException> createUsuarioYaExisteException(UsuarioYaExisteException value) {
+        return new JAXBElement<>(_UsuarioYaExisteException_QNAME, UsuarioYaExisteException.class, null, value);
     }
 
 }

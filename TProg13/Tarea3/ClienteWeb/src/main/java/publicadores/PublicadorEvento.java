@@ -370,50 +370,6 @@ public interface PublicadorEvento {
 
     /**
      * 
-     * @param siglaEdicion
-     * @return
-     *     returns java.lang.String
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/encontrarEventoPorSiglaRequest", output = "http://publicadores/PublicadorEvento/encontrarEventoPorSiglaResponse")
-    public String encontrarEventoPorSigla(
-        @WebParam(name = "siglaEdicion", partName = "siglaEdicion")
-        String siglaEdicion);
-
-    /**
-     * 
-     * @param costo
-     * @param edicion
-     * @param evento
-     * @param fechaInicio
-     * @param fechaRegistro
-     * @param idRegistro
-     * @param tipoRegistro
-     * @param usuario
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoRequest", output = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoResponse")
-    public void altaRegistroEdicionEvento(
-        @WebParam(name = "idRegistro", partName = "idRegistro")
-        String idRegistro,
-        @WebParam(name = "usuario", partName = "usuario")
-        Usuario usuario,
-        @WebParam(name = "evento", partName = "evento")
-        Eventos evento,
-        @WebParam(name = "edicion", partName = "edicion")
-        Ediciones edicion,
-        @WebParam(name = "tipoRegistro", partName = "tipoRegistro")
-        TipoRegistro tipoRegistro,
-        @WebParam(name = "fechaRegistro", partName = "fechaRegistro")
-        LocalDate fechaRegistro,
-        @WebParam(name = "costo", partName = "costo")
-        float costo,
-        @WebParam(name = "fechaInicio", partName = "fechaInicio")
-        LocalDate fechaInicio);
-
-    /**
-     * 
      * @param nombreCategoria
      * @return
      *     returns publicadores.DtEventoArray
@@ -495,4 +451,49 @@ public interface PublicadorEvento {
         @WebParam(name = "fechaInicio", partName = "fechaInicio")
         String fechaInicio);
 
+    /**
+     * 
+     * @param siglaEdicion
+     * @return
+     *     returns java.lang.String
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorEvento/encontrarEventoPorSiglaRequest", output = "http://publicadores/PublicadorEvento/encontrarEventoPorSiglaResponse")
+    public String encontrarEventoPorSigla(
+        @WebParam(name = "siglaEdicion", partName = "siglaEdicion")
+        String siglaEdicion);
+
+    /**
+     * 
+     * @param costo
+     * @param edicion
+     * @param evento
+     * @param fechaInicio
+     * @param fechaRegistro
+     * @param idRegistro
+     * @param tipoRegistro
+     * @param usuario
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoRequest", output = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoResponse")
+    public void altaRegistroEdicionEvento(
+        @WebParam(name = "idRegistro", partName = "idRegistro")
+        String idRegistro,
+        @WebParam(name = "usuario", partName = "usuario")
+        Usuario usuario,
+        @WebParam(name = "evento", partName = "evento")
+        Eventos evento,
+        @WebParam(name = "edicion", partName = "edicion")
+        Ediciones edicion,
+        @WebParam(name = "tipoRegistro", partName = "tipoRegistro")
+        TipoRegistro tipoRegistro,
+        @WebParam(name = "fechaRegistro", partName = "fechaRegistro")
+        LocalDate fechaRegistro,
+        @WebParam(name = "costo", partName = "costo")
+        float costo,
+        @WebParam(name = "fechaInicio", partName = "fechaInicio")
+        LocalDate fechaInicio);
+
 }
+

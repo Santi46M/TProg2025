@@ -22,7 +22,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *         <element name="nombre" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="email" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="apellido" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         <element name="fechaNac" type="{http://publicadores/}localDate" minOccurs="0"/>
+ *         <element name="fechaNac" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="nombreInstitucion" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="desc" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="link" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
@@ -101,7 +101,7 @@ public class DtDatosUsuario {
     protected String nombre;
     protected String email;
     protected String apellido;
-    protected LocalDate fechaNac;
+    protected String fechaNac;
     protected String nombreInstitucion;
     protected String desc;
     protected String link;
@@ -212,10 +212,10 @@ public class DtDatosUsuario {
      * 
      * @return
      *     possible object is
-     *     {@link LocalDate }
+     *     {@link String }
      *     
      */
-    public LocalDate getFechaNac() {
+    public String getFechaNac() {
         return fechaNac;
     }
 
@@ -224,10 +224,10 @@ public class DtDatosUsuario {
      * 
      * @param value
      *     allowed object is
-     *     {@link LocalDate }
+     *     {@link String }
      *     
      */
-    public void setFechaNac(LocalDate value) {
+    public void setFechaNac(String value) {
         this.fechaNac = value;
     }
 

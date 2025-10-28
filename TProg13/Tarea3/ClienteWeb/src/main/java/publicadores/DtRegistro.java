@@ -20,7 +20,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *         <element name="usuario" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="edicion" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="tipoRegistro" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         <element name="fechaRegistro" type="{http://publicadores/}localDate" minOccurs="0"/>
+ *         <element name="fechaRegistro" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="costo" type="{http://www.w3.org/2001/XMLSchema}float"/>
  *         <element name="fechaInicio" type="{http://publicadores/}localDate" minOccurs="0"/>
  *       </sequence>
@@ -47,7 +47,7 @@ public class DtRegistro {
     protected String usuario;
     protected String edicion;
     protected String tipoRegistro;
-    protected LocalDate fechaRegistro;
+    protected String fechaRegistro;
     protected float costo;
     protected LocalDate fechaInicio;
 
@@ -152,10 +152,10 @@ public class DtRegistro {
      * 
      * @return
      *     possible object is
-     *     {@link LocalDate }
+     *     {@link String }
      *     
      */
-    public LocalDate getFechaRegistro() {
+    public String getFechaRegistro() {
         return fechaRegistro;
     }
 
@@ -164,10 +164,10 @@ public class DtRegistro {
      * 
      * @param value
      *     allowed object is
-     *     {@link LocalDate }
+     *     {@link String }
      *     
      */
-    public void setFechaRegistro(LocalDate value) {
+    public void setFechaRegistro(String value) {
         this.fechaRegistro = value;
     }
 

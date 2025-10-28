@@ -6,11 +6,15 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import logica.enumerados.DTNivel;
 
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import logica.utils.LocalDateAdapter;
+
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DTPatrocinio implements Serializable {
 
     private String codigo;
     private int monto;
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate fecha;
     private DTNivel nivel;
     private int cantRegistrosGratuitos;

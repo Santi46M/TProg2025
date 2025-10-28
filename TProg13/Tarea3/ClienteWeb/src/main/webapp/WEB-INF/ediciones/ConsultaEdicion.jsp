@@ -124,9 +124,9 @@
           <% if (edicion != null) { %>
             <div class="event-meta"><strong>Evento:</strong> <%= (evNombre != null ? evNombre : "—") %></div>
             <div class="event-meta"><strong>Sigla:</strong> <%= edicion.getSigla() %></div>
-            <div class="event-meta"><strong>Fecha inicio:</strong> <%= edicion.getFechaInicio() %></div>
-            <div class="event-meta"><strong>Fecha fin:</strong> <%= edicion.getFechaFin() %></div>
-            <div class="event-meta"><strong>Fecha alta:</strong> <%= edicion.getFechaAlta() %></div>
+			<div class="event-meta"><strong>Fecha inicio:</strong> <%= (edicion.getFechaInicio() != null ? edicion.getFechaInicio().toString() : "—") %></div>
+			<div class="event-meta"><strong>Fecha fin:</strong> <%= (edicion.getFechaFin() != null ? edicion.getFechaFin().toString() : "—") %></div>
+			<div class="event-meta"><strong>Fecha alta:</strong> <%= (edicion.getFechaAlta() != null ? edicion.getFechaAlta().toString() : "—") %></div>
             <div class="event-meta"><strong>Ciudad:</strong> <%= edicion.getCiudad() %></div>
             <div class="event-meta"><strong>País:</strong> <%= edicion.getPais() %></div>
             <div class="event-meta"><strong>Estado:</strong> <%= (edicion.getEstado() != null ? edicion.getEstado() : "—") %></div>

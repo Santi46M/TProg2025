@@ -21,7 +21,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *         <element name="nombre" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="sigla" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="descripcion" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
- *         <element name="fecha" type="{http://publicadores/}localDate" minOccurs="0"/>
+ *         <element name="fecha" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="categorias" minOccurs="0">
  *           <complexType>
  *             <complexContent>
@@ -68,7 +68,7 @@ public class DtEvento {
     protected String nombre;
     protected String sigla;
     protected String descripcion;
-    protected LocalDate fecha;
+    protected String fecha;
     protected DtEvento.Categorias categorias;
     protected DtEvento.Ediciones ediciones;
     protected String imagen;
@@ -150,10 +150,10 @@ public class DtEvento {
      * 
      * @return
      *     possible object is
-     *     {@link LocalDate }
+     *     {@link String }
      *     
      */
-    public LocalDate getFecha() {
+    public String getFecha() {
         return fecha;
     }
 
@@ -162,10 +162,10 @@ public class DtEvento {
      * 
      * @param value
      *     allowed object is
-     *     {@link LocalDate }
+     *     {@link String }
      *     
      */
-    public void setFecha(LocalDate value) {
+    public void setFecha(String value) {
         this.fecha = value;
     }
 
