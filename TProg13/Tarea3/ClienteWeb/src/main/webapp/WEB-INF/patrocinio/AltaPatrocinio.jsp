@@ -5,8 +5,8 @@
 <%
   String ctx = request.getContextPath();
 
-  String eventoSel  = (String) request.getAttribute("evento");   // puede venir null
-  String edicionSel = (String) request.getAttribute("edicion");  // puede venir null
+  String eventoSel  = (String) request.getAttribute("evento");
+  String edicionSel = (String) request.getAttribute("edicion");
 
   @SuppressWarnings("unchecked")
   List<String> eventosOrganizador   = (List<String>) request.getAttribute("eventosOrganizador");
@@ -25,10 +25,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>Alta de Patrocinio</title>
-  <!-- Estilos globales -->
   <link rel="stylesheet" href="<%= ctx %>/css/style.css">
   <link rel="stylesheet" href="<%= ctx %>/css/layoutMenu.css">
-  <!-- Estilos específicos de esta vista -->
   <link rel="stylesheet" href="<%= ctx %>/css/AltaPatrocinio.css">
   <link rel="stylesheet" href="<%= ctx %>/css/AltaEvento.css">
 </head>
@@ -42,7 +40,12 @@
     <main class="container" style="flex:2; min-width:0;">
       <section class="form-card-altaEvento form-card--wide">
         <h2 style="text-align:center;">Alta de Patrocinio</h2>
-        <!-- Selectores de evento y edición (dentro del card principal) -->
+
+        <% if (error != null) { %>
+          <div class="alert alert-error" style="margin-bottom:1rem;"><%= error %></div>
+        <% } %>
+
+        <!-- Selección de evento -->
         <form method="get" action="<%= ctx %>/edicion/patrocinio/alta" class="inline-form">
           <div class="form-row">
             <label class="form-label">Evento</label>
@@ -57,6 +60,7 @@
           <noscript><button type="submit" class="btn">Continuar</button></noscript>
         </form>
 
+        <!-- Selección de edición -->
         <form method="get" action="<%= ctx %>/edicion/patrocinio/alta" class="inline-form">
           <input type="hidden" name="evento" value="<%= eventoSel == null ? "" : eventoSel %>"/>
           <div class="form-row">
@@ -72,12 +76,10 @@
           <noscript><button type="submit" class="btn">Continuar</button></noscript>
         </form>
 
-        <% if (error != null) { %>
-          <div class="alert alert-error" style="margin-bottom:1rem;"><%= error %></div>
-        <% } %>
         <% if (eventoSel != null && !eventoSel.isEmpty() && edicionSel != null && !edicionSel.isEmpty()) { %>
+
+        <!-- Formulario principal -->
         <form method="post" action="<%= ctx %>/edicion/patrocinio/alta" class="card form-card">
-          <!-- Preservo selección -->
           <input type="hidden" name="evento"  value="<%= eventoSel %>"/>
           <input type="hidden" name="edicion" value="<%= edicionSel %>"/>
 
@@ -116,7 +118,7 @@
 
             <div class="form-group-altaEvento">
               <label class="form-label">Aporte (monto)</label>
-              <input type="number" min="0" step="1" name="aporte" required class="form-input"/>
+              <input type="number" min="0" step="1" name="aporte" inputmode="numeric" pattern="\\d+" required class="form-input"/>
             </div>
 
             <div class="form-group-altaEvento">
@@ -126,7 +128,7 @@
 
             <div class="form-group-altaEvento">
               <label class="form-label">Cant. registros gratuitos</label>
-              <input type="number" min="0" step="1" name="cantidadRegistros" required class="form-input"/>
+              <input type="number" min="0" step="1" name="cantidadRegistros" inputmode="numeric" pattern="\\d+" required class="form-input"/>
             </div>
 
             <div class="form-group-altaEvento">
@@ -139,6 +141,7 @@
             <button type="submit" class="btn-guardar-altaEvento">Crear patrocinio</button>
           </div>
         </form>
+
         <% } %>
       </section>
     </main>

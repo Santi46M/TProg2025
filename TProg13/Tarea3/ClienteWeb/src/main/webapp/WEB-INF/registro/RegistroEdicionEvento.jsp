@@ -72,8 +72,12 @@
           <li><strong>Evento:</strong> <%= eventoSel %></li>
           <li><strong>Edición:</strong> <%= edSel.getNombre() %></li>
           <li><strong>Sigla:</strong> <%= edSel.getSigla() %></li>
-          <li><strong>Fecha inicio:</strong> <%= edSel.getFechaInicio() %></li>
-          <li><strong>Fecha fin:</strong> <%= edSel.getFechaFin() %></li>
+	<li><strong>Fecha inicio:</strong>
+  	<%= (edSel.getFechaInicio() != null ? edSel.getFechaInicio().toString() : "—") %>
+	</li>
+	<li><strong>Fecha fin:</strong>
+  		<%= (edSel.getFechaFin() != null ? edSel.getFechaFin().toString() : "—") %>
+	</li>
           <li><strong>Ciudad:</strong> <%= edSel.getCiudad() %></li>
           <li><strong>País:</strong> <%= edSel.getPais() %></li>
         </ul>
