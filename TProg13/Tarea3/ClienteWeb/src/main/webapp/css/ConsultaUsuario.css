@@ -86,11 +86,11 @@
 
 .usuario-card .btn:hover { background: #084d99; }
 
-.usuario-card .following {
-  background: #10b981 !important; /* green */
-}
-.usuario-card .not-following {
-  background: #0a66c2 !important; /* blue */
+/* Force follow-state buttons to keep the default blue appearance so they don't turn green */
+.usuario-card .btn.following,
+.usuario-card .btn.not-following {
+  background: #0a66c2 !important;
+  color: #fff !important;
 }
 
 .perfil-header { display:flex; align-items:center; gap:1rem; margin-bottom:1rem; }
