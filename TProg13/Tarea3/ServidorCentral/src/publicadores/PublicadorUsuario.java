@@ -177,6 +177,15 @@ public class PublicadorUsuario {
     ) throws UsuarioNoExisteException, UsuarioTipoIncorrectoException, excepciones.RegistroNoExiste {
         icu.marcarAsistencia(nickname, registroId);
     }
+    
+    @WebMethod
+    public void modificarContrasenia(
+        @WebParam(name = "nickname") String nickname,
+        @WebParam(name = "nuevaContrasenia") String nuevaContrasenia
+    ) throws UsuarioNoExisteException {
+        icu.modificarContrasenia(nickname, nuevaContrasenia);
+    }
+    
 
     @WebMethod(exclude = true)
     public Endpoint getEndpoint() {

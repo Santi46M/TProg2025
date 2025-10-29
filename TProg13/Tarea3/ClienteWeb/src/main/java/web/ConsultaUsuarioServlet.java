@@ -4,13 +4,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
+import java.time.LocalDate;
 
 import publicadores.DtDatosUsuario;
 import publicadores.DtDatosUsuarioArray;
 import publicadores.PublicadorUsuario;
 import publicadores.PublicadorUsuarioService;
 import publicadores.UsuarioNoExisteException_Exception;
+import publicadores.UsuarioTipoIncorrectoException_Exception;
 
 @WebServlet(urlPatterns = {
         "/usuario/ConsultaUsuario",
@@ -18,6 +21,7 @@ import publicadores.UsuarioNoExisteException_Exception;
         "/usuario/seguir",
         "/usuario/dejarSeguir"
 })
+@jakarta.servlet.annotation.MultipartConfig
 public class ConsultaUsuarioServlet extends HttpServlet {
     private static final String JSP_CONSULTA = "/WEB-INF/usuario/ConsultaUsuario.jsp";
 
@@ -78,6 +82,80 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             }
         }
         request.getRequestDispatcher(JSP_CONSULTA).forward(request, response);
+    }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
+        String path = request.getServletPath();
+        PublicadorUsuarioService service = new PublicadorUsuarioService();
+        PublicadorUsuario port = service.getPublicadorUsuarioPort();
+
+        // === POST /usuario/modificar ===
+        if ("/usuario/modificar".equals(path)) {
+
+            HttpSession sAux = request.getSession(false);
+            String nick = (sAux != null) ? (String) sAux.getAttribute("nick") : null;
+
+            if (nick == null || nick.isBlank()) {
+                response.sendRedirect(request.getContextPath() + "/auth/login");
+                return;
+            }
+
+            // Leer parámetros del formulario
+            String nombre      = Optional.ofNullable(request.getParameter("nombre")).orElse("");
+            String apellido    = Optional.ofNullable(request.getParameter("apellido")).orElse("");
+            String institucion = Optional.ofNullable(request.getParameter("institucion")).orElse("");
+            String descripcion = Optional.ofNullable(request.getParameter("descripcion")).orElse("");
+            String nacStr      = Optional.ofNullable(request.getParameter("fechaNac")).orElse("");
+            String password    = Optional.ofNullable(request.getParameter("password")).orElse("");
+            String link        = Optional.ofNullable(request.getParameter("link")).orElse("");
+
+
+       
+            
+
+            LocalDate fechaNac = null;
+            if (nacStr != null && !nacStr.isBlank()) {
+                try {
+                    fechaNac = LocalDate.parse(nacStr);
+                } catch (Exception ignored) {}
+            }
+            String fechaStr = (fechaNac != null) ? fechaNac.toString() : null;
+            Part imgPart = request.getPart("imagen");
+            String imgFileName = null;
+
+            if (imgPart != null && imgPart.getSize() > 0) {
+                imgFileName = Path.of(imgPart.getSubmittedFileName()).getFileName().toString();
+                imgPart.write(getServletContext().getRealPath("/img/usuarios/" + imgFileName));
+            } else {
+                imgFileName = ""; // o mantener la actual del usuario
+            }
+
+            
+
+            try {
+                port.modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaStr, institucion,imgFileName);
+
+                // Si se ingresó nueva contraseña, actualizarla
+                if (password != null && !password.isBlank()) {
+                    port.modificarContrasenia(nick, password);
+                }
+
+                // Redirigir al perfil actualizado
+                response.sendRedirect(request.getContextPath() + "/usuario/ConsultaUsuario?nick=" +
+                        java.net.URLEncoder.encode(nick, java.nio.charset.StandardCharsets.UTF_8));
+
+            } catch (UsuarioNoExisteException_Exception | UsuarioTipoIncorrectoException_Exception e) {
+//                request.setAttribute("error", e.getMessage());
+//                doGet(request, response); // recargar vista con error
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                request.setAttribute("error", "El usuario '" + nick + "' no existe.");
+            }
+        } else {
+            doGet(request, response);
+        }
     }
 
     private String nickEnSesion(HttpServletRequest req) {
