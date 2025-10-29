@@ -134,51 +134,59 @@
              LISTADO DE USUARIOS
         ============================ -->
         <h1>Usuarios registrados</h1>
-        <div class="usuarios-grid">
-          <% if (usuarios == null || usuarios.isEmpty()) { %>
-            <p>No hay usuarios registrados.</p>
-          <% } else {
-               for (DtDatosUsuario u : usuarios) {
-                 String fotoUrl = (fotos == null) ? null : fotos.get(u.getNickname());
-          %>
-            <div class="card usuario-card">
-              <% if (fotoUrl != null && !fotoUrl.isBlank()) { %>
-                <img class="avatar" src="<%= fotoUrl %>" alt="Avatar de <%= u.getNickname() %>">
-              <% } else { %>
-                <div class="no-avatar" aria-label="Sin imagen">sin imagen</div>
-              <% } %>
+<div class="usuarios-grid">
+  <% if (usuarios == null || usuarios.isEmpty()) { %>
+    <p>No hay usuarios registrados.</p>
+  <% } else {
+       for (DtDatosUsuario u : usuarios) {
+         String fotoUrl = (fotos == null) ? null : fotos.get(u.getNickname());
+         if (fotoUrl == null || fotoUrl.isBlank()) {
+             fotoUrl = ctx + "/img/user-default.jpg"; // imagen genérica (existe en src/main/webapp/img)
+         }
+  %>
+    <div class="card usuario-card">
+      <img class="avatar"
+     src="<%= fotoUrl %>"
+     alt="Avatar de <%= u.getNickname() %>"
+     onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
 
-              <h3>
-                <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
-                  <input type="hidden" name="nick" value="<%=u.getNickname()%>" />
-					<button type="button" class="btn-link user-nick">
-					  <i class='bx bxs-user-circle'></i>
-					  <span><%=u.getNickname()%></span>
-					</button>
-                </form>
-              </h3>
-              <p><strong>Nickname:</strong> <%=u.getNickname()%></p>
+      <h3>
+        <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
+          <input type="hidden" name="nick" value="<%=u.getNickname()%>" />
+          <button type="submit" class="btn-link user-nick">
+            <i class='bx bxs-user-circle'></i>
+            <span><%=u.getNickname()%></span>
+          </button>
+        </form>
+      </h3>
 
-              <%-- FOLLOW BUTTON IN LIST VIEW --%>
-              <%
-                @SuppressWarnings("unchecked")
-                Map<String,Boolean> yaLoSigoMap = (Map<String,Boolean>) request.getAttribute("yaLoSigoMap");
-                boolean yaSigueUser = false;
-                if (yaLoSigoMap != null && yaLoSigoMap.get(u.getNickname()) != null) {
-                  yaSigueUser = yaLoSigoMap.get(u.getNickname()).booleanValue();
-                }
-              %>
-              <% if (nickSesion != null && !nickSesion.equals(u.getNickname())) { %>
-                <form class="follow-form" data-nick="<%= u.getNickname() %>" action="<%= ctx %>/<%= (!yaSigueUser ? "usuario/seguir" : "usuario/dejarSeguir") %>" method="post" style="display:inline;margin-top:.5rem;">
-                  <input type="hidden" name="a" value="<%= u.getNickname() %>">
-                  <input type="hidden" name="listar" value="1">
-                  <button type="submit" class="btn"><%= (!yaSigueUser ? "Seguir" : "Dejar de seguir") %></button>
-                </form>
-              <% } %>
+      <p><strong>Nickname:</strong> <%=u.getNickname()%></p>
 
-            </div>
-          <% } } %>
-        </div>
+      <%-- FOLLOW BUTTON IN LIST VIEW --%>
+      <%
+        @SuppressWarnings("unchecked")
+        Map<String,Boolean> yaLoSigoMap = (Map<String,Boolean>) request.getAttribute("yaLoSigoMap");
+        boolean yaSigueUser = false;
+        if (yaLoSigoMap != null && yaLoSigoMap.get(u.getNickname()) != null) {
+          yaSigueUser = yaLoSigoMap.get(u.getNickname()).booleanValue();
+        }
+      %>
+      <% if (nickSesion != null && !nickSesion.equals(u.getNickname())) { %>
+        <form class="follow-form" data-nick="<%= u.getNickname() %>"
+              action="<%= ctx %>/<%= (!yaSigueUser ? "usuario/seguir" : "usuario/dejarSeguir") %>"
+              method="post"
+              style="display:inline;margin-top:.5rem;">
+          <input type="hidden" name="a" value="<%= u.getNickname() %>">
+          <input type="hidden" name="listar" value="1">
+          <button type="submit" class="btn"><%= (!yaSigueUser ? "Seguir" : "Dejar de seguir") %></button>
+        </form>
+      <% } %>
+
+    </div>
+  <% } } %>
+</div>
+
+
 
       <% } else { %>
         <!-- ===========================
@@ -187,14 +195,19 @@
         <h1>Perfil de <%= usuario.getNickname() %></h1>
 
 <div class="perfil-header">
-  <% if (usrImagenUrl != null && !usrImagenUrl.isBlank()) { %>
-    <img class="avatar" src="<%= request.getContextPath() %>/img/usuarios/<%= usuario.getImagen() %>" 
-     alt="Avatar de <%= usuario.getNickname() %>">
-  <% } else { %>
-    <div class="no-avatar" aria-label="Sin imagen">sin imagen</div>
-  <% } %>
+  <% 
+    // Prefer the image name stored in the DtDatosUsuario. If missing, use the generic avatar.
+    String imgName = (usuario != null) ? usuario.getImagen() : null;
+    String avatarSrc;
+    if (imgName != null && !imgName.isBlank()) {
+      avatarSrc = ctx + "/img/usuarios/" + imgName;
+    } else {
+      avatarSrc = ctx + "/img/user-default.jpg";
+    }
+  %>
+  <img class="avatar" src="<%= avatarSrc %>" alt="Avatar de <%= usuario.getNickname() %>" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2296%22 height=%2296%22 viewBox=%220 0 96 96%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f3f4f6%22/><text x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%236b7280%22 font-size=%2232%22 font-family=%22Arial, Helvetica, sans-serif%22>👤</text></svg>';">
 
-  <div id="datosUsuario">
+   <div id="datosUsuario">
       <!-- === BARRA SEGUIR / DEJAR SEGUIR (FORM SEPARADO, NO ANIDADO) === -->
     <div class="follow-bar" style="margin:.5rem 0;">
       <% if (!esSuPropioPerfil && nickSesion != null) { %>
