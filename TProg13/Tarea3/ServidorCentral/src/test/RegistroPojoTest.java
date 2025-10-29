@@ -28,7 +28,8 @@ class RegistroPojoTest {
                 /* tipoReg    */ null,
                 /* fechaReg   */ fechaReg,
                 /* costo      */ 1500.50f,
-                /* fechaIni   */ fechaIni
+                /* fechaIni   */ fechaIni,
+                null
         );
 
         assertEquals("R-123", r.getId());
@@ -44,7 +45,7 @@ class RegistroPojoTest {
     @DisplayName("Setters de escalares actualizan correctamente")
     void settersEscalares() {
         Registro r = new Registro("X", null, null, null,
-                LocalDate.of(2025, 1, 1), 1.0f, LocalDate.of(2025, 1, 2));
+                LocalDate.of(2025, 1, 1), 1.0f, LocalDate.of(2025, 1, 2),null);
 
         r.setId("R-999");
         r.setCosto(999.99f);
@@ -72,7 +73,7 @@ class RegistroPojoTest {
                 "No se pudieron instanciar Usuario/Ediciones/TipoRegistro por reflexión");
 
         Registro r = new Registro("R", null, null, null,
-                LocalDate.of(2025, 1, 1), 0f, LocalDate.of(2025, 1, 2));
+                LocalDate.of(2025, 1, 1), 0f, LocalDate.of(2025, 1, 2),null);
 
         // Usamos los setters públicos reales (tipados) vía reflexión
         Method setUsuario = Registro.class.getMethod("setUsuario", usuario.getClass().getSuperclass() == null

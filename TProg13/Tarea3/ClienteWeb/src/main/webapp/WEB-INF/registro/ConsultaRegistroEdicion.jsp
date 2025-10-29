@@ -36,6 +36,13 @@
             <div class="event-meta"><strong>Fecha de registro:</strong> <%= registro.getFechaRegistro() %></div>
             <div class="event-meta"><strong>Costo:</strong> $<%= registro.getCosto() %></div>
             <div class="event-meta"><strong>Fecha de inicio:</strong> <%= registro.getFechaInicio() %></div>
+			<form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="get">
+  				<input type="hidden" name="idRegistro" value="<%= registro.getIdentificador() %>">
+  				<input type="hidden" name="accion" value="certificado">
+  				<button type="submit" class="btn-linklike"> Descargar certificado</button>
+			</form>
+
+            
           <% } else { %>
             <p>No se encontró información del registro.</p>
           <% } %>

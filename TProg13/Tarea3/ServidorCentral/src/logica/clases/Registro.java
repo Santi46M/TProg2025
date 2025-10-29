@@ -13,8 +13,10 @@ public class Registro {
     private TipoRegistro tipoRegistro;
     private LocalDate fechaRegistro;
     private LocalDate fechaInicio;
+    private Eventos evento;
+    private Boolean asistenciaMarcada;
 
-    public Registro(String identificador, Usuario usuario, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
+    public Registro(String identificador, Usuario usuario, Ediciones edicion, TipoRegistro tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio, Eventos evento) {
         this.identificador = identificador;
         this.usuario = usuario;
         this.edicion = edicion;
@@ -22,6 +24,8 @@ public class Registro {
         this.fechaRegistro = fechaRegistro;
         this.costo = costo;
         this.fechaInicio = fechaInicio;
+        this.evento = evento;
+        this.asistenciaMarcada = false;
     }
 
     // Getters y setters
@@ -39,4 +43,6 @@ public class Registro {
     public void setCosto(float costo) { this.costo = costo; }
     public LocalDate getFechaInicio() { return fechaInicio; }
     public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
+    public Eventos getEvento() {return evento;}
+    public void setAsistencia() {this.asistenciaMarcada = true;}
 }

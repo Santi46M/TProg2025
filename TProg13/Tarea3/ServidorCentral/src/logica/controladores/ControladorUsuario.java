@@ -292,7 +292,8 @@ manejador.addUsuario(nuevoUsuario);
                 reg.getTipoRegistro().getNombre(),
                 reg.getFechaRegistro(),
                 reg.getCosto(),
-                reg.getFechaInicio()
+                reg.getFechaInicio(),
+                reg.getEdicion().getEvento().getNombre()
             );
         }
         return dto;

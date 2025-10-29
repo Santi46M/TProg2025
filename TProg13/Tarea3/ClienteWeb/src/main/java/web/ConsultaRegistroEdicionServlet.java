@@ -4,9 +4,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.time.LocalDate;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
 
 import publicadores.DtDatosUsuario;
+import publicadores.DtEdicion;
 import publicadores.DtRegistro;
+import publicadores.DtEvento;
 import publicadores.PublicadorUsuario;
 import publicadores.PublicadorUsuarioService;
 import publicadores.PublicadorEvento;
@@ -20,10 +26,12 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
         req.setCharacterEncoding("UTF-8");
         HttpSession session = req.getSession(false);
         String nick = (session != null) ? (String) session.getAttribute("nick") : null;
         String idRegistro = req.getParameter("idRegistro");
+        String accion = req.getParameter("accion"); // ← para saber si descarga o consulta
 
         if (idRegistro == null || idRegistro.isBlank() || nick == null) {
             req.setAttribute("error", "Registro no especificado o sesión no iniciada.");
@@ -33,7 +41,7 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
 
         PublicadorUsuarioService service = new PublicadorUsuarioService();
         PublicadorUsuario port = service.getPublicadorUsuarioPort();
-        // PublicadorEvento is the correct service to obtain registro details
+
         PublicadorEventoService evSvc = new PublicadorEventoService();
         PublicadorEvento evPort = evSvc.getPublicadorEventoPort();
 
@@ -48,27 +56,77 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
                     return;
                 }
             }
-            req.setAttribute("usuario", dtoUsuario);
+            DtRegistro dtRegistro = evPort.consultaRegistro(nick, idRegistro);
 
-            DtRegistro dtRegistro = null;
-            try {
-                // consultaRegistro requiere nickname + idRegistro
-                dtRegistro = evPort.consultaRegistro(nick, idRegistro);
-            } catch (Exception e) {
-                req.setAttribute("error", "No se pudo obtener el registro: " + e.getMessage());
+            if (dtRegistro == null) {
+                req.setAttribute("error", "No se encontró el registro solicitado.");
                 req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
                 return;
             }
 
-            if (dtRegistro == null) {
-                req.setAttribute("error", "No se encontró el registro solicitado.");
-            } else {
-                req.setAttribute("registro", dtRegistro);
+            // ============================================================
+            // 🔹 Si la acción es "certificado", generar y descargar el PDF
+            // ============================================================
+            if ("certificado".equalsIgnoreCase(accion)) {
+            	DtEvento eventoRegistro = evPort.consultaDTEvento(dtRegistro.getEvento());
+            	DtEdicion edicionRegisro = evPort.obtenerDtEdicion(eventoRegistro.getNombre(), dtRegistro.getEdicion());
+                generarCertificadoPDF(resp, dtoUsuario, dtRegistro, eventoRegistro, edicionRegisro);
+                return; // no hace forward al JSP
             }
-        } catch (Exception e) {
-            req.setAttribute("error", "Error al consultar el registro: " + e.getMessage());
-        }
 
-        req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
+            // Mostrar la página normal de consulta
+            req.setAttribute("usuario", dtoUsuario);
+            req.setAttribute("registro", dtRegistro);
+            req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("error", "Error al consultar el registro: " + e.getMessage());
+            req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
+        }
+    }
+
+    /** ================================================================
+     *  Genera dinámicamente el PDF del certificado usando iText
+     *  ================================================================ */
+    private void generarCertificadoPDF(HttpServletResponse resp, DtDatosUsuario usr, DtRegistro reg, DtEvento ev, DtEdicion ed)
+            throws IOException, DocumentException {
+
+        // Configurar headers HTTP
+        resp.setContentType("application/pdf");
+        resp.setHeader("Content-Disposition",
+                "attachment; filename=Certificado_" + usr.getNickname() + ".pdf");
+
+        Document doc = new Document(PageSize.A4);
+        PdfWriter.getInstance(doc, resp.getOutputStream());
+        doc.open();
+
+        Font tituloFont = new Font(Font.FontFamily.HELVETICA, 20, Font.BOLD);
+        Font textoFont = new Font(Font.FontFamily.HELVETICA, 12);
+
+        Paragraph titulo = new Paragraph("Certificado de Asistencia", tituloFont);
+        titulo.setAlignment(Element.ALIGN_CENTER);
+        titulo.setSpacingAfter(25);
+        doc.add(titulo);
+
+        doc.add(new Paragraph("Se certifica que:", textoFont));
+        doc.add(new Paragraph(" ", textoFont));
+        doc.add(new Paragraph("    " + usr.getNombre() + " " + usr.getApellido(),
+                new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)));
+        doc.add(new Paragraph(" ", textoFont));
+        
+        doc.add(new Paragraph("Ha asistido al evento: " + ev.getNombre(), textoFont));
+        doc.add(new Paragraph("Edición: " + reg.getEdicion(), textoFont));
+        doc.add(new Paragraph("Ciudad: " + ed.getCiudad(), textoFont));
+        
+        publicadores.LocalDate fechaIni = reg.getFechaInicio();
+        String fechaStr = (fechaIni != null) ? fechaIni.toString() : null;
+        doc.add(new Paragraph("Fecha: " + fechaIni, textoFont));
+        doc.add(new Paragraph(" ", textoFont));
+
+        doc.add(new Paragraph("______________________________", textoFont));
+        doc.add(new Paragraph("Firma del Organizador", textoFont));
+
+        doc.close();
     }
 }

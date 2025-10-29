@@ -19,11 +19,12 @@ public class DTRegistro implements Serializable {
     private LocalDate fechaRegistro;
     private float costo;
     private LocalDate fechaInicio;
+    private String evento;
 
     public DTRegistro() {
     }
 
-    public DTRegistro(String identificador, String usuario, String edicion, String tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio) {
+    public DTRegistro(String identificador, String usuario, String edicion, String tipoRegistro, LocalDate fechaRegistro, float costo, LocalDate fechaInicio, String evento) {
         this.identificador = identificador;
         this.usuario = usuario;
         this.edicion = edicion;
@@ -31,6 +32,7 @@ public class DTRegistro implements Serializable {
         this.fechaRegistro = fechaRegistro;
         this.costo = costo;
         this.fechaInicio = fechaInicio;
+        this.evento = evento;
     }
 
     public String getId() { return identificador; }
@@ -40,4 +42,5 @@ public class DTRegistro implements Serializable {
     public LocalDate getFechaRegistro() { return fechaRegistro; }
     public float getCosto() { return costo; }
     public LocalDate getFechaInicio() { return fechaInicio; }
+    public String getEvento() {return evento;}
 }

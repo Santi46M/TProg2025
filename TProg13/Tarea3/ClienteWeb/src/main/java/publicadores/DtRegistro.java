@@ -23,6 +23,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *         <element name="fechaRegistro" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         <element name="costo" type="{http://www.w3.org/2001/XMLSchema}float"/>
  *         <element name="fechaInicio" type="{http://publicadores/}localDate" minOccurs="0"/>
+ *         <element name="evento" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       </sequence>
  *     </restriction>
  *   </complexContent>
@@ -39,7 +40,8 @@ import jakarta.xml.bind.annotation.XmlType;
     "tipoRegistro",
     "fechaRegistro",
     "costo",
-    "fechaInicio"
+    "fechaInicio",
+    "evento"
 })
 public class DtRegistro {
 
@@ -50,6 +52,7 @@ public class DtRegistro {
     protected String fechaRegistro;
     protected float costo;
     protected LocalDate fechaInicio;
+    protected String evento;
 
     /**
      * Obtiene el valor de la propiedad identificador.
@@ -209,6 +212,30 @@ public class DtRegistro {
      */
     public void setFechaInicio(LocalDate value) {
         this.fechaInicio = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad evento.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getEvento() {
+        return evento;
+    }
+
+    /**
+     * Define el valor de la propiedad evento.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setEvento(String value) {
+        this.evento = value;
     }
 
 }
