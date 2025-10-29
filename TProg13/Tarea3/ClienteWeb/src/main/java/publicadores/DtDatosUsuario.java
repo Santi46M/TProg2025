@@ -9,9 +9,9 @@ import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Clase Java para dtDatosUsuario complex type.
+ * <p>Java class for dtDatosUsuario complex type.
  * 
- * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>{@code
  * <complexType name="dtDatosUsuario">
@@ -112,7 +112,7 @@ public class DtDatosUsuario {
     protected DtDatosUsuario.Seguidos seguidos;
 
     /**
-     * Obtiene el valor de la propiedad nickname.
+     * Gets the value of the nickname property.
      * 
      * @return
      *     possible object is
@@ -124,7 +124,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad nickname.
+     * Sets the value of the nickname property.
      * 
      * @param value
      *     allowed object is
@@ -136,7 +136,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad nombre.
+     * Gets the value of the nombre property.
      * 
      * @return
      *     possible object is
@@ -148,7 +148,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad nombre.
+     * Sets the value of the nombre property.
      * 
      * @param value
      *     allowed object is
@@ -160,7 +160,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad email.
+     * Gets the value of the email property.
      * 
      * @return
      *     possible object is
@@ -172,7 +172,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad email.
+     * Sets the value of the email property.
      * 
      * @param value
      *     allowed object is
@@ -184,7 +184,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad apellido.
+     * Gets the value of the apellido property.
      * 
      * @return
      *     possible object is
@@ -196,7 +196,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad apellido.
+     * Sets the value of the apellido property.
      * 
      * @param value
      *     allowed object is
@@ -208,7 +208,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad fechaNac.
+     * Gets the value of the fechaNac property.
      * 
      * @return
      *     possible object is
@@ -220,7 +220,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad fechaNac.
+     * Sets the value of the fechaNac property.
      * 
      * @param value
      *     allowed object is
@@ -232,7 +232,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad nombreInstitucion.
+     * Gets the value of the nombreInstitucion property.
      * 
      * @return
      *     possible object is
@@ -244,7 +244,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad nombreInstitucion.
+     * Sets the value of the nombreInstitucion property.
      * 
      * @param value
      *     allowed object is
@@ -256,7 +256,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad desc.
+     * Gets the value of the desc property.
      * 
      * @return
      *     possible object is
@@ -268,7 +268,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad desc.
+     * Sets the value of the desc property.
      * 
      * @param value
      *     allowed object is
@@ -280,7 +280,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad link.
+     * Gets the value of the link property.
      * 
      * @return
      *     possible object is
@@ -292,7 +292,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad link.
+     * Sets the value of the link property.
      * 
      * @param value
      *     allowed object is
@@ -304,7 +304,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad registros.
+     * Gets the value of the registros property.
      * 
      * @return
      *     possible object is
@@ -316,7 +316,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad registros.
+     * Sets the value of the registros property.
      * 
      * @param value
      *     allowed object is
@@ -328,7 +328,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad ediciones.
+     * Gets the value of the ediciones property.
      * 
      * @return
      *     possible object is
@@ -340,7 +340,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad ediciones.
+     * Sets the value of the ediciones property.
      * 
      * @param value
      *     allowed object is
@@ -352,7 +352,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad imagen.
+     * Gets the value of the imagen property.
      * 
      * @return
      *     possible object is
@@ -364,7 +364,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad imagen.
+     * Sets the value of the imagen property.
      * 
      * @param value
      *     allowed object is
@@ -376,7 +376,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad seguidores.
+     * Gets the value of the seguidores property.
      * 
      * @return
      *     possible object is
@@ -388,7 +388,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad seguidores.
+     * Sets the value of the seguidores property.
      * 
      * @param value
      *     allowed object is
@@ -400,7 +400,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Obtiene el valor de la propiedad seguidos.
+     * Gets the value of the seguidos property.
      * 
      * @return
      *     possible object is
@@ -412,7 +412,7 @@ public class DtDatosUsuario {
     }
 
     /**
-     * Define el valor de la propiedad seguidos.
+     * Sets the value of the seguidos property.
      * 
      * @param value
      *     allowed object is
@@ -425,9 +425,9 @@ public class DtDatosUsuario {
 
 
     /**
-     * <p>Clase Java para anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>{@code
      * <complexType>
@@ -486,9 +486,9 @@ public class DtDatosUsuario {
 
 
     /**
-     * <p>Clase Java para anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>{@code
      * <complexType>
@@ -547,9 +547,9 @@ public class DtDatosUsuario {
 
 
     /**
-     * <p>Clase Java para anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>{@code
      * <complexType>
@@ -608,9 +608,9 @@ public class DtDatosUsuario {
 
 
     /**
-     * <p>Clase Java para anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>{@code
      * <complexType>
