@@ -70,6 +70,35 @@
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <style>
+  
+	  .btn-link.user-nick {
+	  display: inline-flex;
+	  align-items: center;
+	  gap: 0.4em;
+	  background: none;
+	  border: none;
+	  color: #0d6efd;        /* azul del botón “Seguir” */
+	  font-weight: 600;
+	  font-size: 0.95rem;
+	  text-decoration: none; /* 🔹 saca el subrayado */
+	  padding: 0.2em 0.4em;
+	  border-radius: 6px;
+	  transition: color 0.2s ease, background 0.2s ease;
+	}
+	
+	.btn-link.user-nick i {
+	  font-size: 1.1em;
+	  color: #0d6efd;        /* mismo azul que el texto */
+	}
+	
+	.btn-link.user-nick:hover {
+	  background: rgba(13,110,253,0.1); /* sutil azul de hover */
+	  color: #0b5ed7;                   /* tono azul más oscuro */
+	  cursor: pointer;
+	  text-decoration: none;            /* asegura que no se subraye en hover */
+	}
+
+	  
     .usuario-card .avatar { width:72px; height:72px; border-radius:50%; object-fit:cover; background:#f3f4f6; display:block; margin-bottom:.25rem; }
     .perfil-header { display:flex; align-items:center; gap:1rem; margin-bottom:1rem; }
     .perfil-header .avatar { width:96px; height:96px; border-radius:50%; object-fit:cover; background:#f3f4f6; }
@@ -122,10 +151,10 @@
               <h3>
                 <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
                   <input type="hidden" name="nick" value="<%=u.getNickname()%>" />
-                  <button type="submit" class="btn-link">
-                    <i class='bx bxs-id-card' style="font-size:1.2em;margin-right:0.3em;"></i>
-                    <span><%=u.getNickname()%></span>
-                  </button>
+					<button type="button" class="btn-link user-nick">
+					  <i class='bx bxs-user-circle'></i>
+					  <span><%=u.getNickname()%></span>
+					</button>
                 </form>
               </h3>
               <p><strong>Nickname:</strong> <%=u.getNickname()%></p>
