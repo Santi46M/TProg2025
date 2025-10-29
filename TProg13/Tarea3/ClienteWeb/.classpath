@@ -41,6 +41,7 @@
 	<classpathentry kind="lib" path="lib/jaxb-runtime-4.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/jaxws-rt-4.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/stax-ex-1.8.3.jar"/>
+
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
 		<attributes>
 			<attribute name="module" value="true"/>
@@ -52,5 +53,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/itextpdf-5.5.13.3.jar"/>
+
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

@@ -70,6 +70,35 @@
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <style>
+  
+	  .btn-link.user-nick {
+	  display: inline-flex;
+	  align-items: center;
+	  gap: 0.4em;
+	  background: none;
+	  border: none;
+	  color: #0d6efd;        /* azul del botón “Seguir” */
+	  font-weight: 600;
+	  font-size: 0.95rem;
+	  text-decoration: none; /* 🔹 saca el subrayado */
+	  padding: 0.2em 0.4em;
+	  border-radius: 6px;
+	  transition: color 0.2s ease, background 0.2s ease;
+	}
+	
+	.btn-link.user-nick i {
+	  font-size: 1.1em;
+	  color: #0d6efd;        /* mismo azul que el texto */
+	}
+	
+	.btn-link.user-nick:hover {
+	  background: rgba(13,110,253,0.1); /* sutil azul de hover */
+	  color: #0b5ed7;                   /* tono azul más oscuro */
+	  cursor: pointer;
+	  text-decoration: none;            /* asegura que no se subraye en hover */
+	}
+
+	  
     .usuario-card .avatar { width:72px; height:72px; border-radius:50%; object-fit:cover; background:#f3f4f6; display:block; margin-bottom:.25rem; }
     .perfil-header { display:flex; align-items:center; gap:1rem; margin-bottom:1rem; }
     .perfil-header .avatar { width:96px; height:96px; border-radius:50%; object-fit:cover; background:#f3f4f6; }
@@ -122,13 +151,31 @@
               <h3>
                 <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
                   <input type="hidden" name="nick" value="<%=u.getNickname()%>" />
-                  <button type="submit" class="btn-link">
-                    <i class='bx bxs-id-card' style="font-size:1.2em;margin-right:0.3em;"></i>
-                    <span><%=u.getNickname()%></span>
-                  </button>
+					<button type="button" class="btn-link user-nick">
+					  <i class='bx bxs-user-circle'></i>
+					  <span><%=u.getNickname()%></span>
+					</button>
                 </form>
               </h3>
               <p><strong>Nickname:</strong> <%=u.getNickname()%></p>
+
+              <%-- FOLLOW BUTTON IN LIST VIEW --%>
+              <%
+                @SuppressWarnings("unchecked")
+                Map<String,Boolean> yaLoSigoMap = (Map<String,Boolean>) request.getAttribute("yaLoSigoMap");
+                boolean yaSigueUser = false;
+                if (yaLoSigoMap != null && yaLoSigoMap.get(u.getNickname()) != null) {
+                  yaSigueUser = yaLoSigoMap.get(u.getNickname()).booleanValue();
+                }
+              %>
+              <% if (nickSesion != null && !nickSesion.equals(u.getNickname())) { %>
+                <form class="follow-form" data-nick="<%= u.getNickname() %>" action="<%= ctx %>/<%= (!yaSigueUser ? "usuario/seguir" : "usuario/dejarSeguir") %>" method="post" style="display:inline;margin-top:.5rem;">
+                  <input type="hidden" name="a" value="<%= u.getNickname() %>">
+                  <input type="hidden" name="listar" value="1">
+                  <button type="submit" class="btn"><%= (!yaSigueUser ? "Seguir" : "Dejar de seguir") %></button>
+                </form>
+              <% } %>
+
             </div>
           <% } } %>
         </div>
@@ -148,18 +195,20 @@
   <% } %>
 
   <div id="datosUsuario">
-    <p><strong>Nickname:</strong> <span><%= usuario.getNickname() %></span></p>
-    <p><strong>Email:</strong> <span><%= usuario.getEmail()%></span></p>
-
-    <!-- === BARRA SEGUIR / DEJAR SEGUIR (FORM SEPARADO, NO ANIDADO) === -->
+      <!-- === BARRA SEGUIR / DEJAR SEGUIR (FORM SEPARADO, NO ANIDADO) === -->
     <div class="follow-bar" style="margin:.5rem 0;">
       <% if (!esSuPropioPerfil && nickSesion != null) { %>
-        <form action="<%= ctx %>/<%= (!yaLoSigo ? "usuario/seguir" : "usuario/dejarSeguir") %>" method="post" style="display:inline;">
+        <form class="follow-form" data-nick="<%= usuario.getNickname() %>" action="<%= ctx %>/<%= (!yaLoSigo ? "usuario/seguir" : "usuario/dejarSeguir") %>" method="post" style="display:inline;">
           <input type="hidden" name="a" value="<%= usuario.getNickname() %>">
-          <button type="submit" class="btn"><%= (!yaLoSigo ? "Seguir" : "Dejar de seguir") %></button>
+          <button type="submit" class="btn"><%= (!yaLoSigo ? "Seguir" : "Siguiendo") %></button>
         </form>
       <% } %>
     </div>
+    
+    <p><strong>Nickname:</strong> <span><%= usuario.getNickname() %></span></p>
+    <p><strong>Email:</strong> <span><%= usuario.getEmail()%></span></p>
+
+
 
     <!-- === FORM DE EDICIÓN (SEPARADO) === -->
     <form id="formEditarUsuario" action="<%= ctx %>/usuario/modificar" method="post" enctype="multipart/form-data">
@@ -332,6 +381,93 @@
         if (fi) fi.value = "";
       });
     }
+
+    // AJAX follow/unfollow handler: prevents navigation and toggles button state.
+    (function(){
+      function isFollowAction(action){ return action && action.endsWith('/seguir'); }
+      document.querySelectorAll('form.follow-form').forEach(form => {
+        form.addEventListener('submit', async function(evt){
+          // progressive enhancement: if JS available, handle via fetch; otherwise fallback to normal submit
+          evt.preventDefault();
+          const btn = form.querySelector('button[type="submit"]');
+          if (!btn) return;
+          // disable while processing
+          btn.disabled = true;
+          const formData = new FormData(form);
+          try {
+            const resp = await fetch(form.action, {
+              method: 'POST',
+              headers: { 'X-Requested-With': 'XMLHttpRequest' },
+              body: formData,
+              credentials: 'same-origin'
+            });
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            const text = (await resp.text()).trim();
+            if (text === 'OK') {
+              // toggle UI: swap label and action
+              const currentlyFollow = isFollowAction(form.action);
+              if (currentlyFollow) {
+                btn.textContent = 'Dejar de seguir';
+                form.action = form.action.replace('/seguir', '/dejarSeguir');
+              } else {
+                btn.textContent = 'Seguir';
+                form.action = form.action.replace('/dejarSeguir', '/seguir');
+              }
+            } else {
+              // server returned something else; try to toggle conservatively
+              const currentlyFollow = isFollowAction(form.action);
+              if (currentlyFollow) {
+                btn.textContent = 'Dejar de seguir';
+                form.action = form.action.replace('/seguir', '/dejarSeguir');
+              } else {
+                btn.textContent = 'Seguir';
+                form.action = form.action.replace('/dejarSeguir', '/seguir');
+              }
+            }
+          } catch (err) {
+            console.error('Follow error', err);
+            alert('Error procesando la acción. Intente de nuevo.');
+          } finally {
+            btn.disabled = false;
+          }
+        });
+      });
+
+      // Revalidate follow-state when the page is shown (back/restore from bfcache)
+      var ctx = "<%=ctx%>";
+      window.addEventListener('pageshow', function(evt){
+        try {
+          var forms = Array.from(document.querySelectorAll('form.follow-form'));
+          if (!forms || forms.length === 0) return;
+          var nicks = forms.map(f => f.dataset.nick).filter(Boolean);
+          if (nicks.length === 0) return;
+          var url = ctx + '/usuario/ConsultaUsuario?checkSeguidos=1&nicks=' + encodeURIComponent(nicks.join(',')) + '&_=' + Date.now();
+          fetch(url, { credentials: 'same-origin', cache: 'no-store' })
+            .then(function(r){ if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function(obj){
+              forms.forEach(function(form){
+                var nick = form.dataset.nick;
+                if (!nick) return;
+                var btn = form.querySelector('button[type="submit"]');
+                var sigue = !!obj[nick];
+                if (btn) {
+                  if (sigue) {
+                    btn.textContent = 'Dejar de seguir';
+                    form.action = form.action.replace('/seguir','/dejarSeguir');
+                    btn.classList.add('following'); btn.classList.remove('not-following');
+                  } else {
+                    btn.textContent = 'Seguir';
+                    form.action = form.action.replace('/dejarSeguir','/seguir');
+                    btn.classList.add('not-following'); btn.classList.remove('following');
+                  }
+                }
+              });
+            })
+            .catch(function(err){ console.debug('Revalidate follow state failed:', err); });
+        } catch (e) { console.debug('pageshow handler error', e); }
+      });
+
+    })();
   </script>
 </body>
 </html>
