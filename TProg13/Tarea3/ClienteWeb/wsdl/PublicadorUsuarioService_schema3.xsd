@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns2="http://jaxb.dev.java.net/array" xmlns:ns1="http://publicadores/">
+
+  <xs:import namespace="http://publicadores/" schemaLocation="PublicadorUsuarioService_schema1.xsd"/>
+
+  <xs:import namespace="http://jaxb.dev.java.net/array" schemaLocation="PublicadorUsuarioService_schema2.xsd"/>
+
+  <xs:element name="apellido" nillable="true" type="xs:string"/>
+
+  <xs:element name="contrasena" nillable="true" type="xs:string"/>
+
+  <xs:element name="correo" nillable="true" type="xs:string"/>
+
+  <xs:element name="descripcion" nillable="true" type="xs:string"/>
+
+  <xs:element name="esOrganizador" type="xs:boolean"/>
+
+  <xs:element name="fechaNacimiento" nillable="true" type="xs:anySimpleType"/>
+
+  <xs:element name="identificador" nillable="true" type="xs:string"/>
+
+  <xs:element name="imagen" nillable="true" type="xs:string"/>
+
+  <xs:element name="institucion" nillable="true" type="xs:string"/>
+
+  <xs:element name="link" nillable="true" type="xs:string"/>
+
+  <xs:element name="nickOrEmail" nillable="true" type="xs:string"/>
+
+  <xs:element name="nickname" nillable="true" type="xs:string"/>
+
+  <xs:element name="nombre" nillable="true" type="xs:string"/>
+
+  <xs:element name="return" nillable="true" type="xs:anyType"/>
+
+  <xs:element name="seguido" nillable="true" type="xs:string"/>
+
+  <xs:element name="seguidor" nillable="true" type="xs:string"/>
+</xs:schema>
+

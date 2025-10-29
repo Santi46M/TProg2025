@@ -3,8 +3,10 @@ package web;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
+import jakarta.servlet.ServletContext;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.*;
 import java.time.LocalDate;
 
@@ -14,6 +16,7 @@ import publicadores.PublicadorUsuario;
 import publicadores.PublicadorUsuarioService;
 import publicadores.UsuarioNoExisteException_Exception;
 import publicadores.UsuarioTipoIncorrectoException_Exception;
+import publicadores.StringArray;
 
 @WebServlet(urlPatterns = {
         "/usuario/ConsultaUsuario",
@@ -45,6 +48,35 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         PublicadorUsuarioService service = new PublicadorUsuarioService();
         PublicadorUsuario port = service.getPublicadorUsuarioPort();
 
+        // --- AJAX helper: revalidate follow-status for a list of nicks ---
+        String checkSeguidos = request.getParameter("checkSeguidos");
+        String nicksParam = request.getParameter("nicks");
+        if ("1".equals(checkSeguidos) && nicksParam != null) {
+            response.setCharacterEncoding("UTF-8");
+            response.setContentType("application/json; charset=UTF-8");
+            response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+            String[] parts = nicksParam.split(",");
+            String sessionNick = nickEnSesion(request);
+            StringBuilder sb = new StringBuilder();
+            sb.append('{');
+            boolean first = true;
+            for (String p : parts) {
+                String target = p == null ? null : p.trim();
+                if (target == null || target.isEmpty()) continue;
+                boolean sigue = false;
+                try {
+                    if (sessionNick != null && !sessionNick.isBlank()) {
+                        sigue = port.sigueA(sessionNick, target);
+                    }
+                } catch (Exception ignore) { }
+                if (!first) sb.append(','); first = false;
+                sb.append('"').append(escapeJson(target)).append('"').append(':').append(sigue);
+            }
+            sb.append('}');
+            response.getWriter().write(sb.toString());
+            return;
+        }
+
         if (forzarListado || isBlank(nick)) {
             List<DtDatosUsuario> usuarios = new ArrayList<>();
             try {
@@ -61,6 +93,27 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 }
                 request.setAttribute("fotos", fotos);
 
+                // === Si hay usuario en sesión, construir mapa de a quién ya sigue
+                String nickSesion = nickEnSesion(request);
+                Map<String, Boolean> yaLoSigoMap = new HashMap<>();
+                if (nickSesion != null && !nickSesion.isBlank()) {
+                    for (DtDatosUsuario u : usuarios) {
+                        if (u == null || u.getNickname() == null) continue;
+                        String objetivo = u.getNickname();
+                        if (nickSesion.equalsIgnoreCase(objetivo)) {
+                            yaLoSigoMap.put(objetivo, false);
+                            continue;
+                        }
+                        try {
+                            boolean sigue = port.sigueA(nickSesion, objetivo);
+                            yaLoSigoMap.put(objetivo, sigue);
+                        } catch (Exception ignore) {
+                            yaLoSigoMap.put(objetivo, false);
+                        }
+                    }
+                }
+                request.setAttribute("yaLoSigoMap", yaLoSigoMap);
+
             } catch (Exception e) {
                 request.setAttribute("error", "No se pudo obtener la lista de usuarios.");
             }
@@ -73,9 +126,62 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 String imagenUrl = ctx + "/img/usuarios/" + usuario.getImagen(); 
                 request.setAttribute("usrImagenUrl", imagenUrl);
                 request.setAttribute("usuario", usuario);
+
+                // instituciones para el dropdown
+                List<String> instituciones = Collections.emptyList();
+                try {
+                    StringArray arr = port.listarInstituciones();
+                    if (arr != null && arr.getItem() != null) instituciones = arr.getItem();
+                } catch (Exception ignore) {}
+                request.setAttribute("instituciones", instituciones);
+
+                // mapa edicion -> evento (no disponible en este cliente webservice - enviar empty map)
+                Map<String, String> edicionToEvento = new HashMap<>();
+                request.setAttribute("edicionToEvento", edicionToEvento);
+
+                // imágenes instituciones
+                Map<String,String> instFotos = new HashMap<>();
+                String[] exts = new String[]{".png",".jpg",".jpeg",".webp",".gif"};
+                ServletContext sc = getServletContext();
+                for (String inst : instituciones) {
+                    if (inst == null || inst.isBlank()) continue;
+                    String safe = inst.replaceAll("[^a-zA-Z0-9]", "_");
+                    List<String> candidates = new ArrayList<>();
+                    for (String ext: exts) {
+                        candidates.add("/img/instituciones/" + safe + ext);
+                        candidates.add("/img/instituciones/" + inst + ext);
+                        candidates.add("/img/" + safe + ext);
+                        candidates.add("/img/" + inst + ext);
+                    }
+                    candidates.add("/img/instituciones/" + safe);
+                    candidates.add("/img/instituciones/" + inst);
+                    for (String candRel : candidates) {
+                        String abs = sc.getRealPath(candRel);
+                        if (abs != null && Files.exists(Path.of(abs))) {
+                            instFotos.put(inst, ctx + candRel);
+                            break;
+                        }
+                    }
+                }
+                request.setAttribute("instFotos", instFotos);
+
+                // === Rol real del perfil consultado (organizador/asistente)
+                boolean esPerfilOrganizador = (usuario.getDesc() != null) || (usuario.getLink() != null);
+                request.setAttribute("esPerfilOrganizador", esPerfilOrganizador);
+
+                // === Follow/unfollow flags
                 String nickSesion = nickEnSesion(request);
                 boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname());
                 request.setAttribute("esSuPropioPerfil", esSuPropioPerfil);
+
+                boolean yaLoSigo = false;
+                if (!esSuPropioPerfil && nickSesion != null) {
+                    try {
+                        yaLoSigo = port.sigueA(nickSesion, usuario.getNickname());
+                    } catch (Exception ignore) {}
+                }
+                request.setAttribute("yaLoSigo", yaLoSigo);
+
             } catch (UsuarioNoExisteException_Exception e) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 request.setAttribute("error", "El usuario '" + nick + "' no existe.");
@@ -91,6 +197,53 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         String path = request.getServletPath();
         PublicadorUsuarioService service = new PublicadorUsuarioService();
         PublicadorUsuario port = service.getPublicadorUsuarioPort();
+
+        // === Seguir / Dejar de seguir (SIN AJAX) ===
+        if ("/usuario/seguir".equals(path) || "/usuario/dejarSeguir".equals(path)) {
+            HttpSession sAux = request.getSession(false);
+            String nickSesion = (sAux != null) ? (String) sAux.getAttribute("nick") : null;
+            if (nickSesion == null || nickSesion.isBlank()) {
+                response.sendRedirect(request.getContextPath() + "/auth/login");
+                return;
+            }
+
+            String objetivo = trim(request.getParameter("a")); // nick del perfil objetivo
+            if (isBlank(objetivo)) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Falta parámetro 'a'.");
+                return;
+            }
+
+            if (!nickSesion.equalsIgnoreCase(objetivo)) {
+                try {
+                    if ("/usuario/seguir".equals(path)) {
+                        port.seguirUsuario(nickSesion, objetivo);
+                    } else {
+                        port.dejarSeguirUsuario(nickSesion, objetivo);
+                    }
+                } catch (Exception ignore) {}
+            }
+
+            // If this was an AJAX request, return a simple OK response (no redirect)
+            String xrw = request.getHeader("X-Requested-With");
+            boolean isAjax = xrw != null && "XMLHttpRequest".equalsIgnoreCase(xrw);
+            if (isAjax) {
+                response.setCharacterEncoding("UTF-8");
+                response.setContentType("text/plain; charset=UTF-8");
+                response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+                response.getWriter().write("OK");
+                return;
+            }
+
+            // If the request came from the listing (param 'listar' present), stay on the listing
+            String listarParam = trim(request.getParameter("listar"));
+            if (!isBlank(listarParam)) {
+                response.sendRedirect(request.getContextPath() + "/usuario/ConsultaUsuario?listar=1");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/usuario/ConsultaUsuario?nick=" +
+                        java.net.URLEncoder.encode(objetivo, java.nio.charset.StandardCharsets.UTF_8));
+            }
+            return;
+        }
 
         // === POST /usuario/modificar ===
         if ("/usuario/modificar".equals(path)) {
@@ -112,10 +265,6 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             String password    = Optional.ofNullable(request.getParameter("password")).orElse("");
             String link        = Optional.ofNullable(request.getParameter("link")).orElse("");
 
-
-       
-            
-
             LocalDate fechaNac = null;
             if (nacStr != null && !nacStr.isBlank()) {
                 try {
@@ -133,8 +282,6 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 imgFileName = ""; // o mantener la actual del usuario
             }
 
-            
-
             try {
                 port.modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaStr, institucion,imgFileName);
 
@@ -148,8 +295,6 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                         java.net.URLEncoder.encode(nick, java.nio.charset.StandardCharsets.UTF_8));
 
             } catch (UsuarioNoExisteException_Exception | UsuarioTipoIncorrectoException_Exception e) {
-//                request.setAttribute("error", e.getMessage());
-//                doGet(request, response); // recargar vista con error
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 request.setAttribute("error", "El usuario '" + nick + "' no existe.");
             }
@@ -184,5 +329,10 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 return java.util.List.of();
             }
         }
+    }
+
+    private static String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }

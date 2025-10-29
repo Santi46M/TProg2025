@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://publicadores/" xmlns:tns="http://publicadores/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="CategoriaYaExisteException" type="tns:CategoriaYaExisteException"/>
+
+  <xs:element name="InstitucionYaExisteException" type="tns:InstitucionYaExisteException"/>
+
+  <xs:element name="UsuarioNoExisteException" type="tns:UsuarioNoExisteException"/>
+
+  <xs:element name="UsuarioTipoIncorrectoException" type="tns:UsuarioTipoIncorrectoException"/>
+
+  <xs:element name="UsuarioYaExisteException" type="tns:UsuarioYaExisteException"/>
+
+  <xs:complexType name="dtDatosUsuario">
+    <xs:sequence>
+      <xs:element name="nickname" type="xs:string" minOccurs="0"/>
+      <xs:element name="nombre" type="xs:string" minOccurs="0"/>
+      <xs:element name="email" type="xs:string" minOccurs="0"/>
+      <xs:element name="apellido" type="xs:string" minOccurs="0"/>
+      <xs:element name="fechaNac" type="tns:localDate" minOccurs="0"/>
+      <xs:element name="nombreInstitucion" type="xs:string" minOccurs="0"/>
+      <xs:element name="desc" type="xs:string" minOccurs="0"/>
+      <xs:element name="link" type="xs:string" minOccurs="0"/>
+      <xs:element name="registros" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="registro" type="tns:dtRegistro" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ediciones" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="edicion" type="tns:dtEdicion" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="imagen" type="xs:string" minOccurs="0"/>
+      <xs:element name="seguidores" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="seguidor" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="seguidos" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="seguido" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="localDate" final="extension restriction">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="dtRegistro">
+    <xs:sequence>
+      <xs:element name="identificador" type="xs:string" minOccurs="0"/>
+      <xs:element name="usuario" type="xs:string" minOccurs="0"/>
+      <xs:element name="edicion" type="xs:string" minOccurs="0"/>
+      <xs:element name="tipoRegistro" type="xs:string" minOccurs="0"/>
+      <xs:element name="fechaRegistro" type="tns:localDate" minOccurs="0"/>
+      <xs:element name="costo" type="xs:float"/>
+      <xs:element name="fechaInicio" type="tns:localDate" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="dtEdicion">
+    <xs:sequence>
+      <xs:element name="nombre" type="xs:string" minOccurs="0"/>
+      <xs:element name="sigla" type="xs:string" minOccurs="0"/>
+      <xs:element name="fechaInicio" type="tns:localDate" minOccurs="0"/>
+      <xs:element name="fechaFin" type="tns:localDate" minOccurs="0"/>
+      <xs:element name="fechaAlta" type="tns:localDate" minOccurs="0"/>
+      <xs:element name="organizador" type="xs:string" minOccurs="0"/>
+      <xs:element name="ciudad" type="xs:string" minOccurs="0"/>
+      <xs:element name="pais" type="xs:string" minOccurs="0"/>
+      <xs:element name="imagen" type="xs:string" minOccurs="0"/>
+      <xs:element name="video" type="xs:string" minOccurs="0"/>
+      <xs:element name="estado" type="tns:DTEstado" minOccurs="0"/>
+      <xs:element name="tiposRegistro" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="tipoRegistro" type="tns:dtTipoRegistro" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="patrocinios" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="patrocinio" type="tns:dtPatrocinio" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="registros" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="registro" type="tns:dtRegistro" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="evento" type="tns:dtEvento" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="dtTipoRegistro">
+    <xs:sequence>
+      <xs:element name="nombre" type="xs:string" minOccurs="0"/>
+      <xs:element name="descripcion" type="xs:string" minOccurs="0"/>
+      <xs:element name="costo" type="xs:float"/>
+      <xs:element name="cupo" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="dtPatrocinio">
+    <xs:sequence>
+      <xs:element name="codigo" type="xs:string" minOccurs="0"/>
+      <xs:element name="monto" type="xs:int"/>
+      <xs:element name="fecha" type="tns:localDate" minOccurs="0"/>
+      <xs:element name="nivel" type="tns:DTNivel" minOccurs="0"/>
+      <xs:element name="cantRegistrosGratuitos" type="xs:int"/>
+      <xs:element name="institucion" type="xs:string" minOccurs="0"/>
+      <xs:element name="siglaEdicion" type="xs:string" minOccurs="0"/>
+      <xs:element name="tipoRegistro" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="dtEvento">
+    <xs:sequence>
+      <xs:element name="nombre" type="xs:string" minOccurs="0"/>
+      <xs:element name="sigla" type="xs:string" minOccurs="0"/>
+      <xs:element name="descripcion" type="xs:string" minOccurs="0"/>
+      <xs:element name="fecha" type="tns:localDate" minOccurs="0"/>
+      <xs:element name="categorias" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="categoria" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ediciones" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="edicion" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="imagen" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UsuarioNoExisteException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CategoriaYaExisteException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UsuarioTipoIncorrectoException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="UsuarioYaExisteException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="InstitucionYaExisteException">
+    <xs:sequence>
+      <xs:element name="message" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="DTEstado">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Ingresada"/>
+      <xs:enumeration value="Aceptada"/>
+      <xs:enumeration value="Rechazada"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DTNivel">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ORO"/>
+      <xs:enumeration value="PLATA"/>
+      <xs:enumeration value="BRONCE"/>
+      <xs:enumeration value="PLATINO"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="dtDatosUsuarioArray" final="#all">
+    <xs:sequence>
+      <xs:element name="item" type="tns:dtDatosUsuario" minOccurs="0" maxOccurs="unbounded" nillable="true"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+
