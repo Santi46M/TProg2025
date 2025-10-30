@@ -164,68 +164,80 @@ public class EdicionServlet extends HttpServlet {
     String path = req.getPathInfo();
 
     if ("/alta".equals(path)) {
-      if (!requiereOrganizador(req, resp)) return;
+        if (!requiereOrganizador(req, resp)) return;
 
-      String evento = trim(req.getParameter("evento"));
-      String nombre = trim(req.getParameter("nombre"));
-      String desc   = trim(req.getParameter("desc"));
-      String iniStr = trim(req.getParameter("fechaInicio"));
-      String finStr = trim(req.getParameter("fechaFin"));
-      String ciudad = trim(req.getParameter("ciudad"));
-      String pais   = trim(req.getParameter("pais"));
-      String videoUrl = trim(req.getParameter("videoUrl"));
+        String evento = trim(req.getParameter("evento"));
+        String nombre = trim(req.getParameter("nombre"));
+        String desc   = trim(req.getParameter("desc"));
+        String iniStr = trim(req.getParameter("fechaInicio"));
+        String finStr = trim(req.getParameter("fechaFin"));
+        String ciudad = trim(req.getParameter("ciudad"));
+        String pais   = trim(req.getParameter("pais"));
+        String videoUrl = trim(req.getParameter("videoUrl"));
 
-      Part imagen = null;
-      try { imagen = req.getPart("imagen"); } catch (Exception ignore) {}
+        Part imagen = null;
+        String imagenFileName = null;
+        try { imagen = req.getPart("imagen"); } catch (Exception ignore) {}
 
-      if (isBlank(evento) || isBlank(nombre) || isBlank(desc) ||
-          isBlank(iniStr) || isBlank(finStr) || isBlank(ciudad) || isBlank(pais)) {
-        req.setAttribute("error", "Todos los campos obligatorios deben completarse.");
-        cargarEventos(req, port);
-        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-        return;
-      }
-
-      try {
-        DtDatosUsuario org = getUsuario(req);
-        if (org == null || !"ORGANIZADOR".equals(getRol(req))) {
-          req.setAttribute("error", "Debés iniciar sesión como organizador.");
-          req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-          return;
+        if (isBlank(evento) || isBlank(nombre) || isBlank(desc) ||
+            isBlank(iniStr) || isBlank(finStr) || isBlank(ciudad) || isBlank(pais)) {
+            req.setAttribute("error", "Todos los campos obligatorios deben completarse.");
+            cargarEventos(req, port);
+            req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+            return;
         }
 
-        DtEvento evObj = port.consultaDTEvento(evento);
+        try {
+            DtDatosUsuario org = getUsuario(req);
+            if (org == null || !"ORGANIZADOR".equals(getRol(req))) {
+                req.setAttribute("error", "Debés iniciar sesión como organizador.");
+                req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+                return;
+            }
 
-        String imagenFileName = guardarImagen(req, imagen, nombre);
+            DtEvento evObj = port.consultaDTEvento(evento);
 
-        String hoyStr = LocalDate.now().toString();
+            // ✅ Guardar imagen solo si hay archivo subido
+            if (imagen != null && imagen.getSize() > 0) {
+                try {
+                    imagenFileName = guardarImagen(req, imagen, nombre);
+                } catch (IOException ex) {
+                    System.err.println("[WARN] No se pudo guardar la imagen: " + ex.getMessage());
+                    imagenFileName = null;
+                }
+            } else {
+                imagenFileName = null; // sin imagen
+            }
 
-        port.altaEdicionEventoDTO(
-            evObj,
-            org,
-            nombre,
-            nombre,
-            desc,
-            iniStr,
-            finStr,
-            hoyStr,
-            ciudad,
-            pais,
-            imagenFileName,
-            videoUrl
-        );
+            String hoyStr = LocalDate.now().toString();
 
-        String evEnc = URLEncoder.encode(evento, StandardCharsets.UTF_8);
-        String edEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8);
-        resp.sendRedirect(ctx(req) + "/edicion/ConsultaEdicion?evento=" + evEnc + "&edicion=" + edEnc);
+            port.altaEdicionEventoDTO(
+                evObj,
+                org,
+                nombre,
+                nombre,
+                desc,
+                iniStr,
+                finStr,
+                hoyStr,
+                ciudad,
+                pais,
+                (imagenFileName != null ? imagenFileName : ""), 
+                videoUrl
+            );
 
-      } catch (Exception ex) {
-        req.setAttribute("error", ex.getMessage());
-        cargarEventos(req, port);
-        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-      }
-      return;
+            String evEnc = URLEncoder.encode(evento, StandardCharsets.UTF_8);
+            String edEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8);
+            resp.sendRedirect(ctx(req) + "/edicion/ConsultaEdicion?evento=" + evEnc + "&edicion=" + edEnc);
+
+        } catch (Exception ex) {
+            req.setAttribute("error", ex.getMessage());
+            cargarEventos(req, port);
+            req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+        }
+        return;
     }
+
 
     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
