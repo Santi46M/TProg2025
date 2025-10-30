@@ -31,8 +31,16 @@
 </style>
 <% } %>
 <%
-  String uri = request.getRequestURI();
-  boolean esLogin = uri != null && uri.contains("login");
+  String path = request.getServletPath();           // mejor que getRequestURI() porque ignora el contextPath
+  String q    = request.getParameter("q");
+
+  boolean esRutaBuscar   = "/buscar".equals(path);  // solo la ruta /buscar
+  boolean tieneQuery     = q != null && !q.trim().isEmpty();
+
+  // Solo es “búsqueda” si hay texto en q; otros parámetros (orden, etc.) no influyen
+  boolean esBusquedaConQ = esRutaBuscar && tieneQuery;
+
+  boolean esLogin = (path != null && path.contains("login")) || esBusquedaConQ;
 %>
 <% if (!esLogin) { %>
   <!-- Solo cargar estos si NO estamos en login.jsp -->

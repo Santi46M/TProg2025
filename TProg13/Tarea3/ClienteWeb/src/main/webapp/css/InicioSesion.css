@@ -181,6 +181,10 @@ main button[type="submit"] {
   .site-header, .topbar { display: none; }
 }
 
-
+.busqueda-sidebar,
+.card {
+  background: rgba(255,255,255,.7);           /* semitransparente */
+  backdrop-filter: saturate(120%) blur(8px);  /* difumina lo que está DETRÁS */
+}
 /* Utility: ensure main selectors don't collide badly */
 main form, .form-iniciar-sesion { max-width: 100%; }

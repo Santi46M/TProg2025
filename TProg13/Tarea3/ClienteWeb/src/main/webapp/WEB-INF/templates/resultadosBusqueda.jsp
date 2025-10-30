@@ -13,65 +13,110 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Resultados de búsqueda</title>
+    <title>Resultados de búsqueda — Eventos.uy</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Estilos globales -->
     <link rel="stylesheet" href="<%=ctx%>/css/style.css">
     <link rel="stylesheet" href="<%=ctx%>/css/ConsultaEdicionBase.css">
     <link rel="stylesheet" href="<%=ctx%>/css/ConsultaEdicion.css">
-    <style>
-      .page-busqueda .result-card{ border-radius: 12px; overflow: hidden; margin-bottom:2rem; }
-      .page-busqueda .result-title{ font-size:2rem; margin-bottom:.5rem; }
-      .page-busqueda .result-type{ font-weight:bold; color:#007bff; margin-bottom:.5rem; }
-      .page-busqueda .btn{ margin-top: .5rem; }
-      .page-busqueda .container{ max-width: 1200px; margin: 0 auto; }
-      .orden-form { margin-bottom: 2rem; }
-    </style>
+    <link rel="stylesheet" href="<%=ctx%>/css/Custom.css">
+    <link rel="stylesheet" href="<%=ctx%>/css/Busqueda.css">
+
+
 </head>
 <body>
-<jsp:include page="header.jsp" />
-<div class="container page-busqueda" style="margin-top:1rem;">
-    <form class="orden-form" method="get" action="<%=ctx%>/buscar">
-        <input type="hidden" name="q" value="<%= query != null ? query : "" %>">
-        <label for="orden">Ordenar por:</label>
-        <select name="orden" id="orden" onchange="this.form.submit()">
-            <option value="fecha" <%= "fecha".equals(orden) ? "selected" : "" %>>Fecha de alta (desc)</option>
-            <option value="alfabetico_asc" <%= "alfabetico_asc".equals(orden) ? "selected" : "" %>>Alfabético (A-Z)</option>
-            <option value="alfabetico_desc" <%= "alfabetico_desc".equals(orden) ? "selected" : "" %>>Alfabético (Z-A)</option>
-        </select>
-    </form>
-    <%-- El ordenamiento real se hace en el servlet --%>
-    <% if ((eventos != null && !eventos.isEmpty()) || (ediciones != null && !ediciones.isEmpty())) { %>
-        <% if (eventos != null) {
-            for (DtEvento ev : eventos) { %>
-            <section class="result-card">
-                <div style="display:flex; align-items:center; gap:2rem;">
-                    <span class="result-title" style="font-size:2rem;">
-                        <%= ev.getNombre() %> <span style="font-size:2rem; font-style:italic;">(Evento)</span>
-                    </span>
-                    <form action="<%=ctx%>/evento/ConsultaEvento" method="get" style="display:inline">
-                        <input type="hidden" name="nombre" value="<%= ev.getNombre() %>">
-                        <button type="submit" class="btn btn-primary">Ver detalle</button>
-                    </form>
+
+<jsp:include page="/WEB-INF/templates/header.jsp" />
+
+<main class="page-busqueda-wrapper">
+
+    <!-- Sidebar de filtros / orden -->
+    <aside class="busqueda-sidebar">
+        <h2>Ordenar resultados</h2>
+        <form class="orden-form" method="get" action="<%=ctx%>/buscar">
+            <input type="hidden" name="q" value="<%= query != null ? query : "" %>">
+            <label for="orden">Ordenar por</label>
+            <select name="orden" id="orden" onchange="this.form.submit()">
+                <option value="fecha" <%= "fecha".equals(orden) ? "selected" : "" %>>
+                    Fecha de alta (desc)
+                </option>
+                <option value="alfabetico_asc" <%= "alfabetico_asc".equals(orden) ? "selected" : "" %>>
+                    Alfabético (A-Z)
+                </option>
+                <option value="alfabetico_desc" <%= "alfabetico_desc".equals(orden) ? "selected" : "" %>>
+                    Alfabético (Z-A)
+                </option>
+            </select>
+        </form>
+        <%-- Espacio para futuros filtros (categoría, fecha, etc.) --%>
+    </aside>
+
+    <!-- Resultados -->
+    <section class="busqueda-main">
+        <h1>
+          Resultados
+          <% if (query != null && !query.isBlank()) { %>
+            <span class="query-chip"><%= query %></span>
+          <% } %>
+        </h1>
+
+        <%
+          boolean hayEv = (eventos != null && !eventos.isEmpty());
+          boolean hayEd = (ediciones != null && !ediciones.isEmpty());
+          if (hayEv || hayEd) {
+        %>
+
+        <div class="result-grid">
+          <% if (hayEv) {
+               for (DtEvento ev : eventos) { %>
+            <article class="result-card card">
+                <div class="result-head">
+                    <div>Eventos.uy</div>
                 </div>
-            </section>
-        <% }} %>
-        <% if (ediciones != null) {
-            for (DtEdicion ed : ediciones) { %>
-            <section class="result-card">
-                <div style="display:flex; align-items:center; gap:2rem;">
-                    <span class="result-title" style="font-size:2rem;">
-                        <%= ed.getNombre() %> <span style="font-size:2rem; font-style:italic;">(Edición)</span>
-                    </span>
-                    <form action="<%=ctx%>/edicion/ConsultaEdicion" method="get" style="display:inline">
-                        <input type="hidden" name="nombre" value="<%= ed.getNombre() %>">
-                        <button type="submit" class="btn btn-primary">Ver detalle</button>
-                    </form>
+
+                <div class="result-body">
+                    <h2 class="result-title"><%= ev.getNombre() %></h2>
+                    <div class="result-tipo"><span class="chip">Evento</span></div>
+
+                    <div class="result-actions">
+                        <form action="<%=ctx%>/evento/ConsultaEvento" method="get" style="display:inline">
+                            <input type="hidden" name="nombre" value="<%= ev.getNombre() %>">
+                            <button type="submit" class="btn-vermas">Ver más</button>
+                        </form>
+                    </div>
                 </div>
-            </section>
-        <% }} %>
-    <% } else { %>
-        <p>No se encontraron resultados.</p>
-    <% } %>
-</div>
+            </article>
+          <% }} %>
+
+          <% if (hayEd) {
+               for (DtEdicion ed : ediciones) { %>
+            <article class="result-card card">
+                <div class="result-head">
+                    <div>Eventos.uy</div>
+                </div>
+
+                <div class="result-body">
+                    <h2 class="result-title"><%= ed.getNombre() %></h2>
+                    <div class="result-tipo"><span class="chip">Edición</span></div>
+
+                    <div class="result-actions">
+                        <form action="<%=ctx%>/edicion/ConsultaEdicion" method="get" style="display:inline">
+                            <input type="hidden" name="nombre" value="<%= ed.getNombre() %>">
+                            <button type="submit" class="btn-vermas">Ver más</button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+          <% }} %>
+        </div>
+
+        <% } else { %>
+          <div class="no-results">No se encontraron resultados.</div>
+        <% } %>
+    </section>
+
+</main>
+
 </body>
 </html>

@@ -1,14 +1,13 @@
 /* ===========================================
    CUSTOM.CSS – Efectos globales visuales
    =========================================== */
-
-/* ===== Fondo general ===== */
-html, body {
-  height: 100%;
-  background: url("../img/fondo-eventos.jpg") center/cover no-repeat fixed;
-  background-color: #1a1a1a;
+html, body { margin:0; min-height:100vh; }
+body::before{
+  content:"";
+  position:fixed; inset:0;
+  background: #1a1a1a url("../img/fondo-eventos.jpg") center / cover no-repeat;
+  z-index:-1;
 }
-
 /* Capa translúcida de suavizado */
 body::before {
   content: "";
