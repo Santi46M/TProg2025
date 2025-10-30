@@ -92,10 +92,20 @@
     .chips { display:flex; flex-wrap:wrap; gap:.4rem; }
     .chip { background:#eef2ff; color:#3730a3; padding:.2rem .5rem; border-radius:999px; font-size:.9rem; }
     .ediciones-list { list-style:none; padding:0; margin:0; display:grid; gap:.6rem; }
-    .ediciones-list li { display:flex; align-items:center; gap:.5rem; justify-content:space-between; border:1px solid var(--line); border-radius:10px; padding:.5rem .75rem; background:#fff; }
-    .btn { border:none; padding:.35rem .7rem; border-radius:8px; cursor:pointer; }
+    .ediciones-list li {
+	  display:flex;
+	  align-items:center;
+	  gap:.5rem;
+	  justify-content:space-between;
+	  border:1px solid var(--line);
+	  border-radius:10px;
+	  padding:.5rem .75rem;
+	  background:#fff; /* ← esto es lo que causa el bloque blanco */
+	}
+	.btn { border:none; padding:.35rem .7rem; border-radius:8px; cursor:pointer; }
     .btn-ver-detalles { background:#111827; color:#fff; }
   </style>
+  <link rel="stylesheet" href="<%=ctx%>/css/custom.css">
 </head>
 <body>
 
@@ -105,7 +115,7 @@
     <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
     <main class="container consulta-evento-main" style="flex:2; min-width:0; padding:15px; line-height:2;">
-      <section class="event-card">
+      <section class="card event-card">
         <div class="event-hero <%= hasImgCandidate ? "" : "no-img" %>">
           <% if (hasImgCandidate) { %>
             <div class="event-hero__img">
@@ -155,7 +165,7 @@
       </section>
     </main>
 
-    <aside class="editions" style="min-width:300px; flex:1; margin-left:2rem; align-self:flex-start;">
+    <aside class="card event-card" style="min-width:300px; flex:1; margin-left:2rem; align-self:flex-start;">
       <h3>Ediciones</h3>
       <%
         if (ediciones == null || ediciones.isEmpty()) {
@@ -164,7 +174,7 @@
       <%
         } else {
       %>
-        <ul class="ediciones-list">
+        <ul class="ediciones-list li">
         <% for (DtEdicion ed : ediciones) { %>
           <li>
             <div>

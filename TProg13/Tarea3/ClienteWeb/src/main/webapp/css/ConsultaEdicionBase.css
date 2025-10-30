@@ -1,8 +1,9 @@
 /* ConsultaEdicion base CSS */
 body, .edicion-card, .edicion-title, .edicion-header, .edicion-info, .edicion-info h3, .edicion-meta,
 .chips, .chip, .categorias-label, .evento, .evento-title, .patrocinios, .patrocinio-title, .tipos-registro, .tipo-title {
-  font-family: Arial, Helvetica, sans-serif !important;
-  font-size: 1rem !important;
+  /* Use the site's global font (inherited from body) so typography is consistent */
+  font-family: inherit;
+  font-size: 1rem;
   font-weight: normal;
 }
 

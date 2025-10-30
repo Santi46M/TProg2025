@@ -1,3 +1,6 @@
+/* Load Inter from Google Fonts early to ensure the declared font-family is available */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
 /* === Base muy simple y prolija === */
 :root{
   --brand:#0a66c2;
@@ -11,8 +14,29 @@
 
 *{ box-sizing:border-box; }
 html,body{ margin:0; padding:0; }
-body{ font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--text); background:#fff; line-height:1.45; }
+body {
+  /* Global serious font: Inter if available, otherwise a modern system sans-serif stack */
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-image: url("/img/fondo-eventos.jpg");
+  background-size: cover;             /* que cubra toda la pantalla */
+  background-position: center;        /* centrado */
+  background-attachment: fixed;       /* se mantiene fijo al hacer scroll */
+  background-repeat: no-repeat;
+  background-color: #1a1a1a;          /* color de respaldo oscuro */
+  color: #222;                        /* mantiene contraste con texto */
+}
 
+/* opcional: capa semitransparente para que el fondo no distraiga */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.75);  /* blanco con 75% opacidad */
+  backdrop-filter: blur(3px);             /* difumina un poco */
+  z-index: -1;
+}
 a{ color:#666; text-decoration:none; }
 a:hover{ color:var(--ink); text-decoration:underline; }
 
@@ -744,4 +768,47 @@ input[type="submit"] {
   .acciones-iniciar-sesion .btn,
   .btn-iniciar-sesion,
   .btn-cancelar-iniciar-sesion { width: 100%; }
+  
+  html, body {
+  height: 100%;
+  background: url("../img/fondo-eventos.jpg") center/cover no-repeat fixed;
+  background-color: #1a1a1a;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(3px);
+  z-index: -1;
+}
+
+/* transparencia para que se vea el fondo */
+main, .container, .card, aside {
+  background-color: transparent !important;
+}
+/* ===== Header translúcido ===== */
+.site-header !important {
+  background: rgba(255, 255, 255, 0.7) !important; /* menos opaca */
+  backdrop-filter: blur(8px) saturate(130%);       /* efecto vidrio */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+}
+/* ===== Paneles semitransparentes tipo "glass" ===== */
+body .card,
+body .aside-inicio {
+  background: rgba(255, 255, 255, 0.55) !important;
+  backdrop-filter: blur(12px) saturate(140%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Ajuste del texto */
+body .card h1, 
+body .card h2, 
+body .card p,
+body .aside-inicio h3, 
+body .aside-inicio h4, 
+body .aside-inicio li, 
+body .aside-inicio button {
+  color: #111 !important;
 }

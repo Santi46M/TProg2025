@@ -68,7 +68,7 @@
   <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
   <main class="container consulta-layout">
-    <section class="event-card">
+    <section class="card event-card">
       <div class="event-header">
         <h1 class="event-title">
           Tipo de Registro: <%= (tipoRegistro != null ? tipoRegistro.getNombre() : "Tipo de Registro") %>

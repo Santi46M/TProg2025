@@ -1,5 +1,23 @@
 /* ===== Estilos solo para la página de inicio ===== */
+body {
+  background-image: url("../img/fondo-eventos.jpg");
+  background-size: cover;             /* que cubra toda la pantalla */
+  background-position: center;        /* centrado */
+  background-attachment: fixed;       /* se mantiene fijo al hacer scroll */
+  background-repeat: no-repeat;
+  background-color: #1a1a1a;          /* color de respaldo oscuro */
+  color: #222;                        /* mantiene contraste con texto */
+}
 
+/* opcional: capa semitransparente para que el fondo no distraiga */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.75);  /* blanco con 75% opacidad */
+  backdrop-filter: blur(3px);             /* difumina un poco */
+  z-index: -1;
+}
 /* Layout con aside angosto */
 /* Contenedor principal que incluye el aside y el contenido */
 .layout-inicio {

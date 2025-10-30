@@ -28,7 +28,7 @@
     <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
     <main class="container consulta-layout" style="flex:2; min-width:0;">
-      <section class="event-card">
+      <section class="card event-card">
         <div class="event-header">
           <h1 class="event-title">Consulta de Registro en Edición</h1>
         </div>

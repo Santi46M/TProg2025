@@ -50,7 +50,27 @@
   // 3) Pasar a lista para iterar
   List<String> categorias = new ArrayList<>(categoriasSet);
 %>
+<!-- === BLOQUE DE ESTILOS PARA EL FONDO === -->
+<style>
+  html, body {
+    height: 100%;
+    background: url('<%= ctx %>/img/fondo-eventos.png') center/cover no-repeat fixed;
+    background-color: #1a1a1a;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(3px);
+    z-index: -1;
+  }
 
+  /* Evita que las tarjetas y contenedores tapen el fondo */
+  main, .container, .card, aside {
+    background-color: transparent !important;
+  }
+</style>
 <aside class="card aside-inicio">
   <h3>Menú</h3>
 

@@ -24,7 +24,8 @@
 
   <!-- Contenido principal -->
   <main class="container" style="flex:2; min-width:0;">
-    <section class="form-card-altaEvento form-card--wide">
+  
+    <section class="card event-card">
       <h2>Alta de Tipo de Registro</h2>
 
       <% if (request.getAttribute("error") != null) { %>

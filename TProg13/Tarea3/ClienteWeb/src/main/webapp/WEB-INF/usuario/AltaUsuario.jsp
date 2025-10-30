@@ -30,6 +30,7 @@
   <jsp:include page="/WEB-INF/templates/menu.jsp" />
   
   <main class="form-wrapper-alta-usuario" style="flex:2; min-width:0;">
+  <section class="card event-card" style="padding: 1.5rem;">
     <h1 class="titulo-alta-usuario">Crear cuenta</h1>
 
     <% if (esPost && error != null && !error.isEmpty()) { %>
@@ -156,6 +157,7 @@
         <button type="submit" class="btn ghost" name="accion" value="cancelar">Cancelar</button>
       </div>
     </form>
+    </section>
   </main>
 </div>
 

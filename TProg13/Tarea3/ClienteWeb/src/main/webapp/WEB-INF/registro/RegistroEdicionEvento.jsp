@@ -39,7 +39,7 @@
       <p style="color:#c00; font-weight:600"><%= request.getAttribute("error") %></p>
     <% } %>
 
-    <section class="form-card-registroEdicionEvento">
+    <section class="card event-card">
       <h2>Registrarse a una Edición de Evento</h2>
 
       <form id="formSeleccion" action="<%=ctx%>/registro/inscripcion" method="get">
@@ -66,7 +66,7 @@
     </section>
 
     <% if (edSel != null) { %>
-      <section class="event-card" style="margin-top:1rem">
+      <section class="card event-card" style="margin-top:1rem">
         <h3>Datos de la edición</h3>
         <ul>
           <li><strong>Evento:</strong> <%= eventoSel %></li>

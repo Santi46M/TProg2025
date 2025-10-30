@@ -15,10 +15,12 @@
   <!-- Include responsive login-specific CSS -->
   <link rel="stylesheet" href="<%=ctx%>/css/InicioSesion.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+  <link rel="stylesheet" href="<%=ctx%>/css/custom.css">
 </head>
 <body>
   
   <!-- Header  -->
+
   <jsp:include page="/WEB-INF/templates/header.jsp" />
 
   <!-- Main -->

@@ -125,6 +125,7 @@
 
     <!-- Main -->
     <main class="main-inicio">
+    <section class="card event-card" style="padding: 1.5rem;">
       <% if (error != null) { %>
         <p class="error"><%=error%></p>
       <% } %>
@@ -334,17 +335,18 @@
                 	 }
 
             %>
-              <li>
-                <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
-                  <input type="hidden" name="evento" value="<%= eventoNombre %>" />
-                  <input type="hidden" name="edicion" value="<%= e.getNombre() %>" />
-                  <button type="submit" class="btn-link">
-                    <strong><%= e.getNombre() %></strong>
-                  </button>
-                </form>
-                <span>(<%= e.getFechaInicio() %> - <%= e.getFechaFin() %>)</span>
-                <em class="estado"> — <%= estado %></em>
-              </li>
+             <li>
+			  <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
+			    <input type="hidden" name="evento" value="<%= eventoNombre %>" />
+			    <input type="hidden" name="edicion" value="<%= e.getNombre() %>" />
+			    <a href="#" onclick="this.closest('form').submit(); return false;"
+			       style="color:inherit; text-decoration:none; font-weight:600;">
+			       <%= e.getNombre() %>
+			    </a>
+			  </form>
+			  <span>(<%= e.getFechaInicio() %> - <%= e.getFechaFin() %>)</span>
+			  <em class="estado"> — <%= estado %></em>
+			</li>
             <% } } %>
           </ul>
         <% } %>
@@ -356,22 +358,26 @@
                  String eventoNombre = (edicionToEvento != null) ? edicionToEvento.get(r.getEdicion()) : "";
             %>
               <li>
-                <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
-                  <input type="hidden" name="evento" value="<%= eventoNombre %>" />
-                  <input type="hidden" name="edicion" value="<%= r.getEdicion() %>" />
-                  <button type="submit" class="btn-link">
-                    <strong><%= r.getEdicion() %></strong>
-                  </button>
-                </form>
-                <span>| <strong>Tipo:</strong> <%= r.getTipoRegistro() %></span>
-                <span>| <strong>Fecha registro:</strong> <%= r.getFechaRegistro() %></span>
-                <span>| <strong>Costo:</strong> $<%= r.getCosto() %></span>
-                <a class="btn" href="<%= ctx %>/registro/ConsultaRegistroEdicion?idRegistro=<%= URLEncoder.encode(r.getIdentificador(), "UTF-8") %>">Ver detalles</a>
-              </li>
+			  <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
+			    <input type="hidden" name="evento" value="<%= eventoNombre %>" />
+			    <input type="hidden" name="edicion" value="<%= r.getEdicion() %>" />
+			    <a href="#" onclick="this.closest('form').submit(); return false;"
+			       style="color:inherit; text-decoration:none; font-weight:600;">
+			       <%= r.getEdicion() %>
+			    </a>
+			  </form>
+			  <span>| <strong>Tipo:</strong> <%= r.getTipoRegistro() %></span>
+			  <span>| <strong>Fecha registro:</strong> <%= r.getFechaRegistro() %></span>
+			  <span>| <strong>Costo:</strong> $<%= r.getCosto() %></span>
+			  <a class="btn" href="<%= ctx %>/registro/ConsultaRegistroEdicion?idRegistro=<%= URLEncoder.encode(r.getIdentificador(), "UTF-8") %>">
+			    Ver detalles
+			  </a>
+			</li>
             <% } %>
           </ul>
         <% } %>
       <% } %>
+      </section>
     </main>
   </div>
 

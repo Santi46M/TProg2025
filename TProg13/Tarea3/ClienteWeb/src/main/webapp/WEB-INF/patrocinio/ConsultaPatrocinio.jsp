@@ -17,7 +17,7 @@
 <div class="container row layout-inicio" style="margin-top:1rem; display:flex; align-items:flex-start;">
   <jsp:include page="/WEB-INF/templates/menu.jsp" />
   <main class="container consulta-layout" style="flex:2; min-width:0;">
-    <section class="event-card" style="max-width:600px; margin:0 auto;">
+    <section class="card event-card" style="max-width:600px; margin:0 auto;">
       <div class="event-header" style="text-align:center; margin-bottom:1.5rem;">
         <h1 class="event-title" style="font-size:2rem; font-weight:700; margin:0;">Patrocinio <%= (patrocinio != null ? (": " + patrocinio.getCodigo()) : "") %></h1>
       </div>

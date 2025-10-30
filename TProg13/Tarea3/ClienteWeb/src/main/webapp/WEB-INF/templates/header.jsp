@@ -5,6 +5,39 @@
   //obtenemos el usuario logueado 
   String nick = (String) session.getAttribute("nick");
 %>
+<%
+  // Control del fondo global
+  boolean fondoActivo = true; // <-- Cambiá a false si querés desactivarlo
+%>
+
+<%-- Load Inter font from Google Fonts for a serious, modern sans-serif --%>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<% if (fondoActivo) { %>
+<style>
+  body {
+    background: url('<%= request.getContextPath() %>/img/fondo-eventos.png')
+                center/cover no-repeat fixed;
+    background-color: #1a1a1a;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(3px);
+    z-index: -1;
+  }
+</style>
+<% } %>
+<%
+  String uri = request.getRequestURI();
+  boolean esLogin = uri != null && uri.contains("login");
+%>
+<% if (!esLogin) { %>
+  <!-- Solo cargar estos si NO estamos en login.jsp -->
+  <link rel="stylesheet" href="<%=request.getContextPath()%>/css/custom.css">
+<% } %>
 
 <header class="site-header">
   <div class="container">

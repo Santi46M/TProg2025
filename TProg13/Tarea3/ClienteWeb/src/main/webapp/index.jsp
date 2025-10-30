@@ -39,19 +39,23 @@
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <style>
-    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-    .card{border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:#fff;padding:12px}
-    .card__media{position:relative; aspect-ratio:16/9; background:#f3f4f6; overflow:hidden; border-radius:10px; margin-bottom:8px}
-    .card__media img{width:100%; height:100%; object-fit:cover; display:block}
-    .card h2{margin:.25rem 0 .5rem}
-    .card .actions{margin-top:.5rem}
-    .btn-linklike{background:#f9fafb; border:1px solid #d1d5db; padding:.45rem .75rem; border-radius:8px; cursor:pointer}
-    .btn-linklike:hover{background:#f3f4f6}
-
-    /* ajuste cuando NO hay imagen: quitamos el espacio que dejaba la media */
-    .card.no-media h2{ margin-top: 0; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(260px,1fr));
+      gap: 16px;
+    }
+    .card { border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; background:#fff; padding:12px; }
+    .card__media { position:relative; aspect-ratio:16/9; background:#f3f4f6; overflow:hidden; border-radius:10px; margin-bottom:8px; }
+    .card__media img { width:100%; height:100%; object-fit:cover; display:block; }
+    .card h2 { margin:.25rem 0 .5rem; }
+    .card .actions { margin-top:.5rem; }
+    .btn-linklike { background:#f9fafb; border:1px solid #d1d5db; padding:.45rem .75rem; border-radius:8px; cursor:pointer; }
+    .btn-linklike:hover { background:#f3f4f6; }
+    .card.no-media h2 { margin-top:0; }
   </style>
+  <link rel="stylesheet" href="<%=ctx%>/css/custom.css">
 </head>
+
 <body>
   <jsp:include page="/WEB-INF/templates/header.jsp" />
 
