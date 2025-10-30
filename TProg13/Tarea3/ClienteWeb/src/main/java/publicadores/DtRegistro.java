@@ -24,6 +24,7 @@ import jakarta.xml.bind.annotation.XmlType;
  *         <element name="costo" type="{http://www.w3.org/2001/XMLSchema}float"/>
  *         <element name="fechaInicio" type="{http://publicadores/}localDate" minOccurs="0"/>
  *         <element name="evento" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         <element name="asistio" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/>
  *       </sequence>
  *     </restriction>
  *   </complexContent>
@@ -41,7 +42,8 @@ import jakarta.xml.bind.annotation.XmlType;
     "fechaRegistro",
     "costo",
     "fechaInicio",
-    "evento"
+    "evento",
+    "asistio"
 })
 public class DtRegistro {
 
@@ -53,6 +55,7 @@ public class DtRegistro {
     protected float costo;
     protected LocalDate fechaInicio;
     protected String evento;
+    protected Boolean asistio;
 
     /**
      * Obtiene el valor de la propiedad identificador.
@@ -236,6 +239,30 @@ public class DtRegistro {
      */
     public void setEvento(String value) {
         this.evento = value;
+    }
+
+    /**
+     * Obtiene el valor de la propiedad asistio.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isAsistio() {
+        return asistio;
+    }
+
+    /**
+     * Define el valor de la propiedad asistio.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setAsistio(Boolean value) {
+        this.asistio = value;
     }
 
 }

@@ -45,4 +45,7 @@ public class Registro {
     public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
     public Eventos getEvento() {return evento;}
     public void setAsistencia() {this.asistenciaMarcada = true;}
+    public boolean getAsistencia() {
+    	return asistenciaMarcada;
+    }
 }

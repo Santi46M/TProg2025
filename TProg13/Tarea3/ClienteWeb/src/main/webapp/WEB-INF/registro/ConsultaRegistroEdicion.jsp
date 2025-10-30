@@ -4,6 +4,11 @@
   String nickSesion = (String) session.getAttribute("nick");
   DtRegistro registro = (DtRegistro) request.getAttribute("registro");
   String error = (String) request.getAttribute("error");
+
+  // Nuevo: flag de asistencia (viene del backend)
+  Boolean asistio = (Boolean) request.getAttribute("asistio");
+  if (asistio == null) asistio = false;
+  System.out.println("Asistencia en: " + asistio);
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -28,21 +33,33 @@
         <div class="event-info">
           <% if (error != null) { %>
             <p class="error"><%= error %></p>
+
           <% } else if (registro != null) { %>
-            <%-- <div class="event-meta"><strong>Identificador:</strong> <%= registro.getId() %></div> --%>
             <div class="event-meta"><strong>Usuario:</strong> <%= registro.getUsuario() %></div>
             <div class="event-meta"><strong>Edición:</strong> <%= registro.getEdicion() %></div>
             <div class="event-meta"><strong>Tipo de registro:</strong> <%= registro.getTipoRegistro() %></div>
-            <div class="event-meta"><strong>Fecha de registro:</strong> <%= registro.getFechaRegistro() %></div>
+            <%
+  				String fechaR = (registro.getFechaRegistro() != null) ? registro.getFechaRegistro() : "";
+			%>
+            <div class="event-meta"><strong>Fecha de registro:</strong> <%= fechaR %></div>
             <div class="event-meta"><strong>Costo:</strong> $<%= registro.getCosto() %></div>
-            <div class="event-meta"><strong>Fecha de inicio:</strong> <%= registro.getFechaInicio() %></div>
-			<form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="get">
-  				<input type="hidden" name="idRegistro" value="<%= registro.getIdentificador() %>">
-  				<input type="hidden" name="accion" value="certificado">
-  				<button type="submit" class="btn-linklike"> Descargar certificado</button>
-			</form>
 
-            
+            <div class="event-meta"><strong>Fecha de inicio:</strong> <%= registro.getFechaInicio() %></div>
+
+            <% if (!asistio) { %>
+              <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="post" style="margin-top: 1rem;">
+                <input type="hidden" name="idRegistro" value="<%= registro.getIdentificador() %>">
+                <input type="hidden" name="accion" value="marcarAsistencia">
+                <button type="submit" class="btn btn-primary">Marcar asistencia</button>
+              </form>
+            <% } else { %>
+              <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="get" style="margin-top: 1rem;">
+                <input type="hidden" name="idRegistro" value="<%= registro.getIdentificador() %>">
+                <input type="hidden" name="accion" value="certificado">
+                <button type="submit" class="btn-linklike">Descargar certificado</button>
+              </form>
+            <% } %>
+
           <% } else { %>
             <p>No se encontró información del registro.</p>
           <% } %>

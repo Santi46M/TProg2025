@@ -502,10 +502,24 @@ public class ControladorEvento implements IControladorEvento {
             registroUserAsis.getFechaRegistro(),
             registroUserAsis.getCosto(),
             registroUserAsis.getFechaInicio(),
-            registroUserAsis.getEdicion().getEvento().getNombre()
+            registroUserAsis.getEdicion().getEvento().getNombre(),
+            registroUserAsis.getAsistencia()
         );
     }
 
+    public void marcarAsistencia(String nick, String idRegistro) {
+        ManejadorUsuario manejadorUsuario = ManejadorUsuario.getInstancia();
+        Usuario user = manejadorUsuario.findUsuario(nick);
+    	if (!(user instanceof Asistente)) {
+            throw new UsuarioNoEsAsistente(user.getNickname());
+        }
+        Asistente userAsis = (Asistente) user;
+        Registro registroUserAsis = userAsis.getRegistros().get(idRegistro);
+        if (registroUserAsis == null) {
+            throw new RegistroNoExiste(idRegistro);
+        }
+        registroUserAsis.setAsistencia();
+    }
     // --- selección de edición para consultas ---
     public void seleccionarEdicion(String sigla) {
         Ediciones edicionIter = manejador.obtenerEdicion(sigla);
@@ -579,7 +593,8 @@ public class ControladorEvento implements IControladorEvento {
                 reg.getFechaRegistro(),
                 reg.getCosto(),
                 reg.getFechaInicio(),
-                edicion.getEvento().getNombre()
+                edicion.getEvento().getNombre(),
+                reg.getAsistencia()
             ));
         }
 
