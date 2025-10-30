@@ -22,6 +22,7 @@ echo ==============================
 
 %JAVA_BIN% -cp "%JAXWS_JAR%" com.sun.tools.ws.WsImport -keep -extension -s %SRC% -p %PKG% %BASE_URL%/publicadorUsuario?wsdl
 %JAVA_BIN% -cp "%JAXWS_JAR%" com.sun.tools.ws.WsImport -keep -extension -s %SRC% -p %PKG% %BASE_URL%/publicadorEvento?wsdl
+%JAVA_BIN% -cp "%JAXWS_JAR%" com.sun.tools.ws.WsImport -keep -extension -s %SRC% -p %PKG% %BASE_URL%/publicadorEstadisticas?wsdl
 
 echo.
 echo ✅ Generación completada.
