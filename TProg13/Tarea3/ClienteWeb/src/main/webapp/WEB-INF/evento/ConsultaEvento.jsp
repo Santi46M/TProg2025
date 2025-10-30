@@ -119,7 +119,7 @@
           <% } %>
 
           <div class="event-hero__meta">
-            <h1 class="event-title"><%= (evNombre != null ? evNombre : "Evento") %></h1>
+            <h1 class="event-title"><strong>Evento <%= (evNombre != null ? evNombre : "Evento") %></strong></h1>
 
             <div class="event-info">
               <h3>Descripción</h3>

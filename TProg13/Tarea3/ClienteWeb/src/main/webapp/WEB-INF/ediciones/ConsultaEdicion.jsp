@@ -150,7 +150,7 @@
       <%-- Datos principales --%>
       <div>
         <h1 style="font-size:1.6rem; font-weight:700; margin-bottom:.5rem;">
-          <%= edicion.getNombre() %>
+         <strong>Edicion de Evento <%= edicion.getNombre() %></strong> 
         </h1>
         <p style="font-size:1rem; color:#444; margin-bottom:1rem;">
           <strong>Evento:</strong>
