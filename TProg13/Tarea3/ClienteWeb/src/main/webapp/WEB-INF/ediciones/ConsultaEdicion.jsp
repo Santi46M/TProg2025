@@ -140,11 +140,19 @@
 </div>
 
     <h1 style="font-size:1.6rem; font-weight:700; margin-bottom:.25rem;"><%= edicion.getNombre() %></h1>
-    <p style="font-size:1rem; color:#666; margin-bottom:1rem;">
-      <strong>Evento:</strong> <%= evNombre %> — 
-      <strong>Organizador:</strong> <%= organizador %>
-    </p>
-
+	<p style="font-size:1rem; color:#444; margin-bottom:1rem;">
+	  <strong>Evento:</strong>
+	  <a href="<%=ctx%>/evento/ConsultaEvento?nombre=<%= java.net.URLEncoder.encode(evNombre, java.nio.charset.StandardCharsets.UTF_8) %>"
+	     style="color:inherit; text-decoration:none; font-weight:normal; margin-left:4px; margin-right:8px;">
+	    <%= evNombre %>
+	  </a>
+	  —
+	  <strong>Organizador:</strong>
+	  <a href="<%=ctx%>/usuario/ConsultaUsuario?nick=<%=organizador%>"
+	     style="color:inherit; text-decoration:none; font-weight:normal; margin-left:4px;">
+	    <%= organizador %>
+	  </a>
+	</p>
     <div class="event-meta" style="margin-bottom:1rem;">
       <p><strong>Sigla:</strong> <%= edicion.getSigla() %></p>
       <p><strong>Ciudad:</strong> <%= edicion.getCiudad() %></p>
@@ -153,11 +161,6 @@
       <p><strong>Fin:</strong> <%= edicion.getFechaFin() %></p>
       <p><strong>Alta:</strong> <%= edicion.getFechaAlta() %></p>
       <p><strong>Estado:</strong> <%= edicion.getEstado() %></p>
-    <% if (organizador != null && !organizador.isBlank()) { %>
-      <p><strong>Organizador:</strong> <%= organizador %></p>
-    <% } else { %>
-      <p>No disponible</p>
-    <% } %>
     </div>
 
     
