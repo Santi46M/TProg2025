@@ -7,9 +7,9 @@ import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for dtTopEvento complex type.
+ * <p>Clase Java para dtTopEvento complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>{@code
  * <complexType name="dtTopEvento">
@@ -37,7 +37,7 @@ public class DtTopEvento {
     protected int visitas;
 
     /**
-     * Gets the value of the nombreEvento property.
+     * Obtiene el valor de la propiedad nombreEvento.
      * 
      * @return
      *     possible object is
@@ -49,7 +49,7 @@ public class DtTopEvento {
     }
 
     /**
-     * Sets the value of the nombreEvento property.
+     * Define el valor de la propiedad nombreEvento.
      * 
      * @param value
      *     allowed object is
@@ -61,7 +61,7 @@ public class DtTopEvento {
     }
 
     /**
-     * Gets the value of the visitas property.
+     * Obtiene el valor de la propiedad visitas.
      * 
      */
     public int getVisitas() {
@@ -69,7 +69,7 @@ public class DtTopEvento {
     }
 
     /**
-     * Sets the value of the visitas property.
+     * Define el valor de la propiedad visitas.
      * 
      */
     public void setVisitas(int value) {
