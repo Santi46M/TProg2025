@@ -10,9 +10,9 @@ import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for eventos complex type.
+ * <p>Clase Java para eventos complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>{@code
  * <complexType name="eventos">
@@ -65,7 +65,7 @@ public class Eventos {
     protected Boolean vigente;
 
     /**
-     * Gets the value of the categorias property.
+     * Obtiene el valor de la propiedad categorias.
      * 
      * @return
      *     possible object is
@@ -77,7 +77,7 @@ public class Eventos {
     }
 
     /**
-     * Sets the value of the categorias property.
+     * Define el valor de la propiedad categorias.
      * 
      * @param value
      *     allowed object is
@@ -89,7 +89,7 @@ public class Eventos {
     }
 
     /**
-     * Gets the value of the imagen property.
+     * Obtiene el valor de la propiedad imagen.
      * 
      * @return
      *     possible object is
@@ -101,7 +101,7 @@ public class Eventos {
     }
 
     /**
-     * Sets the value of the imagen property.
+     * Define el valor de la propiedad imagen.
      * 
      * @param value
      *     allowed object is
@@ -113,7 +113,7 @@ public class Eventos {
     }
 
     /**
-     * Gets the value of the vigente property.
+     * Obtiene el valor de la propiedad vigente.
      * 
      * @return
      *     possible object is
@@ -125,7 +125,7 @@ public class Eventos {
     }
 
     /**
-     * Sets the value of the vigente property.
+     * Define el valor de la propiedad vigente.
      * 
      * @param value
      *     allowed object is
@@ -138,9 +138,9 @@ public class Eventos {
 
 
     /**
-     * <p>Java class for anonymous complex type.
+     * <p>Clase Java para anonymous complex type.
      * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
+     * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
      * 
      * <pre>{@code
      * <complexType>
@@ -208,9 +208,9 @@ public class Eventos {
 
 
         /**
-         * <p>Java class for anonymous complex type.
+         * <p>Clase Java para anonymous complex type.
          * 
-         * <p>The following schema fragment specifies the expected content contained within this class.
+         * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
          * 
          * <pre>{@code
          * <complexType>
@@ -238,7 +238,7 @@ public class Eventos {
             protected Categoria value;
 
             /**
-             * Gets the value of the key property.
+             * Obtiene el valor de la propiedad key.
              * 
              * @return
              *     possible object is
@@ -250,7 +250,7 @@ public class Eventos {
             }
 
             /**
-             * Sets the value of the key property.
+             * Define el valor de la propiedad key.
              * 
              * @param value
              *     allowed object is
@@ -262,7 +262,7 @@ public class Eventos {
             }
 
             /**
-             * Gets the value of the value property.
+             * Obtiene el valor de la propiedad value.
              * 
              * @return
              *     possible object is
@@ -274,7 +274,7 @@ public class Eventos {
             }
 
             /**
-             * Sets the value of the value property.
+             * Define el valor de la propiedad value.
              * 
              * @param value
              *     allowed object is
