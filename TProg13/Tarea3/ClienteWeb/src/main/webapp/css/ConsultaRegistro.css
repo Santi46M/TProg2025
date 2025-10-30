@@ -44,3 +44,15 @@
   ul { list-style: disc; padding-left:1.2rem; }
   ul li { cursor:pointer; margin:.3rem 0; }
   ul li:hover { text-decoration: underline; }
+  
+  /* Button used like a soft link (matches project style) */
+  .btn-linklike {
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    padding: .45rem .75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #111827;
+    font-size: .95rem;
+  }
+  .btn-linklike:hover { background: #f3f4f6; }

@@ -189,7 +189,8 @@ legend{ padding:0 .4rem; font-weight:700; color:#374151; }
   font-size: .95rem;
   background: #fff;
 }
-
+.btn-linklike{background:#f9fafb; border:1px solid #d1d5db; padding:.45rem .75rem; border-radius:8px; cursor:pointer}
+    .btn-linklike:hover{background:#f3f4f6}
 .form-group-altaEvento small {
   display: block;
   margin-top: .3rem;
