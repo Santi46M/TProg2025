@@ -156,7 +156,8 @@ class DatatypesPojoTest {
                 reg,
                 1000.0f,
                 inicio,
-                "EV01"
+                "EV01",
+                false
         );
 
         assertEquals("R-001", dto.getId());
@@ -167,6 +168,8 @@ class DatatypesPojoTest {
         assertEquals(1000.0f, dto.getCosto(), 0.0001f);
         assertEquals(inicio, dto.getFechaInicio());
         assertEquals("EV01", dto.getEvento());
+        assertEquals(false, dto.getAsistencia());
+        
     }
 
     @Test

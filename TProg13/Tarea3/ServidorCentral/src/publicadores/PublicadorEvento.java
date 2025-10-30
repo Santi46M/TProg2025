@@ -252,6 +252,14 @@ public class PublicadorEvento {
     public String encontrarEventoPorSigla(@WebParam(name = "siglaEdicion") String siglaEdicion) {
         return ice.encontrarEventoPorSigla(siglaEdicion);
     }
+    @WebMethod
+    public void marcarAsistenciaRegistro(
+        @WebParam(name = "nick") String nick,
+        @WebParam(name = "idRegistro") String idRegistro
+    ) {
+        ice.marcarAsistencia(nick, idRegistro);
+    }
+
 
     @WebMethod(exclude = true)
     public Endpoint getEndpoint() {

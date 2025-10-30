@@ -111,4 +111,6 @@ public interface IControladorEvento {
             float costo,
             LocalDate fechaInicio
     );
+    public void marcarAsistencia(String nick, String idRegistro);
+
 }
