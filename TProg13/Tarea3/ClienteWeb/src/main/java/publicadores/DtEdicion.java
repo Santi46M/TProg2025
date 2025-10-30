@@ -10,9 +10,9 @@ import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Clase Java para dtEdicion complex type.
+ * <p>Java class for dtEdicion complex type.
  * 
- * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>{@code
  * <complexType name="dtEdicion">
@@ -110,7 +110,7 @@ public class DtEdicion {
     protected DtEvento evento;
 
     /**
-     * Obtiene el valor de la propiedad nombre.
+     * Gets the value of the nombre property.
      * 
      * @return
      *     possible object is
@@ -122,7 +122,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad nombre.
+     * Sets the value of the nombre property.
      * 
      * @param value
      *     allowed object is
@@ -134,7 +134,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad sigla.
+     * Gets the value of the sigla property.
      * 
      * @return
      *     possible object is
@@ -146,7 +146,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad sigla.
+     * Sets the value of the sigla property.
      * 
      * @param value
      *     allowed object is
@@ -158,7 +158,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad fechaInicio.
+     * Gets the value of the fechaInicio property.
      * 
      * @return
      *     possible object is
@@ -170,7 +170,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad fechaInicio.
+     * Sets the value of the fechaInicio property.
      * 
      * @param value
      *     allowed object is
@@ -182,7 +182,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad fechaFin.
+     * Gets the value of the fechaFin property.
      * 
      * @return
      *     possible object is
@@ -194,7 +194,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad fechaFin.
+     * Sets the value of the fechaFin property.
      * 
      * @param value
      *     allowed object is
@@ -206,7 +206,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad fechaAlta.
+     * Gets the value of the fechaAlta property.
      * 
      * @return
      *     possible object is
@@ -218,7 +218,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad fechaAlta.
+     * Sets the value of the fechaAlta property.
      * 
      * @param value
      *     allowed object is
@@ -230,7 +230,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad organizador.
+     * Gets the value of the organizador property.
      * 
      * @return
      *     possible object is
@@ -242,7 +242,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad organizador.
+     * Sets the value of the organizador property.
      * 
      * @param value
      *     allowed object is
@@ -254,7 +254,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad ciudad.
+     * Gets the value of the ciudad property.
      * 
      * @return
      *     possible object is
@@ -266,7 +266,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad ciudad.
+     * Sets the value of the ciudad property.
      * 
      * @param value
      *     allowed object is
@@ -278,7 +278,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad pais.
+     * Gets the value of the pais property.
      * 
      * @return
      *     possible object is
@@ -290,7 +290,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad pais.
+     * Sets the value of the pais property.
      * 
      * @param value
      *     allowed object is
@@ -302,7 +302,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad imagen.
+     * Gets the value of the imagen property.
      * 
      * @return
      *     possible object is
@@ -314,7 +314,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad imagen.
+     * Sets the value of the imagen property.
      * 
      * @param value
      *     allowed object is
@@ -326,7 +326,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad video.
+     * Gets the value of the video property.
      * 
      * @return
      *     possible object is
@@ -338,7 +338,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad video.
+     * Sets the value of the video property.
      * 
      * @param value
      *     allowed object is
@@ -350,7 +350,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad estado.
+     * Gets the value of the estado property.
      * 
      * @return
      *     possible object is
@@ -362,7 +362,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad estado.
+     * Sets the value of the estado property.
      * 
      * @param value
      *     allowed object is
@@ -374,7 +374,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad tiposRegistro.
+     * Gets the value of the tiposRegistro property.
      * 
      * @return
      *     possible object is
@@ -386,7 +386,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad tiposRegistro.
+     * Sets the value of the tiposRegistro property.
      * 
      * @param value
      *     allowed object is
@@ -398,7 +398,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad patrocinios.
+     * Gets the value of the patrocinios property.
      * 
      * @return
      *     possible object is
@@ -410,7 +410,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad patrocinios.
+     * Sets the value of the patrocinios property.
      * 
      * @param value
      *     allowed object is
@@ -422,7 +422,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad registros.
+     * Gets the value of the registros property.
      * 
      * @return
      *     possible object is
@@ -434,7 +434,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad registros.
+     * Sets the value of the registros property.
      * 
      * @param value
      *     allowed object is
@@ -446,7 +446,7 @@ public class DtEdicion {
     }
 
     /**
-     * Obtiene el valor de la propiedad evento.
+     * Gets the value of the evento property.
      * 
      * @return
      *     possible object is
@@ -458,7 +458,7 @@ public class DtEdicion {
     }
 
     /**
-     * Define el valor de la propiedad evento.
+     * Sets the value of the evento property.
      * 
      * @param value
      *     allowed object is
@@ -471,9 +471,9 @@ public class DtEdicion {
 
 
     /**
-     * <p>Clase Java para anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>{@code
      * <complexType>
@@ -532,9 +532,9 @@ public class DtEdicion {
 
 
     /**
-     * <p>Clase Java para anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>{@code
      * <complexType>
@@ -593,9 +593,9 @@ public class DtEdicion {
 
 
     /**
-     * <p>Clase Java para anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>{@code
      * <complexType>

@@ -326,7 +326,13 @@
                  boolean mostrar = "Aceptada".equalsIgnoreCase(estado) ||
                                    (esSuPropioPerfil && ("Ingresada".equalsIgnoreCase(estado) || "Rechazada".equalsIgnoreCase(estado)));
                  if (mostrar) {
-                   String eventoNombre = (edicionToEvento != null) ? edicionToEvento.get(e.getNombre()) : "";
+                	 String eventoNombre = "";
+                	 if (edicionToEvento != null && edicionToEvento.get(e.getNombre()) != null) {
+                	     eventoNombre = edicionToEvento.get(e.getNombre());
+                	 } else if (e.getEvento() != null) { 
+                	     eventoNombre = e.getEvento().getNombre();
+                	 }
+
             %>
               <li>
                 <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">

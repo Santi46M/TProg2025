@@ -97,23 +97,30 @@ public class EdicionServlet extends HttpServlet {
           && nickSesion.equals(edicionObj.getOrganizador());
 
       List<DtRegistro> registrosList = new ArrayList<>();
+      DtRegistro registroUsuario = null;
+
       if (esOrganizador) {
-        try {
-          if (edicionObj.getRegistros() != null && edicionObj.getRegistros().getRegistro() != null)
-            registrosList.addAll(edicionObj.getRegistros().getRegistro());
-        } catch (Exception ignore) {}
+          try {
+              if (edicionObj.getRegistros() != null && edicionObj.getRegistros().getRegistro() != null)
+                  registrosList.addAll(edicionObj.getRegistros().getRegistro());
+          } catch (Exception ignore) {}
       } else if (nickSesion != null) {
-        DtDatosUsuario usuarioLogueado = getUsuario(req);
-        try {
-          if (usuarioLogueado != null && usuarioLogueado.getRegistros() != null && usuarioLogueado.getRegistros().getRegistro() != null) {
-            for (DtRegistro r : usuarioLogueado.getRegistros().getRegistro()) {
-              if (r.getEdicion() != null && r.getEdicion().equals(edicionObj.getNombre()))
-                registrosList.add(r);
-            }
-          }
-        } catch (Exception ignore) {}
+          DtDatosUsuario usuarioLogueado = getUsuario(req);
+          try {
+              if (usuarioLogueado != null && usuarioLogueado.getRegistros() != null && usuarioLogueado.getRegistros().getRegistro() != null) {
+                  for (DtRegistro r : usuarioLogueado.getRegistros().getRegistro()) {
+                      if (r.getEdicion() != null && r.getEdicion().equals(edicionObj.getNombre())) {
+                          registroUsuario = r;
+                          break;
+                      }
+                  }
+              }
+          } catch (Exception ignore) {}
       }
+
       req.setAttribute("registros", registrosList);
+      req.setAttribute("registroUsuario", registroUsuario);
+
       req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
       return;
     }

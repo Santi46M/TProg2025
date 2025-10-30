@@ -63,37 +63,44 @@
 
       <div id="eventList" class="cards">
         <%
-          if (eventos != null && !eventos.isEmpty()) {
-            for (DtEvento e : eventos) {
-              String imgUrl = (imgUrls == null) ? null : imgUrls.get(e.getNombre());
-              boolean hasImg = (imgUrl != null && !imgUrl.isBlank());
-        %>
-          <article class="card <%= hasImg ? "" : "no-media" %>">
-            <% if (hasImg) { %>
-              <div class="card__media">
-                <img src="<%= imgUrl %>" alt="Imagen de <%= e.getNombre() %>">
-              </div>
-            <% } %>
+		  if (eventos != null && !eventos.isEmpty()) {
+		    for (DtEvento e : eventos) {
+		      String nombre = e.getNombre();
+		      String imgUrl = (imgUrls != null) ? imgUrls.get(nombre) : null;
+		      if (imgUrl == null || imgUrl.isBlank()) {
+		          imgUrl = ctx + "/img/eventos/" + (e.getImagen() != null ? e.getImagen() : "evento-default.svg");
+		      }
+		      boolean hasImg = (imgUrl != null && !imgUrl.isBlank());
+		%>
+		  <article class="card <%= hasImg ? "" : "no-media" %>">
+		    <% if (hasImg) { %>
+		      <div class="card__media">
+		        <img src="<%= imgUrl %>" 
+		             alt="Imagen de <%= e.getNombre() %>"
+		             onerror="this.onerror=null;this.src='<%=ctx%>/img/evento-default.png';">
+		      </div>
+		    <% } %>
+		
+		    <h2><%= e.getNombre() %></h2>
+		    <p><strong>Descripción:</strong> <%= e.getDescripcion() == null ? "" : e.getDescripcion() %></p>
+		    <p><strong>Fecha:</strong> <%= (e.getFecha() == null ? "" : e.getFecha().toString()) %></p>
+		
+		    <div class="actions">
+		      <form action="<%=ctx%>/evento/ConsultaEvento" method="get" style="display:inline">
+		        <input type="hidden" name="nombre" value="<%= e.getNombre() %>">
+		        <button type="submit" class="btn-linklike">Ver más</button>
+		      </form>
+		    </div>
+		  </article>
+		<%
+		    }
+		  } else {
+		%>
+		  <p>No hay eventos disponibles.</p>
+		<%
+		  }
+		%>
 
-            <h2><%= e.getNombre() %></h2>
-            <p><strong>Descripción:</strong> <%= e.getDescripcion() == null ? "" : e.getDescripcion() %></p>
-            <p><strong>Fecha:</strong> <%= (e.getFecha() == null ? "" : e.getFecha().toString()) %></p>
-
-            <div class="actions">
-              <form action="<%=ctx%>/evento/ConsultaEvento" method="get" style="display:inline">
-                <input type="hidden" name="nombre" value="<%= e.getNombre() %>">
-                <button type="submit" class="btn-linklike">Ver más</button>
-              </form>
-            </div>
-          </article>
-        <%
-            }
-          } else {
-        %>
-          <p>No hay eventos disponibles.</p>
-        <%
-          }
-        %>
       </div>
     </main>
   </div>
