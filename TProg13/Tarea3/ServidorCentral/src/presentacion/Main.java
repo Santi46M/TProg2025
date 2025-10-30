@@ -28,6 +28,7 @@ import publicadores.PublicadorEvento;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.function.Consumer;
+import java.util.Arrays; 
 
 public class Main {
 
@@ -39,6 +40,9 @@ public class Main {
     private JDesktopPane desktopPane;
     private IControladorUsuario icu;
     private IControladorEvento ice;
+
+    // ==== NUEVO: referencia a la instancia publicada ====
+    private PublicadorEstadisticas estadisticasSvc;
 
     // Lazy: se crean on-demand
     private AltaUsuarioFrame creUsrInternalFrame;
@@ -70,39 +74,47 @@ public class Main {
 
             PublicadorEstadisticas publicadorEstadisticas = new PublicadorEstadisticas();
             publicadorEstadisticas.publicar();
+
+            try {
+                boolean puesto = false;
+                for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                    if ("Metal".equals(info.getName())) {
+                        UIManager.setLookAndFeel(info.getClassName());
+                        puesto = true;
+                        break;
+                    }
+                }
+                if (!puesto) {
+                    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                }
+            } catch (ClassNotFoundException
+                    | InstantiationException
+                    | IllegalAccessException
+                    | javax.swing.UnsupportedLookAndFeelException ignore) {
+                // Si falla el Look&Feel, seguimos con el default
+            }
+
+            EventQueue.invokeLater(() -> {
+                Main window = new Main();
+                // ==== NUEVO: inyectamos la instancia publicada ====
+                window.setPublicadores(publicadorUsuario, publicadorEvento, publicadorEstadisticas);
+                window.frame.setVisible(true);
+            });
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        try {
-            boolean puesto = false;
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Metal".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    puesto = true;
-                    break;
-                }
-            }
-            if (!puesto) {
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            }
-        } catch (ClassNotFoundException
-                | InstantiationException
-                | IllegalAccessException
-                | javax.swing.UnsupportedLookAndFeelException ignore) {
-            // Si falla el Look&Feel, seguimos con el default
-        }
-
-        EventQueue.invokeLater(() -> {
-            Main window = new Main();
-            window.frame.setVisible(true);
-        });
     }
 
     public Main() {
         initialize();
         icu = fabrica.getInstance().getIControladorUsuario();
         ice = fabrica.getInstance().getIControladorEvento();
+    }
+
+    // ==== NUEVO: setter para guardar la instancia publicada ====
+    public void setPublicadores(PublicadorUsuario pu, PublicadorEvento pe, PublicadorEstadisticas pes) {
+        this.estadisticasSvc = pes;
     }
 
     private void initialize() {
@@ -362,14 +374,20 @@ public class Main {
         menuEstadisticas.add(itemTopEventos);
 
         itemTopEventos.addActionListener(e -> {
-            // Loader: enchufá tu fuente real de datos aquí cuando tengas el controlador listo.
+            // usa la MISMA instancia publicada 
             Supplier<List<logica.datatypes.DTTopEvento>> loader = () -> {
-                // Ejemplo:
-                // return fabrica.getInstance().getIControladorEstadisticas().listarTopEventos();
-                return java.util.List.of(); // placeholder
+                try {
+                    logica.datatypes.DTTopEvento[] arr = (estadisticasSvc == null)
+                            ? null
+                            : estadisticasSvc.topEventos(5);
+                    return (arr == null) ? List.of() : Arrays.asList(arr);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    return List.of();
+                }
             };
 
-            // Navegación: abre Consulta de Evento para el evento elegido
+            // Navegación: abrir Consulta de Evento para el nombre elegido
             Consumer<String> openEventoByName = (String nombreEvento) -> {
                 try {
                     if (consultaEventoFrame == null || consultaEventoFrame.isClosed()) {
@@ -379,13 +397,13 @@ public class Main {
                     consultaEventoFrame.cargarEventos();
                     showCentered(consultaEventoFrame);
 
-                    // Si añadís un método para preseleccionar por nombre, llamalo aquí:
+                    // (Opcional) si agregás un método en tu frame:
                     // consultaEventoFrame.preseleccionarPorNombre(nombreEvento);
 
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(frame,
-                            "No se pudo abrir la consulta del evento:\n" + ex.getMessage(),
-                            "Error", JOptionPane.ERROR_MESSAGE);
+                        "No se pudo abrir la consulta del evento:\n" + ex.getMessage(),
+                        "Error", JOptionPane.ERROR_MESSAGE);
                 }
             };
 
