@@ -44,28 +44,15 @@
   ul { list-style: disc; padding-left:1.2rem; }
   ul li { cursor:pointer; margin:.3rem 0; }
   ul li:hover { text-decoration: underline; }
-.btn-linklike {
-  background-color: #3366cc;       /* Azul intenso tipo Google */
-  color: #fff;                     /* Texto blanco */
-  font-weight: 600;                /* Negrita suave */
-  border: none;                    /* Sin borde */
-  border-radius: 6px;              /* Bordes redondeados */
-  padding: 8px 16px;               /* Espaciado interno */
-  cursor: pointer;                 /* Manito al pasar */
-  transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.btn-linklike:hover {
-  background-color: #2851a3;       /* Azul más oscuro al hover */
-  transform: translateY(-1px);     /* Efecto de levantar */
-}
-
-.btn-linklike:active {
-  background-color: #1e3d7b;       /* Azul más oscuro al hacer click */
-  transform: translateY(0);        /* Vuelve al nivel */
-}
-
-.btn-linklike:disabled {
-  background-color: #a3b4e0;       /* Azul apagado */
-  cursor: not-allowed;
-}
+  
+  /* Button used like a soft link (matches project style) */
+  .btn-linklike {
+    background: #f9fafb;
+    border: 1px solid #d1d5db;
+    padding: .45rem .75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #111827;
+    font-size: .95rem;
+  }
+  .btn-linklike:hover { background: #f3f4f6; }

@@ -17,6 +17,9 @@
   <title>Consulta Registro Edición — Eventos.uy</title>
   <link rel="stylesheet" href="<%=ctx%>/css/style.css">
   <link rel="stylesheet" href="<%=ctx%>/css/ConsultaRegistro.css">
+  <style>
+  .btn-linklike{background:#f9fafb; border:1px solid #d1d5db; padding:.45rem .75rem; border-radius:8px; cursor:pointer}
+  .btn-linklike:hover{background:#f3f4f6}</style>
 </head>
 <body>
   <jsp:include page="/WEB-INF/templates/header.jsp" />

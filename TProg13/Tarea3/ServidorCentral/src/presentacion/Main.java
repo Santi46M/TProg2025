@@ -22,7 +22,12 @@ import java.awt.Point;
 import java.beans.PropertyVetoException;
 
 import publicadores.PublicadorUsuario;
+import publicadores.PublicadorEstadisticas;
 import publicadores.PublicadorEvento;
+
+import java.util.List;
+import java.util.function.Supplier;
+import java.util.function.Consumer;
 
 public class Main {
 
@@ -52,6 +57,9 @@ public class Main {
     private ModificarDatosUsuarioFrame modificarDatosUsuarioFrame;
     private AceptarEdicionEventoFrame aceptarEdicionEventoFrame;
 
+    // Nuevo: frame de estadísticas Top 5
+    private TopEventosFrame topEventosFrame;
+
     public static void main(String[] args) {
         try {
             PublicadorUsuario publicadorUsuario = new PublicadorUsuario();
@@ -59,10 +67,13 @@ public class Main {
 
             PublicadorEvento publicadorEvento = new PublicadorEvento();
             publicadorEvento.publicar();
-            
+
+            PublicadorEstadisticas publicadorEstadisticas = new PublicadorEstadisticas();
+            publicadorEstadisticas.publicar();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         try {
             boolean puesto = false;
             for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
@@ -125,7 +136,7 @@ public class Main {
         styleMenu(menuEvento);
         menuBar.add(menuEvento);
 
-        // ----- Sistema
+        // ===== Sistema
         JMenuItem itemCargaDatos = new JMenuItem("Cargar Datos Iniciales");
         styleMenuItem(itemCargaDatos);
         menuSistema.add(itemCargaDatos);
@@ -135,7 +146,7 @@ public class Main {
                     "Carga completa", JOptionPane.INFORMATION_MESSAGE);
         });
 
-        // ----- Usuario
+        // ===== Usuario
         JMenuItem itemAltaUsuario = new JMenuItem("Alta de Usuario");
         styleMenuItem(itemAltaUsuario);
         menuUsuario.add(itemAltaUsuario);
@@ -207,7 +218,7 @@ public class Main {
             showCentered(modificarDatosUsuarioFrame);
         });
 
-        // ----- Evento
+        // ===== Evento
         JMenuItem itemConsultaEvento = new JMenuItem("Consulta de Evento");
         styleMenuItem(itemConsultaEvento);
         menuEvento.add(itemConsultaEvento);
@@ -340,6 +351,50 @@ public class Main {
             aceptarEdicionEventoFrame.cargarEventos();
             showCentered(aceptarEdicionEventoFrame);
         });
+
+        // ===== Nuevo menú: Estadísticas → Top 5
+        JMenu menuEstadisticas = new JMenu("Estadísticas");
+        styleMenu(menuEstadisticas);
+        menuBar.add(menuEstadisticas);
+
+        JMenuItem itemTopEventos = new JMenuItem("Top 5 eventos más visitados");
+        styleMenuItem(itemTopEventos);
+        menuEstadisticas.add(itemTopEventos);
+
+        itemTopEventos.addActionListener(e -> {
+            // Loader: enchufá tu fuente real de datos aquí cuando tengas el controlador listo.
+            Supplier<List<logica.datatypes.DTTopEvento>> loader = () -> {
+                // Ejemplo:
+                // return fabrica.getInstance().getIControladorEstadisticas().listarTopEventos();
+                return java.util.List.of(); // placeholder
+            };
+
+            // Navegación: abre Consulta de Evento para el evento elegido
+            Consumer<String> openEventoByName = (String nombreEvento) -> {
+                try {
+                    if (consultaEventoFrame == null || consultaEventoFrame.isClosed()) {
+                        consultaEventoFrame = new ConsultaEventoFrame(icu, ice);
+                        desktopPane.add(consultaEventoFrame);
+                    }
+                    consultaEventoFrame.cargarEventos();
+                    showCentered(consultaEventoFrame);
+
+                    // Si añadís un método para preseleccionar por nombre, llamalo aquí:
+                    // consultaEventoFrame.preseleccionarPorNombre(nombreEvento);
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(frame,
+                            "No se pudo abrir la consulta del evento:\n" + ex.getMessage(),
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            };
+
+            if (topEventosFrame == null || topEventosFrame.isClosed()) {
+                topEventosFrame = new TopEventosFrame(loader, openEventoByName);
+                desktopPane.add(topEventosFrame);
+            }
+            showCentered(topEventosFrame);
+        });
     }
 
     private void styleMenu(JMenu menu) {
@@ -365,7 +420,7 @@ public class Main {
         try {
             framee.setSelected(true);
         } catch (PropertyVetoException ignore) {
-            // Si el frame veta el foco, simplemente lo dejamos visible
+            // Si el frame veta el foco, lo dejamos visible sin foco
         }
         framee.toFront();
     }

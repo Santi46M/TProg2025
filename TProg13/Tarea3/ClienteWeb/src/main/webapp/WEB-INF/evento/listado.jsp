@@ -44,11 +44,26 @@ String ctx = request.getContextPath();
 
              String img = ev.getImagen();
              boolean hasImg = (img != null && !img.isBlank());
+             String imgUrl = null;
+
+             if (hasImg) {
+                 if (img.startsWith("http://") || img.startsWith("https://")) {
+                   imgUrl = img;
+                 } else if (img.startsWith("/")) {
+                   imgUrl = ctx + img;
+                 } else {
+                   // ✅ imágenes nuevas van dentro de /img/eventos/
+                   imgUrl = ctx + "/img/eventos/" + img;
+                 }
+               }
         %>
           <article class="card event-card list <%= hasImg ? "" : "no-cover" %>">
-            <% if (hasImg) { %>
-              <img class="event-cover" src="<%=ctx%>/img/<%=img%>" alt="Imagen de <%=nombre%>">
-            <% } %>
+             <% if (hasImg) { %>
+    <img class="event-cover" 
+         src="<%= imgUrl %>" 
+         alt="Imagen de <%= nombre %>"
+         onerror="this.style.display='none';">
+  <% } %>
 
             <h3 class="event-title"><%= nombre %></h3>
             <p class="event-sub"><%= (sigla==null||sigla.isBlank()) ? "—" : sigla %></p>
