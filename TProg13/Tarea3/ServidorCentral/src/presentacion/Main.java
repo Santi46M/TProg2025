@@ -387,18 +387,50 @@ public class Main {
                 }
             };
 
-            // Navegación: abrir Consulta de Evento para el nombre elegido
+         // Navegación: abrir Consulta de Evento para el nombre elegido
             Consumer<String> openEventoByName = (String nombreEvento) -> {
                 try {
                     if (consultaEventoFrame == null || consultaEventoFrame.isClosed()) {
                         consultaEventoFrame = new ConsultaEventoFrame(icu, ice);
                         desktopPane.add(consultaEventoFrame);
                     }
+
+                    // Aseguramos la carga y lo mostramos
                     consultaEventoFrame.cargarEventos();
                     showCentered(consultaEventoFrame);
 
-                    // (Opcional) si agregás un método en tu frame:
-                    // consultaEventoFrame.preseleccionarPorNombre(nombreEvento);
+                    // Intentar preseleccionar por nombre (reflection para no acoplar)
+                    String[] candidateMethods = new String[] {
+                        "preseleccionarPorNombre",
+                        "seleccionarPorNombre",
+                        "mostrarEventoPorNombre",
+                        "preseleccionar",         // (String)
+                        "seleccionarEvento",      // (String)
+                        "seleccionar"             // (String)
+                    };
+
+                    boolean invoked = false;
+                    for (String mName : candidateMethods) {
+                        try {
+                            var m = consultaEventoFrame.getClass().getMethod(mName, String.class);
+                            m.setAccessible(true);
+                            m.invoke(consultaEventoFrame, nombreEvento);
+                            invoked = true;
+                            break;
+                        } catch (NoSuchMethodException ignore) {
+                            // probá el siguiente nombre
+                        }
+                    }
+
+                    if (!invoked) {
+                        // Si tu frame no tiene aún un método de selección, avisamos
+                        JOptionPane.showMessageDialog(
+                            frame,
+                            "Abrí la consulta de evento.\nAñadí un método en ConsultaEventoFrame para preseleccionar por nombre,\npor ejemplo: preseleccionarPorNombre(\"" + nombreEvento + "\").",
+                            "Seleccionar evento",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                    }
 
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(frame,

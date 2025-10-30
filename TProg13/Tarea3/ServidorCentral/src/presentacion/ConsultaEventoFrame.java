@@ -6,15 +6,21 @@ import javax.swing.ImageIcon;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ListModel;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
+import javax.swing.table.TableModel;
+
+import java.lang.reflect.Field;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -329,6 +335,119 @@ public class ConsultaEventoFrame extends JInternalFrame {
             frameEdicion.toFront();
         } else {
             frameEdicion.setVisible(true);
+        }
+    }
+    
+    public void preseleccionarPorNombre(String nombre) {
+        if (nombre == null || nombre.isBlank()) return;
+
+        // 1) JComboBox<String> comboEventos
+        try {
+            Field f = this.getClass().getDeclaredField("comboEventos");
+            f.setAccessible(true);
+            Object val = f.get(this);
+            if (val instanceof JComboBox) {
+                @SuppressWarnings("unchecked")
+                JComboBox<Object> combo = (JComboBox<Object>) val;
+                int idx = -1;
+                for (int i = 0; i < combo.getItemCount(); i++) {
+                    Object it = combo.getItemAt(i);
+                    if (it != null && nombre.equalsIgnoreCase(String.valueOf(it))) {
+                        idx = i; break;
+                    }
+                }
+                if (idx >= 0) {
+                    combo.setSelectedIndex(idx);
+                    // si tu frame expone una acción para consultar/mostrar:
+                    invocarSiExiste("consultarSeleccion");
+                    return;
+                }
+            }
+        } catch (NoSuchFieldException ignore) {
+            // sigue probando
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 2) JTable tablaEventos (nombre en col 0 o 1)
+        try {
+            Field f = this.getClass().getDeclaredField("tablaEventos");
+            f.setAccessible(true);
+            Object val = f.get(this);
+            if (val instanceof JTable) {
+                JTable tabla = (JTable) val;
+                TableModel model = tabla.getModel();
+                int nameCol = model.getColumnCount() > 1 ? 1 : 0; // heurística común
+                int found = -1;
+                for (int r = 0; r < model.getRowCount(); r++) {
+                    Object cell = model.getValueAt(r, Math.min(nameCol, model.getColumnCount() - 1));
+                    if (cell != null && nombre.equalsIgnoreCase(String.valueOf(cell))) {
+                        found = r; break;
+                    }
+                }
+                if (found >= 0) {
+                    int viewRow = tabla.convertRowIndexToView(found);
+                    tabla.getSelectionModel().setSelectionInterval(viewRow, viewRow);
+                    tabla.scrollRectToVisible(tabla.getCellRect(viewRow, 0, true));
+                    invocarSiExiste("consultarSeleccion");
+                    return;
+                }
+            }
+        } catch (NoSuchFieldException ignore) {
+            // sigue probando
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 3) JList<String> listaEventos
+        try {
+            Field f = this.getClass().getDeclaredField("listaEventos");
+            f.setAccessible(true);
+            Object val = f.get(this);
+            if (val instanceof JList) {
+                @SuppressWarnings("unchecked")
+                JList<Object> lista = (JList<Object>) val;
+                ListModel<Object> model = lista.getModel();
+                int idx = -1;
+                for (int i = 0; i < model.getSize(); i++) {
+                    Object it = model.getElementAt(i);
+                    if (it != null && nombre.equalsIgnoreCase(String.valueOf(it))) {
+                        idx = i; break;
+                    }
+                }
+                if (idx >= 0) {
+                    lista.setSelectedIndex(idx);
+                    lista.ensureIndexIsVisible(idx);
+                    invocarSiExiste("consultarSeleccion");
+                    return;
+                }
+            }
+        } catch (NoSuchFieldException ignore) {
+            // no hay lista, fin
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Si no encontró nada, informar de forma amable (opcional)
+        JOptionPane.showMessageDialog(
+            this,
+            "No se pudo preseleccionar el evento \"" + nombre + "\".\n" +
+            "Verificá que aparezca en la lista/tabla y que el nombre coincida.",
+            "Aviso",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    // Invoca un método sin parámetros si existe (por ejemplo, para disparar la consulta)
+    private void invocarSiExiste(String methodName) {
+        try {
+            var m = this.getClass().getMethod(methodName);
+            m.setAccessible(true);
+            m.invoke(this);
+        } catch (NoSuchMethodException ignore) {
+            // es opcional, no es error
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
