@@ -49,9 +49,4 @@ public class ObjectFactory {
         return new DtTopEventoArray();
     }
 
-	public Object createLocalDate() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 }

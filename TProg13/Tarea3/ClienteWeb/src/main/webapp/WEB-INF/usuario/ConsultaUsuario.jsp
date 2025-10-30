@@ -155,7 +155,7 @@
           <input type="hidden" name="nick" value="<%=u.getNickname()%>" />
           <button type="submit" class="btn-link user-nick">
             <i class='bx bxs-user-circle'></i>
-            <span><%=u.getNickname()%></span>
+            <span><strong>Ver Perfil</strong></span>
           </button>
         </form>
       </h3>
@@ -205,8 +205,7 @@
       avatarSrc = ctx + "/img/user-default.jpg";
     }
   %>
-  <img class="avatar" src="<%= avatarSrc %>" alt="Avatar de <%= usuario.getNickname() %>" onerror="this.onerror=null;this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2296%22 height=%2296%22 viewBox=%220 0 96 96%22><rect width=%22100%25%22 height=%22100%25%22 fill=%22%23f3f4f6%22/><text x=%2250%25%22 y=%2255%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%236b7280%22 font-size=%2232%22 font-family=%22Arial, Helvetica, sans-serif%22>👤</text></svg>';">
-
+  <img class="avatar" src="<%= avatarSrc %>" alt="Avatar de <%= usuario.getNickname() %>" onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
    <div id="datosUsuario">
       <!-- === BARRA SEGUIR / DEJAR SEGUIR (FORM SEPARADO, NO ANIDADO) === -->
     <div class="follow-bar" style="margin:.5rem 0;">
