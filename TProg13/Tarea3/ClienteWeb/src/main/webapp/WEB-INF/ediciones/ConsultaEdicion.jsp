@@ -105,123 +105,133 @@
 <div class="container row page-consulta-edicion <%= hasAnyImg ? "" : "no-img" %>" style="margin-top:1rem; display:flex; align-items:flex-start;">
   <jsp:include page="/WEB-INF/templates/menu.jsp" />
 
-  <main class="container page-consulta-edicion" style="margin-top:1.5rem;">
-  <section class="card event-card" style="max-width:750px; margin:0 auto; padding:1.25rem;">
-	<div class="event-meta" style="margin-bottom:1rem; text-align:center;">
-  <% if (hasAnyImg) { %>
-    <div class="img-frame" style="
-         margin: 0 auto 1rem;
-         border-radius: 10px;
-         overflow: hidden;
-         width: 60%;
-         max-width: 500px;
-         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    ">
-      <img src="<%= edImagenUrl %>" 
-           alt="Imagen de la edición <%= edicion.getNombre() %>" 
-           style="width:100%; height:auto; display:block;">
-    </div>
-  <% } %>
+<main class="container page-consulta-edicion" style="margin-top:1.5rem;">
+  <section class="card event-card"
+    style="display:grid; grid-template-columns: 1fr 1.2fr; gap:2rem;
+           max-width:1100px; margin:0 auto; padding:1.5rem; align-items:start;">
 
-  <% if (hasVideo) { %>
-    <div class="video-frame" style="
-         margin: 1rem auto;
-         width: 60%;
-         max-width: 500px;
-         border-radius: 10px;
-         overflow: hidden;
-         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    ">
-      <iframe src="<%= edVideoEmbed %>" 
-              width="100%" height="280" 
-              frameborder="0" allowfullscreen></iframe>
-    </div>
-  <% } %>
-</div>
-
-    <h1 style="font-size:1.6rem; font-weight:700; margin-bottom:.25rem;"><%= edicion.getNombre() %></h1>
-	<p style="font-size:1rem; color:#444; margin-bottom:1rem;">
-	  <strong>Evento:</strong>
-	  <a href="<%=ctx%>/evento/ConsultaEvento?nombre=<%= java.net.URLEncoder.encode(evNombre, java.nio.charset.StandardCharsets.UTF_8) %>"
-	     style="color:inherit; text-decoration:none; font-weight:normal; margin-left:4px; margin-right:8px;">
-	    <%= evNombre %>
-	  </a>
-	  —
-	  <strong>Organizador:</strong>
-	  <a href="<%=ctx%>/usuario/ConsultaUsuario?nick=<%=organizador%>"
-	     style="color:inherit; text-decoration:none; font-weight:normal; margin-left:4px;">
-	    <%= organizador %>
-	  </a>
-	</p>
-    <div class="event-meta" style="margin-bottom:1rem;">
-      <p><strong>Sigla:</strong> <%= edicion.getSigla() %></p>
-      <p><strong>Ciudad:</strong> <%= edicion.getCiudad() %></p>
-      <p><strong>País:</strong> <%= edicion.getPais() %></p>
-      <p><strong>Inicio:</strong> <%= edicion.getFechaInicio() %></p>
-      <p><strong>Fin:</strong> <%= edicion.getFechaFin() %></p>
-      <p><strong>Alta:</strong> <%= edicion.getFechaAlta() %></p>
-      <p><strong>Estado:</strong> <%= edicion.getEstado() %></p>
-    </div>
-
-    
-
-    <% if (regUsr != null && "ASISTENTE".equalsIgnoreCase(rol)) { %>
-      <section class="registro-detalle" style="border:1px solid #ddd; background:#fafafa; border-radius:10px; padding:1rem; margin-top:1.5rem;">
-        <h3 style="margin-top:0;">Tu registro en esta edición</h3>
-        <p>Ya estás registrado en esta edición del evento.</p>
-        <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="get">
-          <input type="hidden" name="idRegistro" value="<%= regUsr.getIdentificador() %>">
-          <button type="submit" class="btn btn-ver-detalles" style="margin-top:.5rem;">Ver detalles del registro</button>
-        </form>
-      </section>
+    <%-- Imagen llena toda la columna izquierda --%>
+    <% if (hasAnyImg) { %>
+      <div class="img-frame" style="
+        width:100%;
+        height:100%;
+        border-radius:10px;
+        overflow:hidden;
+        box-shadow:0 2px 10px rgba(0,0,0,0.08);
+      ">
+        <img src="<%= edImagenUrl %>"
+             alt="Imagen de la edición <%= edicion.getNombre() %>"
+             style="width:100%; height:100%; object-fit:cover; display:block;">
+      </div>
     <% } %>
 
-    <section style="margin-top:1.5rem;">
-      <h3>Tipos de Registro</h3>
-      <% if (tiposRegistro != null && !tiposRegistro.isEmpty()) { %>
-        <ul style="list-style:none; padding:0;">
-          <% for (DtTipoRegistro tr : tiposRegistro) { %>
-            <li style="margin:.3rem 0;">
-              <strong><%= tr.getNombre() %></strong>
-              <form action="<%=ctx%>/registro/ConsultaTipoRegistro" method="get" style="display:inline;">
-                <input type="hidden" name="evento" value="<%= evNombre %>">
-                <input type="hidden" name="edicion" value="<%= edicion.getNombre() %>">
-                <input type="hidden" name="tipoRegistro" value="<%= tr.getNombre() %>">
-                <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
-              </form>
-            </li>
-          <% } %>
-        </ul>
-      <% } else { %>
-        <p>No hay tipos de registro asociados.</p>
-      <% } %>
-    </section>
+    <%-- Columna derecha: video + info + listas --%>
+    <div class="event-info" style="
+      display:flex;
+      flex-direction:column;
+      gap:1.5rem;
+    ">
 
-    <section style="margin-top:1.5rem;">
-      <h3>Patrocinios</h3>
-      <% if (patrocinios != null && !patrocinios.isEmpty()) { %>
-        <ul style="list-style:none; padding:0;">
-          <% for (DtPatrocinio p : patrocinios) { %>
-            <li style="margin:.3rem 0;">
-              <strong><%= p.getInstitucion() %></strong>
-              <form action="<%=ctx%>/edicion/ConsultaPatrocinio" method="get" style="display:inline;">
-                <input type="hidden" name="evento" value="<%= evNombre %>">
-                <input type="hidden" name="edicion" value="<%= edicion.getNombre() %>">
-                <input type="hidden" name="codigoPatrocinio" value="<%= p.getCodigo() %>">
-                <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver detalles</button>
-              </form>
-            </li>
-          <% } %>
-        </ul>
-      <% } else { %>
-        <p>No hay patrocinios asociados.</p>
+      <%-- Video arriba --%>
+      <% if (hasVideo) { %>
+        <div class="video-frame" style="
+          width:100%;
+          aspect-ratio:16/9;
+          border-radius:10px;
+          overflow:hidden;
+          box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        ">
+          <iframe src="<%= edVideoEmbed %>"
+                  style="width:100%; height:100%; border:none; border-radius:10px;"
+                  allowfullscreen></iframe>
+        </div>
       <% } %>
-    </section>
+
+      <%-- Datos principales --%>
+      <div>
+        <h1 style="font-size:1.6rem; font-weight:700; margin-bottom:.5rem;">
+          <%= edicion.getNombre() %>
+        </h1>
+        <p style="font-size:1rem; color:#444; margin-bottom:1rem;">
+          <strong>Evento:</strong>
+          <a href="<%=ctx%>/evento/ConsultaEvento?nombre=<%= java.net.URLEncoder.encode(evNombre, java.nio.charset.StandardCharsets.UTF_8) %>"
+             style="color:inherit; text-decoration:none; margin-left:4px; margin-right:8px;">
+            <%= evNombre %>
+          </a>
+          —
+          <strong>Organizador:</strong>
+          <a href="<%=ctx%>/usuario/ConsultaUsuario?nick=<%=organizador%>"
+             style="color:inherit; text-decoration:none; margin-left:4px;">
+            <%= organizador %>
+          </a>
+        </p>
+
+        <div class="event-meta" style="
+          display:grid;
+          grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+          gap:.25rem .75rem;
+          font-size:.95rem;
+          color:#555;
+        ">
+          <div><strong>Sigla:</strong> <%= edicion.getSigla() %></div>
+          <div><strong>Ciudad:</strong> <%= edicion.getCiudad() %></div>
+          <div><strong>País:</strong> <%= edicion.getPais() %></div>
+          <div><strong>Inicio:</strong> <%= edicion.getFechaInicio() %></div>
+          <div><strong>Fin:</strong> <%= edicion.getFechaFin() %></div>
+          <div><strong>Alta:</strong> <%= edicion.getFechaAlta() %></div>
+          <div><strong>Estado:</strong> <%= edicion.getEstado() %></div>
+        </div>
+      </div>
+
+      <%-- Tipos y Patrocinios --%>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+        <div>
+          <h3>Tipos de Registro</h3>
+          <% if (tiposRegistro != null && !tiposRegistro.isEmpty()) { %>
+            <ul style="list-style:none; padding:0; margin:0;">
+              <% for (DtTipoRegistro tr : tiposRegistro) { %>
+                <li style="margin:.3rem 0;">
+                  <strong><%= tr.getNombre() %></strong>
+                  <form action="<%=ctx%>/registro/ConsultaTipoRegistro" method="get" style="display:inline;">
+                    <input type="hidden" name="evento" value="<%= evNombre %>">
+                    <input type="hidden" name="edicion" value="<%= edicion.getNombre() %>">
+                    <input type="hidden" name="tipoRegistro" value="<%= tr.getNombre() %>">
+                    <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver</button>
+                  </form>
+                </li>
+              <% } %>
+            </ul>
+          <% } else { %>
+            <p style="color:#666;">Ninguno.</p>
+          <% } %>
+        </div>
+
+        <div>
+          <h3>Patrocinios</h3>
+          <% if (patrocinios != null && !patrocinios.isEmpty()) { %>
+            <ul style="list-style:none; padding:0; margin:0;">
+              <% for (DtPatrocinio p : patrocinios) { %>
+                <li style="margin:.3rem 0;">
+                  <strong><%= p.getInstitucion() %></strong>
+                  <form action="<%=ctx%>/edicion/ConsultaPatrocinio" method="get" style="display:inline;">
+                    <input type="hidden" name="evento" value="<%= evNombre %>">
+                    <input type="hidden" name="edicion" value="<%= edicion.getNombre() %>">
+                    <input type="hidden" name="codigoPatrocinio" value="<%= p.getCodigo() %>">
+                    <button type="submit" class="btn btn-ver-detalles" style="margin-left:0.5rem;">Ver</button>
+                  </form>
+                </li>
+              <% } %>
+            </ul>
+          <% } else { %>
+            <p style="color:#666;">Ninguno.</p>
+          <% } %>
+        </div>
+      </div>
+    </div>
   </section>
 </main>
 
 
- 
 </div>
 
 <script>
