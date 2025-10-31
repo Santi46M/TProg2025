@@ -5,8 +5,14 @@ import jakarta.jws.WebParam;
 import jakarta.jws.WebService;
 import jakarta.jws.soap.SOAPBinding;
 import jakarta.xml.ws.Endpoint;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Properties;
+
 import excepciones.EdicionYaExisteException;
 import excepciones.EventoYaExisteException;
 import excepciones.FechasCruzadasException;
@@ -28,9 +34,38 @@ public class PublicadorEvento {
 
     @WebMethod(exclude = true)
     public void publicar() {
-        endpoint = Endpoint.publish("http://localhost:8090/publicadorEvento", this);
-        System.out.println("Servicio PublicadorEvento disponible en: http://localhost:8090/publicadorEvento?wsdl");
+        String ip = obtenerIpLocal();
+        String puerto = obtenerPuerto();
+        String address = "http://" + ip + ":" + puerto + "/publicadorEvento";
+
+        endpoint = Endpoint.publish(address, this);
+        System.out.println("Servicio PublicadorEvento publicado en: " + address);
+        System.out.println("WSDL disponible en: " + address + "?wsdl");
     }
+
+    private String obtenerIpLocal() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            System.err.println("No se pudo obtener IP local, usando localhost.");
+            return "localhost";
+        }
+    }
+
+    private String obtenerPuerto() {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) return "8090"; // valor por defecto
+            Properties prop = new Properties();
+            prop.load(input);
+            return prop.getProperty("puerto", "8090");
+        } catch (IOException e) {
+            return "8090";
+        }
+    }
+
+    /* ===========================
+       MÉTODOS DEL SERVICIO
+       =========================== */
 
     @WebMethod
     public void altaEvento(
@@ -252,6 +287,7 @@ public class PublicadorEvento {
     public String encontrarEventoPorSigla(@WebParam(name = "siglaEdicion") String siglaEdicion) {
         return ice.encontrarEventoPorSigla(siglaEdicion);
     }
+
     @WebMethod
     public void marcarAsistenciaRegistro(
         @WebParam(name = "nick") String nick,
@@ -259,7 +295,6 @@ public class PublicadorEvento {
     ) {
         ice.marcarAsistencia(nick, idRegistro);
     }
-
 
     @WebMethod(exclude = true)
     public Endpoint getEndpoint() {

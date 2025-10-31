@@ -5,26 +5,62 @@ import jakarta.jws.WebParam;
 import jakarta.jws.WebService;
 import jakarta.jws.soap.SOAPBinding;
 import jakarta.xml.ws.Endpoint;
+
 import logica.datatypes.DTTopEvento;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 @WebService
 @SOAPBinding(style = SOAPBinding.Style.RPC, parameterStyle = SOAPBinding.ParameterStyle.WRAPPED)
 public class PublicadorEstadisticas {
-	
-	private Endpoint endpoint = null;
-	@WebMethod(exclude = true)
+
+    private Endpoint endpoint = null;
+
+    @WebMethod(exclude = true)
     public void publicar() {
-        endpoint = Endpoint.publish("http://localhost:8090/publicadorEstadisticas", this);
-        System.out.println("Servicio PublicadorEstadisticas disponible en: http://localhost:8090/publicadorEstadisticas?wsdl");
+        String ip = obtenerIpLocal();
+        String puerto = obtenerPuerto();
+        String address = "http://" + ip + ":" + puerto + "/publicadorEstadisticas";
+
+        endpoint = Endpoint.publish(address, this);
+        System.out.println("Servicio PublicadorEstadisticas publicado en: " + address);
+        System.out.println("WSDL disponible en: " + address + "?wsdl");
     }
 
-    // contador en memoria por nombre de evento
+    // --- Métodos auxiliares para IP y puerto ---
+    private String obtenerIpLocal() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            System.err.println("No se pudo obtener IP local, usando localhost.");
+            return "localhost";
+        }
+    }
+
+    private String obtenerPuerto() {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) return "8090";
+            Properties prop = new Properties();
+            prop.load(input);
+            return prop.getProperty("puerto", "8090");
+        } catch (IOException e) {
+            return "8090";
+        }
+    }
+
+    /* =============================
+       LÓGICA DEL SERVICIO
+       ============================= */
+
+    // Contador en memoria por nombre de evento
     private static final Map<String, Integer> VISITAS = new ConcurrentHashMap<>();
 
     @WebMethod
@@ -34,7 +70,6 @@ public class PublicadorEstadisticas {
         int nuevo = VISITAS.merge(key, 1, Integer::sum);
         System.out.println("[ESTAD] +1 '" + key + "' => " + nuevo);
     }
-
 
     @WebMethod
     public DTTopEvento[] topEventos(@WebParam(name = "n") int n) {
@@ -52,10 +87,9 @@ public class PublicadorEstadisticas {
 
         return lista.toArray(new DTTopEvento[0]);
     }
-    
+
     @WebMethod(exclude = true)
     public Endpoint getEndpoint() {
         return endpoint;
     }
 }
-

@@ -6,7 +6,11 @@ import jakarta.jws.WebService;
 import jakarta.jws.soap.SOAPBinding;
 import jakarta.xml.ws.Endpoint;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
 import java.time.LocalDate;
+import java.util.Properties;
 import java.util.Set;
 import javax.xml.datatype.XMLGregorianCalendar;
 
@@ -29,9 +33,39 @@ public class PublicadorUsuario {
 
     @WebMethod(exclude = true)
     public void publicar() {
-        endpoint = Endpoint.publish("http://localhost:8090/publicadorUsuario", this);
-        System.out.println("Servicio PublicadorUsuario disponible en: http://localhost:8090/publicadorUsuario?wsdl");
+        String ip = obtenerIpLocal();
+        String puerto = obtenerPuerto();
+        String address = "http://" + ip + ":" + puerto + "/publicadorUsuario";
+
+        endpoint = Endpoint.publish(address, this);
+        System.out.println("Servicio PublicadorUsuario publicado en: " + address);
+        System.out.println("WSDL disponible en: " + address + "?wsdl");
     }
+
+    // --- Métodos auxiliares internos para IP y puerto ---
+    private String obtenerIpLocal() {
+        try {
+            return InetAddress.getLocalHost().getHostAddress();
+        } catch (Exception e) {
+            System.err.println("No se pudo obtener IP local, usando localhost.");
+            return "localhost";
+        }
+    }
+
+    private String obtenerPuerto() {
+        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
+            if (input == null) return "8090"; // valor por defecto
+            Properties prop = new Properties();
+            prop.load(input);
+            return prop.getProperty("puerto", "8090");
+        } catch (IOException e) {
+            return "8090";
+        }
+    }
+
+    /* =============================
+       Métodos del servicio (sin cambios)
+       ============================= */
 
     @WebMethod
     public void altaUsuario(
@@ -47,7 +81,6 @@ public class PublicadorUsuario {
         @WebParam(name = "contrasena") String contrasena,
         @WebParam(name = "imagen") String imagen
     ) throws UsuarioYaExisteException {
-        // convert XMLGregorianCalendar -> java.time.LocalDate (allow null)
         LocalDate ld = null;
         if (fechaNacimiento != null) {
             int y = fechaNacimiento.getYear();
@@ -138,10 +171,6 @@ public class PublicadorUsuario {
         return instituciones.toArray(new String[0]);
     }
 
-    /* =========================
-       NUEVOS MÉTODOS AGREGADOS
-       ========================= */
-
     @WebMethod
     public String[] getInstituciones() {
         Set<String> instituciones = icu.getInstituciones();
@@ -185,7 +214,6 @@ public class PublicadorUsuario {
     ) throws UsuarioNoExisteException {
         icu.modificarContrasenia(nickname, nuevaContrasenia);
     }
-    
 
     @WebMethod(exclude = true)
     public Endpoint getEndpoint() {
