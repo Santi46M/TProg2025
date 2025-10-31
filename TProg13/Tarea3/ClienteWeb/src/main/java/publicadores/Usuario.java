@@ -7,9 +7,9 @@ import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for usuario complex type.
+ * <p>Clase Java para usuario complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>{@code
  * <complexType name="usuario">
@@ -40,7 +40,7 @@ public abstract class Usuario {
     protected String nombre;
 
     /**
-     * Gets the value of the contrasena property.
+     * Obtiene el valor de la propiedad contrasena.
      * 
      * @return
      *     possible object is
@@ -52,7 +52,7 @@ public abstract class Usuario {
     }
 
     /**
-     * Sets the value of the contrasena property.
+     * Define el valor de la propiedad contrasena.
      * 
      * @param value
      *     allowed object is
@@ -64,7 +64,7 @@ public abstract class Usuario {
     }
 
     /**
-     * Gets the value of the imagen property.
+     * Obtiene el valor de la propiedad imagen.
      * 
      * @return
      *     possible object is
@@ -76,7 +76,7 @@ public abstract class Usuario {
     }
 
     /**
-     * Sets the value of the imagen property.
+     * Define el valor de la propiedad imagen.
      * 
      * @param value
      *     allowed object is
@@ -88,7 +88,7 @@ public abstract class Usuario {
     }
 
     /**
-     * Gets the value of the nombre property.
+     * Obtiene el valor de la propiedad nombre.
      * 
      * @return
      *     possible object is
@@ -100,7 +100,7 @@ public abstract class Usuario {
     }
 
     /**
-     * Sets the value of the nombre property.
+     * Define el valor de la propiedad nombre.
      * 
      * @param value
      *     allowed object is

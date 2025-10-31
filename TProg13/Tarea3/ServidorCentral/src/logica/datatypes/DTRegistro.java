@@ -18,6 +18,7 @@ public class DTRegistro implements Serializable {
     @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate fechaRegistro;
     private float costo;
+    @XmlJavaTypeAdapter(LocalDateAdapter.class)
     private LocalDate fechaInicio;
     private String evento;
     private Boolean asistio;

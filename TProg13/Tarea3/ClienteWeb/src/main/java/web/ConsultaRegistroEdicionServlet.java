@@ -171,7 +171,7 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
         doc.add(new Paragraph("Edición: " + reg.getEdicion(), textoFont));
         doc.add(new Paragraph("Ciudad: " + ed.getCiudad(), textoFont));
         
-        publicadores.LocalDate fechaIni = reg.getFechaInicio();
+        String fechaIni = reg.getFechaInicio();
         doc.add(new Paragraph("Fecha: " + fechaIni, textoFont));
         doc.add(new Paragraph(" ", textoFont));
 

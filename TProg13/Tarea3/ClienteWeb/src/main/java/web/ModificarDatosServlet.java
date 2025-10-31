@@ -117,7 +117,7 @@ public class ModificarDatosServlet extends HttpServlet {
             );
 
             if (!password.isBlank()) {
-                port.modificarContrasenia(nick, password);
+                	//port.modificarContrasenia(nick, password);
             }
 
             // Ok → redirigir al perfil

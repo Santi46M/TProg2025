@@ -43,11 +43,16 @@
             <div class="event-meta"><strong>Tipo de registro:</strong> <%= registro.getTipoRegistro() %></div>
             <%
   				String fechaR = (registro.getFechaRegistro() != null) ? registro.getFechaRegistro() : "";
+            	
+            
 			%>
             <div class="event-meta"><strong>Fecha de registro:</strong> <%= fechaR %></div>
             <div class="event-meta"><strong>Costo:</strong> $<%= registro.getCosto() %></div>
 
-            <div class="event-meta"><strong>Fecha de inicio:</strong> <%= registro.getFechaInicio() %></div>
+			<%
+			String fechaI = (registro.getFechaInicio() != null) ? registro.getFechaInicio() : "";
+			%>
+            <div class="event-meta"><strong>Fecha de inicio:</strong> <%= fechaI %></div>
 
             <% if (!asistio) { %>
               <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="post" style="margin-top: 1rem;">

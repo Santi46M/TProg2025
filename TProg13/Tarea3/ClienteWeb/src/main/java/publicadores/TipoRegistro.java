@@ -7,9 +7,9 @@ import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for tipoRegistro complex type.
+ * <p>Clase Java para tipoRegistro complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>{@code
  * <complexType name="tipoRegistro">
@@ -40,7 +40,7 @@ public class TipoRegistro {
     protected String nombre;
 
     /**
-     * Gets the value of the descripcion property.
+     * Obtiene el valor de la propiedad descripcion.
      * 
      * @return
      *     possible object is
@@ -52,7 +52,7 @@ public class TipoRegistro {
     }
 
     /**
-     * Sets the value of the descripcion property.
+     * Define el valor de la propiedad descripcion.
      * 
      * @param value
      *     allowed object is
@@ -64,7 +64,7 @@ public class TipoRegistro {
     }
 
     /**
-     * Gets the value of the edicion property.
+     * Obtiene el valor de la propiedad edicion.
      * 
      * @return
      *     possible object is
@@ -76,7 +76,7 @@ public class TipoRegistro {
     }
 
     /**
-     * Sets the value of the edicion property.
+     * Define el valor de la propiedad edicion.
      * 
      * @param value
      *     allowed object is
@@ -88,7 +88,7 @@ public class TipoRegistro {
     }
 
     /**
-     * Gets the value of the nombre property.
+     * Obtiene el valor de la propiedad nombre.
      * 
      * @return
      *     possible object is
@@ -100,7 +100,7 @@ public class TipoRegistro {
     }
 
     /**
-     * Sets the value of the nombre property.
+     * Define el valor de la propiedad nombre.
      * 
      * @param value
      *     allowed object is

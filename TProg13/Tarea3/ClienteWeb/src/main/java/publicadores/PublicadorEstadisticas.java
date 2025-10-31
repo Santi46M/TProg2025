@@ -26,6 +26,16 @@ public interface PublicadorEstadisticas {
 
     /**
      * 
+     * @param eventoNombre
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEstadisticas/registrarVisitaRequest", output = "http://publicadores/PublicadorEstadisticas/registrarVisitaResponse")
+    public void registrarVisita(
+        @WebParam(name = "eventoNombre", partName = "eventoNombre")
+        String eventoNombre);
+
+    /**
+     * 
      * @param n
      * @return
      *     returns publicadores.DtTopEventoArray
@@ -36,15 +46,5 @@ public interface PublicadorEstadisticas {
     public DtTopEventoArray topEventos(
         @WebParam(name = "n", partName = "n")
         int n);
-
-    /**
-     * 
-     * @param eventoNombre
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorEstadisticas/registrarVisitaRequest", output = "http://publicadores/PublicadorEstadisticas/registrarVisitaResponse")
-    public void registrarVisita(
-        @WebParam(name = "eventoNombre", partName = "eventoNombre")
-        String eventoNombre);
 
 }
