@@ -173,9 +173,7 @@ public class EventoServlet extends HttpServlet {
                             } catch (Exception ignore) { /* ignore and keep original */ }
                         }
 
-                        String url = null;
-                        try { url = resolveImagenUrl(req, source); } catch (Exception ignore) { url = null; }
-                        if (url == null || url.isBlank()) url = ctx + "/img/evento-default.svg";
+                        String url = resolveImagenUrl(req, source); // Ensure default image logic is applied
                         fotos.put(e.getNombre(), url);
                         System.out.println("[FOTOS MAP] Evento: " + e.getNombre() + " -> " + url);
                     } catch (Exception ignore) { /* ignore and continue */ }
@@ -405,7 +403,7 @@ public class EventoServlet extends HttpServlet {
         }
 
         // nothing -> default
-        if (raw.isEmpty()) return ctx + "/img/evento-default.svg";
+        if (raw.isEmpty()) return ctx + "/img/eventos/evento-default.svg";
 
         // absolute URL
         if (lowRaw.startsWith("http://") || lowRaw.startsWith("https://")) return raw;
@@ -447,7 +445,7 @@ public class EventoServlet extends HttpServlet {
         }
 
         // fallback to the simplest assumption (default image)
-        return ctx + "/img/evento-default.svg";
+        return ctx + "/img/eventos/evento-default.svg";
      }
 
     private static boolean esAceptada(Object estado) {

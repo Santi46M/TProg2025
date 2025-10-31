@@ -70,7 +70,7 @@ String ctx = request.getContextPath();
          src="<%= imgUrl %>" 
          alt="Imagen de <%= nombre %>"
          onerror="this.style.display='none';">
-    <div class="debug-img-url" style="font-size:0.75rem;color:#777;margin-top:6px;word-break:break-all;">URL: <%= imgUrl %></div>
+    
   <% } %>
 
             <h3 class="event-title"><%= nombre %></h3>
