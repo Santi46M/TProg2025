@@ -43,19 +43,26 @@ String ctx = request.getContextPath();
              java.util.List<String> evEds  = (ev.getEdiciones() != null) ? ev.getEdiciones().getEdicion() : null;
 
              String img = ev.getImagen();
-             boolean hasImg = (img != null && !img.isBlank());
              String imgUrl = null;
 
-             if (hasImg) {
-                 if (img.startsWith("http://") || img.startsWith("https://")) {
-                   imgUrl = img;
-                 } else if (img.startsWith("/")) {
-                   imgUrl = ctx + img;
-                 } else {
-                   // ✅ imágenes nuevas van dentro de /img/eventos/
-                   imgUrl = ctx + "/img/eventos/" + img;
+             // Prefer pre-resolved map (set by EventoServlet) when available
+             java.util.Map<String,String> fotos = (java.util.Map<String,String>) request.getAttribute("fotos");
+             if (fotos != null && fotos.get(nombre) != null) {
+                 imgUrl = fotos.get(nombre);
+             } else {
+                 boolean hasImg = (img != null && !img.isBlank());
+                 if (hasImg) {
+                     if (img.startsWith("http://") || img.startsWith("https://")) {
+                       imgUrl = img;
+                     } else if (img.startsWith("/")) {
+                       imgUrl = ctx + img;
+                     } else {
+                       // ✅ imágenes nuevas van dentro de /img/eventos/
+                       imgUrl = ctx + "/img/eventos/" + img;
+                     }
                  }
-               }
+             }
+             boolean hasImg = (imgUrl != null && !imgUrl.isBlank());
         %>
           <article class="card event-card list <%= hasImg ? "" : "no-cover" %>">
              <% if (hasImg) { %>
@@ -63,6 +70,7 @@ String ctx = request.getContextPath();
          src="<%= imgUrl %>" 
          alt="Imagen de <%= nombre %>"
          onerror="this.style.display='none';">
+    <div class="debug-img-url" style="font-size:0.75rem;color:#777;margin-top:6px;word-break:break-all;">URL: <%= imgUrl %></div>
   <% } %>
 
             <h3 class="event-title"><%= nombre %></h3>

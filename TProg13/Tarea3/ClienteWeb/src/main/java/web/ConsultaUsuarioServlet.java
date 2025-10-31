@@ -20,7 +20,6 @@ import publicadores.StringArray;
 
 @WebServlet(urlPatterns = {
         "/usuario/ConsultaUsuario",
-        "/usuario/modificar",
         "/usuario/seguir",
         "/usuario/dejarSeguir"
 })
@@ -245,62 +244,15 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             return;
         }
 
-        // === POST /usuario/modificar ===
+        // POST /usuario/modificar has been moved to a dedicated servlet.
+        // This servlet no longer performs modification; return 404 so the caller
+        // can be updated to the new endpoint (or implement the new servlet).
         if ("/usuario/modificar".equals(path)) {
-
-            HttpSession sAux = request.getSession(false);
-            String nick = (sAux != null) ? (String) sAux.getAttribute("nick") : null;
-
-            if (nick == null || nick.isBlank()) {
-                response.sendRedirect(request.getContextPath() + "/auth/login");
-                return;
-            }
-
-            // Leer parámetros del formulario
-            String nombre      = Optional.ofNullable(request.getParameter("nombre")).orElse("");
-            String apellido    = Optional.ofNullable(request.getParameter("apellido")).orElse("");
-            String institucion = Optional.ofNullable(request.getParameter("institucion")).orElse("");
-            String descripcion = Optional.ofNullable(request.getParameter("descripcion")).orElse("");
-            String nacStr      = Optional.ofNullable(request.getParameter("fechaNac")).orElse("");
-            String password    = Optional.ofNullable(request.getParameter("password")).orElse("");
-            String link        = Optional.ofNullable(request.getParameter("link")).orElse("");
-
-            LocalDate fechaNac = null;
-            if (nacStr != null && !nacStr.isBlank()) {
-                try {
-                    fechaNac = LocalDate.parse(nacStr);
-                } catch (Exception ignored) {}
-            }
-            String fechaStr = (fechaNac != null) ? fechaNac.toString() : null;
-            Part imgPart = request.getPart("imagen");
-            String imgFileName = null;
-
-            if (imgPart != null && imgPart.getSize() > 0) {
-                imgFileName = Path.of(imgPart.getSubmittedFileName()).getFileName().toString();
-                imgPart.write(getServletContext().getRealPath("/img/usuarios/" + imgFileName));
-            } else {
-                imgFileName = ""; // o mantener la actual del usuario
-            }
-
-            try {
-                port.modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaStr, institucion,imgFileName);
-
-                // Si se ingresó nueva contraseña, actualizarla
-                if (password != null && !password.isBlank()) {
-                    port.modificarContrasenia(nick, password);
-                }
-
-                // Redirigir al perfil actualizado
-                response.sendRedirect(request.getContextPath() + "/usuario/ConsultaUsuario?nick=" +
-                        java.net.URLEncoder.encode(nick, java.nio.charset.StandardCharsets.UTF_8));
-
-            } catch (UsuarioNoExisteException_Exception | UsuarioTipoIncorrectoException_Exception e) {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                request.setAttribute("error", "El usuario '" + nick + "' no existe.");
-            }
-        } else {
-            doGet(request, response);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
+
+        doGet(request, response);
     }
 
     private String nickEnSesion(HttpServletRequest req) {

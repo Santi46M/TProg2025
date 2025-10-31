@@ -148,7 +148,41 @@ public class EventoServlet extends HttpServlet {
 
                 req.setAttribute("lista", lista);
 
-                // construir listado de categorías a partir de eventos
+                // Build a map of resolved image URLs for each event to ensure the JSP
+                // receives a correct, absolute URL (or default) regardless of how
+                // the DtEvento.imagen field is represented.
+                java.util.Map<String,String> fotos = new java.util.HashMap<>();
+                String ctx = ctx(req);
+                for (DtEvento e : lista) {
+                    if (e == null) continue;
+                    try {
+                        DtEvento source = e;
+                        // if the summarized DtEvento from listarEventos doesn't include imagen,
+                        // fetch the full DtEvento as ConsultaEvento does
+                        boolean hasImg = false;
+                        try {
+                            String imgCandidate = (e.getImagen() == null) ? null : e.getImagen().trim();
+                            if (imgCandidate != null && !imgCandidate.isEmpty()) hasImg = true;
+                        } catch (Exception ignore) { hasImg = false; }
+
+                        if (!hasImg) {
+                            try {
+                                // use the same publicador port to fetch full DTO
+                                DtEvento full = portList.consultaDTEvento(e.getNombre());
+                                if (full != null) source = full;
+                            } catch (Exception ignore) { /* ignore and keep original */ }
+                        }
+
+                        String url = null;
+                        try { url = resolveImagenUrl(req, source); } catch (Exception ignore) { url = null; }
+                        if (url == null || url.isBlank()) url = ctx + "/img/evento-default.svg";
+                        fotos.put(e.getNombre(), url);
+                        System.out.println("[FOTOS MAP] Evento: " + e.getNombre() + " -> " + url);
+                    } catch (Exception ignore) { /* ignore and continue */ }
+                }
+                req.setAttribute("fotos", fotos);
+
+                 // construir listado de categorías a partir de eventos
                 Set<String> cats = new HashSet<>();
                 for (DtEvento e : lista) {
                     if (e == null) continue;
@@ -355,43 +389,66 @@ public class EventoServlet extends HttpServlet {
     private String resolveImagenUrl(HttpServletRequest req, DtEvento ev) {
         String ctx = ctx(req);
         String raw = null;
-        try { raw = ev.getImagen(); } catch (Exception ignore) {}
+        try { raw = (ev == null) ? null : ev.getImagen(); } catch (Exception ignore) { raw = null; }
 
-        String url = null;
-        if (raw != null && !raw.isBlank()) {
-            String lower = raw.toLowerCase();
-            if (lower.startsWith("http://") || lower.startsWith("https://")) {
-                url = raw; 
-            } else if (raw.startsWith("/")) {
-                if (raw.startsWith(ctx + "/")) {
-                    url = raw;
-                } else {
-                    url = ctx + raw; 
-                }
-            } else {
-                String[] candidates = new String[] {
-                    "/img/" + raw,
-                    "/img/eventos/" + raw,
-                    "/eventos/" + raw
-                };
-                for (String rel : candidates) {
-                    String abs = getServletContext().getRealPath(rel);
-                    boolean exists;
-                    if (abs != null) {
-                        exists = Files.exists(Path.of(abs));
-                    } else {
-                        exists = true; 
-                    }
-                    if (exists) {
-                        url = ctx + rel;
-                        break;
-                    }
-                }
-            }
+        if (raw == null) raw = "";
+        raw = raw.replace('\\', '/').trim();
+
+        // normalize common prefixes that might already include 'img/' or 'eventos/'
+        String lowRaw = raw.toLowerCase();
+        if (lowRaw.startsWith("img/")) {
+            raw = raw.substring(4); // remove leading 'img/'
+            lowRaw = raw.toLowerCase();
+        } else if (lowRaw.startsWith("eventos/")) {
+            raw = raw.substring("eventos/".length());
+            lowRaw = raw.toLowerCase();
         }
-        if (url == null) url = ctx + "/img/evento-default.jpg";
-        return url;
-    }
+
+        // nothing -> default
+        if (raw.isEmpty()) return ctx + "/img/evento-default.svg";
+
+        // absolute URL
+        if (lowRaw.startsWith("http://") || lowRaw.startsWith("https://")) return raw;
+
+        // already contains context path (absolute within app)
+        if (raw.startsWith(ctx + "/")) return raw;
+
+        // leading slash -> treat as app-relative
+        if (raw.startsWith("/")) return ctx + raw;
+
+        // build candidate locations (in order of preference)
+        String[] candidates = new String[] {
+            "/img/eventos/" + raw,
+            "/img/" + raw,
+            "/img/ediciones/" + raw,
+            "/img/usuarios/" + raw,
+            "/" + raw,            // raw might already include 'img/..'
+            "/eventos/" + raw
+        };
+
+        java.util.List<String> unknown = new java.util.ArrayList<>();
+        boolean anyReal = false;
+        for (String rel : candidates) {
+            try {
+                String abs = getServletContext().getRealPath(rel);
+                if (abs == null) {
+                    unknown.add(rel);
+                    continue;
+                }
+                anyReal = true;
+                if (Files.exists(Path.of(abs))) return ctx + rel;
+            } catch (Exception ignore) { }
+        }
+
+        // If we couldn't check the filesystem at all (abs == null for candidates),
+        // return the first constructed URL so resources served from the WAR can be used.
+        if (!anyReal && !unknown.isEmpty()) {
+            return ctx + unknown.get(0);
+        }
+
+        // fallback to the simplest assumption (default image)
+        return ctx + "/img/evento-default.svg";
+     }
 
     private static boolean esAceptada(Object estado) {
         if (estado == null) return false;
