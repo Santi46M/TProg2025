@@ -277,10 +277,10 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
                 }
                 if (meth == null) throw new NoSuchMethodException("altaPatrocinioDT not found on publicador port");
 
-                Class<?>[] ptypes = meth.getParameterTypes();
+                // Adaptación para manejar la fecha correctamente
                 Object fechaArg = null;
-                // ptypes: [String, String, DTNivel, String, int, <dateType>, int, String]
-                Class<?> dateType = ptypes[5];
+                Class<?> dateType = meth.getParameterTypes()[5];
+
                 if (dateType.isAssignableFrom(java.util.Date.class)) {
                     fechaArg = fechaDate;
                 } else if (dateType.getName().equals("javax.xml.datatype.XMLGregorianCalendar")) {
@@ -289,14 +289,13 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
                         javax.xml.datatype.XMLGregorianCalendar xgc = df.newXMLGregorianCalendarDate(
                                 fecha.getYear(), fecha.getMonthValue(), fecha.getDayOfMonth(), javax.xml.datatype.DatatypeConstants.FIELD_UNDEFINED);
                         fechaArg = xgc;
-                    } catch (Exception ex) { fechaArg = null; }
-                } else if (dateType.getName().equals("publicadores.LocalDate") || dateType.getSimpleName().equals("LocalDate")) {
-                    // Create stub LocalDate via ObjectFactory (may be empty)
-                    publicadores.ObjectFactory of = new publicadores.ObjectFactory();
-                    fechaArg = of.createLocalDate();
+                    } catch (Exception ex) {
+                        fechaArg = null;
+                    }
+                } else if (dateType.isAssignableFrom(String.class)) {
+                    fechaArg = fechaStr;
                 } else {
-                    // last resort: try assignable from String (ISO)
-                    if (dateType.isAssignableFrom(String.class)) fechaArg = fechaStr;
+                    throw new IllegalArgumentException("Tipo de fecha no soportado: " + dateType.getName());
                 }
 
                 Object[] args = new Object[] { siglaEd, instit, nivel, tipo, aporte, fechaArg, cantidad, codigo };
