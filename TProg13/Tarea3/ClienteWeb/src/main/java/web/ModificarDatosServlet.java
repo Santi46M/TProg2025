@@ -111,7 +111,7 @@ public class ModificarDatosServlet extends HttpServlet {
                     descripcion,
                     link,
                     apellido,
-                    fechaStr,     // nunca null ("" si vacío)
+                    fechaStr,     
                     institucion,
                     imgFileName
             );
