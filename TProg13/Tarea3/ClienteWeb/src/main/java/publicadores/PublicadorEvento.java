@@ -27,16 +27,82 @@ public interface PublicadorEvento {
 
     /**
      * 
-     * @param nombreEvento
      * @return
-     *     returns publicadores.StringArray
+     *     returns publicadores.DtEventoArray
      */
     @WebMethod
     @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/listarEdicionesEventoRequest", output = "http://publicadores/PublicadorEvento/listarEdicionesEventoResponse")
-    public StringArray listarEdicionesEvento(
-        @WebParam(name = "nombreEvento", partName = "nombreEvento")
-        String nombreEvento);
+    @Action(input = "http://publicadores/PublicadorEvento/listarEventosRequest", output = "http://publicadores/PublicadorEvento/listarEventosResponse")
+    public DtEventoArray listarEventos();
+
+    /**
+     * 
+     * @param costo
+     * @param cupo
+     * @param descripcion
+     * @param dtEdicion
+     * @param nombre
+     * @throws CostoTipoRegistroInvalidoException_Exception
+     * @throws TipoRegistroYaExisteException_Exception
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEvento/altaTipoRegistroRequest", output = "http://publicadores/PublicadorEvento/altaTipoRegistroResponse", fault = {
+        @FaultAction(className = TipoRegistroYaExisteException_Exception.class, value = "http://publicadores/PublicadorEvento/altaTipoRegistro/Fault/TipoRegistroYaExisteException"),
+        @FaultAction(className = CostoTipoRegistroInvalidoException_Exception.class, value = "http://publicadores/PublicadorEvento/altaTipoRegistro/Fault/CostoTipoRegistroInvalidoException")
+    })
+    public void altaTipoRegistro(
+        @WebParam(name = "dtEdicion", partName = "dtEdicion")
+        DtEdicion dtEdicion,
+        @WebParam(name = "nombre", partName = "nombre")
+        String nombre,
+        @WebParam(name = "descripcion", partName = "descripcion")
+        String descripcion,
+        @WebParam(name = "costo", partName = "costo")
+        float costo,
+        @WebParam(name = "cupo", partName = "cupo")
+        int cupo)
+        throws CostoTipoRegistroInvalidoException_Exception, TipoRegistroYaExisteException_Exception
+    ;
+
+    /**
+     * 
+     * @return
+     *     returns publicadores.DtEventoArray
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorEvento/listarEventosVigentesRequest", output = "http://publicadores/PublicadorEvento/listarEventosVigentesResponse")
+    public DtEventoArray listarEventosVigentes();
+
+    /**
+     * 
+     * @param categorias
+     * @param descripcion
+     * @param fechaAlta
+     * @param imagen
+     * @param nombre
+     * @param sigla
+     * @throws EventoYaExisteException_Exception
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEvento/altaEventoRequest", output = "http://publicadores/PublicadorEvento/altaEventoResponse", fault = {
+        @FaultAction(className = EventoYaExisteException_Exception.class, value = "http://publicadores/PublicadorEvento/altaEvento/Fault/EventoYaExisteException")
+    })
+    public void altaEvento(
+        @WebParam(name = "nombre", partName = "nombre")
+        String nombre,
+        @WebParam(name = "descripcion", partName = "descripcion")
+        String descripcion,
+        @WebParam(name = "fechaAlta", partName = "fechaAlta")
+        String fechaAlta,
+        @WebParam(name = "sigla", partName = "sigla")
+        String sigla,
+        @WebParam(name = "categorias", partName = "categorias")
+        DtCategorias categorias,
+        @WebParam(name = "imagen", partName = "imagen")
+        String imagen)
+        throws EventoYaExisteException_Exception
+    ;
 
     /**
      * 
@@ -92,16 +158,246 @@ public interface PublicadorEvento {
 
     /**
      * 
+     * @param nombreEdicion
      * @param nombreEvento
+     * @param nombreTipoRegistro
      * @return
-     *     returns publicadores.DtEvento
+     *     returns publicadores.DtTipoRegistro
      */
     @WebMethod
     @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/consultaDTEventoRequest", output = "http://publicadores/PublicadorEvento/consultaDTEventoResponse")
-    public DtEvento consultaDTEvento(
+    @Action(input = "http://publicadores/PublicadorEvento/consultaTipoRegistroRequest", output = "http://publicadores/PublicadorEvento/consultaTipoRegistroResponse")
+    public DtTipoRegistro consultaTipoRegistro(
+        @WebParam(name = "nombreEvento", partName = "nombreEvento")
+        String nombreEvento,
+        @WebParam(name = "nombreEdicion", partName = "nombreEdicion")
+        String nombreEdicion,
+        @WebParam(name = "nombreTipoRegistro", partName = "nombreTipoRegistro")
+        String nombreTipoRegistro);
+
+    /**
+     * 
+     * @param idRegistro
+     * @param nick
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEvento/marcarAsistenciaRegistroRequest", output = "http://publicadores/PublicadorEvento/marcarAsistenciaRegistroResponse")
+    public void marcarAsistenciaRegistro(
+        @WebParam(name = "nick", partName = "nick")
+        String nick,
+        @WebParam(name = "idRegistro", partName = "idRegistro")
+        String idRegistro);
+
+    /**
+     * 
+     * @param codigoPatrocinio
+     * @return
+     *     returns publicadores.DtPatrocinio
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorEvento/obtenerDTPatrocinioRequest", output = "http://publicadores/PublicadorEvento/obtenerDTPatrocinioResponse")
+    public DtPatrocinio obtenerDTPatrocinio(
+        @WebParam(name = "codigoPatrocinio", partName = "codigoPatrocinio")
+        String codigoPatrocinio);
+
+    /**
+     * 
+     * @return
+     *     returns publicadores.StringArray
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorEvento/listarCategoriasConEventosRequest", output = "http://publicadores/PublicadorEvento/listarCategoriasConEventosResponse")
+    public StringArray listarCategoriasConEventos();
+
+    /**
+     * 
+     * @param nombreCategoria
+     * @return
+     *     returns publicadores.DtEventoArray
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorEvento/listarEventosPorCategoriaRequest", output = "http://publicadores/PublicadorEvento/listarEventosPorCategoriaResponse")
+    public DtEventoArray listarEventosPorCategoria(
+        @WebParam(name = "nombreCategoria", partName = "nombreCategoria")
+        String nombreCategoria);
+
+    /**
+     * 
+     * @param sigla
+     * @return
+     *     returns publicadores.DtEdicion
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorEvento/obtenerEdicionPorSiglaDTRequest", output = "http://publicadores/PublicadorEvento/obtenerEdicionPorSiglaDTResponse")
+    public DtEdicion obtenerEdicionPorSiglaDT(
+        @WebParam(name = "sigla", partName = "sigla")
+        String sigla);
+
+    /**
+     * 
+     * @param siglaEdicion
+     * @param siglaEvento
+     * @return
+     *     returns publicadores.DtEdicion
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorEvento/consultaEdicionEventoRequest", output = "http://publicadores/PublicadorEvento/consultaEdicionEventoResponse")
+    public DtEdicion consultaEdicionEvento(
+        @WebParam(name = "siglaEvento", partName = "siglaEvento")
+        String siglaEvento,
+        @WebParam(name = "siglaEdicion", partName = "siglaEdicion")
+        String siglaEdicion);
+
+    /**
+     * 
+     * @param costo
+     * @param cupo
+     * @param descripcion
+     * @param dtEdicion
+     * @param nombre
+     * @throws CostoTipoRegistroInvalidoException_Exception
+     * @throws TipoRegistroYaExisteException_Exception
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEvento/altaTipoRegistroDTORequest", output = "http://publicadores/PublicadorEvento/altaTipoRegistroDTOResponse", fault = {
+        @FaultAction(className = TipoRegistroYaExisteException_Exception.class, value = "http://publicadores/PublicadorEvento/altaTipoRegistroDTO/Fault/TipoRegistroYaExisteException"),
+        @FaultAction(className = CostoTipoRegistroInvalidoException_Exception.class, value = "http://publicadores/PublicadorEvento/altaTipoRegistroDTO/Fault/CostoTipoRegistroInvalidoException")
+    })
+    public void altaTipoRegistroDTO(
+        @WebParam(name = "dtEdicion", partName = "dtEdicion")
+        DtEdicion dtEdicion,
+        @WebParam(name = "nombre", partName = "nombre")
+        String nombre,
+        @WebParam(name = "descripcion", partName = "descripcion")
+        String descripcion,
+        @WebParam(name = "costo", partName = "costo")
+        float costo,
+        @WebParam(name = "cupo", partName = "cupo")
+        int cupo)
+        throws CostoTipoRegistroInvalidoException_Exception, TipoRegistroYaExisteException_Exception
+    ;
+
+    /**
+     * 
+     * @param imagenPath
+     * @param nombreEvento
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEvento/actualizarImagenEventoRequest", output = "http://publicadores/PublicadorEvento/actualizarImagenEventoResponse")
+    public void actualizarImagenEvento(
+        @WebParam(name = "nombreEvento", partName = "nombreEvento")
+        String nombreEvento,
+        @WebParam(name = "imagenPath", partName = "imagenPath")
+        String imagenPath);
+
+    /**
+     * 
+     * @param siglaEdicion
+     * @return
+     *     returns java.lang.String
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorEvento/encontrarEventoPorSiglaRequest", output = "http://publicadores/PublicadorEvento/encontrarEventoPorSiglaResponse")
+    public String encontrarEventoPorSigla(
+        @WebParam(name = "siglaEdicion", partName = "siglaEdicion")
+        String siglaEdicion);
+
+    /**
+     * 
+     * @param costo
+     * @param edicion
+     * @param evento
+     * @param fechaInicio
+     * @param fechaRegistro
+     * @param idRegistro
+     * @param tipoRegistro
+     * @param usuario
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoRequest", output = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoResponse")
+    public void altaRegistroEdicionEvento(
+        @WebParam(name = "idRegistro", partName = "idRegistro")
+        String idRegistro,
+        @WebParam(name = "usuario", partName = "usuario")
+        Usuario usuario,
+        @WebParam(name = "evento", partName = "evento")
+        Eventos evento,
+        @WebParam(name = "edicion", partName = "edicion")
+        Ediciones edicion,
+        @WebParam(name = "tipoRegistro", partName = "tipoRegistro")
+        TipoRegistro tipoRegistro,
+        @WebParam(name = "fechaRegistro", partName = "fechaRegistro")
+        String fechaRegistro,
+        @WebParam(name = "costo", partName = "costo")
+        float costo,
+        @WebParam(name = "fechaInicio", partName = "fechaInicio")
+        String fechaInicio);
+
+    /**
+     * 
+     * @param nombreEvento
+     * @return
+     *     returns publicadores.StringArray
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorEvento/listarEdicionesEventoRequest", output = "http://publicadores/PublicadorEvento/listarEdicionesEventoResponse")
+    public StringArray listarEdicionesEvento(
         @WebParam(name = "nombreEvento", partName = "nombreEvento")
         String nombreEvento);
+
+    /**
+     * 
+     * @param costo
+     * @param fechaInicio
+     * @param fechaRegistro
+     * @param idRegistro
+     * @param nicknameUsuario
+     * @param nombreEdicion
+     * @param nombreEvento
+     * @param nombreTipoRegistro
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoDTRequest", output = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoDTResponse")
+    public void altaRegistroEdicionEventoDT(
+        @WebParam(name = "idRegistro", partName = "idRegistro")
+        String idRegistro,
+        @WebParam(name = "nicknameUsuario", partName = "nicknameUsuario")
+        String nicknameUsuario,
+        @WebParam(name = "nombreEvento", partName = "nombreEvento")
+        String nombreEvento,
+        @WebParam(name = "nombreEdicion", partName = "nombreEdicion")
+        String nombreEdicion,
+        @WebParam(name = "nombreTipoRegistro", partName = "nombreTipoRegistro")
+        String nombreTipoRegistro,
+        @WebParam(name = "fechaRegistro", partName = "fechaRegistro")
+        String fechaRegistro,
+        @WebParam(name = "costo", partName = "costo")
+        float costo,
+        @WebParam(name = "fechaInicio", partName = "fechaInicio")
+        String fechaInicio);
+
+    /**
+     * 
+     * @param nombreEdicion
+     * @param nombreEvento
+     * @return
+     *     returns publicadores.DtTipoRegistroArray
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorEvento/listarTiposRegistroDeEdicionRequest", output = "http://publicadores/PublicadorEvento/listarTiposRegistroDeEdicionResponse")
+    public DtTipoRegistroArray listarTiposRegistroDeEdicion(
+        @WebParam(name = "nombreEvento", partName = "nombreEvento")
+        String nombreEvento,
+        @WebParam(name = "nombreEdicion", partName = "nombreEdicion")
+        String nombreEdicion);
 
     /**
      * 
@@ -118,6 +414,16 @@ public interface PublicadorEvento {
         String nombreEvento,
         @WebParam(name = "nombreEdicion", partName = "nombreEdicion")
         String nombreEdicion);
+
+    /**
+     * 
+     * @param nombreEvento
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEvento/finalizarEventoRequest", output = "http://publicadores/PublicadorEvento/finalizarEventoResponse")
+    public void finalizarEvento(
+        @WebParam(name = "nombreEvento", partName = "nombreEvento")
+        String nombreEvento);
 
     /**
      * 
@@ -160,64 +466,26 @@ public interface PublicadorEvento {
 
     /**
      * 
-     * @param codigoPatrocinio
      * @return
-     *     returns publicadores.DtPatrocinio
+     *     returns publicadores.DtCategoriasArray
      */
     @WebMethod
     @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/obtenerDTPatrocinioRequest", output = "http://publicadores/PublicadorEvento/obtenerDTPatrocinioResponse")
-    public DtPatrocinio obtenerDTPatrocinio(
-        @WebParam(name = "codigoPatrocinio", partName = "codigoPatrocinio")
-        String codigoPatrocinio);
+    @Action(input = "http://publicadores/PublicadorEvento/listarDTCategoriasRequest", output = "http://publicadores/PublicadorEvento/listarDTCategoriasResponse")
+    public DtCategoriasArray listarDTCategorias();
 
     /**
      * 
-     * @param nombreEdicion
      * @param nombreEvento
-     * @param nombreTipoRegistro
      * @return
-     *     returns publicadores.DtTipoRegistro
+     *     returns publicadores.DtEvento
      */
     @WebMethod
     @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/consultaTipoRegistroRequest", output = "http://publicadores/PublicadorEvento/consultaTipoRegistroResponse")
-    public DtTipoRegistro consultaTipoRegistro(
+    @Action(input = "http://publicadores/PublicadorEvento/consultaDTEventoRequest", output = "http://publicadores/PublicadorEvento/consultaDTEventoResponse")
+    public DtEvento consultaDTEvento(
         @WebParam(name = "nombreEvento", partName = "nombreEvento")
-        String nombreEvento,
-        @WebParam(name = "nombreEdicion", partName = "nombreEdicion")
-        String nombreEdicion,
-        @WebParam(name = "nombreTipoRegistro", partName = "nombreTipoRegistro")
-        String nombreTipoRegistro);
-
-    /**
-     * 
-     * @param costo
-     * @param cupo
-     * @param descripcion
-     * @param dtEdicion
-     * @param nombre
-     * @throws CostoTipoRegistroInvalidoException_Exception
-     * @throws TipoRegistroYaExisteException_Exception
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorEvento/altaTipoRegistroDTORequest", output = "http://publicadores/PublicadorEvento/altaTipoRegistroDTOResponse", fault = {
-        @FaultAction(className = TipoRegistroYaExisteException_Exception.class, value = "http://publicadores/PublicadorEvento/altaTipoRegistroDTO/Fault/TipoRegistroYaExisteException"),
-        @FaultAction(className = CostoTipoRegistroInvalidoException_Exception.class, value = "http://publicadores/PublicadorEvento/altaTipoRegistroDTO/Fault/CostoTipoRegistroInvalidoException")
-    })
-    public void altaTipoRegistroDTO(
-        @WebParam(name = "dtEdicion", partName = "dtEdicion")
-        DtEdicion dtEdicion,
-        @WebParam(name = "nombre", partName = "nombre")
-        String nombre,
-        @WebParam(name = "descripcion", partName = "descripcion")
-        String descripcion,
-        @WebParam(name = "costo", partName = "costo")
-        float costo,
-        @WebParam(name = "cupo", partName = "cupo")
-        int cupo)
-        throws CostoTipoRegistroInvalidoException_Exception, TipoRegistroYaExisteException_Exception
-    ;
+        String nombreEvento);
 
     /**
      * 
@@ -239,273 +507,5 @@ public interface PublicadorEvento {
         String idRegistro)
         throws UsuarioNoExisteException_Exception
     ;
-
-    /**
-     * 
-     * @param siglaEdicion
-     * @param siglaEvento
-     * @return
-     *     returns publicadores.DtEdicion
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/consultaEdicionEventoRequest", output = "http://publicadores/PublicadorEvento/consultaEdicionEventoResponse")
-    public DtEdicion consultaEdicionEvento(
-        @WebParam(name = "siglaEvento", partName = "siglaEvento")
-        String siglaEvento,
-        @WebParam(name = "siglaEdicion", partName = "siglaEdicion")
-        String siglaEdicion);
-
-    /**
-     * 
-     * @return
-     *     returns publicadores.DtCategoriasArray
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/listarDTCategoriasRequest", output = "http://publicadores/PublicadorEvento/listarDTCategoriasResponse")
-    public DtCategoriasArray listarDTCategorias();
-
-    /**
-     * 
-     * @param imagenPath
-     * @param nombreEvento
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorEvento/actualizarImagenEventoRequest", output = "http://publicadores/PublicadorEvento/actualizarImagenEventoResponse")
-    public void actualizarImagenEvento(
-        @WebParam(name = "nombreEvento", partName = "nombreEvento")
-        String nombreEvento,
-        @WebParam(name = "imagenPath", partName = "imagenPath")
-        String imagenPath);
-
-    /**
-     * 
-     * @param nombreEvento
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorEvento/finalizarEventoRequest", output = "http://publicadores/PublicadorEvento/finalizarEventoResponse")
-    public void finalizarEvento(
-        @WebParam(name = "nombreEvento", partName = "nombreEvento")
-        String nombreEvento);
-
-    /**
-     * 
-     * @param costo
-     * @param cupo
-     * @param descripcion
-     * @param dtEdicion
-     * @param nombre
-     * @throws CostoTipoRegistroInvalidoException_Exception
-     * @throws TipoRegistroYaExisteException_Exception
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorEvento/altaTipoRegistroRequest", output = "http://publicadores/PublicadorEvento/altaTipoRegistroResponse", fault = {
-        @FaultAction(className = TipoRegistroYaExisteException_Exception.class, value = "http://publicadores/PublicadorEvento/altaTipoRegistro/Fault/TipoRegistroYaExisteException"),
-        @FaultAction(className = CostoTipoRegistroInvalidoException_Exception.class, value = "http://publicadores/PublicadorEvento/altaTipoRegistro/Fault/CostoTipoRegistroInvalidoException")
-    })
-    public void altaTipoRegistro(
-        @WebParam(name = "dtEdicion", partName = "dtEdicion")
-        DtEdicion dtEdicion,
-        @WebParam(name = "nombre", partName = "nombre")
-        String nombre,
-        @WebParam(name = "descripcion", partName = "descripcion")
-        String descripcion,
-        @WebParam(name = "costo", partName = "costo")
-        float costo,
-        @WebParam(name = "cupo", partName = "cupo")
-        int cupo)
-        throws CostoTipoRegistroInvalidoException_Exception, TipoRegistroYaExisteException_Exception
-    ;
-
-    /**
-     * 
-     * @return
-     *     returns publicadores.DtEventoArray
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/listarEventosVigentesRequest", output = "http://publicadores/PublicadorEvento/listarEventosVigentesResponse")
-    public DtEventoArray listarEventosVigentes();
-
-    /**
-     * 
-     * @param costo
-     * @param edicion
-     * @param evento
-     * @param fechaInicio
-     * @param fechaRegistro
-     * @param idRegistro
-     * @param tipoRegistro
-     * @param usuario
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoRequest", output = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoResponse")
-    public void altaRegistroEdicionEvento(
-        @WebParam(name = "idRegistro", partName = "idRegistro")
-        String idRegistro,
-        @WebParam(name = "usuario", partName = "usuario")
-        Usuario usuario,
-        @WebParam(name = "evento", partName = "evento")
-        Eventos evento,
-        @WebParam(name = "edicion", partName = "edicion")
-        Ediciones edicion,
-        @WebParam(name = "tipoRegistro", partName = "tipoRegistro")
-        TipoRegistro tipoRegistro,
-        @WebParam(name = "fechaRegistro", partName = "fechaRegistro")
-        String fechaRegistro,
-        @WebParam(name = "costo", partName = "costo")
-        float costo,
-        @WebParam(name = "fechaInicio", partName = "fechaInicio")
-        String fechaInicio);
-
-    /**
-     * 
-     * @param siglaEdicion
-     * @return
-     *     returns java.lang.String
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/encontrarEventoPorSiglaRequest", output = "http://publicadores/PublicadorEvento/encontrarEventoPorSiglaResponse")
-    public String encontrarEventoPorSigla(
-        @WebParam(name = "siglaEdicion", partName = "siglaEdicion")
-        String siglaEdicion);
-
-    /**
-     * 
-     * @param sigla
-     * @return
-     *     returns publicadores.DtEdicion
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/obtenerEdicionPorSiglaDTRequest", output = "http://publicadores/PublicadorEvento/obtenerEdicionPorSiglaDTResponse")
-    public DtEdicion obtenerEdicionPorSiglaDT(
-        @WebParam(name = "sigla", partName = "sigla")
-        String sigla);
-
-    /**
-     * 
-     * @param nombreEdicion
-     * @param nombreEvento
-     * @return
-     *     returns publicadores.DtTipoRegistroArray
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/listarTiposRegistroDeEdicionRequest", output = "http://publicadores/PublicadorEvento/listarTiposRegistroDeEdicionResponse")
-    public DtTipoRegistroArray listarTiposRegistroDeEdicion(
-        @WebParam(name = "nombreEvento", partName = "nombreEvento")
-        String nombreEvento,
-        @WebParam(name = "nombreEdicion", partName = "nombreEdicion")
-        String nombreEdicion);
-
-    /**
-     * 
-     * @return
-     *     returns publicadores.DtEventoArray
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/listarEventosRequest", output = "http://publicadores/PublicadorEvento/listarEventosResponse")
-    public DtEventoArray listarEventos();
-
-    /**
-     * 
-     * @param categorias
-     * @param descripcion
-     * @param fechaAlta
-     * @param imagen
-     * @param nombre
-     * @param sigla
-     * @throws EventoYaExisteException_Exception
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorEvento/altaEventoRequest", output = "http://publicadores/PublicadorEvento/altaEventoResponse", fault = {
-        @FaultAction(className = EventoYaExisteException_Exception.class, value = "http://publicadores/PublicadorEvento/altaEvento/Fault/EventoYaExisteException")
-    })
-    public void altaEvento(
-        @WebParam(name = "nombre", partName = "nombre")
-        String nombre,
-        @WebParam(name = "descripcion", partName = "descripcion")
-        String descripcion,
-        @WebParam(name = "fechaAlta", partName = "fechaAlta")
-        String fechaAlta,
-        @WebParam(name = "sigla", partName = "sigla")
-        String sigla,
-        @WebParam(name = "categorias", partName = "categorias")
-        DtCategorias categorias,
-        @WebParam(name = "imagen", partName = "imagen")
-        String imagen)
-        throws EventoYaExisteException_Exception
-    ;
-
-    /**
-     * 
-     * @param costo
-     * @param fechaInicio
-     * @param fechaRegistro
-     * @param idRegistro
-     * @param nicknameUsuario
-     * @param nombreEdicion
-     * @param nombreEvento
-     * @param nombreTipoRegistro
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoDTRequest", output = "http://publicadores/PublicadorEvento/altaRegistroEdicionEventoDTResponse")
-    public void altaRegistroEdicionEventoDT(
-        @WebParam(name = "idRegistro", partName = "idRegistro")
-        String idRegistro,
-        @WebParam(name = "nicknameUsuario", partName = "nicknameUsuario")
-        String nicknameUsuario,
-        @WebParam(name = "nombreEvento", partName = "nombreEvento")
-        String nombreEvento,
-        @WebParam(name = "nombreEdicion", partName = "nombreEdicion")
-        String nombreEdicion,
-        @WebParam(name = "nombreTipoRegistro", partName = "nombreTipoRegistro")
-        String nombreTipoRegistro,
-        @WebParam(name = "fechaRegistro", partName = "fechaRegistro")
-        String fechaRegistro,
-        @WebParam(name = "costo", partName = "costo")
-        float costo,
-        @WebParam(name = "fechaInicio", partName = "fechaInicio")
-        String fechaInicio);
-
-    /**
-     * 
-     * @param nombreCategoria
-     * @return
-     *     returns publicadores.DtEventoArray
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/listarEventosPorCategoriaRequest", output = "http://publicadores/PublicadorEvento/listarEventosPorCategoriaResponse")
-    public DtEventoArray listarEventosPorCategoria(
-        @WebParam(name = "nombreCategoria", partName = "nombreCategoria")
-        String nombreCategoria);
-
-    /**
-     * 
-     * @return
-     *     returns publicadores.StringArray
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorEvento/listarCategoriasConEventosRequest", output = "http://publicadores/PublicadorEvento/listarCategoriasConEventosResponse")
-    public StringArray listarCategoriasConEventos();
-
-    /**
-     * 
-     * @param idRegistro
-     * @param nick
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorEvento/marcarAsistenciaRegistroRequest", output = "http://publicadores/PublicadorEvento/marcarAsistenciaRegistroResponse")
-    public void marcarAsistenciaRegistro(
-        @WebParam(name = "nick", partName = "nick")
-        String nick,
-        @WebParam(name = "idRegistro", partName = "idRegistro")
-        String idRegistro);
 
 }

@@ -27,34 +27,6 @@ public interface PublicadorUsuario {
 
     /**
      * 
-     * @return
-     *     returns publicadores.StringArray
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/getInstitucionesRequest", output = "http://publicadores/PublicadorUsuario/getInstitucionesResponse")
-    public StringArray getInstituciones();
-
-    /**
-     * 
-     * @param nickname
-     * @return
-     *     returns publicadores.DtDatosUsuario
-     * @throws UsuarioNoExisteException_Exception
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/obtenerDatosUsuarioRequest", output = "http://publicadores/PublicadorUsuario/obtenerDatosUsuarioResponse", fault = {
-        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/obtenerDatosUsuario/Fault/UsuarioNoExisteException")
-    })
-    public DtDatosUsuario obtenerDatosUsuario(
-        @WebParam(name = "nickname", partName = "nickname")
-        String nickname)
-        throws UsuarioNoExisteException_Exception
-    ;
-
-    /**
-     * 
      * @param descripcion
      * @param link
      * @param nombre
@@ -73,6 +45,72 @@ public interface PublicadorUsuario {
         String link)
         throws InstitucionYaExisteException_Exception
     ;
+
+    /**
+     * 
+     * @return
+     *     returns publicadores.StringArray
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorUsuario/getInstitucionesRequest", output = "http://publicadores/PublicadorUsuario/getInstitucionesResponse")
+    public StringArray getInstituciones();
+
+    /**
+     * 
+     * @param nickname
+     * @param nuevaContrasenia
+     * @throws UsuarioNoExisteException_Exception
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorUsuario/modificarContraseniaRequest", output = "http://publicadores/PublicadorUsuario/modificarContraseniaResponse", fault = {
+        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/modificarContrasenia/Fault/UsuarioNoExisteException")
+    })
+    public void modificarContrasenia(
+        @WebParam(name = "nickname", partName = "nickname")
+        String nickname,
+        @WebParam(name = "nuevaContrasenia", partName = "nuevaContrasenia")
+        String nuevaContrasenia)
+        throws UsuarioNoExisteException_Exception
+    ;
+
+    /**
+     * 
+     * @return
+     *     returns publicadores.StringArray
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorUsuario/listarInstitucionesRequest", output = "http://publicadores/PublicadorUsuario/listarInstitucionesResponse")
+    public StringArray listarInstituciones();
+
+    /**
+     * 
+     * @param nombre
+     * @throws CategoriaYaExisteException_Exception
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUIRequest", output = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUIResponse", fault = {
+        @FaultAction(className = CategoriaYaExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUI/Fault/CategoriaYaExisteException")
+    })
+    public void altaCategoriaSinGUI(
+        @WebParam(name = "nombre", partName = "nombre")
+        String nombre)
+        throws CategoriaYaExisteException_Exception
+    ;
+
+    /**
+     * 
+     * @param identificador
+     * @return
+     *     returns publicadores.DtRegistro
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorUsuario/obtenerDatosRegistrosRequest", output = "http://publicadores/PublicadorUsuario/obtenerDatosRegistrosResponse")
+    public DtRegistro obtenerDatosRegistros(
+        @WebParam(name = "identificador", partName = "identificador")
+        String identificador);
 
     /**
      * 
@@ -114,30 +152,20 @@ public interface PublicadorUsuario {
 
     /**
      * 
-     * @param identificador
+     * @param nickname
      * @return
-     *     returns publicadores.DtRegistro
+     *     returns publicadores.DtDatosUsuario
+     * @throws UsuarioNoExisteException_Exception
      */
     @WebMethod
     @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/obtenerDatosRegistrosRequest", output = "http://publicadores/PublicadorUsuario/obtenerDatosRegistrosResponse")
-    public DtRegistro obtenerDatosRegistros(
-        @WebParam(name = "identificador", partName = "identificador")
-        String identificador);
-
-    /**
-     * 
-     * @param nombre
-     * @throws CategoriaYaExisteException_Exception
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUIRequest", output = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUIResponse", fault = {
-        @FaultAction(className = CategoriaYaExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUI/Fault/CategoriaYaExisteException")
+    @Action(input = "http://publicadores/PublicadorUsuario/obtenerDatosUsuarioRequest", output = "http://publicadores/PublicadorUsuario/obtenerDatosUsuarioResponse", fault = {
+        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/obtenerDatosUsuario/Fault/UsuarioNoExisteException")
     })
-    public void altaCategoriaSinGUI(
-        @WebParam(name = "nombre", partName = "nombre")
-        String nombre)
-        throws CategoriaYaExisteException_Exception
+    public DtDatosUsuario obtenerDatosUsuario(
+        @WebParam(name = "nickname", partName = "nickname")
+        String nickname)
+        throws UsuarioNoExisteException_Exception
     ;
 
     /**
@@ -161,6 +189,19 @@ public interface PublicadorUsuario {
      * @param seguidor
      */
     @WebMethod
+    @Action(input = "http://publicadores/PublicadorUsuario/seguirUsuarioRequest", output = "http://publicadores/PublicadorUsuario/seguirUsuarioResponse")
+    public void seguirUsuario(
+        @WebParam(name = "seguidor", partName = "seguidor")
+        String seguidor,
+        @WebParam(name = "seguido", partName = "seguido")
+        String seguido);
+
+    /**
+     * 
+     * @param seguido
+     * @param seguidor
+     */
+    @WebMethod
     @Action(input = "http://publicadores/PublicadorUsuario/dejarSeguirUsuarioRequest", output = "http://publicadores/PublicadorUsuario/dejarSeguirUsuarioResponse")
     public void dejarSeguirUsuario(
         @WebParam(name = "seguidor", partName = "seguidor")
@@ -170,13 +211,19 @@ public interface PublicadorUsuario {
 
     /**
      * 
+     * @param contrasena
+     * @param nickOrEmail
      * @return
-     *     returns publicadores.StringArray
+     *     returns boolean
      */
     @WebMethod
     @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/listarInstitucionesRequest", output = "http://publicadores/PublicadorUsuario/listarInstitucionesResponse")
-    public StringArray listarInstituciones();
+    @Action(input = "http://publicadores/PublicadorUsuario/validarLoginRequest", output = "http://publicadores/PublicadorUsuario/validarLoginResponse")
+    public boolean validarLogin(
+        @WebParam(name = "nickOrEmail", partName = "nickOrEmail")
+        String nickOrEmail,
+        @WebParam(name = "contrasena", partName = "contrasena")
+        String contrasena);
 
     /**
      * 
@@ -201,20 +248,15 @@ public interface PublicadorUsuario {
     /**
      * 
      * @param nickname
-     * @param nuevaContrasenia
-     * @throws UsuarioNoExisteException_Exception
+     * @return
+     *     returns boolean
      */
     @WebMethod
-    @Action(input = "http://publicadores/PublicadorUsuario/modificarContraseniaRequest", output = "http://publicadores/PublicadorUsuario/modificarContraseniaResponse", fault = {
-        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/modificarContrasenia/Fault/UsuarioNoExisteException")
-    })
-    public void modificarContrasenia(
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorUsuario/esAsistenteRequest", output = "http://publicadores/PublicadorUsuario/esAsistenteResponse")
+    public boolean esAsistente(
         @WebParam(name = "nickname", partName = "nickname")
-        String nickname,
-        @WebParam(name = "nuevaContrasenia", partName = "nuevaContrasenia")
-        String nuevaContrasenia)
-        throws UsuarioNoExisteException_Exception
-    ;
+        String nickname);
 
     /**
      * 
@@ -263,19 +305,6 @@ public interface PublicadorUsuario {
 
     /**
      * 
-     * @param nickname
-     * @return
-     *     returns boolean
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/esAsistenteRequest", output = "http://publicadores/PublicadorUsuario/esAsistenteResponse")
-    public boolean esAsistente(
-        @WebParam(name = "nickname", partName = "nickname")
-        String nickname);
-
-    /**
-     * 
      * @param seguido
      * @param seguidor
      * @return
@@ -285,35 +314,6 @@ public interface PublicadorUsuario {
     @WebResult(partName = "return")
     @Action(input = "http://publicadores/PublicadorUsuario/sigueARequest", output = "http://publicadores/PublicadorUsuario/sigueAResponse")
     public boolean sigueA(
-        @WebParam(name = "seguidor", partName = "seguidor")
-        String seguidor,
-        @WebParam(name = "seguido", partName = "seguido")
-        String seguido);
-
-    /**
-     * 
-     * @param contrasena
-     * @param nickOrEmail
-     * @return
-     *     returns boolean
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/validarLoginRequest", output = "http://publicadores/PublicadorUsuario/validarLoginResponse")
-    public boolean validarLogin(
-        @WebParam(name = "nickOrEmail", partName = "nickOrEmail")
-        String nickOrEmail,
-        @WebParam(name = "contrasena", partName = "contrasena")
-        String contrasena);
-
-    /**
-     * 
-     * @param seguido
-     * @param seguidor
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorUsuario/seguirUsuarioRequest", output = "http://publicadores/PublicadorUsuario/seguirUsuarioResponse")
-    public void seguirUsuario(
         @WebParam(name = "seguidor", partName = "seguidor")
         String seguidor,
         @WebParam(name = "seguido", partName = "seguido")
