@@ -9,6 +9,8 @@ import java.util.HashSet;
 @Table(name = "organizadores")
 @PrimaryKeyJoinColumn(name = "nickname")
 public class OrganizadorOO extends UsuarioOO {
+	
+	private static final long serialVersionUID = 1L;
 
     @Column(name = "descripcion", length = 500)
     @Size(max = 500)
@@ -23,7 +25,7 @@ public class OrganizadorOO extends UsuarioOO {
 
     protected OrganizadorOO() { super(); }
 
-    public OrganizadorOO(String nickname, String nombre, String email, String contrasena, String imagen, String tipoUsuario,
+    public OrganizadorOO(String nickname, String nombre, String email, String contrasena, String imagen,
                          String descripcion, String link) {
         super(nickname, nombre, email, contrasena, imagen);
         this.descripcion = descripcion;

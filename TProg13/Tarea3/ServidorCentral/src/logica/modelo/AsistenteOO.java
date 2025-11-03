@@ -8,6 +8,8 @@ import java.time.LocalDate;
 @Table(name = "asistentes")
 @PrimaryKeyJoinColumn(name = "nickname")
 public class AsistenteOO extends UsuarioOO {
+	
+	private static final long serialVersionUID = 1L;
 
     @Column(name = "apellido", length = 100)
     @Size(max = 100)
@@ -24,7 +26,7 @@ public class AsistenteOO extends UsuarioOO {
         super();
     }
 
-    public AsistenteOO(String nickname, String nombre, String email, String contrasena, String imagen, String tipoUsuario,
+    public AsistenteOO(String nickname, String nombre, String email, String contrasena, String imagen,
                        String apellido, LocalDate fechaNacimiento, String institucion) {
         super(nickname, nombre, email, contrasena, imagen);
         this.apellido = apellido;

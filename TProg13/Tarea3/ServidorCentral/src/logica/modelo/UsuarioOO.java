@@ -9,7 +9,6 @@ import java.util.Objects;
 @Table(
   name = "usuarios",
   uniqueConstraints = {
-    @UniqueConstraint(name="uk_usuarios_nick", columnNames = "nickname"),
     @UniqueConstraint(name="uk_usuarios_email", columnNames = "email")
 })
 @Access(AccessType.FIELD)
