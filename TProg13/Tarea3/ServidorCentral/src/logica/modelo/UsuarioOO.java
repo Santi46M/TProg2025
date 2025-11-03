@@ -39,20 +39,16 @@ public class UsuarioOO implements Serializable {
   @Size(max = 255)
   private String imagen;
 
-  @Column(name = "tipo_usuario", nullable = false, length = 20)
-  @NotBlank @Size(max = 20)
-  private String tipoUsuario; // consider enum
 
   protected UsuarioOO() {}
 
   public UsuarioOO(String nickname, String nombre, String email,
-                   String contrasena, String imagen, String tipoUsuario) {
+                   String contrasena, String imagen) {
     this.nickname = nickname;
     this.nombre = nombre;
     this.email = email;
     this.contrasena = contrasena;
     this.imagen = imagen;
-    this.tipoUsuario = tipoUsuario;
   }
 
   public String getNickname() { return nickname; }
@@ -69,9 +65,6 @@ public class UsuarioOO implements Serializable {
 
   public String getImagen() { return imagen; }
   public void setImagen(String imagen) { this.imagen = imagen; }
-
-  public String getTipoUsuario() { return tipoUsuario; }
-  public void setTipoUsuario(String tipoUsuario) { this.tipoUsuario = tipoUsuario; }
 
   @Override
   public boolean equals(Object o) {
@@ -91,7 +84,6 @@ public class UsuarioOO implements Serializable {
            ", nombre='" + nombre + '\'' +
            ", email='" + email + '\'' +
            ", imagen='" + imagen + '\'' +
-           ", tipoUsuario='" + tipoUsuario + '\'' +
            '}';
   }
 }

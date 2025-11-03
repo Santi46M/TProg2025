@@ -25,7 +25,7 @@ public class OrganizadorOO extends UsuarioOO {
 
     public OrganizadorOO(String nickname, String nombre, String email, String contrasena, String imagen, String tipoUsuario,
                          String descripcion, String link) {
-        super(nickname, nombre, email, contrasena, imagen, tipoUsuario);
+        super(nickname, nombre, email, contrasena, imagen);
         this.descripcion = descripcion;
         this.link = link;
     }

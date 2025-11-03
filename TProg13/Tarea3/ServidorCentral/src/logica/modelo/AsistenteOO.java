@@ -26,7 +26,7 @@ public class AsistenteOO extends UsuarioOO {
 
     public AsistenteOO(String nickname, String nombre, String email, String contrasena, String imagen, String tipoUsuario,
                        String apellido, LocalDate fechaNacimiento, String institucion) {
-        super(nickname, nombre, email, contrasena, imagen, tipoUsuario);
+        super(nickname, nombre, email, contrasena, imagen);
         this.apellido = apellido;
         this.fechaNacimiento = fechaNacimiento;
         this.institucion = institucion;
