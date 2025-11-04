@@ -13,7 +13,7 @@
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 </head>
 <body>
-<header class="site-header">
+<header class="site-header" style="position:relative; z-index:2000;">
   <div class="container d-flex justify-content-between align-items-center">
     <span class="brand">Eventos.uy</span>
 
@@ -21,7 +21,7 @@
       <button class="btn btn-outline-secondary" type="button" id="menuHamburguesa" aria-label="Menú" style="width:56px;height:56px;">
         <i class="bx bx-menu" style="font-size:2.5rem;"></i>
       </button>
-      <div id="menuOpciones" class="bg-white border rounded shadow-lg mt-2" style="display:none; position:absolute; top:60px; left:0; right:0; z-index:1000; min-width:220px; width:90vw; max-width:400px; background: rgba(255,255,255,0.95);">
+      <div id="menuOpciones" class="bg-white border rounded shadow-lg mt-2" style="display:none; position:absolute; top:60px; left:0; right:0; z-index:2001; min-width:220px; width:90vw; max-width:400px; background: rgba(255,255,255,0.95);">
         <ul class="list-unstyled mb-0 py-3">
           <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/evento/listado">Consulta Edición</a></li>
           <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/usuario/edicionesRegistradas">Consulta Registro</a></li>
