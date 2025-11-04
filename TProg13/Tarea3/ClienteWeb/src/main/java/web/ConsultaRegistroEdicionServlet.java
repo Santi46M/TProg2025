@@ -114,8 +114,8 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+    /* @Override
+     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
         String accion = req.getParameter("accion");
@@ -140,7 +140,7 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
 
         doGet(req, resp);
     }
-
+*/
     private void generarCertificadoPDF(HttpServletResponse resp, DtDatosUsuario usr,
                                        DtRegistro reg, DtEvento ev, DtEdicion ed)
             throws IOException, DocumentException {

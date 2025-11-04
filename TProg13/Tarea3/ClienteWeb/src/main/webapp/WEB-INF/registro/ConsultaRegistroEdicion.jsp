@@ -56,18 +56,13 @@
             <div class="event-meta"><strong>Fecha de inicio:</strong> <%= fechaI %></div>
 
             <% if ("asistente".equalsIgnoreCase(rol)) { %>
-              <% if (!asistio) { %>
-                <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="post" style="margin-top:1rem;">
-                  <input type="hidden" name="idRegistro" value="<%= registro.getIdentificador() %>">
-                  <input type="hidden" name="accion" value="marcarAsistencia">
-                  <button type="submit" class="btn btn-primary">Marcar asistencia</button>
-                </form>
-              <% } else { %>
-                <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="get" style="margin-top:1rem;">
+              <% if (asistio) { %>
+              <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="get" style="margin-top:1rem;">
                   <input type="hidden" name="idRegistro" value="<%= registro.getIdentificador() %>">
                   <input type="hidden" name="accion" value="certificado">
                   <button type="submit" class="btn-linklike">Descargar certificado</button>
                 </form>
+
               <% } %>
             <% } %>
 
