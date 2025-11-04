@@ -12,10 +12,8 @@
   <title>Iniciar Sesión — Eventos.uy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="<%=ctx%>/css/style.css">
-  <!-- Bootstrap CDN for Responsive Web Design -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <!-- Include responsive login-specific CSS -->
   <link rel="stylesheet" href="<%=ctx%>/css/InicioSesion.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
 </head>

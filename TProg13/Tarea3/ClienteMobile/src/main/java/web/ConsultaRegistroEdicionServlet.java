@@ -53,7 +53,6 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
 
             DtRegistro dtRegistro = null;
             try {
-                // Buscar el registro por edición y usuario
                 List<DtRegistro> registros = dtoUsuario.getRegistros() != null ? dtoUsuario.getRegistros().getRegistro() : java.util.List.of();
                 for (DtRegistro r : registros) {
                     if (r.getEdicion() != null && r.getEdicion().equals(edicion)) {

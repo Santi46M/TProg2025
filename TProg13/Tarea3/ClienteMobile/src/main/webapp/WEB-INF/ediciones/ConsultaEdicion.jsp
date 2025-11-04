@@ -15,10 +15,8 @@
   @SuppressWarnings("unchecked")
   List<DtPatrocinio> patrocinios = (List<DtPatrocinio>) request.getAttribute("patrocinios");
 
-  // nombre del evento 
   String evNombre = (String) request.getAttribute("evNombre");
 
-  // (no duplicar ctx en la JSP)
   String edImagenUrl = (String) request.getAttribute("edImagenUrl");
   boolean hasAnyImg = (edImagenUrl != null && !edImagenUrl.isBlank());
   String edVideoRaw = (edicion != null) ? edicion.getVideo() : null;
@@ -61,6 +59,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Consulta de Edición — <%=(edicion != null ? edicion.getNombre() : "Edición")%></title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="<%=ctx%>/css/style.css">
   <link rel="stylesheet" href="<%=ctx%>/css/ConsultaEdicionBase.css">
@@ -222,6 +221,6 @@
     if (detalle) detalle.classList.toggle('oculto');
   }
 </script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

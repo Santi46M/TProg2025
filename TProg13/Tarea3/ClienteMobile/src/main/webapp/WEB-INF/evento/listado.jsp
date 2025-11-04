@@ -17,13 +17,11 @@ String ctx = request.getContextPath();
 <jsp:include page="/WEB-INF/templates/header.jsp"/>
 
 <style>
-  /* si la tarjeta no tiene cover, ajusto paddings/márgenes */
   .event-card.list.no-cover .event-title { margin-top: .25rem; }
 </style>
 
 <div class="container">
   <div class="page-list">
-
     <main class="content">
       <h1 class="list-title"><%= (catSel==null||catSel.isBlank()) ? "Todos los eventos" : "Eventos en " + catSel %></h1>
       <p class="list-sub">
@@ -76,7 +74,7 @@ String ctx = request.getContextPath();
               <span class="event-meta"></span>
               <form action="<%=ctx%>/evento/ediciones/ListadoEdiciones" method="get" style="display:inline;">
                 <input type="hidden" name="evento" value="<%= nombre %>" />
-                <button type="submit" class="btn">Ver ediciones</button>
+                <button type="submit" class="btn btn-primary">Ver ediciones</button>
               </form>
             </div>
           </article>
@@ -85,3 +83,7 @@ String ctx = request.getContextPath();
     </main>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

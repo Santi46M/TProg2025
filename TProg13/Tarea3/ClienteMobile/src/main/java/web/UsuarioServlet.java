@@ -280,14 +280,7 @@ public class UsuarioServlet extends HttpServlet {
         return;
       }
 
-      // Alta por publicador
-      // Ensure we never pass nulls to the SOAP client: use empty strings and a LocalDate instance.
-      // Use the generated publicadores.LocalDate wrapper (we patched it to carry an ISO date string).
-      // Send null when there's no date (organizer case) and send an ISO string when fechaNac is present.
-      publicadores.LocalDate pFecha = null;
-      if (fechaNac != null) {
-        pFecha = new publicadores.LocalDate(fechaNac.toString());
-      }
+
 
       // helper to send non-null trimmed strings
       java.util.function.Function<String,String> sendNonNull = s -> (s == null) ? "" : s.trim();
@@ -310,23 +303,24 @@ public class UsuarioServlet extends HttpServlet {
         svcDescripcion = "";
         svcLink = "";
       }
-
+      
+      
+      String fechaStr = (fechaNac != null) ? fechaNac.toString() : null;
       // Debug: print sanitized parameters to confirm none are null
-      System.out.println("DEBUG altaUsuario params: nickname='" + nick + "', nombre='" + svcNombre + "', correo='" + svcCorreo + "', descripcion='" + svcDescripcion + "', link='" + svcLink + "', apellido='" + svcApellido + "', fechaNacimiento='" + pFecha + "', institucion='" + svcInstitucion + "', esOrganizador='" + esOrganizador + "', imagen='" + svcImagen + "'");
 
       port.altaUsuario(
-          nick,
-          svcNombre,
-          svcCorreo,
-          svcDescripcion,
-          svcLink,
-          svcApellido,
-          pFecha,
-          svcInstitucion,
-          esOrganizador,
-          pass1,
-          svcImagen
-      );
+              nick,
+              svcNombre,
+              svcCorreo,
+              svcDescripcion,
+              svcLink,
+              svcApellido,
+              fechaStr,
+              svcInstitucion,
+              esOrganizador,
+              pass1,
+              svcImagen
+          );
 
       // login directo post-alta
       HttpSession sAux = req.getSession(true);

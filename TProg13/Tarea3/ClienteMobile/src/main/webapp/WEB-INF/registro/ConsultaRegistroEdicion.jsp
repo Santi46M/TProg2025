@@ -11,47 +11,64 @@
 <head>
   <meta charset="UTF-8">
   <title>Consulta Registro Edición — Eventos.uy</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="<%=ctx%>/css/style.css">
   <link rel="stylesheet" href="<%=ctx%>/css/ConsultaRegistro.css">
 </head>
 <body>
   <jsp:include page="/WEB-INF/templates/header.jsp" />
 
-  <div class="container row" style="margin-top:1rem; display: flex; align-items: flex-start;">
+  <div class="container my-4">
+    <main class="row justify-content-center">
+      <section class="col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h1 class="h4 mb-0">Consulta de Registro en Edición</h1>
+          </div>
 
-    <main class="container consulta-layout" style="flex:2; min-width:0;">
-      <section class="event-card">
-        <div class="event-header">
-          <h1 class="event-title">Consulta de Registro en Edición</h1>
-        </div>
+          <div class="card-body">
+            <% if (error != null) { %>
+              <div class="alert alert-danger" role="alert">
+                <%= error %>
+              </div>
+            <% } else if (registro != null) { %>
+              <ul class="list-group list-group-flush mb-3">
+                <li class="list-group-item"><strong>Usuario:</strong> <%= registro.getUsuario() %></li>
+                <li class="list-group-item"><strong>Edición:</strong> <%= registro.getEdicion() %></li>
+                <li class="list-group-item"><strong>Tipo de registro:</strong> <%= registro.getTipoRegistro() %></li>
+                <li class="list-group-item"><strong>Fecha de registro:</strong> <%= registro.getFechaRegistro() %></li>
+                <li class="list-group-item"><strong>Costo:</strong> $<%= registro.getCosto() %></li>
+                <li class="list-group-item"><strong>Fecha de inicio:</strong> <%= registro.getFechaInicio() %></li>
+              </ul>
 
-        <div class="event-info">
-          <% if (error != null) { %>
-            <p class="error"><%= error %></p>
-          <% } else if (registro != null) { %>
-            <%-- <div class="event-meta"><strong>Identificador:</strong> <%= registro.getIdentificador() %></div> --%>
-            <div class="event-meta"><strong>Usuario:</strong> <%= registro.getUsuario() %></div>
-            <div class="event-meta"><strong>Edición:</strong> <%= registro.getEdicion() %></div>
-            <div class="event-meta"><strong>Tipo de registro:</strong> <%= registro.getTipoRegistro() %></div>
-            <div class="event-meta"><strong>Fecha de registro:</strong> <%= registro.getFechaRegistro() %></div>
-            <div class="event-meta"><strong>Costo:</strong> $<%= registro.getCosto() %></div>
-            <div class="event-meta"><strong>Fecha de inicio:</strong> <%= registro.getFechaInicio() %></div>
-            <% if (mensaje != null) { %>
-              <p class="success"><%= mensaje %></p>
+              <% if (mensaje != null) { %>
+                <div class="alert alert-success" role="alert">
+                  <%= mensaje %>
+                </div>
+              <% } else { %>
+                <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="post">
+                  <input type="hidden" name="usuario" value="<%= nickSesion %>" />
+                  <input type="hidden" name="edicion" value="<%= registro.getEdicion() %>" />
+                  <input type="hidden" name="registroId" value="<%= registro.getIdentificador() %>" />
+                  <div class="d-grid">
+                    <button type="submit" class="btn btn-success">
+                      Confirmar asistencia
+                    </button>
+                  </div>
+                </form>
+              <% } %>
+
             <% } else { %>
-              <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="post" style="margin-top:1rem;">
-                <input type="hidden" name="usuario" value="<%= nickSesion %>" />
-                <input type="hidden" name="edicion" value="<%= registro.getEdicion() %>" />
-                <input type="hidden" name="registroId" value="<%= registro.getIdentificador() %>" />
-                <button type="submit" class="btn btn-success">Confirmar asistencia</button>
-              </form>
+              <div class="alert alert-warning" role="alert">
+                No se encontró información del registro.
+              </div>
             <% } %>
-          <% } else { %>
-            <p>No se encontró información del registro.</p>
-          <% } %>
+          </div>
         </div>
       </section>
     </main>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
