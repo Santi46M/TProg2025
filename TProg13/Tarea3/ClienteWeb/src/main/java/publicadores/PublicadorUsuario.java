@@ -27,6 +27,50 @@ public interface PublicadorUsuario {
 
     /**
      * 
+     * @param descripcion
+     * @param link
+     * @param nombre
+     * @throws InstitucionYaExisteException_Exception
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorUsuario/altaInstitucionRequest", output = "http://publicadores/PublicadorUsuario/altaInstitucionResponse", fault = {
+        @FaultAction(className = InstitucionYaExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/altaInstitucion/Fault/InstitucionYaExisteException")
+    })
+    public void altaInstitucion(
+        @WebParam(name = "nombre", partName = "nombre")
+        String nombre,
+        @WebParam(name = "descripcion", partName = "descripcion")
+        String descripcion,
+        @WebParam(name = "link", partName = "link")
+        String link)
+        throws InstitucionYaExisteException_Exception
+    ;
+
+    /**
+     * 
+     * @return
+     *     returns publicadores.StringArray
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorUsuario/getInstitucionesRequest", output = "http://publicadores/PublicadorUsuario/getInstitucionesResponse")
+    public StringArray getInstituciones();
+
+    /**
+     * 
+     * @param identificador
+     * @return
+     *     returns publicadores.DtRegistro
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorUsuario/obtenerDatosRegistrosRequest", output = "http://publicadores/PublicadorUsuario/obtenerDatosRegistrosResponse")
+    public DtRegistro obtenerDatosRegistros(
+        @WebParam(name = "identificador", partName = "identificador")
+        String identificador);
+
+    /**
+     * 
      * @param apellido
      * @param descripcion
      * @param fechaNacimiento
@@ -65,16 +109,157 @@ public interface PublicadorUsuario {
 
     /**
      * 
-     * @param identificador
+     * @param nickname
      * @return
-     *     returns publicadores.DtRegistro
+     *     returns publicadores.DtDatosUsuario
+     * @throws UsuarioNoExisteException_Exception
      */
     @WebMethod
     @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/obtenerDatosRegistrosRequest", output = "http://publicadores/PublicadorUsuario/obtenerDatosRegistrosResponse")
-    public DtRegistro obtenerDatosRegistros(
-        @WebParam(name = "identificador", partName = "identificador")
-        String identificador);
+    @Action(input = "http://publicadores/PublicadorUsuario/obtenerDatosUsuarioRequest", output = "http://publicadores/PublicadorUsuario/obtenerDatosUsuarioResponse", fault = {
+        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/obtenerDatosUsuario/Fault/UsuarioNoExisteException")
+    })
+    public DtDatosUsuario obtenerDatosUsuario(
+        @WebParam(name = "nickname", partName = "nickname")
+        String nickname)
+        throws UsuarioNoExisteException_Exception
+    ;
+
+    /**
+     * 
+     * @param nombre
+     * @throws CategoriaYaExisteException_Exception
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUIRequest", output = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUIResponse", fault = {
+        @FaultAction(className = CategoriaYaExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUI/Fault/CategoriaYaExisteException")
+    })
+    public void altaCategoriaSinGUI(
+        @WebParam(name = "nombre", partName = "nombre")
+        String nombre)
+        throws CategoriaYaExisteException_Exception
+    ;
+
+    /**
+     * 
+     * @param nickname
+     * @param nuevaContrasenia
+     * @throws UsuarioNoExisteException_Exception
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorUsuario/modificarContraseniaRequest", output = "http://publicadores/PublicadorUsuario/modificarContraseniaResponse", fault = {
+        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/modificarContrasenia/Fault/UsuarioNoExisteException")
+    })
+    public void modificarContrasenia(
+        @WebParam(name = "nickname", partName = "nickname")
+        String nickname,
+        @WebParam(name = "nuevaContrasenia", partName = "nuevaContrasenia")
+        String nuevaContrasenia)
+        throws UsuarioNoExisteException_Exception
+    ;
+
+    /**
+     * 
+     * @return
+     *     returns publicadores.StringArray
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorUsuario/listarInstitucionesRequest", output = "http://publicadores/PublicadorUsuario/listarInstitucionesResponse")
+    public StringArray listarInstituciones();
+
+    /**
+     * 
+     * @param seguido
+     * @param seguidor
+     * @return
+     *     returns boolean
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorUsuario/sigueARequest", output = "http://publicadores/PublicadorUsuario/sigueAResponse")
+    public boolean sigueA(
+        @WebParam(name = "seguidor", partName = "seguidor")
+        String seguidor,
+        @WebParam(name = "seguido", partName = "seguido")
+        String seguido);
+
+    /**
+     * 
+     * @param seguido
+     * @param seguidor
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorUsuario/dejarSeguirUsuarioRequest", output = "http://publicadores/PublicadorUsuario/dejarSeguirUsuarioResponse")
+    public void dejarSeguirUsuario(
+        @WebParam(name = "seguidor", partName = "seguidor")
+        String seguidor,
+        @WebParam(name = "seguido", partName = "seguido")
+        String seguido);
+
+    /**
+     * 
+     * @param contrasena
+     * @param nickOrEmail
+     * @return
+     *     returns boolean
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorUsuario/validarLoginRequest", output = "http://publicadores/PublicadorUsuario/validarLoginResponse")
+    public boolean validarLogin(
+        @WebParam(name = "nickOrEmail", partName = "nickOrEmail")
+        String nickOrEmail,
+        @WebParam(name = "contrasena", partName = "contrasena")
+        String contrasena);
+
+    /**
+     * 
+     * @return
+     *     returns publicadores.DtDatosUsuarioArray
+     * @throws UsuarioNoExisteException_Exception
+     */
+    @WebMethod
+    @WebResult(partName = "return")
+    @Action(input = "http://publicadores/PublicadorUsuario/obtenerUsuariosDTRequest", output = "http://publicadores/PublicadorUsuario/obtenerUsuariosDTResponse", fault = {
+        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/obtenerUsuariosDT/Fault/UsuarioNoExisteException")
+    })
+    public DtDatosUsuarioArray obtenerUsuariosDT()
+        throws UsuarioNoExisteException_Exception
+    ;
+
+    /**
+     * 
+     * @param nickname
+     * @param registroId
+     * @throws UsuarioNoExisteException_Exception
+     * @throws UsuarioTipoIncorrectoException_Exception
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorUsuario/marcarAsistenciaRequest", output = "http://publicadores/PublicadorUsuario/marcarAsistenciaResponse", fault = {
+        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/marcarAsistencia/Fault/UsuarioNoExisteException"),
+        @FaultAction(className = UsuarioTipoIncorrectoException_Exception.class, value = "http://publicadores/PublicadorUsuario/marcarAsistencia/Fault/UsuarioTipoIncorrectoException")
+    })
+    public void marcarAsistencia(
+        @WebParam(name = "nickname", partName = "nickname")
+        String nickname,
+        @WebParam(name = "registroId", partName = "registroId")
+        String registroId)
+        throws UsuarioNoExisteException_Exception, UsuarioTipoIncorrectoException_Exception
+    ;
+
+    /**
+     * 
+     * @param seguido
+     * @param seguidor
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorUsuario/seguirUsuarioRequest", output = "http://publicadores/PublicadorUsuario/seguirUsuarioResponse")
+    public void seguirUsuario(
+        @WebParam(name = "seguidor", partName = "seguidor")
+        String seguidor,
+        @WebParam(name = "seguido", partName = "seguido")
+        String seguido);
 
     /**
      * 
@@ -133,190 +318,5 @@ public interface PublicadorUsuario {
     public boolean esAsistente(
         @WebParam(name = "nickname", partName = "nickname")
         String nickname);
-
-    /**
-     * 
-     * @param descripcion
-     * @param link
-     * @param nombre
-     * @throws InstitucionYaExisteException_Exception
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorUsuario/altaInstitucionRequest", output = "http://publicadores/PublicadorUsuario/altaInstitucionResponse", fault = {
-        @FaultAction(className = InstitucionYaExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/altaInstitucion/Fault/InstitucionYaExisteException")
-    })
-    public void altaInstitucion(
-        @WebParam(name = "nombre", partName = "nombre")
-        String nombre,
-        @WebParam(name = "descripcion", partName = "descripcion")
-        String descripcion,
-        @WebParam(name = "link", partName = "link")
-        String link)
-        throws InstitucionYaExisteException_Exception
-    ;
-
-    /**
-     * 
-     * @return
-     *     returns publicadores.StringArray
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/getInstitucionesRequest", output = "http://publicadores/PublicadorUsuario/getInstitucionesResponse")
-    public StringArray getInstituciones();
-
-    /**
-     * 
-     * @return
-     *     returns publicadores.StringArray
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/listarInstitucionesRequest", output = "http://publicadores/PublicadorUsuario/listarInstitucionesResponse")
-    public StringArray listarInstituciones();
-
-    /**
-     * 
-     * @param nickname
-     * @return
-     *     returns publicadores.DtDatosUsuario
-     * @throws UsuarioNoExisteException_Exception
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/obtenerDatosUsuarioRequest", output = "http://publicadores/PublicadorUsuario/obtenerDatosUsuarioResponse", fault = {
-        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/obtenerDatosUsuario/Fault/UsuarioNoExisteException")
-    })
-    public DtDatosUsuario obtenerDatosUsuario(
-        @WebParam(name = "nickname", partName = "nickname")
-        String nickname)
-        throws UsuarioNoExisteException_Exception
-    ;
-
-    /**
-     * 
-     * @param nickname
-     * @param nuevaContrasenia
-     * @throws UsuarioNoExisteException_Exception
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorUsuario/modificarContraseniaRequest", output = "http://publicadores/PublicadorUsuario/modificarContraseniaResponse", fault = {
-        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/modificarContrasenia/Fault/UsuarioNoExisteException")
-    })
-    public void modificarContrasenia(
-        @WebParam(name = "nickname", partName = "nickname")
-        String nickname,
-        @WebParam(name = "nuevaContrasenia", partName = "nuevaContrasenia")
-        String nuevaContrasenia)
-        throws UsuarioNoExisteException_Exception
-    ;
-
-    /**
-     * 
-     * @param nombre
-     * @throws CategoriaYaExisteException_Exception
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUIRequest", output = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUIResponse", fault = {
-        @FaultAction(className = CategoriaYaExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/altaCategoriaSinGUI/Fault/CategoriaYaExisteException")
-    })
-    public void altaCategoriaSinGUI(
-        @WebParam(name = "nombre", partName = "nombre")
-        String nombre)
-        throws CategoriaYaExisteException_Exception
-    ;
-
-    /**
-     * 
-     * @param seguido
-     * @param seguidor
-     * @return
-     *     returns boolean
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/sigueARequest", output = "http://publicadores/PublicadorUsuario/sigueAResponse")
-    public boolean sigueA(
-        @WebParam(name = "seguidor", partName = "seguidor")
-        String seguidor,
-        @WebParam(name = "seguido", partName = "seguido")
-        String seguido);
-
-    /**
-     * 
-     * @return
-     *     returns publicadores.DtDatosUsuarioArray
-     * @throws UsuarioNoExisteException_Exception
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/obtenerUsuariosDTRequest", output = "http://publicadores/PublicadorUsuario/obtenerUsuariosDTResponse", fault = {
-        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/obtenerUsuariosDT/Fault/UsuarioNoExisteException")
-    })
-    public DtDatosUsuarioArray obtenerUsuariosDT()
-        throws UsuarioNoExisteException_Exception
-    ;
-
-    /**
-     * 
-     * @param contrasena
-     * @param nickOrEmail
-     * @return
-     *     returns boolean
-     */
-    @WebMethod
-    @WebResult(partName = "return")
-    @Action(input = "http://publicadores/PublicadorUsuario/validarLoginRequest", output = "http://publicadores/PublicadorUsuario/validarLoginResponse")
-    public boolean validarLogin(
-        @WebParam(name = "nickOrEmail", partName = "nickOrEmail")
-        String nickOrEmail,
-        @WebParam(name = "contrasena", partName = "contrasena")
-        String contrasena);
-
-    /**
-     * 
-     * @param seguido
-     * @param seguidor
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorUsuario/seguirUsuarioRequest", output = "http://publicadores/PublicadorUsuario/seguirUsuarioResponse")
-    public void seguirUsuario(
-        @WebParam(name = "seguidor", partName = "seguidor")
-        String seguidor,
-        @WebParam(name = "seguido", partName = "seguido")
-        String seguido);
-
-    /**
-     * 
-     * @param seguido
-     * @param seguidor
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorUsuario/dejarSeguirUsuarioRequest", output = "http://publicadores/PublicadorUsuario/dejarSeguirUsuarioResponse")
-    public void dejarSeguirUsuario(
-        @WebParam(name = "seguidor", partName = "seguidor")
-        String seguidor,
-        @WebParam(name = "seguido", partName = "seguido")
-        String seguido);
-
-    /**
-     * 
-     * @param nickname
-     * @param registroId
-     * @throws UsuarioNoExisteException_Exception
-     * @throws UsuarioTipoIncorrectoException_Exception
-     */
-    @WebMethod
-    @Action(input = "http://publicadores/PublicadorUsuario/marcarAsistenciaRequest", output = "http://publicadores/PublicadorUsuario/marcarAsistenciaResponse", fault = {
-        @FaultAction(className = UsuarioNoExisteException_Exception.class, value = "http://publicadores/PublicadorUsuario/marcarAsistencia/Fault/UsuarioNoExisteException"),
-        @FaultAction(className = UsuarioTipoIncorrectoException_Exception.class, value = "http://publicadores/PublicadorUsuario/marcarAsistencia/Fault/UsuarioTipoIncorrectoException")
-    })
-    public void marcarAsistencia(
-        @WebParam(name = "nickname", partName = "nickname")
-        String nickname,
-        @WebParam(name = "registroId", partName = "registroId")
-        String registroId)
-        throws UsuarioNoExisteException_Exception, UsuarioTipoIncorrectoException_Exception
-    ;
 
 }

@@ -1087,8 +1087,8 @@ public class ControladorEvento implements IControladorEvento {
 	                            managedOrgDom.getNickname(),
 	                            managedOrgDom.getNombre(),
 	                            managedOrgDom.getEmail(),
-	                            "",   // contraseña no disponible
-	                            null, // imagen
+	                            managedOrgDom.getContrasena(),   // contraseña no disponible
+	                            managedOrgDom.getImagen(), // imagen
 	                            managedOrgDom.getDesc(),
 	                            managedOrgDom.getLink()
 	                    );
@@ -1159,15 +1159,20 @@ public class ControladorEvento implements IControladorEvento {
 	                        if (managedUser == null) {
 	                            if (usuarioDom instanceof Asistente aDom) {
 	                                System.out.println("[ARCHIV][TX] crear AsistenteOO nick='" + aDom.getNickname() + "'");
+	                                String insti;
+	                                if (aDom.getInstitucion() == null) {
+	                                    insti = "";
+	                                }
+	                                else insti = aDom.getInstitucion().getNombre();
 	                                AsistenteOO newA = new AsistenteOO(
 	                                        aDom.getNickname(),
 	                                        aDom.getNombre(),
 	                                        aDom.getEmail(),
-	                                        "",      // contraseña
-	                                        null,    // imagen
-	                                        null,    // apellido
-	                                        null,    // fecha nacimiento
-	                                        null     // institución
+	                                        aDom.getContrasena(),      // contraseña
+	                                        aDom.getImagen(),    // imagen
+	                                        aDom.getApellido(),    // apellido
+	                                        aDom.getFechaDeNacimiento(),    // fecha nacimiento
+	                                        insti     // institución
 	                                );
 	                                em.persist(newA);
 	                                managedUser = newA;
@@ -1177,8 +1182,8 @@ public class ControladorEvento implements IControladorEvento {
 	                                        oDom.getNickname(),
 	                                        oDom.getNombre(),
 	                                        oDom.getEmail(),
-	                                        "",   // contraseña
-	                                        null, // imagen
+	                                        oDom.getContrasena(),   // contraseña
+	                                        oDom.getImagen(), // imagen
 	                                        oDom.getDesc(),
 	                                        oDom.getLink()
 	                                );
@@ -1190,8 +1195,8 @@ public class ControladorEvento implements IControladorEvento {
 	                                        usuarioDom.getNickname(),
 	                                        usuarioDom.getNombre(),
 	                                        usuarioDom.getEmail(),
-	                                        "",   // contraseña
-	                                        null  // imagen
+	                                        usuarioDom.getContrasena(),   // contraseña
+	                                        usuarioDom.getImagen()  // imagen
 	                                );
 	                                em.persist(newU);
 	                                managedUser = newU;

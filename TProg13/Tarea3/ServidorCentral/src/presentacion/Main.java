@@ -65,6 +65,10 @@ public class Main {
     private TopEventosFrame topEventosFrame;
 
     public static void main(String[] args) {
+    	 System.setProperty(
+    		        "jakarta.xml.bind.context.factory",
+    		        "org.glassfish.jaxb.runtime.v2.ContextFactory"
+    		    );
         try {
             PublicadorUsuario publicadorUsuario = new PublicadorUsuario();
             publicadorUsuario.publicar();

@@ -51,4 +51,14 @@ GRANT DBA TO SA
 SET SCHEMA SYSTEM_LOBS
 INSERT INTO BLOCKS VALUES(0,2147483647,0)
 SET SCHEMA PUBLIC
+INSERT INTO USUARIOS VALUES('MariR','AsistenteOO','maria55r','maria.rodriguez@gmail.com','IMG-US14.jpeg','Mar\u00eda')
+INSERT INTO USUARIOS VALUES('SofiM','AsistenteOO','smarti99z','sofia.martinez@yahoo.com','IMG-US15.jpeg','Sof\u00eda')
+INSERT INTO USUARIOS VALUES('miseventos','OrganizadorOO','22miseventos','contacto@miseventos.com','IMG-US04.jpeg','MisEventos')
 INSERT INTO USUARIOS VALUES('testnick','UsuarioOO','secret','test@example.com','img.png','Test User')
+INSERT INTO ORGANIZADORES VALUES('miseventos','Empresa de organizaci\u00f3n de eventos.','https://miseventos.com')
+INSERT INTO EDICIONES VALUES('Montevideo Comics 2024','Montevideo','Archivada','Montevideo Comics','2024-06-20','2024-07-21','2024-07-18','IMG-EDEV05.jpeg','Uruguay','COMICS24',NULL,'miseventos')
+INSERT INTO EDICIONES VALUES('Montevideo Comics 2025','Montevideo','Archivada','Montevideo Comics','2025-07-04','2025-08-06','2025-08-04','IMG-EDEV06.jpeg','Uruguay','COMICS25',NULL,'miseventos')
+INSERT INTO REGISTROS VALUES('RE08',FALSE,500.0E0,'Montevideo Comics','2025-08-04','2025-08-03','Cosplayer','Montevideo Comics 2025','MariR')
+INSERT INTO REGISTROS VALUES('RE09',FALSE,600.0E0,'Montevideo Comics','2024-07-18','2024-07-16','General','Montevideo Comics 2024','SofiM')
+INSERT INTO ASISTENTES VALUES('MariR','Rodr\u00edguez','2000-11-10','')
+INSERT INTO ASISTENTES VALUES('SofiM','Mart\u00ednez','1997-02-05','')
