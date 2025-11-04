@@ -7,15 +7,16 @@ import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Clase Java para DTEstado.
+ * <p>Java class for DTEstado.
  * 
- * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * <pre>{@code
  * <simpleType name="DTEstado">
  *   <restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *     <enumeration value="Ingresada"/>
  *     <enumeration value="Aceptada"/>
  *     <enumeration value="Rechazada"/>
+ *     <enumeration value="Archivada"/>
  *   </restriction>
  * </simpleType>
  * }</pre>
@@ -30,7 +31,9 @@ public enum DTEstado {
     @XmlEnumValue("Aceptada")
     ACEPTADA("Aceptada"),
     @XmlEnumValue("Rechazada")
-    RECHAZADA("Rechazada");
+    RECHAZADA("Rechazada"),
+    @XmlEnumValue("Archivada")
+    ARCHIVADA("Archivada");
     private final String value;
 
     DTEstado(String v) {

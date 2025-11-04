@@ -17,6 +17,7 @@ import excepciones.TipoRegistroYaExisteException;
 import excepciones.UsuarioNoEsAsistente;
 import excepciones.PatrocinioYaExisteException;
 import excepciones.ValorPatrocinioExcedidoException;
+import logica.utils.EntityManagerUtil;
 import jakarta.persistence.EntityManager;
 import excepciones.FechasCruzadasException;
 import excepciones.CupoTipoRegistroInvalidoException;
@@ -45,6 +46,8 @@ import logica.manejadores.ManejadorAuxiliar;
 import logica.manejadores.ManejadorUsuario;
 
 import java.lang.reflect.InvocationTargetException;
+
+import logica.modelo.AsistenteOO;
 import logica.modelo.EdicionOO;
 import logica.modelo.OrganizadorOO;
 import logica.modelo.RegistroOO;
@@ -1027,169 +1030,226 @@ public class ControladorEvento implements IControladorEvento {
 	    }
 	}
 	
-	public void archivarEdicion(String edicionNombre) { // luego de que eligis la edicion a partir del nombre de la edicion seria chequear todas las relaciones y agregarlas a la base de datos, el organizador de esa edicion, los asistentes registrados a esa edicion
-       if (edicionNombre == null || edicionNombre.isBlank()) return;
+	public void archivarEdicion(String edicionNombre) {
+	    System.out.println("[ARCHIV][IN] arg='" + edicionNombre + "'");
+	    if (edicionNombre == null || edicionNombre.isBlank()) {
+	        System.out.println("[ARCHIV][WARN] nombre vacío/nulo. Abort.");
+	        return;
+	    }
 
-       // 1) localizar la Ediciones en el manejador (no en la DB)
-       Ediciones edDom = null;
-       if (edicionNombre.contains("::")) {
-           String[] parts = edicionNombre.split("::", 2);
-           String nombreEvento = parts[0];
-           String nombreEdicion = parts[1];
-           edDom = obtenerEdicion(nombreEvento, nombreEdicion);
-       } else {
-           // tratar como sigla
-           edDom = obtenerEdicionPorSigla(edicionNombre);
-       }
+	    // === Resolver en memoria ===
+	    final Ediciones ed;
+	    if (edicionNombre.contains("::")) {
+	        String[] parts = edicionNombre.split("::", 2);
+	        final String nombreEvento  = parts[0];
+	        final String nombreEdicion = parts[1];
+	        System.out.println("[ARCHIV][MEM] parse evento='" + nombreEvento + "' edicion='" + nombreEdicion + "'");
+	        ed = obtenerEdicion(nombreEvento, nombreEdicion);
+	    } else {
+	        System.out.println("[ARCHIV][MEM] tratar como sigla/nombre='" + edicionNombre + "'");
+	        ed = obtenerEdicionPorSigla(edicionNombre);
+	    }
 
-       if (edDom == null) {
-           throw new IllegalArgumentException("Edición no encontrada en memoria: " + edicionNombre);
-       }
+	    if (ed == null) {
+	        System.out.println("[ARCHIV][ERR] Edición no encontrada en memoria: " + edicionNombre);
+	        throw new IllegalArgumentException("Edición no encontrada en memoria: " + edicionNombre);
+	    }
 
-       // marcar en memoria
-       edDom.setEstado(DTEstado.Archivada);
+	    System.out.println("[ARCHIV][MEM] encontrado ed='" + ed.getNombre() + "' sigla='" + ed.getSigla() + "'" +
+	            " evento='" + (ed.getEvento()!=null?ed.getEvento().getNombre():"<null>") + "'");
 
-       // 2) convertir/persistir en la base usando las entidades JPA (EdicionOO, UsuarioOO, RegistroOO, OrganizadorOO)
-       EntityManagerUtil.tx(em -> {
-           // Organizador JPA
-           Organizador orgDom = null;
-           if (edDom.getOrganizador() instanceof Organizador) orgDom = (Organizador) edDom.getOrganizador();
+	    // Marcar en memoria
+	    ed.setEstado(DTEstado.Archivada);
+	    System.out.println("[ARCHIV][MEM] estado -> Archivada");
 
-           OrganizadorOO managedOrg = null;
-           if (orgDom != null) {
-               managedOrg = em.find(OrganizadorOO.class, orgDom.getNickname());
-               if (managedOrg == null) {
-                   // crear entidad OrganizadorOO nueva a persistir
-                   managedOrg = new OrganizadorOO(
-                       orgDom.getNickname(),
-                       orgDom.getNombre(),
-                       orgDom.getEmail(),
-                       /*contrasena*/ "", // no disponible en domain, dejar vacía o adaptá si existe
-                       /*imagen*/ null,
-                       orgDom.getDesc(),
-                       orgDom.getLink()
-                   );
-                   em.persist(managedOrg);
-               }
-           }
+	    // Datos para logging
+	    final String edNombreLog   = ed.getNombre();
+	    final String evNombreLog   = (ed.getEvento()!=null? ed.getEvento().getNombre() : null);
+	    final int cantRegDom       = (ed.getRegistros()!=null? ed.getRegistros().size() : 0);
+	    System.out.println("[ARCHIV][MEM] registros asociados=" + cantRegDom);
 
-           // Edicion JPA: buscar por PK (nombre). Si ya existe actualizar; si no, crear
-           EdicionOO edOO = em.find(EdicionOO.class, edDom.getNombre());
-           boolean newlyCreated = false;
-           if (edOO == null) {
-               edOO = new EdicionOO(
-                   edDom.getNombre(),
-                   edDom.getEvento() != null ? edDom.getEvento().getNombre() : null,
-                   edDom.getSigla(),
-                   edDom.getFechaInicio(),
-                   edDom.getFechaFin(),
-                   edDom.getFechaAlta(),
-                   managedOrg,
-                   edDom.getCiudad(),
-                   edDom.getPais(),
-                   DTEstado.Archivada.name(),
-                   edDom.getImagen(),
-                   edDom.getVideo()
-               );
-               em.persist(edOO);
-               newlyCreated = true;
-           } else {
-               // actualizar campos relevantes
-               edOO.setSigla(edDom.getSigla());
-               edOO.setFechaInicio(edDom.getFechaInicio());
-               edOO.setFechaFin(edDom.getFechaFin());
-               edOO.setFechaAlta(edDom.getFechaAlta());
-               edOO.setCiudad(edDom.getCiudad());
-               edOO.setPais(edDom.getPais());
-               edOO.setImagen(edDom.getImagen());
-               edOO.setVideo(edDom.getVideo());
-               edOO.setEstado(DTEstado.Archivada.name());
-               if (managedOrg != null) edOO.setOrganizador(managedOrg);
-           }
+	    try {
+	        EntityManagerUtil.tx((EntityManager em) -> {
+	            System.out.println("[ARCHIV][TX] BEGIN ed='" + edNombreLog + "' ev='" + evNombreLog + "'");
 
-           // asegurar relación organizador -> edicion
-           if (managedOrg != null) {
-               // si no contiene la edicion, agregar
-               if (!managedOrg.getEdiciones().contains(edOO)) {
-                   managedOrg.addEdicion(edOO);
-               }
-           }
+	            // ----- OrganizadorOO -----
+	            Organizador managedOrgDom = (ed.getOrganizador() instanceof Organizador)
+	                    ? (Organizador) ed.getOrganizador()
+	                    : null;
 
-           // Persistir registros y usuarios asociados. EdicionOO tiene cascade ALL en registros,
-           // pero debemos asegurarnos que UsuarioOO estén persistidos primero (ya que RegistroOO reference usuario no es cascade desde edicion)
-           for (Registro regDom : edDom.getRegistros().values()) {
-               if (regDom == null) continue;
-               // usuario asociado
-               Usuario usuarioDom = regDom.getUsuario();
-               UsuarioOO managedUser = null;
-               if (usuarioDom != null) {
-                   managedUser = em.find(UsuarioOO.class, usuarioDom.getNickname());
-                   if (managedUser == null) {
-                       // crear la subclase correcta
-                       if (usuarioDom instanceof Asistente) {
-                           Asistente aDom = (Asistente) usuarioDom;
-                           // AsistenteOO constructor: (nickname, nombre, email, contrasena, imagen, apellido, fechaNacimiento, institucion)
-                           logica.modelo.AsistenteOO newA = new logica.modelo.AsistenteOO(
-                               aDom.getNickname(),
-                               aDom.getNombre(),
-                               aDom.getEmail(),
-                               "",
-                               null,
-                               /*apellido*/ null,
-                               /*fechaNacimiento*/ null,
-                               /*institucion*/ null
-                           );
-                           em.persist(newA);
-                           managedUser = newA;
-                       } else if (usuarioDom instanceof Organizador) {
-                           Organizador oDom = (Organizador) usuarioDom;
-                           OrganizadorOO newO = new OrganizadorOO(
-                               oDom.getNickname(),
-                               oDom.getNombre(),
-                               oDom.getEmail(),
-                               "",
-                               null,
-                               oDom.getDesc(),
-                               oDom.getLink()
-                           );
-                           em.persist(newO);
-                           managedUser = newO;
-                       } else {
-                           // fallback UsuarioOO
-                           UsuarioOO newU = new UsuarioOO(
-                               usuarioDom.getNickname(),
-                               usuarioDom.getNombre(),
-                               usuarioDom.getEmail(),
-                               "",
-                               null
-                           );
-                           em.persist(newU);
-                           managedUser = newU;
-                       }
-                   }
-               }
+	            OrganizadorOO managedOrg = null;
+	            if (managedOrgDom != null) {
+	                System.out.println("[ARCHIV][TX] buscar OrganizadorOO nick='" + managedOrgDom.getNickname() + "'");
+	                managedOrg = em.find(OrganizadorOO.class, managedOrgDom.getNickname());
+	                if (managedOrg == null) {
+	                    System.out.println("[ARCHIV][TX] crear OrganizadorOO nick='" + managedOrgDom.getNickname() + "'");
+	                    managedOrg = new OrganizadorOO(
+	                            managedOrgDom.getNickname(),
+	                            managedOrgDom.getNombre(),
+	                            managedOrgDom.getEmail(),
+	                            "",   // contraseña no disponible
+	                            null, // imagen
+	                            managedOrgDom.getDesc(),
+	                            managedOrgDom.getLink()
+	                    );
+	                    em.persist(managedOrg);
+	                } else {
+	                    System.out.println("[ARCHIV][TX] encontrado OrganizadorOO existente");
+	                }
+	            } else {
+	                System.out.println("[ARCHIV][TX][INFO] edición sin organizador asignado");
+	            }
 
-               // crear RegistroOO y asociar
-               RegistroOO regOO = new RegistroOO(
-                   regDom.getId(),
-                   regDom.getCosto(),
-                   managedUser,
-                   edOO,
-                   regDom.getTipoRegistro() != null ? regDom.getTipoRegistro().getNombre() : null,
-                   regDom.getFechaRegistro(),
-                   regDom.getFechaInicio(),
-                   regDom.getEvento() != null ? regDom.getEvento().getNombre() : null,
-                   regDom.getAsistencia()
-               );
+	            // ----- EdicionOO -----
+	            System.out.println("[ARCHIV][TX] buscar EdicionOO pk='" + ed.getNombre() + "'");
+	            EdicionOO edOO = em.find(EdicionOO.class, ed.getNombre());
+	            boolean createdEd = false;
+	            if (edOO == null) {
+	                System.out.println("[ARCHIV][TX] crear EdicionOO");
+	                edOO = new EdicionOO(
+	                        ed.getNombre(),
+	                        (ed.getEvento() != null ? ed.getEvento().getNombre() : null),
+	                        ed.getSigla(),
+	                        ed.getFechaInicio(),
+	                        ed.getFechaFin(),
+	                        ed.getFechaAlta(),
+	                        managedOrg,
+	                        ed.getCiudad(),
+	                        ed.getPais(),
+	                        DTEstado.Archivada.name(),
+	                        ed.getImagen(),
+	                        ed.getVideo()
+	                );
+	                em.persist(edOO);
+	                createdEd = true;
+	            } else {
+	                System.out.println("[ARCHIV][TX] actualizar EdicionOO existente");
+	                edOO.setSigla(ed.getSigla());
+	                edOO.setFechaInicio(ed.getFechaInicio());
+	                edOO.setFechaFin(ed.getFechaFin());
+	                edOO.setFechaAlta(ed.getFechaAlta());
+	                edOO.setCiudad(ed.getCiudad());
+	                edOO.setPais(ed.getPais());
+	                edOO.setImagen(ed.getImagen());
+	                edOO.setVideo(ed.getVideo());
+	                edOO.setEstado(DTEstado.Archivada.name());
+	                if (managedOrg != null) edOO.setOrganizador(managedOrg);
+	            }
 
-               // agregar al edOO (cascade persist)
-               edOO.addRegistro(regOO);
-           }
+	            if (managedOrg != null && !managedOrg.getEdiciones().contains(edOO)) {
+	                System.out.println("[ARCHIV][TX] vincular OrganizadorOO -> EdicionOO");
+	                managedOrg.addEdicion(edOO);
+	            }
 
-           // Finalmente, merge edOO to update relationships (if existed)
-           em.merge(edOO);
+	            // ----- RegistrosOO -----
+	            int creadosReg = 0;
+	            int yaExistReg = 0;
 
-           return null;
-       });
-    }
-}
+	            if (ed.getRegistros() != null && !ed.getRegistros().isEmpty()) {
+	                System.out.println("[ARCHIV][TX] procesar " + ed.getRegistros().size() + " registros…");
+	                for (Registro regDom : ed.getRegistros().values()) {
+	                    if (regDom == null) continue;
+
+	                    // Usuario asociado
+	                    Usuario usuarioDom = regDom.getUsuario();
+	                    UsuarioOO managedUser = null;
+
+	                    if (usuarioDom != null) {
+	                        managedUser = em.find(UsuarioOO.class, usuarioDom.getNickname());
+	                        if (managedUser == null) {
+	                            if (usuarioDom instanceof Asistente aDom) {
+	                                System.out.println("[ARCHIV][TX] crear AsistenteOO nick='" + aDom.getNickname() + "'");
+	                                AsistenteOO newA = new AsistenteOO(
+	                                        aDom.getNickname(),
+	                                        aDom.getNombre(),
+	                                        aDom.getEmail(),
+	                                        "",      // contraseña
+	                                        null,    // imagen
+	                                        null,    // apellido
+	                                        null,    // fecha nacimiento
+	                                        null     // institución
+	                                );
+	                                em.persist(newA);
+	                                managedUser = newA;
+	                            } else if (usuarioDom instanceof Organizador oDom) {
+	                                System.out.println("[ARCHIV][TX] crear OrganizadorOO (desde registro) nick='" + oDom.getNickname() + "'");
+	                                OrganizadorOO newO = new OrganizadorOO(
+	                                        oDom.getNickname(),
+	                                        oDom.getNombre(),
+	                                        oDom.getEmail(),
+	                                        "",   // contraseña
+	                                        null, // imagen
+	                                        oDom.getDesc(),
+	                                        oDom.getLink()
+	                                );
+	                                em.persist(newO);
+	                                managedUser = newO;
+	                            } else {
+	                                System.out.println("[ARCHIV][TX] crear UsuarioOO nick='" + usuarioDom.getNickname() + "'");
+	                                UsuarioOO newU = new UsuarioOO(
+	                                        usuarioDom.getNickname(),
+	                                        usuarioDom.getNombre(),
+	                                        usuarioDom.getEmail(),
+	                                        "",   // contraseña
+	                                        null  // imagen
+	                                );
+	                                em.persist(newU);
+	                                managedUser = newU;
+	                            }
+	                        }
+	                    }
+
+	                    // ¿Existe ya el registro en la tabla archivada? (si tu PK es id)
+	                    RegistroOO regOOExisting = (regDom.getId() != null)
+	                            ? em.find(RegistroOO.class, regDom.getId())
+	                            : null;
+
+	                    if (regOOExisting == null) {
+	                        RegistroOO regOO = new RegistroOO(
+	                                regDom.getId(),
+	                                regDom.getCosto(),
+	                                managedUser,
+	                                edOO,
+	                                (regDom.getTipoRegistro() != null ? regDom.getTipoRegistro().getNombre() : null),
+	                                regDom.getFechaRegistro(),
+	                                regDom.getFechaInicio(),
+	                                (regDom.getEvento() != null ? regDom.getEvento().getNombre() : null),
+	                                regDom.getAsistencia()
+	                        );
+	                        edOO.addRegistro(regOO); // cascade PERSIST desde EdicionOO → registros
+	                        creadosReg++;
+	                    } else {
+	                        yaExistReg++;
+	                    }
+	                }
+	            } else {
+	                System.out.println("[ARCHIV][TX] sin registros asociados.");
+	            }
+
+	            // merge por si edOO era existente
+	            em.merge(edOO);
+	            System.out.println("[ARCHIV][TX] OK edOO " + (createdEd ? "creada" : "actualizada")
+	                    + " | registros nuevos=" + creadosReg + " | ya existentes=" + yaExistReg);
+	            System.out.println("[ARCHIV][TX] COMMIT");
+	            return null;
+	        });
+
+	        System.out.println("[ARCHIV][OUT] DONE ed='" + edNombreLog + "'");
+	    } catch (RuntimeException ex) {
+	        System.out.println("[ARCHIV][ERR] " + ex.getClass().getName() + " | " + String.valueOf(ex.getMessage()));
+	        Throwable c = ex;
+	        int hops = 0;
+	        while (c != null && hops++ < 6) {
+	            System.out.println("   cause -> " + c.getClass().getName() + " | " + String.valueOf(c.getMessage()));
+	            c = c.getCause();
+	        }
+	        throw ex; // re-lanzo para que el WS devuelva 500 y podamos ver el stack
+	    }
+	}
+
+
+
+	}
+
+  
+

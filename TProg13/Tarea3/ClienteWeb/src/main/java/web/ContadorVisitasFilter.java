@@ -40,7 +40,6 @@ public class ContadorVisitasFilter implements Filter {
         String pathInfo    = req.getPathInfo();      // p.ej. "/ConsultaEvento" o "/<nombre>" o null
         String queryEvento = trim(req.getParameter("evento"));
 
-        System.out.println("[VISITAS][DBG.pre] servletPath=" + servletPath + " | pathInfo=" + pathInfo + " | param.evento=" + queryEvento);
 
         // 1) /evento/ConsultaEvento (o /evento + /ConsultaEvento): priorizar ?evento=
         boolean esConsultaEvento =
@@ -61,9 +60,6 @@ public class ContadorVisitasFilter implements Filter {
         // 3) Forma REST: /evento/<nombre>
         if (isBlank(evento) && "/evento".equals(servletPath) && pathInfo != null && pathInfo.length() > 1) {
             evento = URLDecoder.decode(pathInfo.substring(1), StandardCharsets.UTF_8);
-            if (!isBlank(evento)) {
-                System.out.println("[VISITAS][DBG.pre] Resuelto por REST: evento='" + evento + "'");
-            }
         }
 
         // Defensa: no contar claves genéricas
@@ -88,14 +84,12 @@ public class ContadorVisitasFilter implements Filter {
             v = req.getAttribute("evento");
             if (v instanceof String s && !isBlank(s)) {
                 evento = s.trim();
-                System.out.println("[VISITAS][DBG.post] Resuelto por atributo 'evento'='" + evento + "'");
             }
 
             if (isBlank(evento)) {
                 v = req.getAttribute("nombreEvento");
                 if (v instanceof String s && !isBlank(s)) {
                     evento = s.trim();
-                    System.out.println("[VISITAS][DBG.post] Resuelto por atributo 'nombreEvento'='" + evento + "'");
                 }
             }
 
@@ -103,7 +97,6 @@ public class ContadorVisitasFilter implements Filter {
                 v = req.getAttribute("evNombre");
                 if (v instanceof String s && !isBlank(s)) {
                     evento = s.trim();
-                    System.out.println("[VISITAS][DBG.post] Resuelto por atributo 'evNombre'='" + evento + "'");
                 }
             }
 
@@ -118,7 +111,6 @@ public class ContadorVisitasFilter implements Filter {
                             Object nombre = m.invoke(v);
                             if (nombre != null && !isBlank(nombre.toString())) {
                                 evento = nombre.toString().trim();
-                                System.out.println("[VISITAS][DBG.post] Resuelto por DTO '" + key + "'.getNombre()='" + evento + "'");
                                 break;
                             }
                         } catch (Exception ignore) {
@@ -134,8 +126,6 @@ public class ContadorVisitasFilter implements Filter {
         }
 
         if (!isBlank(evento)) {
-            System.out.println("[VISITAS] Preparando notificación | evento='" + evento
-                    + "' | uri='" + reqUri + "' | nick='" + nick + "' | status=" + resp.getStatus());
 
             try {
                 publicadores.PublicadorEstadisticasService service = new publicadores.PublicadorEstadisticasService();
@@ -145,22 +135,18 @@ public class ContadorVisitasFilter implements Filter {
                 if (overrideEndpoint != null && !overrideEndpoint.isBlank()) {
                     ((BindingProvider) port).getRequestContext().put(
                             BindingProvider.ENDPOINT_ADDRESS_PROPERTY, overrideEndpoint);
-                    System.out.println("[VISITAS] Endpoint OVERRIDE = " + overrideEndpoint);
                 } else {
                     Object actual = ((BindingProvider) port).getRequestContext()
                             .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
-                    System.out.println("[VISITAS] Endpoint por defecto del stub = " + actual);
                 }
 
                 ((BindingProvider) port).getRequestContext().put("com.sun.xml.ws.connect.timeout", 3000);
                 ((BindingProvider) port).getRequestContext().put("com.sun.xml.ws.request.timeout", 3000);
 
-                System.out.println("[VISITAS] Invocando registrarVisita('" + evento + "') …");
                 port.registrarVisita(evento);
-                System.out.println("[VISITAS] OK registrarVisita para '" + evento + "'");
 
             } catch (jakarta.xml.ws.WebServiceException wse) {
-                System.out.println("[VISITAS][ERROR] WebServiceException: " + wse.getClass().getName()
+				System.out.println("[VISITAS][ERROR] WebService: " + wse.getClass().getName()
                         + " | msg=" + String.valueOf(wse.getMessage()));
                 Throwable c = wse.getCause();
                 int hops = 0;

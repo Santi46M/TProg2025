@@ -5,6 +5,7 @@ import jakarta.jws.WebParam;
 import jakarta.jws.WebService;
 import jakarta.jws.soap.SOAPBinding;
 import jakarta.xml.ws.Endpoint;
+import jakarta.xml.ws.WebServiceException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -294,6 +295,30 @@ public class PublicadorEvento {
         @WebParam(name = "idRegistro") String idRegistro
     ) {
         ice.marcarAsistencia(nick, idRegistro);
+    }
+    
+    @WebMethod
+    public String[] listarEdicionesArchivables(
+            @WebParam(name = "organizadorNick") String organizadorNick) {
+
+        try {
+            List<String> lista = ice.listarEdicionesArchivables(organizadorNick);
+            return (lista == null) ? new String[0] : lista.toArray(new String[0]);
+        } catch (RuntimeException ex) {
+            // Exponer un fallo claro al cliente SOAP
+            throw new WebServiceException("No se pudo listar ediciones archivables: " + ex.getMessage(), ex);
+        }
+    }
+
+    @WebMethod
+    public void archivarEdicion(
+            @WebParam(name = "edicionNombre") String edicionNombre) {
+
+        try {
+            ice.archivarEdicion(edicionNombre);
+        } catch (RuntimeException ex) {
+            throw new WebServiceException("No se pudo archivar la edición: " + ex.getMessage(), ex);
+        }
     }
 
     @WebMethod(exclude = true)

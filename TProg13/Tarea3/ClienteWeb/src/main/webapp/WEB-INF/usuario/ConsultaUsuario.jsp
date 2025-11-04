@@ -322,6 +322,15 @@
         <% if (tieneEdiciones) { %>
           <h2>Ediciones de eventos</h2>
           <ul class="lista-ediciones">
+        <%
+    		@SuppressWarnings("unchecked")
+    		Set<String> archivablesSet =
+        	(Set<String>) request.getAttribute("archivablesSet");
+    		if (archivablesSet == null) archivablesSet = java.util.Collections.emptySet();
+
+    		String ownerNick = (usuario != null ? usuario.getNickname() : null);
+		%>
+          
             <% for (DtEdicion e : usuario.getEdiciones().getEdicion()) {
                  String estado = (e.getEstado() != null) ? e.getEstado().toString() : "Sin estado";
                  boolean mostrar = "Aceptada".equalsIgnoreCase(estado) ||
@@ -333,21 +342,42 @@
                 	 } else if (e.getEvento() != null) { 
                 	     eventoNombre = e.getEvento().getNombre();
                 	 }
+                	
+                	  String edicionNombre = e.getNombre();
+                	  String claveCompuesta = (eventoNombre == null ? "" : eventoNombre) + "::" + edicionNombre;
+                	  boolean esArchivable = archivablesSet.contains(edicionNombre) || archivablesSet.contains(claveCompuesta);
+                	  String edKey = (eventoNombre == null ? "" : eventoNombre) + "::" + e.getNombre();
+
+                	
 
             %>
-             <li>
-			  <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
-			    <input type="hidden" name="evento" value="<%= eventoNombre %>" />
-			    <input type="hidden" name="edicion" value="<%= e.getNombre() %>" />
-			    <a href="#" onclick="this.closest('form').submit(); return false;"
-			       style="color:inherit; text-decoration:none; font-weight:600;">
-			       <%= e.getNombre() %>
-			    </a>
-			  </form>
-			  <span>(<%= e.getFechaInicio() %> - <%= e.getFechaFin() %>)</span>
-			  <em class="estado"> — <%= estado %></em>
-			</li>
-            <% } } %>
+             <li style="display:flex; align-items:center; gap:.5rem; flex-wrap: wrap;">
+  <!-- Link a ConsultaEdicion -->
+  <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
+    <input type="hidden" name="evento" value="<%= eventoNombre %>" />
+    <input type="hidden" name="edicion" value="<%= e.getNombre() %>" />
+    <a href="#" onclick="this.closest('form').submit(); return false;"
+       style="color:inherit; text-decoration:none; font-weight:600;">
+      <%= e.getNombre() %>
+    </a>
+  </form>
+
+  <span>(<%= e.getFechaInicio() %> - <%= e.getFechaFin() %>)</span>
+  <em class="estado"> — <%= estado %></em>
+
+  <%-- Botón Archivar: solo si es su propio perfil y está en archivables --%>
+  <% if (esSuPropioPerfil && archivablesSet.contains(edKey)) { %>
+    <form action="<%= ctx %>/usuario/archivarEdicion" method="post" style="display:inline; margin-left:.5rem;">
+      <input type="hidden" name="edicion" value="<%= edKey %>"/>
+      <input type="hidden" name="owner"   value="<%= ownerNick %>"/>
+      <button type="submit" class="btn btn--small"
+              onclick="return confirm('¿Archivar la edición «<%= e.getNombre() %>»? Esta acción la saca de los listados.');">
+        Archivar
+      </button>
+    </form>
+  <% } %>
+</li>            
+			<% } } %>
           </ul>
         <% } %>
 

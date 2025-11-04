@@ -7,9 +7,9 @@ import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Clase Java para dtRegistro complex type.
+ * <p>Java class for dtRegistro complex type.
  * 
- * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>{@code
  * <complexType name="dtRegistro">
@@ -58,7 +58,7 @@ public class DtRegistro {
     protected Boolean asistio;
 
     /**
-     * Obtiene el valor de la propiedad identificador.
+     * Gets the value of the identificador property.
      * 
      * @return
      *     possible object is
@@ -70,7 +70,7 @@ public class DtRegistro {
     }
 
     /**
-     * Define el valor de la propiedad identificador.
+     * Sets the value of the identificador property.
      * 
      * @param value
      *     allowed object is
@@ -82,7 +82,7 @@ public class DtRegistro {
     }
 
     /**
-     * Obtiene el valor de la propiedad usuario.
+     * Gets the value of the usuario property.
      * 
      * @return
      *     possible object is
@@ -94,7 +94,7 @@ public class DtRegistro {
     }
 
     /**
-     * Define el valor de la propiedad usuario.
+     * Sets the value of the usuario property.
      * 
      * @param value
      *     allowed object is
@@ -106,7 +106,7 @@ public class DtRegistro {
     }
 
     /**
-     * Obtiene el valor de la propiedad edicion.
+     * Gets the value of the edicion property.
      * 
      * @return
      *     possible object is
@@ -118,7 +118,7 @@ public class DtRegistro {
     }
 
     /**
-     * Define el valor de la propiedad edicion.
+     * Sets the value of the edicion property.
      * 
      * @param value
      *     allowed object is
@@ -130,7 +130,7 @@ public class DtRegistro {
     }
 
     /**
-     * Obtiene el valor de la propiedad tipoRegistro.
+     * Gets the value of the tipoRegistro property.
      * 
      * @return
      *     possible object is
@@ -142,7 +142,7 @@ public class DtRegistro {
     }
 
     /**
-     * Define el valor de la propiedad tipoRegistro.
+     * Sets the value of the tipoRegistro property.
      * 
      * @param value
      *     allowed object is
@@ -154,7 +154,7 @@ public class DtRegistro {
     }
 
     /**
-     * Obtiene el valor de la propiedad fechaRegistro.
+     * Gets the value of the fechaRegistro property.
      * 
      * @return
      *     possible object is
@@ -166,7 +166,7 @@ public class DtRegistro {
     }
 
     /**
-     * Define el valor de la propiedad fechaRegistro.
+     * Sets the value of the fechaRegistro property.
      * 
      * @param value
      *     allowed object is
@@ -178,7 +178,7 @@ public class DtRegistro {
     }
 
     /**
-     * Obtiene el valor de la propiedad costo.
+     * Gets the value of the costo property.
      * 
      */
     public float getCosto() {
@@ -186,7 +186,7 @@ public class DtRegistro {
     }
 
     /**
-     * Define el valor de la propiedad costo.
+     * Sets the value of the costo property.
      * 
      */
     public void setCosto(float value) {
@@ -194,7 +194,7 @@ public class DtRegistro {
     }
 
     /**
-     * Obtiene el valor de la propiedad fechaInicio.
+     * Gets the value of the fechaInicio property.
      * 
      * @return
      *     possible object is
@@ -206,7 +206,7 @@ public class DtRegistro {
     }
 
     /**
-     * Define el valor de la propiedad fechaInicio.
+     * Sets the value of the fechaInicio property.
      * 
      * @param value
      *     allowed object is
@@ -218,7 +218,7 @@ public class DtRegistro {
     }
 
     /**
-     * Obtiene el valor de la propiedad evento.
+     * Gets the value of the evento property.
      * 
      * @return
      *     possible object is
@@ -230,7 +230,7 @@ public class DtRegistro {
     }
 
     /**
-     * Define el valor de la propiedad evento.
+     * Sets the value of the evento property.
      * 
      * @param value
      *     allowed object is
@@ -242,7 +242,7 @@ public class DtRegistro {
     }
 
     /**
-     * Obtiene el valor de la propiedad asistio.
+     * Gets the value of the asistio property.
      * 
      * @return
      *     possible object is
@@ -254,7 +254,7 @@ public class DtRegistro {
     }
 
     /**
-     * Define el valor de la propiedad asistio.
+     * Sets the value of the asistio property.
      * 
      * @param value
      *     allowed object is
