@@ -45,7 +45,11 @@ import logica.manejadores.ManejadorAuxiliar;
 import logica.manejadores.ManejadorUsuario;
 
 import java.lang.reflect.InvocationTargetException;
-
+import logica.modelo.EdicionOO;
+import logica.modelo.OrganizadorOO;
+import logica.modelo.RegistroOO;
+import logica.modelo.UsuarioOO;
+import logica.utils.EntityManagerUtil;
 
 
 
@@ -1024,6 +1028,168 @@ public class ControladorEvento implements IControladorEvento {
 	}
 	
 	public void archivarEdicion(String edicionNombre) { // luego de que eligis la edicion a partir del nombre de la edicion seria chequear todas las relaciones y agregarlas a la base de datos, el organizador de esa edicion, los asistentes registrados a esa edicion
-	   // los registros, y agregar el organizador y el asistente a la abse de datos de UsuarioOO
-	}
+       if (edicionNombre == null || edicionNombre.isBlank()) return;
+
+       // 1) localizar la Ediciones en el manejador (no en la DB)
+       Ediciones edDom = null;
+       if (edicionNombre.contains("::")) {
+           String[] parts = edicionNombre.split("::", 2);
+           String nombreEvento = parts[0];
+           String nombreEdicion = parts[1];
+           edDom = obtenerEdicion(nombreEvento, nombreEdicion);
+       } else {
+           // tratar como sigla
+           edDom = obtenerEdicionPorSigla(edicionNombre);
+       }
+
+       if (edDom == null) {
+           throw new IllegalArgumentException("Edición no encontrada en memoria: " + edicionNombre);
+       }
+
+       // marcar en memoria
+       edDom.setEstado(DTEstado.Archivada);
+
+       // 2) convertir/persistir en la base usando las entidades JPA (EdicionOO, UsuarioOO, RegistroOO, OrganizadorOO)
+       EntityManagerUtil.tx(em -> {
+           // Organizador JPA
+           Organizador orgDom = null;
+           if (edDom.getOrganizador() instanceof Organizador) orgDom = (Organizador) edDom.getOrganizador();
+
+           OrganizadorOO managedOrg = null;
+           if (orgDom != null) {
+               managedOrg = em.find(OrganizadorOO.class, orgDom.getNickname());
+               if (managedOrg == null) {
+                   // crear entidad OrganizadorOO nueva a persistir
+                   managedOrg = new OrganizadorOO(
+                       orgDom.getNickname(),
+                       orgDom.getNombre(),
+                       orgDom.getEmail(),
+                       /*contrasena*/ "", // no disponible en domain, dejar vacía o adaptá si existe
+                       /*imagen*/ null,
+                       orgDom.getDesc(),
+                       orgDom.getLink()
+                   );
+                   em.persist(managedOrg);
+               }
+           }
+
+           // Edicion JPA: buscar por PK (nombre). Si ya existe actualizar; si no, crear
+           EdicionOO edOO = em.find(EdicionOO.class, edDom.getNombre());
+           boolean newlyCreated = false;
+           if (edOO == null) {
+               edOO = new EdicionOO(
+                   edDom.getNombre(),
+                   edDom.getEvento() != null ? edDom.getEvento().getNombre() : null,
+                   edDom.getSigla(),
+                   edDom.getFechaInicio(),
+                   edDom.getFechaFin(),
+                   edDom.getFechaAlta(),
+                   managedOrg,
+                   edDom.getCiudad(),
+                   edDom.getPais(),
+                   DTEstado.Archivada.name(),
+                   edDom.getImagen(),
+                   edDom.getVideo()
+               );
+               em.persist(edOO);
+               newlyCreated = true;
+           } else {
+               // actualizar campos relevantes
+               edOO.setSigla(edDom.getSigla());
+               edOO.setFechaInicio(edDom.getFechaInicio());
+               edOO.setFechaFin(edDom.getFechaFin());
+               edOO.setFechaAlta(edDom.getFechaAlta());
+               edOO.setCiudad(edDom.getCiudad());
+               edOO.setPais(edDom.getPais());
+               edOO.setImagen(edDom.getImagen());
+               edOO.setVideo(edDom.getVideo());
+               edOO.setEstado(DTEstado.Archivada.name());
+               if (managedOrg != null) edOO.setOrganizador(managedOrg);
+           }
+
+           // asegurar relación organizador -> edicion
+           if (managedOrg != null) {
+               // si no contiene la edicion, agregar
+               if (!managedOrg.getEdiciones().contains(edOO)) {
+                   managedOrg.addEdicion(edOO);
+               }
+           }
+
+           // Persistir registros y usuarios asociados. EdicionOO tiene cascade ALL en registros,
+           // pero debemos asegurarnos que UsuarioOO estén persistidos primero (ya que RegistroOO reference usuario no es cascade desde edicion)
+           for (Registro regDom : edDom.getRegistros().values()) {
+               if (regDom == null) continue;
+               // usuario asociado
+               Usuario usuarioDom = regDom.getUsuario();
+               UsuarioOO managedUser = null;
+               if (usuarioDom != null) {
+                   managedUser = em.find(UsuarioOO.class, usuarioDom.getNickname());
+                   if (managedUser == null) {
+                       // crear la subclase correcta
+                       if (usuarioDom instanceof Asistente) {
+                           Asistente aDom = (Asistente) usuarioDom;
+                           // AsistenteOO constructor: (nickname, nombre, email, contrasena, imagen, apellido, fechaNacimiento, institucion)
+                           logica.modelo.AsistenteOO newA = new logica.modelo.AsistenteOO(
+                               aDom.getNickname(),
+                               aDom.getNombre(),
+                               aDom.getEmail(),
+                               "",
+                               null,
+                               /*apellido*/ null,
+                               /*fechaNacimiento*/ null,
+                               /*institucion*/ null
+                           );
+                           em.persist(newA);
+                           managedUser = newA;
+                       } else if (usuarioDom instanceof Organizador) {
+                           Organizador oDom = (Organizador) usuarioDom;
+                           OrganizadorOO newO = new OrganizadorOO(
+                               oDom.getNickname(),
+                               oDom.getNombre(),
+                               oDom.getEmail(),
+                               "",
+                               null,
+                               oDom.getDesc(),
+                               oDom.getLink()
+                           );
+                           em.persist(newO);
+                           managedUser = newO;
+                       } else {
+                           // fallback UsuarioOO
+                           UsuarioOO newU = new UsuarioOO(
+                               usuarioDom.getNickname(),
+                               usuarioDom.getNombre(),
+                               usuarioDom.getEmail(),
+                               "",
+                               null
+                           );
+                           em.persist(newU);
+                           managedUser = newU;
+                       }
+                   }
+               }
+
+               // crear RegistroOO y asociar
+               RegistroOO regOO = new RegistroOO(
+                   regDom.getId(),
+                   regDom.getCosto(),
+                   managedUser,
+                   edOO,
+                   regDom.getTipoRegistro() != null ? regDom.getTipoRegistro().getNombre() : null,
+                   regDom.getFechaRegistro(),
+                   regDom.getFechaInicio(),
+                   regDom.getEvento() != null ? regDom.getEvento().getNombre() : null,
+                   regDom.getAsistencia()
+               );
+
+               // agregar al edOO (cascade persist)
+               edOO.addRegistro(regOO);
+           }
+
+           // Finalmente, merge edOO to update relationships (if existed)
+           em.merge(edOO);
+
+           return null;
+       });
+    }
 }
