@@ -17,6 +17,7 @@ import excepciones.TipoRegistroYaExisteException;
 import excepciones.UsuarioNoEsAsistente;
 import excepciones.PatrocinioYaExisteException;
 import excepciones.ValorPatrocinioExcedidoException;
+import jakarta.persistence.EntityManager;
 import excepciones.FechasCruzadasException;
 import excepciones.CupoTipoRegistroInvalidoException;
 import excepciones.CostoTipoRegistroInvalidoException;
@@ -995,4 +996,33 @@ public class ControladorEvento implements IControladorEvento {
 	            tipo.getNombre()
 	    );
 }
+	public List<String> listarEdicionesArchivables(String organizadorNick) { //aca seria listar las ediciones que ya finalizaron y estan aceptadas
+	    LocalDate hoy = LocalDate.now();
+
+	    try {
+	        // Cargamos el organizador con sus ediciones
+	        Organizador org = manejadorUsuario.find(Organizador.class, organizadorNick);
+	        if (org == null) {
+	            return List.of();
+	        }
+
+	        Collection<Ediciones> eds = org.getEdiciones().values();
+
+	        return eds.stream()
+	            .filter(e -> e != null)
+	            .filter(e ->e.getEstado() == DTEstado.Aceptada)
+	            .filter(e -> e.getFechaFin() != null && e.getFechaFin().isBefore(hoy))
+	            .filter(e -> e.getEstado() != DTEstado.Archivada)  // agregar a enum supongo ni idea
+	            .map(e -> e.getEvento().getNombre() + "::" + e.getNombre())
+	            .sorted()
+	            .toList();
+
+	    } catch (RuntimeException ex) {
+	        throw ex;
+	    }
+	}
+	
+	public void archivarEdicion(String edicionNombre) { // luego de que eligis la edicion a partir del nombre de la edicion seria chequear todas las relaciones y agregarlas a la base de datos, el organizador de esa edicion, los asistentes registrados a esa edicion
+	   // los registros, y agregar el organizador y el asistente a la abse de datos de UsuarioOO
+	}
 }

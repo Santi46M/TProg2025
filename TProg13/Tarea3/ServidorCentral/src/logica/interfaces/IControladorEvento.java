@@ -112,5 +112,7 @@ public interface IControladorEvento {
             LocalDate fechaInicio
     );
     public void marcarAsistencia(String nick, String idRegistro);
+    public List<String> listarEdicionesArchivables(String organizadorNick); 
+    public void archivarEdicion(String nombreEdicion); 
 
 }
