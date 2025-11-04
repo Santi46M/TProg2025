@@ -26,6 +26,7 @@ import logica.clases.Categoria;
 import logica.clases.Ediciones;
 import logica.clases.Eventos;
 import logica.clases.Institucion;
+import logica.clases.Organizador;
 import logica.clases.Patrocinio;
 import logica.clases.Registro;
 import logica.clases.TipoRegistro;
@@ -1000,8 +1001,8 @@ public class ControladorEvento implements IControladorEvento {
 	    LocalDate hoy = LocalDate.now();
 
 	    try {
-	        // Cargamos el organizador con sus ediciones
-	        Organizador org = manejadorUsuario.find(Organizador.class, organizadorNick);
+			// Cargamos el organizador con sus ediciones
+	        Organizador org = mUsuario.findOrganizador(organizadorNick);
 	        if (org == null) {
 	            return List.of();
 	        }

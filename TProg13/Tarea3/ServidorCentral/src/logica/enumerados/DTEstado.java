@@ -7,5 +7,6 @@ import jakarta.xml.bind.annotation.XmlType;
 public enum DTEstado implements Serializable {
     Ingresada,
     Aceptada,
-    Rechazada
+    Rechazada,
+    Archivada
 }
