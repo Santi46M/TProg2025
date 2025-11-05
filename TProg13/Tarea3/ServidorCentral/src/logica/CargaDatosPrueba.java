@@ -145,6 +145,7 @@ public class CargaDatosPrueba {
         try {
             controladorEve.altaEvento("Global", "Aventureros en grupo",
                     LocalDate.of(2025, 1, 1), "GBL", new DTCategorias(catEv08), "IMG-EV08.jpeg");
+            
         } catch (EventoYaExisteException ignore) {}
 
         var manejadorEve = logica.manejadores.ManejadorEvento.getInstancia();
@@ -155,7 +156,7 @@ public class CargaDatosPrueba {
         manejadorEve.obtenerEvento("Montevideo Comics").setVigente(true);
         manejadorEve.obtenerEvento("Expointer Uruguay").setVigente(true);
         manejadorEve.obtenerEvento("Montevideo Fashion Week").setVigente(true);
-        manejadorEve.obtenerEvento("Global").setVigente(false);
+        manejadorEve.obtenerEvento("Global").setVigente(true);
 
 
     }
@@ -359,6 +360,7 @@ public class CargaDatosPrueba {
              "Cusco", "Perú", "IMG-EDEV12.jpeg"
          );
          setEstadoEdicion.accept("MAPI25", DTEstado.Aceptada);
+         manejadorEve.obtenerEvento("Global").setVigente(false);
 
      } catch (Exception ex) {
          System.err.println("[ERROR cargarEdicionesEjemplo] " + ex.getMessage());
@@ -547,7 +549,7 @@ public class CargaDatosPrueba {
 
         // RE13
         controladorEve.altaRegistroEdicionEvento("RE13",
-            manejadorUsu.getUsuarios().get("udelar"),
+            manejadorUsu.getUsuarios().get("atorres"),
             manejadorEve.obtenerEvento("Global"),
             manejadorEve.obtenerEdicion("MAPI25"),
             manejadorEve.obtenerEdicion("MAPI25").obtenerTipoRegistro("Mayores"),
@@ -555,7 +557,7 @@ public class CargaDatosPrueba {
 
         // RE14
         controladorEve.altaRegistroEdicionEvento("RE14",
-            manejadorUsu.getUsuarios().get("ort"),
+            manejadorUsu.getUsuarios().get("msilva"),
             manejadorEve.obtenerEvento("Global"),
             manejadorEve.obtenerEdicion("MAPI25"),
             manejadorEve.obtenerEdicion("MAPI25").obtenerTipoRegistro("Mayores"),
