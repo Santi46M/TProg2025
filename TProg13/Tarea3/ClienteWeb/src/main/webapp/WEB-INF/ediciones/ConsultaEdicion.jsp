@@ -208,21 +208,37 @@
               List<DtRegistro> regs = edAux.getRegistros().getRegistro();
               if (!regs.isEmpty()) {
         %>
-          <div class="registro-detalle">
-            <h3>Usuarios registrados en esta edición</h3>
-            <ul style="list-style:none; padding:0;">
-              <% for (DtRegistro r : regs) { %>
-                <li style="margin:.25rem 0;">
-                  <form action="<%=ctx%>/registro/ConsultaRegistroEdicion" method="get" style="display:inline;">
-                    <input type="hidden" name="idRegistro" value="<%= r.getIdentificador() %>">
-                    <input type="hidden" name="evento" value="<%= evNombre %>">
-                    <input type="hidden" name="edicion" value="<%= edicion.getNombre() %>">
-                    <button type="submit" class="link-button"><%= r.getUsuario() %></button>
-                  </form>
-                </li>
-              <% } %>
-            </ul>
-          </div>
+<div class="registro-detalle">
+  <h3>Usuarios registrados en esta edición</h3>
+  <table style="width:100%; border-collapse:collapse; font-size:0.95rem;">
+    <thead>
+      <tr style="background:#e5e7eb;">
+        <th style="text-align:left; padding:0.5rem;">Usuario</th>
+        <th style="text-align:left; padding:0.5rem;">Asistió</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% for (DtRegistro r : regs) { 
+           Boolean asistencia = r.isAsistio();
+           boolean asistio = (asistencia != null && asistencia);
+      %>
+        <tr style="border-bottom:1px solid #ddd;">
+          <td style="padding:0.5rem;">
+            <form action="<%=ctx%>/registro/ConsultaRegistroEdicion" method="get" style="display:inline;">
+              <input type="hidden" name="idRegistro" value="<%= r.getIdentificador() %>">
+              <input type="hidden" name="evento" value="<%= evNombre %>">
+              <input type="hidden" name="edicion" value="<%= edicion.getNombre() %>">
+              <button type="submit" class="link-button"><%= r.getUsuario() %></button>
+            </form>
+          </td>
+          <td style="padding:0.5rem; color:<%= asistio ? "green" : "red" %>;">
+            <%= asistio ? "Sí" : "No" %>
+          </td>
+        </tr>
+      <% } %>
+    </tbody>
+  </table>
+</div>
         <% 
               }
             }
