@@ -140,7 +140,11 @@ public class ControladorEvento implements IControladorEvento {
         }
         if (manejador.existeEvento(evento.getNombre())) {
             if (!manejador.existeEdicion(nombre)) {
-                Ediciones nuevaEdicion = new Ediciones(evento, nombre, sigla, fechaInicio, fechaFin, fechaAlta, usuario, ciudad, pais, imagen);
+            	Ediciones nuevaEdicion = new Ediciones(
+            		    evento, nombre, sigla,
+            		    fechaInicio, fechaFin, fechaAlta,
+            		    usuario, ciudad, pais, imagen, desc
+            		);
                 evento.agregarEdicion(nuevaEdicion);
                 manejador.agregarEdicion(nuevaEdicion);
                 mUsuario.findOrganizador(usuario.getNickname()).agregarEdicion(nuevaEdicion);
@@ -174,6 +178,15 @@ public class ControladorEvento implements IControladorEvento {
         );
         dto.setVideo(edicion.getVideo());
         return dto;
+    }
+    
+    public void marcarAsistencia(String idRegistro) {
+        var manejadorEve = ManejadorEvento.getInstancia();
+        Registro registro = manejadorEve.obtenerRegistros().get(idRegistro);
+        if (registro == null) {
+            throw new RegistroNoExiste(idRegistro);
+        }
+        registro.setAsistencia(); // marca asistencia como true
     }
     
     public List<DTEvento> listarEventosPorCategoria(String categoriaBuscada) {
@@ -596,7 +609,7 @@ public class ControladorEvento implements IControladorEvento {
         for (Registro reg : edicion.getRegistros().values()) {
             registrosDTO.add(new DTRegistro(
                 reg.getId(),
-                reg.getUsuario().getNombre(),
+                reg.getUsuario().getNickname(),
                 edicion.getNombre(),
                 reg.getTipoRegistro().getNombre(),
                 reg.getFechaRegistro(),

@@ -114,5 +114,6 @@ public interface IControladorEvento {
     public void marcarAsistencia(String nick, String idRegistro);
     public List<String> listarEdicionesArchivables(String organizadorNick); 
     public void archivarEdicion(String nombreEdicion); 
+    public void marcarAsistencia(String idRegistro);
 
 }
