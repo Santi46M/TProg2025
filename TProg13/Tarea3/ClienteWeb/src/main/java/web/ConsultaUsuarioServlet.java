@@ -126,6 +126,19 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 String imagenUrl = ctx + "/img/usuarios/" + usuario.getImagen(); 
                 request.setAttribute("usrImagenUrl", imagenUrl);
                 request.setAttribute("usuario", usuario);
+                List<String> seguidores = new ArrayList<>();
+                List<String> seguidos = new ArrayList<>();
+
+                if (usuario.getSeguidores() != null && usuario.getSeguidores().getSeguidor() != null) {
+                    seguidores.addAll(usuario.getSeguidores().getSeguidor());
+                }
+
+                if (usuario.getSeguidos() != null && usuario.getSeguidos().getSeguido() != null) {
+                    seguidos.addAll(usuario.getSeguidos().getSeguido());
+                }
+
+                request.setAttribute("seguidores", seguidores);
+                request.setAttribute("seguidos", seguidos);
 
                 // instituciones para el dropdown
                 List<String> instituciones = Collections.emptyList();

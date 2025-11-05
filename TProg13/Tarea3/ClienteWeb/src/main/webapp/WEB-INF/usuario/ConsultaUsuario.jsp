@@ -220,6 +220,59 @@
     
     <p><strong>Nickname:</strong> <span><%= usuario.getNickname() %></span></p>
     <p><strong>Email:</strong> <span><%= usuario.getEmail()%></span></p>
+    <%
+  List<String> seguidores = (List<String>) request.getAttribute("seguidores");
+  List<String> seguidos = (List<String>) request.getAttribute("seguidos");
+%>
+
+<div style="margin-top: 1rem; border-top: 1px solid #ddd; padding-top: .75rem;">
+  <h2>Red social</h2>
+  <div style="display:flex;gap:3rem;flex-wrap:wrap;">
+
+    <!-- === Seguidores === -->
+    <div>
+      <strong>Seguidores:</strong><br>
+      <% if (seguidores == null || seguidores.isEmpty()) { %>
+        <span>—</span>
+      <% } else { %>
+        <ul style="margin:.25rem 0;padding-left:1rem;">
+          <% for (String s : seguidores) { %>
+            <li>
+              <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
+                <input type="hidden" name="nick" value="<%= s %>">
+                <button type="submit" class="btn-link user-nick">
+                  <i class='bx bxs-user'></i> <%= s %>
+                </button>
+              </form>
+            </li>
+          <% } %>
+        </ul>
+      <% } %>
+    </div>
+
+    <!-- === Seguidos === -->
+    <div>
+      <strong>Seguidos:</strong><br>
+      <% if (seguidos == null || seguidos.isEmpty()) { %>
+        <span>—</span>
+      <% } else { %>
+        <ul style="margin:.25rem 0;padding-left:1rem;">
+          <% for (String s : seguidos) { %>
+            <li>
+              <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
+                <input type="hidden" name="nick" value="<%= s %>">
+                <button type="submit" class="btn-link user-nick">
+                  <i class='bx bxs-user'></i> <%= s %>
+                </button>
+              </form>
+            </li>
+          <% } %>
+        </ul>
+      <% } %>
+    </div>
+
+  </div>
+</div>
 
 
 
