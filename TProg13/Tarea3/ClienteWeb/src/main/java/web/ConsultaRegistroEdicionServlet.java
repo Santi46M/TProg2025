@@ -77,6 +77,10 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
                 return;
             }
 
+            // PASAR ASISTENCIAS AL JSP (igual que en mobile)
+            java.util.List<DtRegistro> asistencias = dtoUsuario.getAsistencias() != null ? dtoUsuario.getAsistencias().getAsistencia() : java.util.List.of();
+            req.setAttribute("asistencias", asistencias);
+
             boolean asistio = false;
             try {
                 asistio = dtRegistro.isAsistio();

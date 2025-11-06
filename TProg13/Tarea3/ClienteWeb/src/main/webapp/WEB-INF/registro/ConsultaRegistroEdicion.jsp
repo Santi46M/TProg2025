@@ -5,8 +5,8 @@
   String rol = (String) session.getAttribute("rol");
   DtRegistro registro = (DtRegistro) request.getAttribute("registro");
   String error = (String) request.getAttribute("error");
-  Boolean asistio = (Boolean) request.getAttribute("asistio");
-  if (asistio == null) asistio = false;
+  String mensaje = (String) request.getAttribute("mensaje");
+
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -56,13 +56,32 @@
             <div class="event-meta"><strong>Fecha de inicio:</strong> <%= fechaI %></div>
 
             <% if ("asistente".equalsIgnoreCase(rol)) { %>
-              <% if (asistio) { %>
-              <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="get" style="margin-top:1rem;">
+              <%
+                List<DtRegistro> asistencias = (List<DtRegistro>) request.getAttribute("asistencias");
+                boolean yaAsistio = false;
+                if (asistencias != null && registro != null) {
+                  for (DtRegistro asis : asistencias) {
+                    if (asis.getIdentificador() != null && asis.getIdentificador().equals(registro.getIdentificador())) {
+                      yaAsistio = true;
+                      break;
+                    }
+                  }
+                }
+              %>
+              <% if (mensaje != null) { %>
+                <div class="alert alert-success" role="alert">
+                  <%= mensaje %>
+                </div>
+              <% } %>
+              <% if (yaAsistio) { %>
+                <div class="alert alert-info" role="alert">
+                  Ya has confirmado tu asistencia para este registro.
+                </div>
+                <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="get" style="margin-top:1rem;">
                   <input type="hidden" name="idRegistro" value="<%= registro.getIdentificador() %>">
                   <input type="hidden" name="accion" value="certificado">
                   <button type="submit" class="btn-linklike">Descargar certificado</button>
                 </form>
-
               <% } %>
             <% } %>
 
