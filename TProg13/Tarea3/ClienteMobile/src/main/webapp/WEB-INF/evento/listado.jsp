@@ -37,8 +37,6 @@ String ctx = request.getContextPath();
              String sigla  = ev.getSigla();
              String desc   = (ev.getDescripcion() == null ? "" : ev.getDescripcion());
              java.util.List<String> evCats = (ev.getCategorias() != null) ? ev.getCategorias().getCategoria() : null;
-             java.util.List<String> evEds  = (ev.getEdiciones() != null) ? ev.getEdiciones().getEdicion() : null;
-
              String img = ev.getImagen();
              boolean hasImg = (img != null && !img.isBlank());
         %>
@@ -58,14 +56,6 @@ String ctx = request.getContextPath();
               <div class="chips" aria-label="Categorías">
                 <% for (String c : evCats) { %>
                   <span class="chip"><%= c %></span>
-                <% } %>
-              </div>
-            <% } %>
-
-            <% if (evEds != null && !evEds.isEmpty()) { %>
-              <div class="chips" aria-label="Ediciones">
-                <% for (String ed : evEds) { %>
-                  <span class="chip"><%= ed %></span>
                 <% } %>
               </div>
             <% } %>

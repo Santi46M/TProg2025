@@ -40,7 +40,7 @@ List<DtEdicion> edicionesRegistradas = (List<DtEdicion>) request.getAttribute("e
               <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="get" style="display:inline;">
                 <input type="hidden" name="usuario" value="<%= nick %>" />
                 <input type="hidden" name="edicion" value="<%= nombre %>" />
-                <button type="submit" class="btn">Ver detalles de mi registro</button>
+				<button type="submit" class="btn btn-primary">Ver detalles de mi registro</button>
               </form>
             </div>
           </article>

@@ -288,8 +288,25 @@ public class EdicionServlet extends HttpServlet {
           publicadores.LocalDate pIni = new publicadores.LocalDate();
           publicadores.LocalDate pFin = new publicadores.LocalDate();
           publicadores.LocalDate pHoy = new publicadores.LocalDate();
-          port.altaEdicionEventoDTO(evObj, org, nombre, nombre, desc, pIni, pFin,
-                                     pHoy, ciudad, pais, imagenFileName, videoUrl);
+          
+          String hoyStr = LocalDate.now().toString();
+
+          
+          port.altaEdicionEventoDTO(
+                  evObj,
+                  org,
+                  nombre,
+                  nombre,
+                  desc,
+                  iniStr,
+                  finStr,
+                  hoyStr,
+                  ciudad,
+                  pais,
+                  (imagenFileName != null ? imagenFileName : ""), 
+                  videoUrl
+              );
+
         } catch (publicadores.EdicionYaExisteException_Exception | publicadores.EventoYaExisteException_Exception | publicadores.FechasCruzadasException_Exception ex) {
           throw ex;
         }

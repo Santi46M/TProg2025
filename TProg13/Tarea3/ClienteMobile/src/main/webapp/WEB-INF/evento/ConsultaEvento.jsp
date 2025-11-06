@@ -23,7 +23,7 @@
   String evSigla  = (ev != null ? ev.getSigla() : null);
   String evDesc   = (ev != null ? ev.getDescripcion() : null);
   // use the generated LocalDate type (publicadores.LocalDate) to avoid type mismatch
-  LocalDate evFecha  = (ev != null ? ev.getFecha() : null);
+  //LocalDate evFecha  = (ev != null ? ev.getFecha() : null);
   List<String> evCategorias = (ev != null && ev.getCategorias() != null) ? ev.getCategorias().getCategoria() : Collections.emptyList();
 
   String raw = (String) request.getAttribute("evImagenUrl");
@@ -136,7 +136,6 @@
               </div>
 
               <div class="event-meta" style="margin-top:.5rem;">
-                <strong>Fecha alta:</strong> <%= (evFecha != null ? evFecha : "—") %>
               </div>
               
               

@@ -25,7 +25,7 @@
         <ul class="list-unstyled mb-0 py-3">
           <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/evento/listado">Consulta Edición</a></li>
           <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/usuario/edicionesRegistradas">Consulta Registro</a></li>
-          <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/usuario/listarRegistros">Registro Asistencia a Edición</a></li>
+          <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/usuario/listarRegistros">Registro a Asistencia</a></li>
         </ul>
       </div>
       <script>

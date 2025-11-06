@@ -282,33 +282,7 @@ public class EventoServlet extends HttpServlet {
             DtCategorias.Categorias inner = new DtCategorias.Categorias();
             inner.getCategoria().addAll(categoriasList);
             dtCategorias.setCategorias(inner);
-            try {
-                // Note: generated stub expects publicadores.LocalDate, use its empty instance
-                publicadores.LocalDate fechaAlta = new publicadores.LocalDate();
-                
-                
-                PublicadorEvento port = obtenerPort();
-                port.altaEvento(nombre, desc, fechaAlta, sigla, dtCategorias, sigla);
 
-                if (imagenFileName != null) {
-                    // actualizarImagenEvento puede no existir en el stub; intentar reflectivamente
-                    try {
-                        Method m = port.getClass().getMethod("actualizarImagenEvento", String.class, String.class);
-                        m.invoke(port, nombre, imagenFileName);
-                    } catch (NoSuchMethodException nsme) {
-                        // método no expuesto en el stub -> ignorar
-                    } catch (Exception ex) {
-                        System.err.println("No se pudo asociar imagen al evento: " + ex.getMessage());
-                    }
-                }
-
-                String nombreEnc = URLEncoder.encode(nombre, StandardCharsets.UTF_8.name());
-                resp.sendRedirect(ctx(req) + "/evento/ConsultaEvento?nombre=" + nombreEnc);
-            } catch (EventoYaExisteException_Exception e) {
-                req.setAttribute("error", "duplicado");
-                req.setAttribute("nombreEventoDuplicado", nombre);
-                req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-            }
             return;
         }
 
