@@ -41,22 +41,44 @@
                 <li class="list-group-item"><strong>Fecha de inicio:</strong> <%= registro.getFechaInicio() %></li>
               </ul>
 
-              <% if (mensaje != null) { %>
-                <div class="alert alert-success" role="alert">
-                  <%= mensaje %>
-                </div>
-              <% } else { %>
-                <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="post">
-                  <input type="hidden" name="usuario" value="<%= nickSesion %>" />
-                  <input type="hidden" name="edicion" value="<%= registro.getEdicion() %>" />
-                  <input type="hidden" name="registroId" value="<%= registro.getIdentificador() %>" />
-                  <div class="d-grid">
-                    <button type="submit" class="btn btn-success">
-                      Confirmar asistencia
-                    </button>
-                  </div>
-                </form>
-              <% } %>
+
+			<%
+			  List<DtRegistro> asistencias = (List<DtRegistro>) request.getAttribute("asistencias");
+			%>
+
+			<%
+			  boolean yaAsistio = false;
+			  if (asistencias != null && registro != null) {
+			    for (DtRegistro asis : asistencias) {
+			      if (asis.getIdentificador() != null && asis.getIdentificador().equals(registro.getIdentificador())) {
+			        yaAsistio = true;
+			        break;
+			      }
+			    }
+			  }
+			%>
+
+			<% if (mensaje != null) { %>
+			  <div class="alert alert-success" role="alert">
+			    <%= mensaje %>
+			  </div>
+			<% } else if (yaAsistio) { %>
+			  <div class="alert alert-info" role="alert">
+			    Ya has confirmado tu asistencia para este registro.
+			  </div>
+			
+			<% } else { %>
+			  <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="post">
+			    <input type="hidden" name="usuario" value="<%= nickSesion %>" />
+			    <input type="hidden" name="edicion" value="<%= registro.getEdicion() %>" />
+			    <input type="hidden" name="registroId" value="<%= registro.getIdentificador() %>" />
+			    <div class="d-grid">
+			      <button type="submit" class="btn btn-success">
+			        Confirmar asistencia
+			      </button>
+			    </div>
+			  </form>
+			<% } %>
 
             <% } else { %>
               <div class="alert alert-warning" role="alert">

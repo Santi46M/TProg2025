@@ -217,6 +217,8 @@ manejador.addUsuario(nuevoUsuario);
             dto.setFechaNac(asisUser.getFechaDeNacimiento());
             dto.setRegistros(obtenerRegistrosAsistente(asisUser));
             dto.setInstitucion(obtenerInstitucion(asisUser));
+            // Poblar asistencias en el DTO
+            dto.setAsistencias(obtenerAsistenciasAsistente(asisUser));
         } else if (user instanceof Organizador) {
             Organizador orgUser = (Organizador) user;
             dto.setDesc(orgUser.getDesc());
@@ -239,6 +241,17 @@ manejador.addUsuario(nuevoUsuario);
         Set<DTRegistro> dtr = new HashSet<>();
         Map<String, Registro> registros = asist.getRegistros();
         for (Registro reg : registros.values()) {
+            DTRegistro detalle = obtenerDatosRegistros(reg.getId());
+            dtr.add(detalle);
+        }
+        return dtr;
+    }
+
+    // Devuelve el set de DTRegistro de asistencias del Asistente
+    public Set<DTRegistro> obtenerAsistenciasAsistente(Asistente asist) {
+        Set<DTRegistro> dtr = new HashSet<>();
+        Map<String, Registro> asistencias = asist.getAsistencias();
+        for (Registro reg : asistencias.values()) {
             DTRegistro detalle = obtenerDatosRegistros(reg.getId());
             dtr.add(detalle);
         }

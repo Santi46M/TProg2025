@@ -40,7 +40,7 @@ List<DtEdicion> listaEdiciones = (List<DtEdicion>) request.getAttribute("listaEd
               <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
                 <input type="hidden" name="evento" value="<%= evento %>" />
                 <input type="hidden" name="edicion" value="<%= nombre %>" />
-                <button type="submit" class="btn btn-primary">Ver detalles de mi registro</button>
+                <button type="submit" class="btn btn-primary">Ver detalles</button>
               </form>
             </div>
           </article>

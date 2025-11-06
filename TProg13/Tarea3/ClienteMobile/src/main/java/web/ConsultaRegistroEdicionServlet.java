@@ -5,6 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import publicadores.DtDatosUsuario;
 import publicadores.DtRegistro;
@@ -50,6 +51,9 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
                 }
             }
             req.setAttribute("usuario", dtoUsuario);
+            // PASAR ASISTENCIAS AL JSP (usando el tipo correcto)
+            List<DtRegistro> asistencias = dtoUsuario.getAsistencias() != null ? dtoUsuario.getAsistencias().getAsistencia() : java.util.List.of();
+            req.setAttribute("asistencias", asistencias);
 
             DtRegistro dtRegistro = null;
             try {
@@ -70,6 +74,17 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
                 req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
                 return;
             }
+            // CHEQUEAR SI YA MARCO ASISTENCIA
+            boolean yaAsistio = false;
+            if (asistencias != null) {
+                for (DtRegistro asis : asistencias) {
+                    if (asis.getIdentificador() != null && asis.getIdentificador().equals(dtRegistro.getIdentificador())) {
+                        yaAsistio = true;
+                        break;
+                    }
+                }
+            }
+            req.setAttribute("yaAsistio", yaAsistio);
             req.setAttribute("registro", dtRegistro);
             req.getRequestDispatcher(JSP_CONSULTA).forward(req, resp);
         } catch (Exception e) {
@@ -97,6 +112,9 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
             PublicadorUsuarioService service = new PublicadorUsuarioService();
             PublicadorUsuario port = service.getPublicadorUsuarioPort();
             port.marcarAsistencia(nick, registroId);
+            // Actualizar datos del usuario en sesión
+            DtDatosUsuario dtoUsuarioActualizado = port.obtenerDatosUsuario(nick);
+            session.setAttribute("usuario_logueado", dtoUsuarioActualizado);
             req.setAttribute("mensaje", "¡Asistencia confirmada correctamente!");
         } catch (Exception e) {
             req.setAttribute("error", "No se pudo confirmar la asistencia: " + e.getMessage());

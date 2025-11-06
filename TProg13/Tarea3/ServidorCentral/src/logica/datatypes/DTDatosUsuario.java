@@ -42,6 +42,10 @@ public class DTDatosUsuario implements Serializable {
     @XmlElementWrapper(name = "seguidos")
     @XmlElement(name = "seguido")
     private Set<String> seguidos;
+    
+    @XmlElementWrapper(name = "asistencias")
+    @XmlElement(name = "asistencia")
+    private Set<DTRegistro> asistencias;
 
     public DTDatosUsuario() {
         this.registros = new HashSet<>();
@@ -76,6 +80,8 @@ public class DTDatosUsuario implements Serializable {
     public String getImagen() { return imagen; }
     public Set<String> getSeguidores() { return seguidores; }
     public Set<String> getSeguidos() { return seguidos; }
+    public Set<DTRegistro> getAsistencias() { return asistencias; }
+
 
     public void setSeguidores(Set<String> s) { this.seguidores = s == null ? new HashSet<>() : s; }
     public void setSeguidos(Set<String> s) { this.seguidos = s == null ? new HashSet<>() : s; }
@@ -87,4 +93,9 @@ public class DTDatosUsuario implements Serializable {
     public void setRegistros(Set<DTRegistro> registros) { this.registros = registros; }
     public void setEdicion(Set<DTEdicion> edicion) { this.ediciones = edicion; }
     public void setImagen(String imagen) { this.imagen = imagen; }
+    public void setAsistencias(Set<DTRegistro> asistencias) { 
+        this.asistencias = asistencias == null ? new HashSet<>() : asistencias; 
+    }
+
+    
 }

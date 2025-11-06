@@ -8,9 +8,9 @@ import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java class for dtPatrocinio complex type.
+ * <p>Clase Java para dtPatrocinio complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
  * 
  * <pre>{@code
  * <complexType name="dtPatrocinio">
@@ -57,7 +57,7 @@ public class DtPatrocinio {
     protected String tipoRegistro;
 
     /**
-     * Gets the value of the codigo property.
+     * Obtiene el valor de la propiedad codigo.
      * 
      * @return
      *     possible object is
@@ -69,7 +69,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Sets the value of the codigo property.
+     * Define el valor de la propiedad codigo.
      * 
      * @param value
      *     allowed object is
@@ -81,7 +81,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Gets the value of the monto property.
+     * Obtiene el valor de la propiedad monto.
      * 
      */
     public int getMonto() {
@@ -89,7 +89,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Sets the value of the monto property.
+     * Define el valor de la propiedad monto.
      * 
      */
     public void setMonto(int value) {
@@ -97,7 +97,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Gets the value of the fecha property.
+     * Obtiene el valor de la propiedad fecha.
      * 
      * @return
      *     possible object is
@@ -109,7 +109,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Sets the value of the fecha property.
+     * Define el valor de la propiedad fecha.
      * 
      * @param value
      *     allowed object is
@@ -121,7 +121,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Gets the value of the nivel property.
+     * Obtiene el valor de la propiedad nivel.
      * 
      * @return
      *     possible object is
@@ -133,7 +133,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Sets the value of the nivel property.
+     * Define el valor de la propiedad nivel.
      * 
      * @param value
      *     allowed object is
@@ -145,7 +145,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Gets the value of the cantRegistrosGratuitos property.
+     * Obtiene el valor de la propiedad cantRegistrosGratuitos.
      * 
      */
     public int getCantRegistrosGratuitos() {
@@ -153,7 +153,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Sets the value of the cantRegistrosGratuitos property.
+     * Define el valor de la propiedad cantRegistrosGratuitos.
      * 
      */
     public void setCantRegistrosGratuitos(int value) {
@@ -161,7 +161,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Gets the value of the institucion property.
+     * Obtiene el valor de la propiedad institucion.
      * 
      * @return
      *     possible object is
@@ -173,7 +173,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Sets the value of the institucion property.
+     * Define el valor de la propiedad institucion.
      * 
      * @param value
      *     allowed object is
@@ -185,7 +185,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Gets the value of the siglaEdicion property.
+     * Obtiene el valor de la propiedad siglaEdicion.
      * 
      * @return
      *     possible object is
@@ -197,7 +197,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Sets the value of the siglaEdicion property.
+     * Define el valor de la propiedad siglaEdicion.
      * 
      * @param value
      *     allowed object is
@@ -209,7 +209,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Gets the value of the tipoRegistro property.
+     * Obtiene el valor de la propiedad tipoRegistro.
      * 
      * @return
      *     possible object is
@@ -221,7 +221,7 @@ public class DtPatrocinio {
     }
 
     /**
-     * Sets the value of the tipoRegistro property.
+     * Define el valor de la propiedad tipoRegistro.
      * 
      * @param value
      *     allowed object is
