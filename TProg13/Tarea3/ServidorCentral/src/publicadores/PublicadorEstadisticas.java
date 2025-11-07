@@ -7,6 +7,7 @@ import jakarta.jws.soap.SOAPBinding;
 import jakarta.xml.ws.Endpoint;
 
 import logica.datatypes.DTTopEvento;
+import util.ConfigLoader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,8 +27,8 @@ public class PublicadorEstadisticas {
 
     @WebMethod(exclude = true)
     public void publicar() {
-        String ip = obtenerIpLocal();
-        String puerto = obtenerPuerto();
+        String ip = ConfigLoader.get("ipServidor");
+        String puerto = ConfigLoader.get("puerto");
         String address = "http://" + ip + ":" + puerto + "/publicadorEstadisticas";
 
         endpoint = Endpoint.publish(address, this);
@@ -37,23 +38,11 @@ public class PublicadorEstadisticas {
 
     // --- Métodos auxiliares para IP y puerto ---
     private String obtenerIpLocal() {
-        try {
-            return InetAddress.getLocalHost().getHostAddress();
-        } catch (Exception e) {
-            System.err.println("No se pudo obtener IP local, usando localhost.");
-            return "localhost";
-        }
+        return ConfigLoader.get("ipServidor") != null ? ConfigLoader.get("ipServidor") : "localhost";
     }
 
     private String obtenerPuerto() {
-        try (InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties")) {
-            if (input == null) return "8090";
-            Properties prop = new Properties();
-            prop.load(input);
-            return prop.getProperty("puerto", "8090");
-        } catch (IOException e) {
-            return "8090";
-        }
+        return ConfigLoader.get("puerto") != null ? ConfigLoader.get("puerto") : "8090";
     }
 
     /* =============================
