@@ -309,6 +309,12 @@ public class PublicadorEvento {
             throw new WebServiceException("No se pudo archivar la edición: " + ex.getMessage(), ex);
         }
     }
+    
+    @WebMethod
+    public DTArchEdicion[] edicionesArchivadasOrganizadas(@WebParam(name="nickOrg") String nickOrg) {
+        List<DTArchEdicion> list = ice.edicionesArchivadasOrganizadas(nickOrg);
+        return list.toArray(new DTArchEdicion[0]);   // ← ARRAY
+      }
 
     @WebMethod(exclude = true)
     public Endpoint getEndpoint() {

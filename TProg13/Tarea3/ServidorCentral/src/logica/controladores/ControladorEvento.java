@@ -32,6 +32,7 @@ import logica.clases.Patrocinio;
 import logica.clases.Registro;
 import logica.clases.TipoRegistro;
 import logica.clases.Usuario;
+import logica.datatypes.DTArchEdicion;
 import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
@@ -1264,6 +1265,31 @@ public class ControladorEvento implements IControladorEvento {
 	        throw ex; // re-lanzo para que el WS devuelva 500 y podamos ver el stack
 	    }
 	}
+	public List<DTArchEdicion> edicionesArchivadasOrganizadas(String nickOrg) {
+	    EntityManager em = EntityManagerUtil.em();
+	    try {
+	      // Constructor expression → devolvemos DT directo a la capa web
+	      return em.createQuery("""
+	        select new logica.datatypes.DTArchEdicion(
+	          e.nombreEvento,
+	          e.siglaEdicion,
+	          e.fechaInicio,
+	          e.fechaFin,
+	          e.fechaArchivado,
+	          o.nickname,
+	          (select count(r2) from archivo.ArchRegistro r2 where r2.edicion = e)
+	        )
+	        from archivo.ArchEdicion e
+	        join e.organizador o
+	        where o.nickname = :nick
+	        order by e.fechaArchivado desc
+	      """, DTArchEdicion.class)
+	      .setParameter("nick", nickOrg)
+	      .getResultList();
+	    } finally {
+	      em.close();
+	    }
+	  }
 
 
 

@@ -17,6 +17,7 @@ import logica.clases.Usuario;
 import logica.datatypes.DTDatosUsuario;
 import logica.datatypes.DTRegistro;
 
+
 public interface IControladorUsuario {
 
     // Crear usuarios

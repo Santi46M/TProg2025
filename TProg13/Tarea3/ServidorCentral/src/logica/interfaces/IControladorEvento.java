@@ -15,6 +15,7 @@ import logica.clases.Eventos;
 import logica.clases.Institucion;
 import logica.clases.TipoRegistro;
 import logica.clases.Usuario;
+import logica.datatypes.DTArchEdicion;
 import logica.datatypes.DTCategorias;
 import logica.datatypes.DTEdicion;
 import logica.datatypes.DTEvento;
@@ -115,5 +116,6 @@ public interface IControladorEvento {
     public List<String> listarEdicionesArchivables(String organizadorNick); 
     public void archivarEdicion(String nombreEdicion); 
     public void marcarAsistencia(String idRegistro);
+    public List<DTArchEdicion> edicionesArchivadasOrganizadas(String nickOrg);
 
 }
