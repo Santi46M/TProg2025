@@ -231,45 +231,39 @@ public class EdicionServlet extends HttpServlet {
 
       String imagenFileName = null;
       try {
-        if (imagen != null && imagen.getSize() > 0) {
-          String ctype = imagen.getContentType();
-          if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
-            req.setAttribute("error", "El archivo subido no es una imagen válida.");
-            List<DtEvento> listaEventos = new ArrayList<>();
-            try { publicadores.DtEventoArray arr = port.listarEventos(); if (arr != null && arr.getItem() != null) listaEventos = arr.getItem(); } catch (Throwable t) { }
-            req.setAttribute("listaEventos", listaEventos);
-            req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-            return;
-          }
-          //  guardar en /img/ediciones
-          String baseImg = getServletContext().getRealPath(UPLOAD_PUBLIC_DIR_ED);
-          if (baseImg == null) {
-            String root = getServletContext().getRealPath("/");
-            if (root != null) baseImg = Path.of(root, "img", "ediciones").toString();
-          }
-          if (baseImg != null) {
-            Files.createDirectories(Path.of(baseImg));
+          if (imagen != null && imagen.getSize() > 0) {
+              String ctype = imagen.getContentType();
+              if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
+                  req.setAttribute("error", "El archivo subido no es una imagen válida.");
+                  List<DtEvento> listaEventos = new ArrayList<>();
+                  try { publicadores.DtEventoArray arr = port.listarEventos(); if (arr != null && arr.getItem() != null) listaEventos = arr.getItem(); } catch (Throwable t) { }
+                  req.setAttribute("listaEventos", listaEventos);
+                  req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+                  return;
+              }
 
-            String original = getSafeFilename(imagen);
-            String ext = getExtension(original);
-            if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
-            if (ext == null || ext.isBlank()) ext = ".jpg";
+              String tomcatBase = System.getProperty("catalina.base");
+              Path basePath = Path.of(tomcatBase, "webapps", "ServidorCentral-0.0.1-SNAPSHOT", "images", "ediciones");
+              Files.createDirectories(basePath);
 
-            String finalName = (isBlank(nombre) ? "edicion" : nombre) + ext;
-            Path destino = Path.of(baseImg, finalName);
-            imagen.write(destino.toAbsolutePath().toString());
+              String safeNombre = nombre.replaceAll("[^a-zA-Z0-9_-]", "_");
+              String ext = getExtension(Path.of(imagen.getSubmittedFileName()).getFileName().toString());
+              if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
+              if (ext == null || ext.isBlank()) ext = ".jpg";
 
-            imagenFileName = finalName;
-            System.out.println("[IMG-ED] Guardada en: " + destino + " | URL: " + ctx(req) + UPLOAD_PUBLIC_DIR_ED + "/" + finalName);
+              String finalName = safeNombre + ext;
+              Path destino = basePath.resolve(finalName);
+              Files.copy(imagen.getInputStream(), destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+              imagenFileName = finalName;
           }
-        }
       } catch (Exception ex) {
-        req.setAttribute("error", "Error al procesar la imagen: " + ex.getMessage());
-        List<DtEvento> listaEventos = new ArrayList<>();
-        try { publicadores.DtEventoArray arr = port.listarEventos(); if (arr != null && arr.getItem() != null) listaEventos = arr.getItem(); } catch (Throwable t) { }
-        req.setAttribute("listaEventos", listaEventos);
-        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-        return;
+          req.setAttribute("error", "Error al procesar la imagen.");
+          List<DtEvento> listaEventos = new ArrayList<>();
+          try { publicadores.DtEventoArray arr = port.listarEventos(); if (arr != null && arr.getItem() != null) listaEventos = arr.getItem(); } catch (Throwable t) { }
+          req.setAttribute("listaEventos", listaEventos);
+          req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+          return;
+      
       }
 
       try {
@@ -404,34 +398,7 @@ public class EdicionServlet extends HttpServlet {
 
   //  Resolución unificada de URL para imagen de edición
   private String resolveImagenUrlEdicion(HttpServletRequest req, String raw) {
-    if (raw == null || raw.isBlank()) return null;
-    String ctx = ctx(req);
-    String lower = raw.toLowerCase();
-
-    if (lower.startsWith("http://") || lower.startsWith("https://")) {
-      return raw;
-    }
-    if (raw.startsWith("/")) {
-      // si ya incluye el ctx 
-      return raw.startsWith(ctx + "/") ? raw : (ctx + raw);
-    }
-
-    // Solo filename
-    String[] candidates = new String[] {
-      "/img/" + raw,
-      "/img/ediciones/" + raw,
-      "/ediciones/" + raw 
-    };
-    for (String rel : candidates) {
-      String abs = getServletContext().getRealPath(rel);
-      boolean exists;
-      if (abs != null) {
-        exists = java.nio.file.Files.exists(java.nio.file.Path.of(abs));
-      } else {
-        exists = true;
-      }
-      if (exists) return ctx + rel;
-    }
-    return null;
-  }
+	    if (raw == null || raw.isBlank()) return null;
+	    return "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/" + raw;
+	}
 }

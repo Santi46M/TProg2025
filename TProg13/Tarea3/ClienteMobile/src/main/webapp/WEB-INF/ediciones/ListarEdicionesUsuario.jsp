@@ -29,8 +29,15 @@ List<DtEdicion> edicionesRegistradas = (List<DtEdicion>) request.getAttribute("e
         %>
           <article class="card event-card list <%= hasImg ? "" : "no-cover" %>">
             <% if (hasImg) { %>
-              <img class="event-cover" src="<%=ctx%>/img/<%=img%>" alt="Imagen de <%=nombre%>">
-            <% } %>
+  <img class="event-cover"
+       src="http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/<%= img %>"
+       alt="Imagen de <%= nombre %>"
+       onerror="this.onerror=null;this.src='<%=ctx%>/img/evento-default.jpg';">
+<% } else { %>
+  <img class="event-cover"
+       src="<%=ctx%>/img/evento-default.jpg"
+       alt="Sin imagen disponible">
+<% } %>
             <h3 class="event-title"><%= nombre %></h3>
             <p class="event-sub"><%= (sigla==null||sigla.isBlank()) ? "—" : sigla %></p>
             <p class="event-desc">
