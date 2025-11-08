@@ -44,21 +44,13 @@
 
       <div class="acciones-iniciar-sesion">
         <button type="submit" class="btn btn-iniciar-sesion">Ingresar</button>
-        <button type="submit" class="btn ghost btn-cancelar-iniciar-sesion" name="accion" value="cancelar" style="margin-left:1rem;">Cancelar</button>
+        <button type="button" class="btn ghost btn-cancelar-iniciar-sesion" style="margin-left:1rem;" onclick="window.location='<%=ctx%>/inicio'">Cancelar</button>
       </div>
 
       <p id="msg" style="display:<%= (error==null)? "none" : "block" %>; color:red; font-weight:bold; margin-top:.5rem;">
         <%= (error==null)? "" : error %>
       </p>
     </form>
-    <script>
-      document.querySelector('.btn-cancelar-iniciar-sesion').addEventListener('click', function(e) {
-        var form = document.getElementById('loginForm');
-        Array.from(form.querySelectorAll('[required]')).forEach(function(input) {
-          input.removeAttribute('required');
-        });
-      });
-    </script>
   </main>
 </body>
 </html>

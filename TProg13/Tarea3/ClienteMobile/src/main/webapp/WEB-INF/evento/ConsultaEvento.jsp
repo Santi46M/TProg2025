@@ -3,7 +3,6 @@
   String ctx  = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
 
-  // Prefer request-provided event if servlet set it; otherwise fetch using webservice
   DtEvento ev = null;
   Object reqEv = request.getAttribute("evento");
   String paramNombre = request.getParameter("nombre");
@@ -22,8 +21,7 @@
   String evNombre = (ev != null ? ev.getNombre() : null);
   String evSigla  = (ev != null ? ev.getSigla() : null);
   String evDesc   = (ev != null ? ev.getDescripcion() : null);
-  // use the generated LocalDate type (publicadores.LocalDate) to avoid type mismatch
-  //LocalDate evFecha  = (ev != null ? ev.getFecha() : null);
+
   List<String> evCategorias = (ev != null && ev.getCategorias() != null) ? ev.getCategorias().getCategoria() : Collections.emptyList();
 
   String raw = (String) request.getAttribute("evImagenUrl");
@@ -47,7 +45,6 @@
       hasImgCandidate = (evImagenUrl != null && !evImagenUrl.isBlank());
   }
 
-  // ediciones: prefer request attribute, otherwise fetch via publicador
   List<DtEdicion> ediciones = (List<DtEdicion>) request.getAttribute("evEdiciones");
   try {
     if ((ediciones == null || ediciones.isEmpty()) && ev != null) {
@@ -79,11 +76,9 @@
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <style>
-    /* ---- layout principal ---- */
     .event-hero { display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem; }
     .event-hero.no-img { display:block; } /* cuando no hay imagen, el texto ocupa todo */
 
-    /* ---- bloque de imagen: oculto por defecto */
     .event-hero__img { display:none; width:360px; max-width:40vw; aspect-ratio:16/9; background:#f3f4f6; border-radius:12px; overflow:hidden; flex-shrink:0; }
     .event-hero.has-img .event-hero__img { display:block; }
 

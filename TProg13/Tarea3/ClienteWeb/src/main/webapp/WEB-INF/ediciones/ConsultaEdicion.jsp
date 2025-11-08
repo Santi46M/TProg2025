@@ -244,6 +244,33 @@
             }
           } 
         %>
+
+        <%-- Mostrar datos del registro si el usuario es asistente y está registrado --%>
+        <% if (rol != null && rol.equalsIgnoreCase("asistente") && edicion != null && edicion.getRegistros() != null && edicion.getRegistros().getRegistro() != null && nick != null) {
+             DtRegistro miRegistro = null;
+             for (DtRegistro r : edicion.getRegistros().getRegistro()) {
+               if (nick.equals(r.getUsuario())) {
+                 miRegistro = r;
+                 break;
+               }
+             }
+             if (miRegistro != null) {
+        %>
+        <div class="registro-detalle" style="border: 1px solid #e5e7eb; background: #fafafa; border-radius: 10px; padding: 1rem; margin-top: 1rem;">
+          <h3>Tu registro en esta edición</h3>
+          <p><strong>Tipo:</strong> <%= miRegistro.getTipoRegistro() %></p>
+          <p><strong>Fecha registro:</strong> <%= miRegistro.getFechaRegistro() %></p>
+          <p><strong>Costo:</strong> $<%= miRegistro.getCosto() %></p>
+          <form action="<%=ctx%>/registro/ConsultaRegistroEdicion" method="get" style="margin-top:1rem;">
+            <input type="hidden" name="idRegistro" value="<%= miRegistro.getIdentificador() %>" />
+            <input type="hidden" name="evento" value="<%= evNombre %>" />
+            <input type="hidden" name="edicion" value="<%= edicion.getNombre() %>" />
+            <button type="submit" class="btn btn-ver-detalles">Ver detalles de mi registro</button>
+          </form>
+        </div>
+        <%   }
+           }
+        %>
       </div>
     </section>
   </main>

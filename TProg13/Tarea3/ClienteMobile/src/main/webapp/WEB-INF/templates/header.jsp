@@ -23,9 +23,21 @@
       </button>
       <div id="menuOpciones" class="bg-white border rounded shadow-lg mt-2" style="display:none; position:absolute; top:60px; left:0; right:0; z-index:2001; min-width:220px; width:90vw; max-width:400px; background: rgba(255,255,255,0.95);">
         <ul class="list-unstyled mb-0 py-3">
-          <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/evento/listado">Consulta Edición</a></li>
-          <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/usuario/edicionesRegistradas">Consulta Registro</a></li>
-          <li><a class="dropdown-item fs-4 py-3" href="<%=ctx%>/usuario/listarRegistros">Registro a Asistencia</a></li>
+		<li>
+		  <form action="<%=ctx%>/evento/listado" method="get">
+		    <button type="submit" class="dropdown-item fs-4 py-3 btn w-100 text-start">Consulta Edición</button>
+		  </form>
+		</li>
+		<li>
+		  <form action="<%=ctx%>/usuario/edicionesRegistradas" method="get">
+		    <button type="submit" class="dropdown-item fs-4 py-3 btn w-100 text-start">Consulta Registro</button>
+		  </form>
+		</li>
+		<li>
+		  <form action="<%=ctx%>/usuario/listarRegistros" method="get">
+		    <button type="submit" class="dropdown-item fs-4 py-3 btn w-100 text-start">Registro a Asistencia</button>
+		  </form>
+		</li>
         </ul>
       </div>
       <script>

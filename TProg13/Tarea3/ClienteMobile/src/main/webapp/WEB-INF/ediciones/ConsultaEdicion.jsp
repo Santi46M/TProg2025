@@ -207,7 +207,7 @@
               </tbody>
             </table>
           <% } else { %>
-            <p>No hay registros para esta edición.</p>
+            <p>No estás registrado a esta edición.</p>
           <% } %>
         </div>
       </section>

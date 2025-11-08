@@ -345,7 +345,14 @@
   <h2>Eventos registrados</h2>
   <ul class="lista-eventos">
     <% for (DtRegistro r : usuario.getRegistros().getRegistro()) {
-         String eventoNombre = (edicionToEvento != null) ? edicionToEvento.get(r.getEdicion()) : "";
+         String eventoNombre = "";
+         if (edicionToEvento != null && edicionToEvento.get(r.getEdicion()) != null && !edicionToEvento.get(r.getEdicion()).isBlank()) {
+           eventoNombre = edicionToEvento.get(r.getEdicion());
+         } else if (r.getEvento() != null && !r.getEvento().isBlank()) {
+           eventoNombre = r.getEvento();
+         } else {
+           eventoNombre = "";
+         }
     %>
       <li>
         <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">

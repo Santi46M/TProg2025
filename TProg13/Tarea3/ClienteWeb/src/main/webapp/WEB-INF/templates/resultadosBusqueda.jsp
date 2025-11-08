@@ -90,7 +90,12 @@
           <% }} %>
 
           <% if (hayEd) {
-               for (DtEdicion ed : ediciones) { %>
+               for (DtEdicion ed : ediciones) {
+                   String eventoNombre = "";
+                   if (ed.getEvento() != null && ed.getEvento().getNombre() != null) {
+                       eventoNombre = ed.getEvento().getNombre();
+                   }
+          %>
             <article class="result-card card">
                 <div class="result-head">
                     <div>Eventos.uy</div>
@@ -102,7 +107,8 @@
 
                     <div class="result-actions">
                         <form action="<%=ctx%>/edicion/ConsultaEdicion" method="get" style="display:inline">
-                            <input type="hidden" name="nombre" value="<%= ed.getNombre() %>">
+                            <input type="hidden" name="evento" value="<%= eventoNombre %>">
+                            <input type="hidden" name="edicion" value="<%= ed.getNombre() %>">
                             <button type="submit" class="btn-vermas">Ver más</button>
                         </form>
                     </div>
