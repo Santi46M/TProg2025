@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.util.*;
-import java.time.LocalDate;
 
 import publicadores.DtDatosUsuario;
 import publicadores.DtDatosUsuarioArray;
@@ -83,7 +82,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 DtDatosUsuarioArray arr = port.obtenerUsuariosDT();
                 usuarios = asList(arr);
 
-                // ✅ Construir mapa de fotos de usuarios
+                // ✅ fotos
                 Map<String, String> fotos = new HashMap<>();
                 String ctx = request.getContextPath();
                 for (DtDatosUsuario u : usuarios) {
@@ -93,7 +92,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 }
                 request.setAttribute("fotos", fotos);
 
-                // === Si hay usuario en sesión, construir mapa de a quién ya sigue
+                // ✅ yaLoSigoMap
                 String nickSesion = nickEnSesion(request);
                 Map<String, Boolean> yaLoSigoMap = new HashMap<>();
                 if (nickSesion != null && !nickSesion.isBlank()) {
@@ -123,24 +122,23 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             try {
                 DtDatosUsuario usuario = port.obtenerDatosUsuario(nick);
                 String ctx = request.getContextPath();
-                String imagenUrl = ctx + "/img/usuarios/" + usuario.getImagen(); 
+                String imagenUrl = ctx + "/img/usuarios/" + usuario.getImagen();
                 request.setAttribute("usrImagenUrl", imagenUrl);
                 request.setAttribute("usuario", usuario);
+
+                // seguidores/seguidos
                 List<String> seguidores = new ArrayList<>();
                 List<String> seguidos = new ArrayList<>();
-
                 if (usuario.getSeguidores() != null && usuario.getSeguidores().getSeguidor() != null) {
                     seguidores.addAll(usuario.getSeguidores().getSeguidor());
                 }
-
                 if (usuario.getSeguidos() != null && usuario.getSeguidos().getSeguido() != null) {
                     seguidos.addAll(usuario.getSeguidos().getSeguido());
                 }
-
                 request.setAttribute("seguidores", seguidores);
                 request.setAttribute("seguidos", seguidos);
 
-                // instituciones para el dropdown
+                // instituciones
                 List<String> instituciones = Collections.emptyList();
                 try {
                     StringArray arr = port.listarInstituciones();
@@ -148,11 +146,11 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 } catch (Exception ignore) {}
                 request.setAttribute("instituciones", instituciones);
 
-                // mapa edicion -> evento (no disponible en este cliente webservice - enviar empty map)
+                // mapa edicion -> evento (no disponible); placeholder vacío
                 Map<String, String> edicionToEvento = new HashMap<>();
                 request.setAttribute("edicionToEvento", edicionToEvento);
 
-                // imágenes instituciones
+                // logos instituciones
                 Map<String,String> instFotos = new HashMap<>();
                 String[] exts = new String[]{".png",".jpg",".jpeg",".webp",".gif"};
                 ServletContext sc = getServletContext();
@@ -178,52 +176,29 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 }
                 request.setAttribute("instFotos", instFotos);
 
-                // === Rol real del perfil consultado (organizador/asistente)
+                // rol real del perfil
                 boolean esPerfilOrganizador = (usuario.getDesc() != null) || (usuario.getLink() != null);
                 request.setAttribute("esPerfilOrganizador", esPerfilOrganizador);
-             // === Ediciones archivables del organizador (para mostrar botón "Archivar")
+
+                // ediciones archivables
                 try {
                     String nickPerfil = (usuario != null ? usuario.getNickname() : null);
-
-                    System.out.println("[ARCHIV][pre] esPerfilOrganizador=" + esPerfilOrganizador
-                            + " | nickPerfil=" + nickPerfil);
-
                     if (esPerfilOrganizador && nickPerfil != null && !nickPerfil.isBlank()) {
                         publicadores.PublicadorEventoService evSrv = new publicadores.PublicadorEventoService();
                         publicadores.PublicadorEvento evPort = evSrv.getPublicadorEventoPort();
 
                         java.util.Set<String> archivables = new java.util.HashSet<>();
                         try {
-                            System.out.println("[ARCHIV] Llamando listarEdicionesArchivables('" + nickPerfil + "') …");
                             publicadores.StringArray arrArch = evPort.listarEdicionesArchivables(nickPerfil);
-
                             if (arrArch != null && arrArch.getItem() != null) {
                                 archivables.addAll(arrArch.getItem());
-                                System.out.println("[ARCHIV] OK, " + archivables.size() + " ediciones archivables");
-                                if (!archivables.isEmpty()) {
-                                    // imprime hasta 10 para no inundar logs
-                                    int i = 0;
-                                    for (String ed : archivables) {
-                                        System.out.println("   [ARCHIV] · " + ed);
-                                        if (++i >= 10) { 
-                                            if (archivables.size() > 10) {
-                                                System.out.println("   [ARCHIV] … (" + (archivables.size() - 10) + " más)");
-                                            }
-                                            break;
-                                        }
-                                    }
-                                }
-                            } else {
-                                System.out.println("[ARCHIV] Respuesta vacía (null o sin items)");
                             }
                         } catch (Exception ex) {
                             System.out.println("[ARCHIV][ERROR] listarEdicionesArchivables: "
                                     + ex.getClass().getName() + " | " + String.valueOf(ex.getMessage()));
                         }
-
                         request.setAttribute("archivablesSet", archivables);
                     } else {
-                        System.out.println("[ARCHIV] No se consultan archivables (no es perfil de organizador o nick nulo)");
                         request.setAttribute("archivablesSet", java.util.Collections.emptySet());
                     }
                 } catch (Exception e) {
@@ -232,18 +207,46 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                     request.setAttribute("archivablesSet", java.util.Collections.emptySet());
                 }
 
-                // === Follow/unfollow flags
+                // follow flags
                 String nickSesion = nickEnSesion(request);
                 boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname());
                 request.setAttribute("esSuPropioPerfil", esSuPropioPerfil);
 
                 boolean yaLoSigo = false;
                 if (!esSuPropioPerfil && nickSesion != null) {
-                    try {
-                        yaLoSigo = port.sigueA(nickSesion, usuario.getNickname());
-                    } catch (Exception ignore) {}
+                    try { yaLoSigo = port.sigueA(nickSesion, usuario.getNickname()); } catch (Exception ignore) {}
                 }
                 request.setAttribute("yaLoSigo", yaLoSigo);
+
+                // === ARCHIVADAS: pedir wrapper y dejar también la lista + contador
+                try {
+                    publicadores.PublicadorEventoService evSrv = new publicadores.PublicadorEventoService();
+                    publicadores.PublicadorEvento evPort = evSrv.getPublicadorEventoPort();
+
+                    publicadores.DTArchEdicionArray archOrgWrap = null;
+
+                    if (esPerfilOrganizador) {
+                        archOrgWrap = evPort.edicionesArchivadasOrganizadas(usuario.getNickname());
+                    }
+
+                    java.util.List<publicadores.DTArchEdicion> archOrgList =
+                            (archOrgWrap != null && archOrgWrap.getItem() != null)
+                            ? archOrgWrap.getItem()
+                            : java.util.Collections.emptyList();
+
+                    request.setAttribute("archivadasOrganizadas", archOrgWrap);          // wrapper
+                    request.setAttribute("archivadasOrganizadasList", archOrgList);      // lista para JSP
+                    request.setAttribute("archivadasOrganizadasCount", archOrgList.size());
+
+                    System.out.println("[ARCHIV][SERVLET] org=" + usuario.getNickname()
+                            + " | archivadas=" + archOrgList.size());
+
+                } catch (Exception ex) {
+                    System.out.println("[ARCHIV][WARN] No se pudieron obtener archivadas: " + String.valueOf(ex.getMessage()));
+                    request.setAttribute("archivadasOrganizadas", null);
+                    request.setAttribute("archivadasOrganizadasList", java.util.Collections.emptyList());
+                    request.setAttribute("archivadasOrganizadasCount", 0);
+                }
 
             } catch (UsuarioNoExisteException_Exception e) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -252,13 +255,14 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         }
         request.getRequestDispatcher(JSP_CONSULTA).forward(request, response);
     }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
         String path = request.getServletPath();
-        String pathInfo    = request.getPathInfo();    // "/archivarEdicion" (o null)
+        String pathInfo    = request.getPathInfo();
         PublicadorUsuarioService service = new PublicadorUsuarioService();
         PublicadorUsuario port = service.getPublicadorUsuarioPort();
 
@@ -271,7 +275,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 return;
             }
 
-            String objetivo = trim(request.getParameter("a")); // nick del perfil objetivo
+            String objetivo = trim(request.getParameter("a"));
             if (isBlank(objetivo)) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Falta parámetro 'a'.");
                 return;
@@ -279,15 +283,11 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
             if (!nickSesion.equalsIgnoreCase(objetivo)) {
                 try {
-                    if ("/usuario/seguir".equals(path)) {
-                        port.seguirUsuario(nickSesion, objetivo);
-                    } else {
-                        port.dejarSeguirUsuario(nickSesion, objetivo);
-                    }
+                    if ("/usuario/seguir".equals(path)) { port.seguirUsuario(nickSesion, objetivo); }
+                    else { port.dejarSeguirUsuario(nickSesion, objetivo); }
                 } catch (Exception ignore) {}
             }
 
-            // If this was an AJAX request, return a simple OK response (no redirect)
             String xrw = request.getHeader("X-Requested-With");
             boolean isAjax = xrw != null && "XMLHttpRequest".equalsIgnoreCase(xrw);
             if (isAjax) {
@@ -298,7 +298,6 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 return;
             }
 
-            // If the request came from the listing (param 'listar' present), stay on the listing
             String listarParam = trim(request.getParameter("listar"));
             if (!isBlank(listarParam)) {
                 response.sendRedirect(request.getContextPath() + "/usuario/ConsultaUsuario?listar=1");
@@ -309,15 +308,12 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             return;
         }
 
-        // POST /usuario/modificar has been moved to a dedicated servlet.
-        // This servlet no longer performs modification; return 404 so the caller
-        // can be updated to the new endpoint (or implement the new servlet).
         if ("/usuario/modificar".equals(path)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        
-     // === POST /usuario/archivarEdicion ===
+
+        // === POST /usuario/archivarEdicion ===
         System.out.println(path);
         if ("/usuario/archivarEdicion".equals(path)) {
             HttpSession sAux = request.getSession(false);
@@ -344,23 +340,23 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             try {
                 publicadores.PublicadorEventoService evSrv = new publicadores.PublicadorEventoService();
                 publicadores.PublicadorEvento evPort = evSrv.getPublicadorEventoPort();
-                evPort.archivarEdicion(edicionNombre); // lanza fault si falla
+                evPort.archivarEdicion(edicionNombre);
                 System.out.println("[ARCHIV][POST] OK archivar " + edicionNombre);
 
-                // ➜ Redirigir al inicio (home)
+                // Si preferís volver al perfil para ver la etiqueta (ARCHIVADA), podés usar:
+                // response.sendRedirect(request.getContextPath() + "/usuario/ConsultaUsuario?nick=" +
+                //         java.net.URLEncoder.encode(nickSesion, java.nio.charset.StandardCharsets.UTF_8));
                 response.sendRedirect(request.getContextPath() + "/");
                 return;
 
             } catch (Exception ex) {
                 System.out.println("[ARCHIV][POST][ERR] " + ex.getClass().getName() + " : " + ex.getMessage());
-                // También al inicio, pero con query 'error' si querés capturarla ahí
                 response.sendRedirect(request.getContextPath() + "/?error=" +
                         java.net.URLEncoder.encode("No se pudo archivar: " + ex.getMessage(),
                                 java.nio.charset.StandardCharsets.UTF_8));
                 return;
             }
         }
-
 
         doGet(request, response);
     }

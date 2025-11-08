@@ -1266,30 +1266,24 @@ public class ControladorEvento implements IControladorEvento {
 	    }
 	}
 	public List<DTArchEdicion> edicionesArchivadasOrganizadas(String nickOrg) {
-	    EntityManager em = EntityManagerUtil.em();
-	    try {
-	      // Constructor expression → devolvemos DT directo a la capa web
-	      return em.createQuery("""
-	        select new logica.datatypes.DTArchEdicion(
-	          e.nombreEvento,
-	          e.siglaEdicion,
-	          e.fechaInicio,
-	          e.fechaFin,
-	          e.fechaArchivado,
-	          o.nickname,
-	          (select count(r2) from archivo.ArchRegistro r2 where r2.edicion = e)
-	        )
-	        from archivo.ArchEdicion e
-	        join e.organizador o
-	        where o.nickname = :nick
-	        order by e.fechaArchivado desc
-	      """, DTArchEdicion.class)
-	      .setParameter("nick", nickOrg)
-	      .getResultList();
-	    } finally {
-	      em.close();
-	    }
-	  }
+		  EntityManager em = EntityManagerUtil.em();
+		  try {
+		    return em.createQuery(
+		        "select new logica.datatypes.DTArchEdicion(" +
+		        "  e.evento, e.nombre, e.fechaInicio, e.fechaFin, o.nickname" +
+		        ") " +
+		        "from EdicionOO e " +
+		        "join e.organizador o " +
+		        "where o.nickname = :nick " +
+		        "  and e.estado = 'Archivada' " +   // ajustá si tu valor es otro
+		        "order by e.fechaFin desc",
+		        DTArchEdicion.class)
+		      .setParameter("nick", nickOrg)
+		      .getResultList();
+		  } finally {
+		    em.close();
+		  }
+		}
 
 
 

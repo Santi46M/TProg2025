@@ -9,9 +9,9 @@ import jakarta.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Clase Java para dtEvento complex type.
+ * <p>Java class for dtEvento complex type.
  * 
- * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>{@code
  * <complexType name="dtEvento">
@@ -74,7 +74,7 @@ public class DtEvento {
     protected String imagen;
 
     /**
-     * Obtiene el valor de la propiedad nombre.
+     * Gets the value of the nombre property.
      * 
      * @return
      *     possible object is
@@ -86,7 +86,7 @@ public class DtEvento {
     }
 
     /**
-     * Define el valor de la propiedad nombre.
+     * Sets the value of the nombre property.
      * 
      * @param value
      *     allowed object is
@@ -98,7 +98,7 @@ public class DtEvento {
     }
 
     /**
-     * Obtiene el valor de la propiedad sigla.
+     * Gets the value of the sigla property.
      * 
      * @return
      *     possible object is
@@ -110,7 +110,7 @@ public class DtEvento {
     }
 
     /**
-     * Define el valor de la propiedad sigla.
+     * Sets the value of the sigla property.
      * 
      * @param value
      *     allowed object is
@@ -122,7 +122,7 @@ public class DtEvento {
     }
 
     /**
-     * Obtiene el valor de la propiedad descripcion.
+     * Gets the value of the descripcion property.
      * 
      * @return
      *     possible object is
@@ -134,7 +134,7 @@ public class DtEvento {
     }
 
     /**
-     * Define el valor de la propiedad descripcion.
+     * Sets the value of the descripcion property.
      * 
      * @param value
      *     allowed object is
@@ -146,7 +146,7 @@ public class DtEvento {
     }
 
     /**
-     * Obtiene el valor de la propiedad fecha.
+     * Gets the value of the fecha property.
      * 
      * @return
      *     possible object is
@@ -158,7 +158,7 @@ public class DtEvento {
     }
 
     /**
-     * Define el valor de la propiedad fecha.
+     * Sets the value of the fecha property.
      * 
      * @param value
      *     allowed object is
@@ -170,7 +170,7 @@ public class DtEvento {
     }
 
     /**
-     * Obtiene el valor de la propiedad categorias.
+     * Gets the value of the categorias property.
      * 
      * @return
      *     possible object is
@@ -182,7 +182,7 @@ public class DtEvento {
     }
 
     /**
-     * Define el valor de la propiedad categorias.
+     * Sets the value of the categorias property.
      * 
      * @param value
      *     allowed object is
@@ -194,7 +194,7 @@ public class DtEvento {
     }
 
     /**
-     * Obtiene el valor de la propiedad ediciones.
+     * Gets the value of the ediciones property.
      * 
      * @return
      *     possible object is
@@ -206,7 +206,7 @@ public class DtEvento {
     }
 
     /**
-     * Define el valor de la propiedad ediciones.
+     * Sets the value of the ediciones property.
      * 
      * @param value
      *     allowed object is
@@ -218,7 +218,7 @@ public class DtEvento {
     }
 
     /**
-     * Obtiene el valor de la propiedad imagen.
+     * Gets the value of the imagen property.
      * 
      * @return
      *     possible object is
@@ -230,7 +230,7 @@ public class DtEvento {
     }
 
     /**
-     * Define el valor de la propiedad imagen.
+     * Sets the value of the imagen property.
      * 
      * @param value
      *     allowed object is
@@ -243,9 +243,9 @@ public class DtEvento {
 
 
     /**
-     * <p>Clase Java para anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>{@code
      * <complexType>
@@ -304,9 +304,9 @@ public class DtEvento {
 
 
     /**
-     * <p>Clase Java para anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>El siguiente fragmento de esquema especifica el contenido que se espera que haya en esta clase.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>{@code
      * <complexType>
