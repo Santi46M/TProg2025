@@ -98,12 +98,10 @@ public class UsuarioServlet extends HttpServlet {
         return;
       }
 
-      String baseImg = getServletContext().getRealPath(IMG_REL_BASE_USR);
-      if (baseImg == null) {
-        String root = getServletContext().getRealPath("/");
-        if (root != null) baseImg = Path.of(root, "img", "usuarios").toString();
-      }
-      if (baseImg == null) throw new ServletException("No se pudo resolver la ruta física de /img/usuarios.");
+      String tomcatBase = System.getProperty("catalina.base");
+
+      // Carpeta destino real (ServidorCentral)
+      String baseImg = tomcatBase + "/webapps/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios";
       Files.createDirectories(Path.of(baseImg));
 
       // nombre original del archivo
