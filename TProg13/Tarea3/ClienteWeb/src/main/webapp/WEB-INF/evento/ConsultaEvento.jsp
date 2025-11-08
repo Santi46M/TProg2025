@@ -32,7 +32,7 @@
         : img.startsWith("IMG-ED") ? baseUrl + "ediciones/" + img
         : img.startsWith("IMG-US") ? baseUrl + "usuarios/" + img
         : baseUrl + "eventos/" + img)
-      : (baseUrl + "eventos/evento-default.png");
+      : (baseUrl + "eventos/evento-default.svg");
 
   boolean hasImgCandidate = (evImagenUrl != null && !evImagenUrl.isBlank());
 
@@ -97,7 +97,7 @@
                 src="<%= evImagenUrl %>"
                 alt="Imagen de <%= (evNombre != null ? evNombre : "Evento") %>"
                 onload="this.closest('.event-hero')?.classList.add('has-img');"
-                onerror="this.onerror=null;this.src='<%=baseUrl%>eventos/evento-default.png';"
+                onerror="this.onerror=null;this.src='<%=baseUrl%>eventos/evento-default.svg';"
               >
             </div>
           <% } %>

@@ -138,17 +138,27 @@
           <% if (usuarios == null || usuarios.isEmpty()) { %>
             <p>No hay usuarios registrados.</p>
           <% } else {
-               for (DtDatosUsuario u : usuarios) {
-            	   String fotoUrl = "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/" + u.getImagen();
-            	   if (u.getImagen() == null || u.getImagen().isBlank()) {
-            	       fotoUrl = ctx + "/img/user-default.jpg";
-            	   }
-          %>
-            <div class="card usuario-card">
-              <img class="avatar"
-                   src="<%= fotoUrl %>"
-                   alt="Avatar de <%= u.getNickname() %>"
-                   onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
+        	  for (DtDatosUsuario u : usuarios) {
+        		    String img = u.getImagen();
+        		    String fotoUrl;
+
+        		    if (img == null || img.isBlank()) {
+        		        fotoUrl = ctx + "/img/user-default.jpg";
+        		    } else if (img.startsWith("http")) {
+        		        fotoUrl = img;
+        		    } else if (img.startsWith("img/") || img.startsWith("/img/")) {
+        		        fotoUrl = "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/" + img.replaceFirst("^/?img/", "images/usuarios/");
+        		    } else {
+        		        fotoUrl = "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/" + img;
+        		    }
+        		%>
+        		<div class="card usuario-card">
+        		  <img class="avatar"
+     src="<%= (u.getImagen() != null && !u.getImagen().isBlank()
+                ? ("http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/" + u.getImagen())
+                : ("http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/user-default.jpg")) %>"
+     alt="Avatar de <%= u.getNickname() %>"
+     onerror="this.onerror=null;this.src='http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/user-default.jpg';">
 
               <h3>
                 <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
@@ -215,10 +225,10 @@
 <img class="avatar"
      src="<%= (usuario.getImagen()!=null && !usuario.getImagen().isBlank()
                     ? ("http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/" + usuario.getImagen())
-                    : (ctx + "/img/user-default.jpg")) %>"
+                    : ("http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/user-default.jpg")) %>"
      alt="Avatar de <%= usuario.getNickname() %>"
      style="width:96px;height:96px;border-radius:50%;object-fit:cover"
-     onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
+     onerror="this.onerror=null;this.src='http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/user-default.jpg';">
 
   <div id="datosUsuario">
     <div class="follow-bar" style="margin:.5rem 0;">
@@ -411,10 +421,10 @@
                   <div>
                     <span>Imagen actual</span><br>
                     <img src="<%= (usuario.getImagen() != null && !usuario.getImagen().isBlank()? "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/" + usuario.getImagen()
-     	   					: (ctx + "/img/user-default.jpg")) %>"
+     	   					: ("http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/user-default.jpg")) %>"
      				alt="Avatar de <%= usuario.getNickname() %>"
      				style="width:96px;height:96px;border-radius:50%;object-fit:cover"
-     				onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
+     				onerror="this.onerror=null;this.src='http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/user-default.jpg';">
 
                   </div>
                   <label>

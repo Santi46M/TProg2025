@@ -34,12 +34,12 @@
               String img = e.getImagen();
               String imgUrl = (img != null && !img.isBlank())
                               ? (baseUrl + "eventos/" + img)
-                              : (baseUrl + "eventos/evento-default.png");
+                              : (baseUrl + "eventos/evento-default.svg");
         %>
           <article class="card">
             <div class="card__media">
               <img src="<%= imgUrl %>" alt="<%= e.getNombre() %>"
-                   onerror="this.onerror=null;this.src='<%=baseUrl%>eventos/evento-default.png';">
+                   onerror="this.onerror=null;this.src='<%=baseUrl%>eventos/evento-default.svg';">
             </div>
             <h2><%= e.getNombre() %></h2>
             <p><%= e.getDescripcion()==null ? "" : e.getDescripcion() %></p>
