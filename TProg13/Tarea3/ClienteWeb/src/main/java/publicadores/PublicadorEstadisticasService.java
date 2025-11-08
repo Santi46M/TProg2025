@@ -6,9 +6,9 @@ import java.net.URL;
 import javax.xml.namespace.QName;
 import jakarta.xml.ws.Service;
 import jakarta.xml.ws.WebEndpoint;
-import jakarta.xml.ws.WebServiceClient;
 import jakarta.xml.ws.WebServiceException;
 import jakarta.xml.ws.WebServiceFeature;
+import util.ConfigLoader;
 
 
 /**
@@ -17,7 +17,6 @@ import jakarta.xml.ws.WebServiceFeature;
  * Generated source version: 3.0
  * 
  */
-@WebServiceClient(name = "PublicadorEstadisticasService", targetNamespace = "http://publicadores/", wsdlLocation = "http://192.168.1.37:8090/publicadorEstadisticas?wsdl")
 public class PublicadorEstadisticasService
     extends Service
 {
@@ -30,7 +29,9 @@ public class PublicadorEstadisticasService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("http://192.168.1.37:8090/publicadorEstadisticas?wsdl");
+    	   String ip = ConfigLoader.get("ipServidor");
+    	   String puerto = ConfigLoader.get("puerto");
+    	   url = new URL("http://" + ip + ":" + puerto + "/publicadorEstadisticas?wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }
