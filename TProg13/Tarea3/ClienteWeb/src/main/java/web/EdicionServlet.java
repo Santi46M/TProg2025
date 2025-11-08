@@ -260,18 +260,17 @@ public class EdicionServlet extends HttpServlet {
 
 	    String safeName = nombre.replaceAll("[^a-zA-Z0-9_-]", "_");
 	    String ext = getExtension(getSafeFilename(imagen));
-	    if (isBlank(ext)) ext = guessExtensionFromContentType(ctype);
-	    if (isBlank(ext)) ext = ".jpg";
+	    if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
+	    if (ext == null || ext.isBlank()) ext = ".jpg";
 	    String finalName = "IMG-" + safeName + ext;
 
-	    String baseImg = getServletContext().getRealPath("/images/ediciones");
-	    if (baseImg == null) {
-	        baseImg = Path.of(getServletContext().getRealPath("/"), "images", "ediciones").toString();
-	    }
+	    String tomcatBase = System.getProperty("catalina.base");
+	    String baseImg = tomcatBase + "/webapps/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones";
 
 	    Files.createDirectories(Path.of(baseImg));
 	    Path destino = Path.of(baseImg, finalName);
-	    imagen.write(destino.toAbsolutePath().toString());
+	    imagen.write(destino.toString());
+
 	    System.out.println("[IMG] Guardada en: " + destino);
 	    return finalName;
 	}
