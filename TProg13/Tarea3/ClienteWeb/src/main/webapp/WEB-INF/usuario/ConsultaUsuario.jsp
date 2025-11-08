@@ -3,7 +3,8 @@
             publicadores.PublicadorUsuarioService,
             publicadores.DtDatosUsuario, publicadores.DtDatosUsuarioArray,
             publicadores.DtEdicion, publicadores.DtRegistro" %>
-<%@ page import="publicadores.DTArchEdicion" %> <%-- ARCHIVADAS (clase generada por wsimport) --%>
+<%@ page import="publicadores.DTArchEdicion" %>
+
 <%
   String ctx = request.getContextPath();
   String nickSesion = (String) session.getAttribute("nick");
@@ -59,26 +60,19 @@
   Boolean yaLoSigoAttr = (Boolean) request.getAttribute("yaLoSigo");
   boolean yaLoSigo = (yaLoSigoAttr != null) ? yaLoSigoAttr.booleanValue() : false;
 
-  /* === ARCHIVADAS: preferimos la LISTA que dejó el servlet; si no, tomamos el array === */
+  /* === ARCHIVADAS: lista que deja el servlet (puede venir null) === */
+  @SuppressWarnings("unchecked")
   List<DTArchEdicion> archOrgList = (List<DTArchEdicion>) request.getAttribute("archivadasOrganizadasList");
-  if (archOrgList == null) {
-    Object archArrAttr = request.getAttribute("archivadasOrganizadas"); // DTArchEdicion[]
-    if (archArrAttr instanceof DTArchEdicion[]) {
-      archOrgList = Arrays.asList((DTArchEdicion[]) archArrAttr);
-    } else {
-      archOrgList = java.util.Collections.emptyList();
-    }
-  }
+  if (archOrgList == null) archOrgList = java.util.Collections.emptyList();
+  boolean hayArchivadasOrg = !archOrgList.isEmpty();
 
-  /* === SET de claves archivadas para filtrar duplicados en “vivas” === */
-  java.util.Set<String> archivedKeys = new java.util.HashSet<>();
-  for (DTArchEdicion a : archOrgList) {
-    // Clave consistente con cómo armás edKey en las “vivas”: "Evento::Edicion"
-    String ev = a.getNombreEvento();
-    String ed = a.getSiglaEdicion();
-    String key = (ev == null ? "" : ev) + "::" + (ed == null ? "" : ed);
-    archivedKeys.add(key);
-  }
+  /* Alerts (éxito/advertencias/errores) */
+  @SuppressWarnings("unchecked")
+  List<String> AOK   = (List<String>) request.getAttribute("alerts_ok");
+  @SuppressWarnings("unchecked")
+  List<String> AWARN = (List<String>) request.getAttribute("alerts_warn");
+  @SuppressWarnings("unchecked")
+  List<String> AERR  = (List<String>) request.getAttribute("alerts_err");
 %>
 
 <!DOCTYPE html>
@@ -104,6 +98,17 @@
     .hint{font-size:.85rem;color:#6b7280}
     .tag-arch { font-weight:600; opacity:.85; }
     .archivada { opacity:.92; }
+
+    /* Collapsible */
+    .collapse-wrap { border:1px solid #e5e7eb; border-radius:12px; background:#fff; }
+    .collapse-head { display:flex; align-items:center; justify-content:space-between; width:100%; padding:.8rem 1rem; background:#fafafa; border-radius:12px; border:0; cursor:pointer; font-weight:600; }
+    .collapse-body { overflow:hidden; max-height:0; transition:max-height .28s ease; }
+    .collapse-body-inner { padding:1rem; }
+    .collapse-wrap.open .collapse-body { max-height:2000px; } /* lo suficiente para el form */
+    .alerts-stack .alert{padding:.6rem .8rem; border-radius:8px}
+    .alert--ok{background:#e9f7ef; border:1px solid #ccebd9}
+    .alert--warn{background:#fff8e6; border:1px solid #ffe6ad}
+    .alert--err{background:#fdecea; border:1px solid #f5c2c0}
   </style>
 </head>
 
@@ -117,9 +122,11 @@
 
     <!-- Main -->
     <main class="main-inicio">
-    <section class="card event-card" style="padding: 1.5rem;">
+      <section class="card event-card" style="padding: 1.5rem;">
       <% if (error != null) { %>
-        <p class="error"><%=error%></p>
+        <div class="alerts-stack" style="margin-bottom:1rem">
+          <div class="alert alert--err"><strong>✕</strong> <%= error %></div>
+        </div>
       <% } %>
 
       <% if (usuario == null) { %>
@@ -173,7 +180,6 @@
                   <button type="submit" class="btn"><%= (!yaSigueUser ? "Seguir" : "Dejar de seguir") %></button>
                 </form>
               <% } %>
-
             </div>
           <% } } %>
         </div>
@@ -203,219 +209,234 @@
             </div>
             <p><strong>Nickname:</strong> <span><%= usuario.getNickname() %></span></p>
             <p><strong>Email:</strong> <span><%= usuario.getEmail()%></span></p>
+          </div>
+        </div>
+
+        <!-- ====== ALERTS (si vinieron del servlet) ====== -->
+        <div class="alerts-stack" style="display:grid; gap:.5rem; margin: .5rem 0 1rem;">
+          <% if (AOK != null) { for (String m : AOK) { %>
+            <div class="alert alert--ok"><strong>✓</strong> <%= m %></div>
+          <% } } %>
+          <% if (AWARN != null) { for (String m : AWARN) { %>
+            <div class="alert alert--warn"><strong>!</strong> <%= m %></div>
+          <% } } %>
+          <% if (AERR != null) { for (String m : AERR) { %>
+            <div class="alert alert--err"><strong>✕</strong> <%= m %></div>
+          <% } } %>
+        </div>
+
+        <!-- ====== BOTÓN QUE DESPLIEGA EL FORM ====== -->
+        <% if (esSuPropioPerfil) { %>
+        <div class="collapse-wrap" id="editCollapse">
+          <button class="collapse-head" type="button" id="toggleEdit">
+            <span>Modificar datos</span>
+            <i class='bx bx-chevron-down' id="chev"></i>
+          </button>
+          <div class="collapse-body">
+            <div class="collapse-body-inner">
+
+              <!-- ====== FORMULARIO (igual al que veníamos usando) ====== -->
+              <form id="formEditarUsuario"
+                    action="<%= ctx %>/usuario/modificar"
+                    method="post"
+                    enctype="multipart/form-data"
+                    class="form form--perfil">
+
+                <!-- Identidad (no editables) -->
+                <div class="grid-2">
+                  <label>
+                    <span>Nickname</span>
+                    <input type="text" value="<%= usuario.getNickname() %>" disabled>
+                  </label>
+                  <label>
+                    <span>Email</span>
+                    <input type="email" value="<%= usuario.getEmail() %>" disabled>
+                  </label>
+                </div>
+
+                <!-- Nombre -->
+                <label>
+                  <span>Nombre</span>
+                  <input type="text" name="nombre"
+                         value="<%= (request.getAttribute("form_nombre")!=null ? (String)request.getAttribute("form_nombre")
+                                         : (usuario.getNombre()!=null ? usuario.getNombre() : "")) %>"
+                         required>
+                </label>
+
+                <%-- Perfil público (si aplica) --%>
+                <%
+                  boolean muestraDesc = (usuario.getDesc() != null) || (request.getAttribute("form_descripcion")!=null);
+                  boolean muestraLink = (usuario.getLink() != null) || (request.getAttribute("form_link")!=null);
+                  if (muestraDesc || muestraLink) {
+                %>
+                  <div class="grid-2">
+                    <% if (muestraDesc) { %>
+                    <label>
+                      <span>Descripción</span>
+                      <textarea name="descripcion" rows="3"><%= (
+                          request.getAttribute("form_descripcion")!=null ? (String)request.getAttribute("form_descripcion")
+                          : (usuario.getDesc()!=null ? usuario.getDesc() : "")
+                      ) %></textarea>
+                    </label>
+                    <% } %>
+
+                    <% if (muestraLink) { %>
+                    <label>
+                      <span>Sitio web</span>
+                      <input type="url" name="link"
+                             value="<%= (
+                                  request.getAttribute("form_link")!=null ? (String)request.getAttribute("form_link")
+                                  : (usuario.getLink()!=null ? usuario.getLink() : "")
+                             ) %>">
+                    </label>
+                    <% } %>
+                  </div>
+                <% } %>
+
+                <%-- Datos personales (si aplica) --%>
+                <%
+                  boolean muestraApellido = (usuario.getApellido() != null) || (request.getAttribute("form_apellido")!=null);
+                  boolean muestraFecha    = (usuario.getFechaNac() != null) || (request.getAttribute("form_fechaNac")!=null);
+                  boolean muestraInst     = false;
+                  try { muestraInst = (usuario.getNombreInstitucion()!=null) || (request.getAttribute("form_institucion")!=null); }
+                  catch (Throwable ignore) {}
+                  if (muestraApellido || muestraFecha || muestraInst) {
+                %>
+                  <div class="grid-3">
+                    <% if (muestraApellido) { %>
+                    <label>
+                      <span>Apellido</span>
+                      <input type="text" name="apellido"
+                             value="<%= (
+                                request.getAttribute("form_apellido")!=null ? (String)request.getAttribute("form_apellido")
+                                : (usuario.getApellido()!=null ? usuario.getApellido() : "")
+                             ) %>">
+                    </label>
+                    <% } %>
+
+                    <% if (muestraFecha) { %>
+                    <label>
+                      <span>Fecha de nacimiento</span>
+                      <input type="date" name="fechaNac"
+                             value="<%= (
+                               request.getAttribute("form_fechaNac")!=null ? (String)request.getAttribute("form_fechaNac")
+                               : (usuario.getFechaNac()!=null ? usuario.getFechaNac().toString() : "")
+                             ) %>">
+                    </label>
+                    <% } %>
+
+                    <% if (muestraInst) { %>
+                    <label>
+                      <span>Institución</span>
+                      <input type="text" name="institucion"
+                             value="<%= (
+                               request.getAttribute("form_institucion")!=null ? (String)request.getAttribute("form_institucion")
+                               : (usuario.getNombreInstitucion()!=null ? usuario.getNombreInstitucion() : "")
+                             ) %>">
+                    </label>
+                    <% } %>
+                  </div>
+                <% } %>
+
+                <!-- Cambio de contraseña (opcional) -->
+                <fieldset class="field-group">
+                  <legend>Cambiar contraseña (opcional)</legend>
+                  <div class="grid-2">
+                    <label>
+                      <span>Nueva contraseña</span>
+                      <input type="password" name="password" autocomplete="new-password" minlength="6">
+                    </label>
+                    <label>
+                      <span>Repetir nueva contraseña</span>
+                      <input type="password" name="password2" autocomplete="new-password" minlength="6">
+                    </label>
+                  </div>
+                  <p class="hint">Si completás ambos campos y coinciden, se actualizará tu contraseña.</p>
+                </fieldset>
+
+                <!-- Imagen -->
+                <div class="grid-2" style="align-items:center">
+                  <div>
+                    <span>Imagen actual</span><br>
+                    <img src="<%= (usuario.getImagen()!=null && !usuario.getImagen().isBlank()
+                                    ? (ctx + "/img/usuarios/" + usuario.getImagen())
+                                    : (ctx + "/img/user-default.jpg")) %>"
+                         alt="Avatar de <%= usuario.getNickname() %>"
+                         style="width:96px;height:96px;border-radius:50%;object-fit:cover"
+                         onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
+                  </div>
+                  <label>
+                    <span>Subir nueva imagen</span>
+                    <input type="file" name="imagen" accept="image/*">
+                  </label>
+                </div>
+
+                <!-- Acciones -->
+                <div class="actions" style="margin-top:1rem; display:flex; gap:.5rem;">
+                  <button type="submit" class="btn">Guardar cambios</button>
+                  <a class="btn btn--ghost" href="<%= ctx %>/usuario/ConsultaUsuario?nick=<%= java.net.URLEncoder.encode(usuario.getNickname(), java.nio.charset.StandardCharsets.UTF_8) %>">Cancelar</a>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+        <% } %>
+
+        <!-- ====== RED SOCIAL ====== -->
 <%
   List<String> seguidores = (List<String>) request.getAttribute("segidores"); // (typo original)
   seguidores = (List<String>) request.getAttribute("seguidores");
   List<String> seguidos = (List<String>) request.getAttribute("seguidos");
 %>
+        <div style="margin-top: 1rem; border-top: 1px solid #ddd; padding-top: .75rem;">
+          <h2>Red social</h2>
+          <div style="display:flex;gap:3rem;flex-wrap:wrap;">
+            <div>
+              <strong>Seguidores:</strong><br>
+              <% if (seguidores == null || seguidores.isEmpty()) { %>
+                <span>—</span>
+              <% } else { %>
+                <ul style="margin:.25rem 0;padding-left:1rem;">
+                  <% for (String s : seguidores) { %>
+                    <li>
+                      <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
+                        <input type="hidden" name="nick" value="<%= s %>">
+                        <button type="submit" class="btn-link user-nick">
+                          <i class='bx bxs-user'></i> <%= s %>
+                        </button>
+                      </form>
+                    </li>
+                  <% } %>
+                </ul>
+              <% } %>
+            </div>
 
-<div style="margin-top: 1rem; border-top: 1px solid #ddd; padding-top: .75rem;">
-  <h2>Red social</h2>
-  <div style="display:flex;gap:3rem;flex-wrap:wrap;">
-    <div>
-      <strong>Seguidores:</strong><br>
-      <% if (seguidores == null || seguidores.isEmpty()) { %>
-        <span>—</span>
-      <% } else { %>
-        <ul style="margin:.25rem 0;padding-left:1rem;">
-          <% for (String s : seguidores) { %>
-            <li>
-              <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
-                <input type="hidden" name="nick" value="<%= s %>">
-                <button type="submit" class="btn-link user-nick">
-                  <i class='bx bxs-user'></i> <%= s %>
-                </button>
-              </form>
-            </li>
-          <% } %>
-        </ul>
-      <% } %>
-    </div>
+            <div>
+              <strong>Seguidos:</strong><br>
+              <% if (seguidos == null || seguidos.isEmpty()) { %>
+                <span>—</span>
+              <% } else { %>
+                <ul style="margin:.25rem 0;padding-left:1rem;">
+                  <% for (String s : seguidos) { %>
+                    <li>
+                      <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
+                        <input type="hidden" name="nick" value="<%= s %>">
+                        <button type="submit" class="btn-link user-nick">
+                          <i class='bx bxs-user'></i> <%= s %>
+                        </button>
+                      </form>
+                    </li>
+                  <% } %>
+                </ul>
+              <% } %>
+            </div>
+          </div>
+        </div>
 
-    <div>
-      <strong>Seguidos:</strong><br>
-      <% if (seguidos == null || seguidos.isEmpty()) { %>
-        <span>—</span>
-      <% } else { %>
-        <ul style="margin:.25rem 0;padding-left:1rem;">
-          <% for (String s : seguidos) { %>
-            <li>
-              <form action="<%=ctx%>/usuario/ConsultaUsuario" method="get" style="display:inline;">
-                <input type="hidden" name="nick" value="<%= s %>">
-                <button type="submit" class="btn-link user-nick">
-                  <i class='bx bxs-user'></i> <%= s %>
-                </button>
-              </form>
-            </li>
-          <% } %>
-        </ul>
-      <% } %>
-    </div>
-  </div>
-</div>
-
-    <form id="formEditarUsuario"
-      action="<%= ctx %>/usuario/modificar"
-      method="post"
-      enctype="multipart/form-data"
-      class="form form--perfil">
-
-  <%-- ====== ALERTS (compacto) ====== --%>
-  <%
-    java.util.List<String> AOK   = (java.util.List<String>) request.getAttribute("alerts_ok");
-    java.util.List<String> AWARN = (java.util.List<String>) request.getAttribute("alerts_warn");
-    java.util.List<String> AERR  = (java.util.List<String>) request.getAttribute("alerts_err");
-  %>
-  <div class="alerts-stack" style="display:grid; gap:.5rem; margin-bottom:1rem;">
-    <% if (AOK != null) { for (String m : AOK) { %>
-      <div class="alert alert--ok" style="padding:.6rem .8rem; border-radius:8px; background:#e9f7ef; border:1px solid #ccebd9;">
-        <strong>✓</strong> <%= m %>
-      </div>
-    <% } } %>
-    <% if (AWARN != null) { for (String m : AWARN) { %>
-      <div class="alert alert--warn" style="padding:.6rem .8rem; border-radius:8px; background:#fff8e6; border:1px solid #ffe6ad;">
-        <strong>!</strong> <%= m %>
-      </div>
-    <% } } %>
-    <% if (AERR != null) { for (String m : AERR) { %>
-      <div class="alert alert--err" style="padding:.6rem .8rem; border-radius:8px; background:#fdecea; border:1px solid #f5c2c0;">
-        <strong>✕</strong> <%= m %>
-      </div>
-    <% } } %>
-  </div>
-
-  <!-- Nombre -->
-  <label>
-    <span>Nombre</span>
-    <input type="text" name="nombre"
-           value="<%= (request.getAttribute("form_nombre")!=null ? (String)request.getAttribute("form_nombre")
-                           : (usuario.getNombre()!=null ? usuario.getNombre() : "")) %>"
-           required>
-  </label>
-
-  <%-- Perfil público (si aplica) --%>
-  <%
-    boolean muestraDesc = (usuario.getDesc() != null) || (request.getAttribute("form_descripcion")!=null);
-    boolean muestraLink = (usuario.getLink() != null) || (request.getAttribute("form_link")!=null);
-    if (muestraDesc || muestraLink) {
-  %>
-    <div class="grid-2">
-      <% if (muestraDesc) { %>
-      <label>
-        <span>Descripción</span>
-        <textarea name="descripcion" rows="3"><%= (
-            request.getAttribute("form_descripcion")!=null ? (String)request.getAttribute("form_descripcion")
-            : (usuario.getDesc()!=null ? usuario.getDesc() : "")
-        ) %></textarea>
-      </label>
-      <% } %>
-
-      <% if (muestraLink) { %>
-      <label>
-        <span>Sitio web</span>
-        <input type="url" name="link"
-               value="<%= (
-                    request.getAttribute("form_link")!=null ? (String)request.getAttribute("form_link")
-                    : (usuario.getLink()!=null ? usuario.getLink() : "")
-               ) %>">
-      </label>
-      <% } %>
-    </div>
-  <% } %>
-
-  <%-- Datos personales (si aplica) --%>
-  <%
-    boolean muestraApellido = (usuario.getApellido() != null) || (request.getAttribute("form_apellido")!=null);
-    boolean muestraFecha    = (usuario.getFechaNac() != null) || (request.getAttribute("form_fechaNac")!=null);
-    boolean muestraInst     = false;
-    try { muestraInst = (usuario.getNombreInstitucion()!=null) || (request.getAttribute("form_institucion")!=null); }
-    catch (Throwable ignore) {}
-    if (muestraApellido || muestraFecha || muestraInst) {
-  %>
-    <div class="grid-3">
-      <% if (muestraApellido) { %>
-      <label>
-        <span>Apellido</span>
-        <input type="text" name="apellido"
-               value="<%= (
-                  request.getAttribute("form_apellido")!=null ? (String)request.getAttribute("form_apellido")
-                  : (usuario.getApellido()!=null ? usuario.getApellido() : "")
-               ) %>">
-      </label>
-      <% } %>
-
-      <% if (muestraFecha) { %>
-      <label>
-        <span>Fecha de nacimiento</span>
-        <input type="date" name="fechaNac"
-               value="<%= (
-                 request.getAttribute("form_fechaNac")!=null ? (String)request.getAttribute("form_fechaNac")
-                 : (usuario.getFechaNac()!=null ? usuario.getFechaNac().toString() : "")
-               ) %>">
-      </label>
-      <% } %>
-
-      <% if (muestraInst) { %>
-      <label>
-        <span>Institución</span>
-        <input type="text" name="institucion"
-               value="<%= (
-                 request.getAttribute("form_institucion")!=null ? (String)request.getAttribute("form_institucion")
-                 : (usuario.getNombreInstitucion()!=null ? usuario.getNombreInstitucion() : "")
-               ) %>">
-      </label>
-      <% } %>
-    </div>
-  <% } %>
-
-  <!-- Cambio de contraseña (opcional) -->
-  <fieldset class="field-group">
-    <legend>Cambiar contraseña (opcional)</legend>
-    <div class="grid-2">
-      <label>
-        <span>Nueva contraseña</span>
-        <input type="password" name="password" autocomplete="new-password" minlength="6">
-      </label>
-      <label>
-        <span>Repetir nueva contraseña</span>
-        <input type="password" name="password2" autocomplete="new-password" minlength="6">
-      </label>
-    </div>
-    <p class="hint">Si completás ambos campos y coinciden, se actualizará tu contraseña.</p>
-  </fieldset>
-
-  <!-- Imagen -->
-  <div class="grid-2" style="align-items:center">
-    <div>
-      <span>Imagen actual</span><br>
-      <img src="<%= (usuario.getImagen()!=null && !usuario.getImagen().isBlank()
-                      ? (ctx + "/img/usuarios/" + usuario.getImagen())
-                      : (ctx + "/img/user-default.jpg")) %>"
-           alt="Avatar de <%= usuario.getNickname() %>"
-           style="width:96px;height:96px;border-radius:50%;object-fit:cover"
-           onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
-    </div>
-    <label>
-      <span>Subir nueva imagen</span>
-      <input type="file" name="imagen" accept="image/*">
-    </label>
-  </div>
-
-  <!-- Acciones -->
-  <div class="actions" style="margin-top:1rem; display:flex; gap:.5rem;">
-    <button type="submit" class="btn">Guardar cambios</button>
-    <a class="btn btn--ghost" href="<%= ctx %>/usuario/ConsultaUsuario?nick=<%= java.net.URLEncoder.encode(usuario.getNickname(), java.nio.charset.StandardCharsets.UTF_8) %>">Cancelar</a>
-  </div>
-</form>
-
-  </div>
-</div>
-
+        <!-- ====== EDICIONES (vivas y archivadas) ====== -->
 <%
   boolean tieneEdiciones = usuario.getEdiciones() != null && !usuario.getEdiciones().getEdicion().isEmpty();
   boolean tieneRegistros = usuario.getRegistros() != null && !usuario.getRegistros().getRegistro().isEmpty();
-
-  boolean hayArchivadasOrg = (archOrgList != null && !archOrgList.isEmpty());
 %>
 
 <% if (tieneEdiciones || hayArchivadasOrg) { %>
@@ -445,11 +466,6 @@
              String claveCompuesta = (eventoNombre == null ? "" : eventoNombre) + "::" + edicionNombre;
              boolean esArchivable = archivablesSet.contains(edicionNombre) || archivablesSet.contains(claveCompuesta);
              String edKey = (eventoNombre == null ? "" : eventoNombre) + "::" + e.getNombre();
-
-             // ⛔ si ya está en archivadas, NO la muestres aquí (evita duplicados)
-             if (archivedKeys.contains(edKey)) {
-                 continue;
-             }
   %>
     <li style="display:flex; align-items:center; gap:.5rem; flex-wrap: wrap;">
       <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
@@ -483,9 +499,8 @@
     <li class="archivada" style="display:flex; align-items:center; gap:.5rem; flex-wrap: wrap;">
       <span style="font-weight:600;"><%= a.getSiglaEdicion() %></span>
       <span>(<%= a.getFechaInicio() %> - <%= a.getFechaFin() %>)</span>
-      <em class="estado"> — Archivada</em>
+      <em class="estado"> — Aceptada</em>
       <span class="tag-arch"> — (ARCHIVADA)</span>
-      <%-- No linkeamos a ConsultaEdicion si está archivada --%>
     </li>
   <% } } %>
   </ul>
@@ -495,14 +510,7 @@
   <h2>Eventos registrados</h2>
   <ul class="lista-eventos">
     <% for (DtRegistro r : usuario.getRegistros().getRegistro()) {
-         String eventoNombre = "";
-         if (edicionToEvento != null && edicionToEvento.get(r.getEdicion()) != null && !edicionToEvento.get(r.getEdicion()).isBlank()) {
-           eventoNombre = edicionToEvento.get(r.getEdicion());
-         } else if (r.getEvento() != null && !r.getEvento().isBlank()) {
-           eventoNombre = r.getEvento();
-         } else {
-           eventoNombre = "";
-         }
+         String eventoNombre = (edicionToEvento != null) ? edicionToEvento.get(r.getEdicion()) : "";
     %>
       <li>
         <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
@@ -530,30 +538,20 @@
   </div>
 
   <script>
-    const btnEditar = document.getElementById("btnEditar");
-    const btnGuardar = document.getElementById("btnGuardar");
-    const btnCancelar = document.getElementById("btnCancelar");
+    // Toggle "Modificar datos"
+    (function(){
+      var wrap = document.getElementById('editCollapse');
+      var btn  = document.getElementById('toggleEdit');
+      var chev = document.getElementById('chev');
+      if (wrap && btn) {
+        btn.addEventListener('click', function(){
+          wrap.classList.toggle('open');
+          if (chev) chev.classList.toggle('bx-rotate-180');
+        });
+      }
+    })();
 
-    if (btnEditar) {
-      btnEditar.addEventListener("click", () => {
-        document.querySelectorAll(".view-mode").forEach(e => e.style.display = "none");
-        document.querySelectorAll(".edit-mode").forEach(e => e.style.display = "inline");
-        btnEditar.style.display = "none";
-        btnGuardar.style.display = "inline";
-        btnCancelar.style.display = "inline";
-      });
-
-      btnCancelar.addEventListener("click", () => {
-        document.querySelectorAll(".view-mode").forEach(e => e.style.display = "inline");
-        document.querySelectorAll(".edit-mode").forEach(e => e.style.display = "none");
-        btnEditar.style.display = "inline";
-        btnGuardar.style.display = "none";
-        btnCancelar.style.display = "none";
-        const fi = document.getElementById("imagen");
-        if (fi) fi.value = "";
-      });
-    }
-
+    // Follow AJAX — igual que tenías
     (function(){
       function isFollowAction(action){ return action && action.endsWith('/seguir'); }
       document.querySelectorAll('form.follow-form').forEach(form => {
@@ -582,6 +580,7 @@
                 form.action = form.action.replace('/dejarSeguir', '/seguir');
               }
             } else {
+              // mismo fallback
               if (currentlyFollow) {
                 btn.textContent = 'Dejar de seguir';
                 form.action = form.action.replace('/seguir', '/dejarSeguir');
@@ -631,32 +630,7 @@
             .catch(function(err){ console.debug('Revalidate follow state failed:', err); });
         } catch (e) { console.debug('pageshow handler error', e); }
       });
-
     })();
   </script>
-  
-  <script>
-  // Validación mínima en cliente: contraseñas iguales si una no está vacía
-  (function(){
-    const form = document.getElementById('formEditarUsuario');
-    if (!form) return;
-    form.addEventListener('submit', function(e){
-      const p1 = form.querySelector('input[name="password"]').value.trim();
-      const p2 = form.querySelector('input[name="password2"]').value.trim();
-      if ((p1 || p2) && p1 !== p2) {
-        e.preventDefault();
-        alert('Las contraseñas no coinciden.');
-      }
-    });
-
-    const btnCancelar = document.getElementById('btnCancelar');
-    if (btnCancelar) {
-      btnCancelar.addEventListener('click', function(){
-        // recargar la página del perfil sin cambios
-        window.location.href = '<%= ctx %>/usuario/ConsultaUsuario?nick=' + encodeURIComponent('<%= usuario.getNickname() %>');
-      });
-    }
-  })();
-</script>
 </body>
 </html>
