@@ -212,10 +212,13 @@
     }
   %>
 
-  <img class="avatar"
-       src="<%= avatarSrc %>"
-       alt="Avatar de <%= usuario.getNickname() %>"
-       onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
+<img class="avatar"
+     src="<%= (usuario.getImagen()!=null && !usuario.getImagen().isBlank()
+                    ? ("http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/" + usuario.getImagen())
+                    : (ctx + "/img/user-default.jpg")) %>"
+     alt="Avatar de <%= usuario.getNickname() %>"
+     style="width:96px;height:96px;border-radius:50%;object-fit:cover"
+     onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
 
   <div id="datosUsuario">
     <div class="follow-bar" style="margin:.5rem 0;">
@@ -407,12 +410,12 @@
                 <div class="grid-2" style="align-items:center">
                   <div>
                     <span>Imagen actual</span><br>
-                    <img src="<%= (usuario.getImagen()!=null && !usuario.getImagen().isBlank()
-                                    ? (ctx + "/img/usuarios/" + usuario.getImagen())
-                                    : (ctx + "/img/user-default.jpg")) %>"
-                         alt="Avatar de <%= usuario.getNickname() %>"
-                         style="width:96px;height:96px;border-radius:50%;object-fit:cover"
-                         onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
+                    <img src="<%= (usuario.getImagen() != null && !usuario.getImagen().isBlank()? "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/" + usuario.getImagen()
+     	   					: (ctx + "/img/user-default.jpg")) %>"
+     				alt="Avatar de <%= usuario.getNickname() %>"
+     				style="width:96px;height:96px;border-radius:50%;object-fit:cover"
+     				onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
+
                   </div>
                   <label>
                     <span>Subir nueva imagen</span>
