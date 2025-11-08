@@ -40,6 +40,16 @@ public class ContadorVisitasFilter implements Filter {
         String pathInfo    = req.getPathInfo();      // p.ej. "/ConsultaEvento" o "/<nombre>" o null
         String queryEvento = trim(req.getParameter("evento"));
 
+        // ====== EXCLUSIÓN TEMPRANA: listado por categoría ======
+        boolean esListado =
+            "/evento/listado".equals(servletPath) ||
+            ("/evento".equals(servletPath) && "/listado".equals(pathInfo));
+
+        if (esListado) {
+            // No registrar visitas para listados (p.ej. /evento/listado?categoria=Entretenimiento)
+            chain.doFilter(request, response);
+            return;
+        }
 
         // 1) /evento/ConsultaEvento (o /evento + /ConsultaEvento): priorizar ?evento=
         boolean esConsultaEvento =
@@ -57,13 +67,17 @@ public class ContadorVisitasFilter implements Filter {
             evento = queryEvento;
         }
 
-        // 3) Forma REST: /evento/<nombre>
+        // 3) Forma REST: /evento/<nombre>  (pero NO para /evento/listado)
         if (isBlank(evento) && "/evento".equals(servletPath) && pathInfo != null && pathInfo.length() > 1) {
-            evento = URLDecoder.decode(pathInfo.substring(1), StandardCharsets.UTF_8);
+            String candidato = URLDecoder.decode(pathInfo.substring(1), StandardCharsets.UTF_8);
+            // Defensa extra: si el candidato es "listado", ignorarlo
+            if (!"listado".equalsIgnoreCase(candidato)) {
+                evento = candidato;
+            }
         }
 
         // Defensa: no contar claves genéricas
-        if ("ConsultaEvento".equalsIgnoreCase(evento)) {
+        if ("ConsultaEvento".equalsIgnoreCase(evento) || "listado".equalsIgnoreCase(evento)) {
             evento = null;
         }
 
@@ -78,7 +92,6 @@ public class ContadorVisitasFilter implements Filter {
 
         // 4) Post-chain: si aún no lo tenemos, intentar por ATRIBUTOS del request
         if (isBlank(evento)) {
-            // candidatos típicos que podría setear el servlet antes del forward
             Object v;
 
             v = req.getAttribute("evento");
@@ -110,7 +123,10 @@ public class ContadorVisitasFilter implements Filter {
                             Method m = v.getClass().getMethod("getNombre");
                             Object nombre = m.invoke(v);
                             if (nombre != null && !isBlank(nombre.toString())) {
-                                evento = nombre.toString().trim();
+                                String candidato = nombre.toString().trim();
+                                if (!"listado".equalsIgnoreCase(candidato)) {
+                                    evento = candidato;
+                                }
                                 break;
                             }
                         } catch (Exception ignore) {
@@ -121,12 +137,11 @@ public class ContadorVisitasFilter implements Filter {
             }
         }
 
-        if ("ConsultaEvento".equalsIgnoreCase(evento)) {
+        if ("ConsultaEvento".equalsIgnoreCase(evento) || "listado".equalsIgnoreCase(evento)) {
             evento = null;
         }
 
         if (!isBlank(evento)) {
-
             try {
                 publicadores.PublicadorEstadisticasService service = new publicadores.PublicadorEstadisticasService();
                 publicadores.PublicadorEstadisticas port = service.getPublicadorEstadisticasPort();
@@ -135,9 +150,6 @@ public class ContadorVisitasFilter implements Filter {
                 if (overrideEndpoint != null && !overrideEndpoint.isBlank()) {
                     ((BindingProvider) port).getRequestContext().put(
                             BindingProvider.ENDPOINT_ADDRESS_PROPERTY, overrideEndpoint);
-                } else {
-                    Object actual = ((BindingProvider) port).getRequestContext()
-                            .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
                 }
 
                 ((BindingProvider) port).getRequestContext().put("com.sun.xml.ws.connect.timeout", 3000);
@@ -146,7 +158,7 @@ public class ContadorVisitasFilter implements Filter {
                 port.registrarVisita(evento);
 
             } catch (jakarta.xml.ws.WebServiceException wse) {
-				System.out.println("[VISITAS][ERROR] WebService: " + wse.getClass().getName()
+                System.out.println("[VISITAS][ERROR] WebService: " + wse.getClass().getName()
                         + " | msg=" + String.valueOf(wse.getMessage()));
                 Throwable c = wse.getCause();
                 int hops = 0;

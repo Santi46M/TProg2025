@@ -4,14 +4,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import jakarta.servlet.ServletContext;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.time.LocalDate;
-import java.util.Locale;
-import java.util.Optional;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 import publicadores.PublicadorUsuario;
 import publicadores.PublicadorUsuarioService;
@@ -40,6 +40,22 @@ public class ModificarDatosServlet extends HttpServlet {
         PublicadorUsuarioService service = new PublicadorUsuarioService();
         PublicadorUsuario port = service.getPublicadorUsuarioPort();
 
+        // ===== Colección de alerts (se muestran en la JSP) =====
+        List<String> alertsOk   = new ArrayList<>();
+        List<String> alertsWarn = new ArrayList<>();
+        List<String> alertsErr  = new ArrayList<>();
+
+        // Para comparar cambios, traemos el usuario actual
+        DtDatosUsuario antes;
+        try {
+            antes = port.obtenerDatosUsuario(nick);
+        } catch (Exception e) {
+            // Si ni siquiera podemos cargar el perfil, devolvemos error duro
+            request.setAttribute("error", "No se pudo cargar el perfil actual: " + safeMsg(e));
+            request.getRequestDispatcher("/WEB-INF/usuario/ConsultaUsuario.jsp").forward(request, response);
+            return;
+        }
+
         // ---- Parámetros del formulario
         String nombre      = orEmpty(request.getParameter("nombre"));
         String apellido    = orEmpty(request.getParameter("apellido"));
@@ -47,63 +63,96 @@ public class ModificarDatosServlet extends HttpServlet {
         String descripcion = orEmpty(request.getParameter("descripcion"));
         String link        = orEmpty(request.getParameter("link"));
         String password    = orEmpty(request.getParameter("password"));
-
-        // OJO: en tu JSP el name es "fechaNac" (no "fechaNacimiento")
+        String password2   = orEmpty(request.getParameter("password2"));
         String nacStr      = orEmpty(request.getParameter("fechaNac"));
 
-        // Parseo opcional (sólo para validar formato); el WS recibe String.
+        // Guardamos overrides para que la JSP pueda repintar lo que el usuario tipeó
+        request.setAttribute("form_nombre", nombre);
+        request.setAttribute("form_apellido", apellido);
+        request.setAttribute("form_institucion", institucion);
+        request.setAttribute("form_descripcion", descripcion);
+        request.setAttribute("form_link", link);
+        request.setAttribute("form_fechaNac", nacStr);
+
+        // ===== Validaciones no fatales → vamos acumulando en alertsErr y si hay, forward
         String fechaStr = "";
         if (!nacStr.isBlank()) {
+            LocalDate hoy = LocalDate.now();
             try {
-                LocalDate.parse(nacStr); // valida "yyyy-MM-dd" de input type=date
-                fechaStr = nacStr;
-            } catch (Exception e) {
-                // Si viene mal, devolvemos error de formulario
-                request.setAttribute("error", "Fecha de nacimiento inválida. Use formato yyyy-MM-dd.");
-                request.getRequestDispatcher("/WEB-INF/usuario/ConsultaUsuario.jsp").forward(request, response);
-                return;
+                LocalDate fnac = LocalDate.parse(nacStr); // yyyy-MM-dd
+                if (fnac.isAfter(hoy)) {
+                    alertsErr.add("La fecha de nacimiento no puede ser futura.");
+                } else if (fnac.isBefore(hoy.minusYears(120))) {
+                    alertsErr.add("La fecha de nacimiento es inválida (¿más de 120 años?).");
+                } else {
+                    fechaStr = nacStr; // OK
+                }
+            } catch (DateTimeParseException e) {
+                alertsErr.add("Fecha de nacimiento inválida. Use formato yyyy-MM-dd.");
             }
-        } else {
-            // MUY IMPORTANTE: jamás enviar null → usar "" (string vacío) o el valor actual.
-            fechaStr = "";
+        } // si viene vacía, queda "" (no cambia)
+
+        boolean quiereCambiarPass = !password.isBlank() || !password2.isBlank();
+        if (quiereCambiarPass) {
+            if (password.isBlank() || password2.isBlank()) {
+                alertsErr.add("Debés completar ambos campos de contraseña.");
+            } else if (!password.equals(password2)) {
+                alertsErr.add("Las contraseñas no coinciden.");
+            } else if (password.length() < 6) {
+                alertsErr.add("La contraseña debe tener al menos 6 caracteres.");
+            }
         }
 
-        // ---- Imagen: si no suben una nueva, conservar la actual
+        // Imagen: si falla el upload, lo reportamos como error y no seguimos
         String imgFileName = "";
         try {
-            Part imgPart = request.getPart("imagen"); // name="imagen" en el form
+            Part imgPart = request.getPart("imagen"); // name="imagen"
             if (imgPart != null && imgPart.getSize() > 0) {
                 String onlyName = Path.of(imgPart.getSubmittedFileName()).getFileName().toString();
                 String rel = "/img/usuarios/" + onlyName;
                 String abs = getServletContext().getRealPath(rel);
-                if (abs == null) {
-                    // fallback por si realPath no está disponible (ej., empaquetado)
-                    throw new IOException("No se pudo resolver ruta de escritura para " + rel);
-                }
-                // aseguramos carpeta
+                if (abs == null) throw new IOException("No se pudo resolver ruta de escritura para " + rel);
                 Files.createDirectories(Path.of(abs).getParent());
                 imgPart.write(abs);
                 imgFileName = onlyName;
+                alertsOk.add("Imagen subida correctamente.");
             } else {
-                // mantener imagen actual
-                try {
-                    DtDatosUsuario actual = port.obtenerDatosUsuario(nick);
-                    String actualImg = actual.getImagen();
-                    imgFileName = (actualImg != null) ? actualImg : "";
-                } catch (Exception ignore) {
-                    imgFileName = "";
-                }
+                String actualImg = antes.getImagen();
+                imgFileName = (actualImg != null) ? actualImg : "";
             }
         } catch (IllegalStateException ise) {
-            // tamaño excedido u otro error de multipart
-            request.setAttribute("error", "La imagen excede el tamaño permitido o es inválida.");
-            request.getRequestDispatcher("/WEB-INF/usuario/ConsultaUsuario.jsp").forward(request, response);
+            alertsErr.add("La imagen excede el tamaño permitido o es inválida.");
+        } catch (IOException ioe) {
+            alertsErr.add("No se pudo guardar la imagen: " + safeMsg(ioe));
+        }
+
+        // Si hubo errores de validación → mostramos alerts y volvemos a la vista
+        if (!alertsErr.isEmpty()) {
+            setAlertsAndForward(request, response, alertsOk, alertsWarn, alertsErr, antes);
             return;
         }
 
-        // ---- Invocar WS (sin nulls)
+        // ===== Invocar WS (sin nulls)
+        boolean huboCambios = false;
         try {
-            // Firma según tu stub actual:
+            // Detectar cambios básicos (para alertita si no cambió nada)
+            boolean cambioNombre      = !eqSafe(antes.getNombre(), nombre);
+            boolean cambioApellido    = !eqSafe(nvl(antes.getApellido()), apellido);
+            boolean cambioInstitucion = !eqSafe(nvl(antes.getNombreInstitucion()), institucion);
+            boolean cambioDesc        = !eqSafe(nvl(antes.getDesc()), descripcion);
+            boolean cambioLink        = !eqSafe(nvl(antes.getLink()), link);
+            boolean cambioFecha       = !eqSafe(dateToStr(antes.getFechaNac()), fechaStr);
+            boolean cambioImg         = !eqSafe(nvl(antes.getImagen()), imgFileName);
+
+            huboCambios = cambioNombre || cambioApellido || cambioInstitucion ||
+                          cambioDesc   || cambioLink    || cambioFecha || cambioImg;
+
+            if (!huboCambios && !quiereCambiarPass) {
+                alertsWarn.add("No realizaste cambios en tus datos.");
+                setAlertsAndForward(request, response, alertsOk, alertsWarn, alertsErr, antes);
+                return;
+            }
+
             // modificarDatosUsuario(nick, nombre, descripcion, link, apellido, fechaStr, institucion, imgFileName)
             port.modificarDatosUsuario(
                     nick,
@@ -111,33 +160,79 @@ public class ModificarDatosServlet extends HttpServlet {
                     descripcion,
                     link,
                     apellido,
-                    fechaStr,     
+                    fechaStr,     // "" si no se cambió
                     institucion,
                     imgFileName
             );
+            if (huboCambios) alertsOk.add("Datos actualizados correctamente.");
 
-            if (!password.isBlank()) {
-                	//port.modificarContrasenia(nick, password);
+            if (quiereCambiarPass) {
+                tryUpdatePasswordByReflection(port, nick, password);
+                alertsOk.add("Contraseña actualizada.");
             }
 
-            // Ok → redirigir al perfil
-            response.sendRedirect(request.getContextPath() + "/usuario/ConsultaUsuario?nick=" +
-                    java.net.URLEncoder.encode(nick, java.nio.charset.StandardCharsets.UTF_8));
+            // Recargamos DTO actualizado para mostrar la vista con los nuevos datos y alerts
+            DtDatosUsuario despues = port.obtenerDatosUsuario(nick);
+
+            request.setAttribute("usuario", despues);
+            putAlerts(request, alertsOk, alertsWarn, alertsErr);
+            request.getRequestDispatcher("/WEB-INF/usuario/ConsultaUsuario.jsp").forward(request, response);
+            return;
 
         } catch (UsuarioNoExisteException_Exception | UsuarioTipoIncorrectoException_Exception e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            request.setAttribute("error", "El usuario '" + nick + "' no existe o el tipo es inválido.");
-            request.getRequestDispatcher("/WEB-INF/usuario/ConsultaUsuario.jsp").forward(request, response);
+            alertsErr.add("El usuario '" + nick + "' no existe o el tipo es inválido.");
+            setAlertsAndForward(request, response, alertsOk, alertsWarn, alertsErr, antes);
         } catch (Exception e) {
-            // Errores genéricos del WS (incluye BP 1.1 si algo quedó null)
-            request.setAttribute("error", "No se pudieron actualizar los datos: " + safeMsg(e));
-            request.getRequestDispatcher("/WEB-INF/usuario/ConsultaUsuario.jsp").forward(request, response);
+            alertsErr.add("No se pudieron actualizar los datos: " + safeMsg(e));
+            setAlertsAndForward(request, response, alertsOk, alertsWarn, alertsErr, antes);
         }
     }
 
-    // ===== Helpers =====
+    /* ===== Helpers ===== */
+
+    private static void setAlertsAndForward(HttpServletRequest req, HttpServletResponse resp,
+                                            List<String> ok, List<String> warn, List<String> err,
+                                            DtDatosUsuario usuarioParaMostrar)
+            throws ServletException, IOException {
+        putAlerts(req, ok, warn, err);
+        if (req.getAttribute("usuario") == null && usuarioParaMostrar != null) {
+            req.setAttribute("usuario", usuarioParaMostrar);
+        }
+        req.getRequestDispatcher("/WEB-INF/usuario/ConsultaUsuario.jsp").forward(req, resp);
+    }
+
+    private static void putAlerts(HttpServletRequest req,
+                                  List<String> ok, List<String> warn, List<String> err) {
+        if (ok   != null && !ok.isEmpty())   req.setAttribute("alerts_ok",   ok);
+        if (warn != null && !warn.isEmpty()) req.setAttribute("alerts_warn", warn);
+        if (err  != null && !err.isEmpty())  req.setAttribute("alerts_err",  err);
+    }
+
+    // Intenta port.modificarContrasenia / modificarContrasena / cambiarContrasenia / cambiarContrasena
+    private static void tryUpdatePasswordByReflection(PublicadorUsuario port, String nick, String newPass) throws Exception {
+        Exception last = null;
+        String[] nombres = { "modificarContrasenia", "modificarContrasena", "cambiarContrasenia", "cambiarContrasena" };
+        for (String m : nombres) {
+            try {
+                port.getClass().getMethod(m, String.class, String.class).invoke(port, nick, newPass);
+                return; // éxito
+            } catch (NoSuchMethodException nsme) {
+                last = nsme;
+            } catch (Exception ex) {
+                last = ex;
+            }
+        }
+        throw (last != null) ? last : new NoSuchMethodException("No existe método para cambiar contraseña en el stub.");
+    }
+
     private static String orEmpty(String s) { return (s == null) ? "" : s; }
     private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
+
+    private static String nvl(String s) { return (s == null) ? "" : s; }
+    private static boolean eqSafe(String a, String b) { return Objects.equals(nvl(a), nvl(b)); }
+    private static String dateToStr(Object fechaNac) {
+        return (fechaNac == null) ? "" : fechaNac.toString(); // el stub suele traer LocalDate -> toString() yyyy-MM-dd
+    }
 
     private static String safeMsg(Throwable t) {
         String m = (t == null) ? "" : t.getMessage();

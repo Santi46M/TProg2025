@@ -254,10 +254,160 @@
   </div>
 </div>
 
-    <form id="formEditarUsuario" action="<%= ctx %>/usuario/modificar" method="post" enctype="multipart/form-data">
-      <input type="hidden" name="nick" value="<%= usuario.getNickname() %>">
-      <!-- (resto del formulario igual que lo tenías) -->
-    </form>
+    <form id="formEditarUsuario"
+      action="<%= ctx %>/usuario/modificar"
+      method="post"
+      enctype="multipart/form-data"
+      class="form form--perfil">
+
+  <%-- ====== ALERTS (compacto) ====== --%>
+  <%
+    java.util.List<String> AOK   = (java.util.List<String>) request.getAttribute("alerts_ok");
+    java.util.List<String> AWARN = (java.util.List<String>) request.getAttribute("alerts_warn");
+    java.util.List<String> AERR  = (java.util.List<String>) request.getAttribute("alerts_err");
+  %>
+  <div class="alerts-stack" style="display:grid; gap:.5rem; margin-bottom:1rem;">
+    <% if (AOK != null) { for (String m : AOK) { %>
+      <div class="alert alert--ok" style="padding:.6rem .8rem; border-radius:8px; background:#e9f7ef; border:1px solid #ccebd9;">
+        <strong>✓</strong> <%= m %>
+      </div>
+    <% } } %>
+    <% if (AWARN != null) { for (String m : AWARN) { %>
+      <div class="alert alert--warn" style="padding:.6rem .8rem; border-radius:8px; background:#fff8e6; border:1px solid #ffe6ad;">
+        <strong>!</strong> <%= m %>
+      </div>
+    <% } } %>
+    <% if (AERR != null) { for (String m : AERR) { %>
+      <div class="alert alert--err" style="padding:.6rem .8rem; border-radius:8px; background:#fdecea; border:1px solid #f5c2c0;">
+        <strong>✕</strong> <%= m %>
+      </div>
+    <% } } %>
+  </div>
+
+  <!-- Nombre -->
+  <label>
+    <span>Nombre</span>
+    <input type="text" name="nombre"
+           value="<%= (request.getAttribute("form_nombre")!=null ? (String)request.getAttribute("form_nombre")
+                           : (usuario.getNombre()!=null ? usuario.getNombre() : "")) %>"
+           required>
+  </label>
+
+  <%-- Perfil público (si aplica) --%>
+  <%
+    boolean muestraDesc = (usuario.getDesc() != null) || (request.getAttribute("form_descripcion")!=null);
+    boolean muestraLink = (usuario.getLink() != null) || (request.getAttribute("form_link")!=null);
+    if (muestraDesc || muestraLink) {
+  %>
+    <div class="grid-2">
+      <% if (muestraDesc) { %>
+      <label>
+        <span>Descripción</span>
+        <textarea name="descripcion" rows="3"><%= (
+            request.getAttribute("form_descripcion")!=null ? (String)request.getAttribute("form_descripcion")
+            : (usuario.getDesc()!=null ? usuario.getDesc() : "")
+        ) %></textarea>
+      </label>
+      <% } %>
+
+      <% if (muestraLink) { %>
+      <label>
+        <span>Sitio web</span>
+        <input type="url" name="link"
+               value="<%= (
+                    request.getAttribute("form_link")!=null ? (String)request.getAttribute("form_link")
+                    : (usuario.getLink()!=null ? usuario.getLink() : "")
+               ) %>">
+      </label>
+      <% } %>
+    </div>
+  <% } %>
+
+  <%-- Datos personales (si aplica) --%>
+  <%
+    boolean muestraApellido = (usuario.getApellido() != null) || (request.getAttribute("form_apellido")!=null);
+    boolean muestraFecha    = (usuario.getFechaNac() != null) || (request.getAttribute("form_fechaNac")!=null);
+    boolean muestraInst     = false;
+    try { muestraInst = (usuario.getNombreInstitucion()!=null) || (request.getAttribute("form_institucion")!=null); }
+    catch (Throwable ignore) {}
+    if (muestraApellido || muestraFecha || muestraInst) {
+  %>
+    <div class="grid-3">
+      <% if (muestraApellido) { %>
+      <label>
+        <span>Apellido</span>
+        <input type="text" name="apellido"
+               value="<%= (
+                  request.getAttribute("form_apellido")!=null ? (String)request.getAttribute("form_apellido")
+                  : (usuario.getApellido()!=null ? usuario.getApellido() : "")
+               ) %>">
+      </label>
+      <% } %>
+
+      <% if (muestraFecha) { %>
+      <label>
+        <span>Fecha de nacimiento</span>
+        <input type="date" name="fechaNac"
+               value="<%= (
+                 request.getAttribute("form_fechaNac")!=null ? (String)request.getAttribute("form_fechaNac")
+                 : (usuario.getFechaNac()!=null ? usuario.getFechaNac().toString() : "")
+               ) %>">
+      </label>
+      <% } %>
+
+      <% if (muestraInst) { %>
+      <label>
+        <span>Institución</span>
+        <input type="text" name="institucion"
+               value="<%= (
+                 request.getAttribute("form_institucion")!=null ? (String)request.getAttribute("form_institucion")
+                 : (usuario.getNombreInstitucion()!=null ? usuario.getNombreInstitucion() : "")
+               ) %>">
+      </label>
+      <% } %>
+    </div>
+  <% } %>
+
+  <!-- Cambio de contraseña (opcional) -->
+  <fieldset class="field-group">
+    <legend>Cambiar contraseña (opcional)</legend>
+    <div class="grid-2">
+      <label>
+        <span>Nueva contraseña</span>
+        <input type="password" name="password" autocomplete="new-password" minlength="6">
+      </label>
+      <label>
+        <span>Repetir nueva contraseña</span>
+        <input type="password" name="password2" autocomplete="new-password" minlength="6">
+      </label>
+    </div>
+    <p class="hint">Si completás ambos campos y coinciden, se actualizará tu contraseña.</p>
+  </fieldset>
+
+  <!-- Imagen -->
+  <div class="grid-2" style="align-items:center">
+    <div>
+      <span>Imagen actual</span><br>
+      <img src="<%= (usuario.getImagen()!=null && !usuario.getImagen().isBlank()
+                      ? (ctx + "/img/usuarios/" + usuario.getImagen())
+                      : (ctx + "/img/user-default.jpg")) %>"
+           alt="Avatar de <%= usuario.getNickname() %>"
+           style="width:96px;height:96px;border-radius:50%;object-fit:cover"
+           onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
+    </div>
+    <label>
+      <span>Subir nueva imagen</span>
+      <input type="file" name="imagen" accept="image/*">
+    </label>
+  </div>
+
+  <!-- Acciones -->
+  <div class="actions" style="margin-top:1rem; display:flex; gap:.5rem;">
+    <button type="submit" class="btn">Guardar cambios</button>
+    <a class="btn btn--ghost" href="<%= ctx %>/usuario/ConsultaUsuario?nick=<%= java.net.URLEncoder.encode(usuario.getNickname(), java.nio.charset.StandardCharsets.UTF_8) %>">Cancelar</a>
+  </div>
+</form>
+
   </div>
 </div>
 
@@ -484,5 +634,29 @@
 
     })();
   </script>
+  
+  <script>
+  // Validación mínima en cliente: contraseñas iguales si una no está vacía
+  (function(){
+    const form = document.getElementById('formEditarUsuario');
+    if (!form) return;
+    form.addEventListener('submit', function(e){
+      const p1 = form.querySelector('input[name="password"]').value.trim();
+      const p2 = form.querySelector('input[name="password2"]').value.trim();
+      if ((p1 || p2) && p1 !== p2) {
+        e.preventDefault();
+        alert('Las contraseñas no coinciden.');
+      }
+    });
+
+    const btnCancelar = document.getElementById('btnCancelar');
+    if (btnCancelar) {
+      btnCancelar.addEventListener('click', function(){
+        // recargar la página del perfil sin cambios
+        window.location.href = '<%= ctx %>/usuario/ConsultaUsuario?nick=' + encodeURIComponent('<%= usuario.getNickname() %>');
+      });
+    }
+  })();
+</script>
 </body>
 </html>
