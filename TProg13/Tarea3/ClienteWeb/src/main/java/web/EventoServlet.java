@@ -250,18 +250,17 @@ public class EventoServlet extends HttpServlet {
                     if (isBlank(ext)) ext = ".jpg";
                     String finalName = "IMG-" + safeName + ext;
 
-                    String baseImg = getServletContext().getRealPath("/images/eventos");
-                    if (baseImg == null) {
-                        baseImg = Path.of(getServletContext().getRealPath("/"), "images", "eventos").toString();
-                    }
+                   
+                    String tomcatBase = System.getProperty("catalina.base");
+                    String baseImg = tomcatBase + "/webapps/ServidorCentral-0.0.1-SNAPSHOT/images/eventos";
 
                     Files.createDirectories(Path.of(baseImg));
                     Path destino = Path.of(baseImg, finalName);
-                    imgPart.write(destino.toAbsolutePath().toString());
+                    imgPart.write(destino.toString());
+
                     imagenFileName = finalName;
                     System.out.println("[IMG] Guardada en: " + destino);
                 }
-                
             } catch (Exception fileEx) {
                 req.setAttribute("error", "Error al procesar la imagen: " + fileEx.getMessage());
                 req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
