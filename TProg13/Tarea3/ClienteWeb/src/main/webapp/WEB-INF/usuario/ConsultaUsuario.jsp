@@ -512,48 +512,59 @@
 
     String ownerNick = (usuario != null ? usuario.getNickname() : null);
   %>
-  <% if (tieneEdiciones) {
-       for (DtEdicion e : usuario.getEdiciones().getEdicion()) {
-         String estado = (e.getEstado() != null) ? e.getEstado().toString() : "Sin estado";
-         boolean mostrar = "Aceptada".equalsIgnoreCase(estado) ||
-                           (esSuPropioPerfil && ("Ingresada".equalsIgnoreCase(estado) || "Rechazada".equalsIgnoreCase(estado)));
-         if (mostrar) {
-             String eventoNombre = "";
-             if (edicionToEvento != null && edicionToEvento.get(e.getNombre()) != null) {
-                 eventoNombre = edicionToEvento.get(e.getNombre());
-             } else if (e.getEvento() != null) {
-                 eventoNombre = e.getEvento().getNombre();
-             }
-             String edicionNombre = e.getNombre();
-             String claveCompuesta = (eventoNombre == null ? "" : eventoNombre) + "::" + edicionNombre;
-             boolean esArchivable = archivablesSet.contains(edicionNombre) || archivablesSet.contains(claveCompuesta);
-             String edKey = (eventoNombre == null ? "" : eventoNombre) + "::" + e.getNombre();
-  %>
-    <li style="display:flex; align-items:center; gap:.5rem; flex-wrap: wrap;">
-      <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
-        <input type="hidden" name="evento" value="<%= eventoNombre %>" />
-        <input type="hidden" name="edicion" value="<%= e.getNombre() %>" />
-        <a href="#" onclick="this.closest('form').submit(); return false;"
-           style="color:inherit; text-decoration:none; font-weight:600;">
-          <%= e.getNombre() %>
-        </a>
+<% if (tieneEdiciones) {
+     for (DtEdicion e : usuario.getEdiciones().getEdicion()) {
+       String estado = (e.getEstado() != null) ? e.getEstado().toString() : "Sin estado";
+       boolean mostrar = "Aceptada".equalsIgnoreCase(estado) ||
+                         (esSuPropioPerfil && ("Ingresada".equalsIgnoreCase(estado) || "Rechazada".equalsIgnoreCase(estado)));
+       if (mostrar) {
+
+         
+         String eventoNombre = "";
+         if (edicionToEvento != null && edicionToEvento.get(e.getNombre()) != null) {
+             eventoNombre = edicionToEvento.get(e.getNombre());
+         } else if (e.getEvento() != null && e.getEvento().getNombre() != null) {
+             eventoNombre = e.getEvento().getNombre();
+         } else {
+             eventoNombre = "(Evento desconocido)"; 
+         }
+
+         String edicionNombre = e.getNombre();
+         String claveCompuesta = (eventoNombre == null ? "" : eventoNombre) + "::" + edicionNombre;
+         boolean esArchivable = archivablesSet.contains(edicionNombre) || archivablesSet.contains(claveCompuesta);
+         String edKey = (eventoNombre == null ? "" : eventoNombre) + "::" + e.getNombre();
+%>
+
+  <li style="display:flex; align-items:center; gap:.5rem; flex-wrap: wrap;">
+    <form action="<%= ctx %>/edicion/ConsultaEdicion" method="get" style="display:inline;">
+      <input type="hidden" name="evento" value="<%= eventoNombre %>" />
+      <input type="hidden" name="edicion" value="<%= e.getNombre() %>" />
+      <a href="#" onclick="this.closest('form').submit(); return false;"
+         style="color:inherit; text-decoration:none; font-weight:600;">
+        <%= e.getNombre() %>
+      </a>
+    </form>
+
+    <span>(<%= e.getFechaInicio() %> - <%= e.getFechaFin() %>)</span>
+    <em class="estado"> — <%= estado %></em>
+
+    <% if (esSuPropioPerfil && archivablesSet.contains(edKey)) { %>
+      <form action="<%= ctx %>/usuario/archivarEdicion" method="post" style="display:inline; margin-left:.5rem;">
+        <input type="hidden" name="edicion" value="<%= edKey %>"/>
+        <input type="hidden" name="owner"   value="<%= ownerNick %>"/>
+        <button type="submit" class="btn btn--small"
+                onclick="return confirm('¿Archivar la edición «<%= e.getNombre() %>»? Esta acción la saca de los listados.');">
+          Archivar
+        </button>
       </form>
+    <% } %>
+  </li>
 
-      <span>(<%= e.getFechaInicio() %> - <%= e.getFechaFin() %>)</span>
-      <em class="estado"> — <%= estado %></em>
-
-      <% if (esSuPropioPerfil && archivablesSet.contains(edKey)) { %>
-        <form action="<%= ctx %>/usuario/archivarEdicion" method="post" style="display:inline; margin-left:.5rem;">
-          <input type="hidden" name="edicion" value="<%= edKey %>"/>
-          <input type="hidden" name="owner"   value="<%= ownerNick %>"/>
-          <button type="submit" class="btn btn--small"
-                  onclick="return confirm('¿Archivar la edición «<%= e.getNombre() %>»? Esta acción la saca de los listados.');">
-            Archivar
-          </button>
-        </form>
-      <% } %>
-    </li>
-  <% } } } %>
+<%
+       } // if mostrar
+     } // for
+   } // if tieneEdiciones
+%>
 
   <%-- === ARCHIVADAS (como ORGANIZADOR) --%>
   <% if (esPerfilOrganizador && hayArchivadasOrg) {

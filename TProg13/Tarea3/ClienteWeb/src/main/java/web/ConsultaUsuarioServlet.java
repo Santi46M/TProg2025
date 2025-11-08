@@ -1,5 +1,5 @@
-
 package web;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -13,8 +13,8 @@ import publicadores.DtDatosUsuarioArray;
 import publicadores.PublicadorUsuario;
 import publicadores.PublicadorUsuarioService;
 import publicadores.UsuarioNoExisteException_Exception;
-import publicadores.UsuarioTipoIncorrectoException_Exception;
 import publicadores.StringArray;
+
 @WebServlet(urlPatterns = {
         "/usuario/ConsultaUsuario",
         "/usuario/seguir",
@@ -24,12 +24,16 @@ import publicadores.StringArray;
 @jakarta.servlet.annotation.MultipartConfig
 public class ConsultaUsuarioServlet extends HttpServlet {
     private static final String JSP_CONSULTA = "/WEB-INF/usuario/ConsultaUsuario.jsp";
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         request.setCharacterEncoding("UTF-8");
+
         boolean forzarListado = isTrue(request.getParameter("listar")) ||
                 "list".equalsIgnoreCase(trim(request.getParameter("view")));
+
         String nick = trim(request.getParameter("nick"));
         if (!forzarListado && isBlank(nick)) {
             HttpSession sAux = request.getSession(false);
@@ -38,9 +42,10 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 if (obj instanceof String) nick = (String) obj;
             }
         }
+
         PublicadorUsuarioService service = new PublicadorUsuarioService();
         PublicadorUsuario port = service.getPublicadorUsuarioPort();
-        // --- AJAX helper: revalidate follow-status for a list of nicks ---
+
         String checkSeguidos = request.getParameter("checkSeguidos");
         String nicksParam = request.getParameter("nicks");
         if ("1".equals(checkSeguidos) && nicksParam != null) {
@@ -61,19 +66,20 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                         sigue = port.sigueA(sessionNick, target);
                     }
                 } catch (Exception ignore) { }
-                if (!first) sb.append(','); first = false;
+                if (!first) sb.append(',');
+                first = false;
                 sb.append('"').append(escapeJson(target)).append('"').append(':').append(sigue);
             }
             sb.append('}');
             response.getWriter().write(sb.toString());
             return;
         }
+
         if (forzarListado || isBlank(nick)) {
             List<DtDatosUsuario> usuarios = new ArrayList<>();
             try {
                 DtDatosUsuarioArray arr = port.obtenerUsuariosDT();
                 usuarios = asList(arr);
-
 
                 String nickSesion = nickEnSesion(request);
                 Map<String, Boolean> yaLoSigoMap = new HashMap<>();
@@ -98,6 +104,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 request.setAttribute("error", "No se pudo obtener la lista de usuarios.");
             }
             request.setAttribute("usuarios", usuarios);
+
         } else {
             try {
                 DtDatosUsuario usuario = port.obtenerDatosUsuario(nick);
@@ -105,7 +112,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 String imagenUrl = "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/" + usuario.getImagen();
                 request.setAttribute("usrImagenUrl", imagenUrl);
                 request.setAttribute("usuario", usuario);
-                // seguidores/seguidos
+
                 List<String> seguidores = new ArrayList<>();
                 List<String> seguidos = new ArrayList<>();
                 if (usuario.getSeguidores() != null && usuario.getSeguidores().getSeguidor() != null) {
@@ -116,17 +123,35 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 }
                 request.setAttribute("seguidores", seguidores);
                 request.setAttribute("seguidos", seguidos);
-                // instituciones
+
                 List<String> instituciones = Collections.emptyList();
                 try {
                     StringArray arr = port.listarInstituciones();
                     if (arr != null && arr.getItem() != null) instituciones = arr.getItem();
                 } catch (Exception ignore) {}
                 request.setAttribute("instituciones", instituciones);
-                // mapa edicion -> evento (no disponible); placeholder vacío
+
                 Map<String, String> edicionToEvento = new HashMap<>();
+                try {
+                    if (usuario.getEdiciones() != null && usuario.getEdiciones().getEdicion() != null) {
+                        for (publicadores.DtEdicion ed : usuario.getEdiciones().getEdicion()) {
+                            if (ed.getEvento() != null && ed.getEvento().getNombre() != null) {
+                                edicionToEvento.put(ed.getNombre(), ed.getEvento().getNombre());
+                            }
+                        }
+                    }
+                    if (usuario.getRegistros() != null && usuario.getRegistros().getRegistro() != null) {
+                        for (publicadores.DtRegistro reg : usuario.getRegistros().getRegistro()) {
+                            if (reg.getEdicion() != null && reg.getEvento() != null) {
+                                edicionToEvento.put(reg.getEdicion(), reg.getEvento());
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    System.out.println("[WARN] No se pudo construir edicionToEvento: " + ex.getMessage());
+                }
                 request.setAttribute("edicionToEvento", edicionToEvento);
-                // logos instituciones
+
                 Map<String,String> instFotos = new HashMap<>();
                 String[] exts = new String[]{".png",".jpg",".jpeg",".webp",".gif"};
                 ServletContext sc = getServletContext();
@@ -151,10 +176,10 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                     }
                 }
                 request.setAttribute("instFotos", instFotos);
-                // rol real del perfil
+
                 boolean esPerfilOrganizador = (usuario.getDesc() != null) || (usuario.getLink() != null);
                 request.setAttribute("esPerfilOrganizador", esPerfilOrganizador);
-                // ediciones archivables
+
                 try {
                     String nickPerfil = (usuario != null ? usuario.getNickname() : null);
                     if (esPerfilOrganizador && nickPerfil != null && !nickPerfil.isBlank()) {
@@ -167,19 +192,16 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                                 archivables.addAll(arrArch.getItem());
                             }
                         } catch (Exception ex) {
-                            System.out.println("[ARCHIV][ERROR] listarEdicionesArchivables: "
-                                    + ex.getClass().getName() + " | " + String.valueOf(ex.getMessage()));
+                            System.out.println("[ARCHIV][ERROR] listarEdicionesArchivables: " + ex.getMessage());
                         }
                         request.setAttribute("archivablesSet", archivables);
                     } else {
                         request.setAttribute("archivablesSet", java.util.Collections.emptySet());
                     }
                 } catch (Exception e) {
-                    System.out.println("[ARCHIV][ERROR] bloque archivables: "
-                            + e.getClass().getName() + " | " + String.valueOf(e.getMessage()));
                     request.setAttribute("archivablesSet", java.util.Collections.emptySet());
                 }
-                // follow flags
+
                 String nickSesion = nickEnSesion(request);
                 boolean esSuPropioPerfil = nickSesion != null && nickSesion.equals(usuario.getNickname());
                 request.setAttribute("esSuPropioPerfil", esSuPropioPerfil);
@@ -188,7 +210,7 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                     try { yaLoSigo = port.sigueA(nickSesion, usuario.getNickname()); } catch (Exception ignore) {}
                 }
                 request.setAttribute("yaLoSigo", yaLoSigo);
-                // === ARCHIVADAS: pedir wrapper y dejar también la lista + contador
+
                 try {
                     publicadores.PublicadorEventoService evSrv = new publicadores.PublicadorEventoService();
                     publicadores.PublicadorEvento evPort = evSrv.getPublicadorEventoPort();
@@ -198,15 +220,12 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                     }
                     java.util.List<publicadores.DTArchEdicion> archOrgList =
                             (archOrgWrap != null && archOrgWrap.getItem() != null)
-                            ? archOrgWrap.getItem()
-                            : java.util.Collections.emptyList();
-                    request.setAttribute("archivadasOrganizadas", archOrgWrap);          // wrapper
-                    request.setAttribute("archivadasOrganizadasList", archOrgList);      // lista para JSP
+                                    ? archOrgWrap.getItem()
+                                    : java.util.Collections.emptyList();
+                    request.setAttribute("archivadasOrganizadas", archOrgWrap);
+                    request.setAttribute("archivadasOrganizadasList", archOrgList);
                     request.setAttribute("archivadasOrganizadasCount", archOrgList.size());
-                    System.out.println("[ARCHIV][SERVLET] org=" + usuario.getNickname()
-                            + " | archivadas=" + archOrgList.size());
                 } catch (Exception ex) {
-                    System.out.println("[ARCHIV][WARN] No se pudieron obtener archivadas: " + String.valueOf(ex.getMessage()));
                     request.setAttribute("archivadasOrganizadas", null);
                     request.setAttribute("archivadasOrganizadasList", java.util.Collections.emptyList());
                     request.setAttribute("archivadasOrganizadasCount", 0);
@@ -218,15 +237,15 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         }
         request.getRequestDispatcher(JSP_CONSULTA).forward(request, response);
     }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
         String path = request.getServletPath();
-        String pathInfo    = request.getPathInfo();
+        String pathInfo = request.getPathInfo();
         PublicadorUsuarioService service = new PublicadorUsuarioService();
         PublicadorUsuario port = service.getPublicadorUsuarioPort();
-        // === Seguir / Dejar de seguir (SIN AJAX) ===
         if ("/usuario/seguir".equals(path) || "/usuario/dejarSeguir".equals(path)) {
             HttpSession sAux = request.getSession(false);
             String nickSesion = (sAux != null) ? (String) sAux.getAttribute("nick") : null;
@@ -263,12 +282,12 @@ public class ConsultaUsuarioServlet extends HttpServlet {
             }
             return;
         }
+
         if ("/usuario/modificar".equals(path)) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-        // === POST /usuario/archivarEdicion ===
-        System.out.println(path);
+
         if ("/usuario/archivarEdicion".equals(path)) {
             HttpSession sAux = request.getSession(false);
             String nickSesion = (sAux != null) ? (String) sAux.getAttribute("nick") : null;
@@ -276,8 +295,8 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/auth/login");
                 return;
             }
-            String edicionNombre = trim(request.getParameter("edicion")); // "Evento::Edicion"
-            String owner         = trim(request.getParameter("owner"));
+            String edicionNombre = trim(request.getParameter("edicion"));
+            String owner = trim(request.getParameter("owner"));
             if (isBlank(edicionNombre) || isBlank(owner)) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Faltan parámetros.");
                 return;
@@ -286,19 +305,13 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "No podés archivar ediciones de otro usuario.");
                 return;
             }
-            System.out.println("[ARCHIV][POST] solicitante=" + nickSesion + " | ed=" + edicionNombre);
             try {
                 publicadores.PublicadorEventoService evSrv = new publicadores.PublicadorEventoService();
                 publicadores.PublicadorEvento evPort = evSrv.getPublicadorEventoPort();
                 evPort.archivarEdicion(edicionNombre);
-                System.out.println("[ARCHIV][POST] OK archivar " + edicionNombre);
-                // Si preferís volver al perfil para ver la etiqueta (ARCHIVADA), podés usar:
-                // response.sendRedirect(request.getContextPath() + "/usuario/ConsultaUsuario?nick=" +
-                //         java.net.URLEncoder.encode(nickSesion, java.nio.charset.StandardCharsets.UTF_8));
                 response.sendRedirect(request.getContextPath() + "/");
                 return;
             } catch (Exception ex) {
-                System.out.println("[ARCHIV][POST][ERR] " + ex.getClass().getName() + " : " + ex.getMessage());
                 response.sendRedirect(request.getContextPath() + "/?error=" +
                         java.net.URLEncoder.encode("No se pudo archivar: " + ex.getMessage(),
                                 java.nio.charset.StandardCharsets.UTF_8));
@@ -307,10 +320,12 @@ public class ConsultaUsuarioServlet extends HttpServlet {
         }
         doGet(request, response);
     }
+
     private String nickEnSesion(HttpServletRequest req) {
         HttpSession sAux = req.getSession(false);
         return sAux == null ? null : (String) sAux.getAttribute("nick");
     }
+
     private static String trim(String s) { return (s == null) ? null : s.trim(); }
     private static boolean isBlank(String s) { return s == null || s.trim().isEmpty(); }
     private static boolean isTrue(String v) {
