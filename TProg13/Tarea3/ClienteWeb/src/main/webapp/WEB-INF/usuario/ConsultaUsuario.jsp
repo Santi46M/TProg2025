@@ -186,31 +186,80 @@
 
       <% } else { %>
         <!-- ===========================
-             PERFIL INDIVIDUAL
-        ============================ -->
-        <h1>Perfil de <%= usuario.getNickname() %></h1>
+     PERFIL INDIVIDUAL
+============================ -->
+<h1>Perfil de <%= usuario.getNickname() %></h1>
 
-        <div class="perfil-header">
-          <%
-            String imgName = (usuario != null) ? usuario.getImagen() : null;
-            String avatarSrc = (imgName != null && !imgName.isBlank())
-                               ? (ctx + "/img/usuarios/" + imgName)
-                               : (ctx + "/img/user-default.jpg");
-          %>
-          <img class="avatar" src="<%= avatarSrc %>" alt="Avatar de <%= usuario.getNickname() %>" onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
-          <div id="datosUsuario">
-            <div class="follow-bar" style="margin:.5rem 0;">
-              <% if (!esSuPropioPerfil && nickSesion != null) { %>
-                <form class="follow-form" data-nick="<%= usuario.getNickname() %>" action="<%= ctx %>/<%= (!yaLoSigo ? "usuario/seguir" : "usuario/dejarSeguir") %>" method="post" style="display:inline;">
-                  <input type="hidden" name="a" value="<%= usuario.getNickname() %>">
-                  <button type="submit" class="btn"><%= (!yaLoSigo ? "Seguir" : "Siguiendo") %></button>
-                </form>
-              <% } %>
-            </div>
-            <p><strong>Nickname:</strong> <span><%= usuario.getNickname() %></span></p>
-            <p><strong>Email:</strong> <span><%= usuario.getEmail()%></span></p>
-          </div>
-        </div>
+<div class="perfil-header">
+  <%
+    String imgName   = (usuario != null) ? usuario.getImagen() : null;
+    String avatarSrc = (imgName != null && !imgName.isBlank())
+                       ? (ctx + "/img/usuarios/" + imgName)
+                       : (ctx + "/img/user-default.jpg");
+
+    // Campos opcionales por rol (con tolerancia a stubs distintos)
+    String descripcion = null, link = null, apellido = null, institucion = null;
+    String fechaNac = null;
+
+    try { descripcion = usuario.getDesc(); } catch (Throwable ignore) {}
+    try { link        = usuario.getLink(); } catch (Throwable ignore) {}
+
+    try { apellido    = usuario.getApellido(); } catch (Throwable ignore) {}
+    try { fechaNac    = usuario.getFechaNac(); } catch (Throwable ignore) {}
+    try { institucion = usuario.getNombreInstitucion(); } catch (Throwable ignore) {}
+    if (institucion == null || institucion.isBlank()) {
+      try { institucion = usuario.getNombreInstitucion(); } catch (Throwable ignore) {}
+    }
+  %>
+
+  <img class="avatar"
+       src="<%= avatarSrc %>"
+       alt="Avatar de <%= usuario.getNickname() %>"
+       onerror="this.onerror=null;this.src='<%=ctx%>/img/user-default.jpg';">
+
+  <div id="datosUsuario">
+    <div class="follow-bar" style="margin:.5rem 0;">
+      <% if (!esSuPropioPerfil && nickSesion != null) { %>
+        <form class="follow-form"
+              data-nick="<%= usuario.getNickname() %>"
+              action="<%= ctx %>/<%= (!yaLoSigo ? "usuario/seguir" : "usuario/dejarSeguir") %>"
+              method="post"
+              style="display:inline;">
+          <input type="hidden" name="a" value="<%= usuario.getNickname() %>">
+          <button type="submit" class="btn"><%= (!yaLoSigo ? "Seguir" : "Siguiendo") %></button>
+        </form>
+      <% } %>
+    </div>
+
+    <!-- Datos básicos -->
+    <p><strong>Nickname:</strong> <span><%= usuario.getNickname() %></span></p>
+    <p><strong>Email:</strong>    <span><%= usuario.getEmail() %></span></p>
+    <% if (usuario.getNombre() != null && !usuario.getNombre().isBlank()) { %>
+      <p><strong>Nombre:</strong>   <span><%= usuario.getNombre() %></span></p>
+    <% } %>
+
+    <!-- Datos específicos de ASISTENTE (si existen en el DTO) -->
+    <% if (apellido != null && !apellido.isBlank()) { %>
+      <p><strong>Apellido:</strong> <span><%= apellido %></span></p>
+    <% } %>
+    <% if (fechaNac != null) { %>
+      <p><strong>Fecha de nacimiento:</strong> <span><%= fechaNac %></span></p>
+    <% } %>
+    <% if (institucion != null && !institucion.isBlank()) { %>
+      <p><strong>Institución:</strong> <span><%= institucion %></span></p>
+    <% } %>
+
+    <!-- Datos específicos de ORGANIZADOR (si existen en el DTO) -->
+    <% if (descripcion != null && !descripcion.isBlank()) { %>
+      <p><strong>Descripción:</strong> <span><%= descripcion %></span></p>
+    <% } %>
+    <% if (link != null && !link.isBlank()) { %>
+      <p><strong>Sitio web:</strong>
+        <a href="<%= link %>" target="_blank" rel="noopener"><%= link %></a>
+      </p>
+    <% } %>
+  </div>
+</div>
 
         <!-- ====== ALERTS (si vinieron del servlet) ====== -->
         <div class="alerts-stack" style="display:grid; gap:.5rem; margin: .5rem 0 1rem;">
