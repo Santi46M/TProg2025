@@ -36,14 +36,6 @@ public class PublicadorEstadisticas {
         System.out.println("WSDL disponible en: " + address + "?wsdl");
     }
 
-    // --- Métodos auxiliares para IP y puerto ---
-    private String obtenerIpLocal() {
-        return ConfigLoader.get("ipServidor") != null ? ConfigLoader.get("ipServidor") : "localhost";
-    }
-
-    private String obtenerPuerto() {
-        return ConfigLoader.get("puerto") != null ? ConfigLoader.get("puerto") : "8090";
-    }
 
     /* =============================
        LÓGICA DEL SERVICIO
@@ -75,6 +67,27 @@ public class PublicadorEstadisticas {
         if (lista.size() > n) lista = lista.subList(0, n);
 
         return lista.toArray(new DTTopEvento[0]);
+    }
+    
+    @WebMethod
+    public void setVisitasEvento(@WebParam(name = "eventoNombre") String eventoNombre,
+                                 @WebParam(name = "cantidad") int cantidad) {
+        if (eventoNombre == null || eventoNombre.isBlank() || cantidad < 0) return;
+        VISITAS.put(eventoNombre, cantidad);
+        System.out.println("[ESTAD] setVisitas '" + eventoNombre + "' = " + cantidad);
+    }
+
+    @WebMethod
+    public void resetVisitas() {
+        VISITAS.clear();
+        System.out.println("[ESTAD] resetVisitas() → mapa vacío");
+    }
+    
+    @WebMethod(exclude = true)
+    public void seedVisitasLocal(String eventoNombre, int cantidad) {
+        if (eventoNombre == null || eventoNombre.isBlank() || cantidad < 0) return;
+        VISITAS.put(eventoNombre, cantidad);
+        System.out.println("[ESTAD][SEED] '" + eventoNombre + "' = " + cantidad);
     }
 
     @WebMethod(exclude = true)

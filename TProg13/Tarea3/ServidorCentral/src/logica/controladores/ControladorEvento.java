@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.LinkedHashSet;
 
 
@@ -1285,8 +1287,7 @@ public class ControladorEvento implements IControladorEvento {
 		    em.close();
 		  }
 		}
-
-
+	
 
 	}
 

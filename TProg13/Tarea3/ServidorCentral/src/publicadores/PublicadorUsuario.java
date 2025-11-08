@@ -43,14 +43,6 @@ public class PublicadorUsuario {
         System.out.println("WSDL disponible en: " + address + "?wsdl");
     }
 
-    // --- Métodos auxiliares internos para IP y puerto ---
-    private String obtenerIpLocal() {
-        return ConfigLoader.get("ipServidor") != null ? ConfigLoader.get("ipServidor") : "localhost";
-    }
-
-    private String obtenerPuerto() {
-        return ConfigLoader.get("puerto") != null ? ConfigLoader.get("puerto") : "8090";
-    }
 
     /* =============================
        Métodos del servicio (sin cambios)

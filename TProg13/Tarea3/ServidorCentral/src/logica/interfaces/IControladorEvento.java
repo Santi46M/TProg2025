@@ -22,6 +22,7 @@ import logica.datatypes.DTEvento;
 import logica.datatypes.DTPatrocinio;
 import logica.datatypes.DTRegistro;
 import logica.datatypes.DTTipoRegistro;
+import logica.datatypes.DTTopEvento;
 import logica.enumerados.DTNivel;
 
 
@@ -117,5 +118,6 @@ public interface IControladorEvento {
     public void archivarEdicion(String nombreEdicion); 
     public void marcarAsistencia(String idRegistro);
     public List<DTArchEdicion> edicionesArchivadasOrganizadas(String nickOrg);
+
 
 }

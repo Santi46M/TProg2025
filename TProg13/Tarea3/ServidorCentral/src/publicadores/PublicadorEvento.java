@@ -45,13 +45,6 @@ public class PublicadorEvento {
         System.out.println("WSDL disponible en: " + address + "?wsdl");
     }
 
-    private String obtenerIpLocal() {
-        return ConfigLoader.get("ipServidor") != null ? ConfigLoader.get("ipServidor") : "localhost";
-    }
-
-    private String obtenerPuerto() {
-        return ConfigLoader.get("puerto") != null ? ConfigLoader.get("puerto") : "8090";
-    }
 
     /* ===========================
        MÉTODOS DEL SERVICIO

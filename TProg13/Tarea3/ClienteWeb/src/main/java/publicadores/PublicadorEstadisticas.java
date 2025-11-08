@@ -39,6 +39,19 @@ public interface PublicadorEstadisticas {
 
     /**
      * 
+     * @param cantidad
+     * @param eventoNombre
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEstadisticas/setVisitasEventoRequest", output = "http://publicadores/PublicadorEstadisticas/setVisitasEventoResponse")
+    public void setVisitasEvento(
+        @WebParam(name = "eventoNombre", partName = "eventoNombre")
+        String eventoNombre,
+        @WebParam(name = "cantidad", partName = "cantidad")
+        int cantidad);
+
+    /**
+     * 
      * @param eventoNombre
      */
     @WebMethod
@@ -46,5 +59,12 @@ public interface PublicadorEstadisticas {
     public void registrarVisita(
         @WebParam(name = "eventoNombre", partName = "eventoNombre")
         String eventoNombre);
+
+    /**
+     * 
+     */
+    @WebMethod
+    @Action(input = "http://publicadores/PublicadorEstadisticas/resetVisitasRequest", output = "http://publicadores/PublicadorEstadisticas/resetVisitasResponse")
+    public void resetVisitas();
 
 }

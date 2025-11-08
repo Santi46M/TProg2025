@@ -157,6 +157,20 @@ public class CargaDatosPrueba {
         manejadorEve.obtenerEvento("Expointer Uruguay").setVigente(true);
         manejadorEve.obtenerEvento("Montevideo Fashion Week").setVigente(true);
         manejadorEve.obtenerEvento("Global").setVigente(true);
+        
+        try {
+           
+            publicadores.PublicadorEstadisticas stats = new publicadores.PublicadorEstadisticas();
+            
+            stats.seedVisitasLocal("Conferencia de Tecnología", 2);
+            stats.seedVisitasLocal("Feria del Libro", 10);
+            stats.seedVisitasLocal("Montevideo Rock", 25);
+            stats.seedVisitasLocal("Maratón de Montevideo", 13);
+            stats.seedVisitasLocal("Montevideo Comics", 5);
+            stats.seedVisitasLocal("Expointer Uruguay", 10);
+            stats.seedVisitasLocal("Montevideo Fashion Week", 8);
+            stats.seedVisitasLocal("Global", 20);
+        } catch (Exception ignore) { }
 
 
     }
