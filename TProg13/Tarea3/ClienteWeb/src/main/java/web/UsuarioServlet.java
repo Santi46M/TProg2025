@@ -90,38 +90,34 @@ public class UsuarioServlet extends HttpServlet {
     String nombreArchivo = null;
 
     if (imagenPart != null && imagenPart.getSize() > 0) {
-      String ctype = imagenPart.getContentType();
-      if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
-        req.setAttribute("error", "El archivo subido no es una imagen válida.");
-        cargarInstituciones(req, port);
-        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-        return;
-      }
+        String ctype = imagenPart.getContentType();
+        if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
+            req.setAttribute("error", "El archivo subido no es una imagen válida.");
+            cargarInstituciones(req, port);
+            req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+            return;
+        }
 
-      String tomcatBase = System.getProperty("catalina.base");
+        String tomcatBase = System.getProperty("catalina.base");
+        Path basePath = Path.of(tomcatBase, "webapps", "ServidorCentral-0.0.1-SNAPSHOT", "images", "usuarios");
+        Files.createDirectories(basePath);
 
-      // Carpeta destino real (ServidorCentral)
-      String baseImg = tomcatBase + "/webapps/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios";
-      Files.createDirectories(Path.of(baseImg));
+        String original = getSafeFilename(imagenPart);
+        String ext = getExtension(original);
+        if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
+        if (ext == null || ext.isBlank()) ext = ".jpg";
 
-      // nombre original del archivo
-      String original = getSafeFilename(imagenPart);
-      String ext = getExtension(original);
-      if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
-      if (ext == null || ext.isBlank()) ext = ".jpg";
 
-      // ✅ Usar directamente el nombre original
-      String finalName = original;
-      Path destino = Path.of(baseImg, finalName);
+        String safeNick = req.getParameter("nick").replaceAll("[^a-zA-Z0-9_-]", "_");
+        String finalName = safeNick + ext;
 
-      try (var in = imagenPart.getInputStream()) {
-        Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-      }
-      
+        Path destino = basePath.resolve(finalName);
+        try (var in = imagenPart.getInputStream()) {
+            Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+        }
 
-      nombreArchivo = finalName;
-      System.out.println("✅ Imagen guardada: " + destino.toAbsolutePath()
-          + " | URL: " + ctx(req) + IMG_REL_BASE_USR + "/" + finalName);
+        nombreArchivo = finalName;
+        System.out.println("✅ Imagen guardada en: " + destino.toAbsolutePath());
     }
 
     // === leer params ===

@@ -104,11 +104,13 @@
           <h1 class="event-title"><%= (edicion != null ? edicion.getNombre() : "Edición") %></h1>
         </div>
 
-        <% if (hasAnyImg) { %>
-          <div class="img-frame">
-            <img src="<%= edImagenUrl %>" alt="Imagen de la edición <%= (edicion != null ? edicion.getNombre() : "") %>">
-          </div>
-        <% } %>
+<% if (hasAnyImg) { %>
+  <div class="img-frame">
+    <img src="<%= "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/" + edicion.getImagen() %>"
+         alt="Imagen de la edición <%= (edicion != null ? edicion.getNombre() : "") %>"
+         onerror="this.onerror=null;this.src='<%=ctx%>/img/evento-default.jpg';">
+  </div>
+<% } %>
 
         <% if (hasVideo) { %>
           <div class="img-frame video-frame" style="margin: 0.5rem auto 1rem;">
