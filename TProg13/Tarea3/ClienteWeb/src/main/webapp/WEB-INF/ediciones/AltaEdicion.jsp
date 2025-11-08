@@ -114,7 +114,7 @@
                     <%= (request.getAttribute("sinEventos") != null && (Boolean)request.getAttribute("sinEventos")) ? "disabled" : "" %>>
               <i class='bx bx-save'></i> Guardar
             </button>
-            <button type="submit" class="btn-cancelar-altaEvento" name="accion" value="cancelar">
+            <button type="button" class="btn-cancelar-altaEvento" onclick="window.location='<%=ctx%>/inicio'">
               <i class='bx bx-x-circle'></i> Cancelar
             </button>
           </div>
@@ -123,11 +123,6 @@
         <script>
           (function () {
             const form = document.getElementById('form-alta-edicion');
-            const cancelarBtn = document.querySelector('.btn-cancelar-altaEvento');
-            cancelarBtn.addEventListener('click', function() {
-              Array.from(form.querySelectorAll('[required]')).forEach(i => i.removeAttribute('required'));
-            });
-
             const inputImg = form.querySelector('input[type="file"]');
             const MAX_BYTES = 2 * 1024 * 1024;
             if (inputImg) {

@@ -13,8 +13,7 @@
   Boolean yaRegistrado = (Boolean) request.getAttribute("yaRegistrado");
   if (yaRegistrado == null) yaRegistrado = false;
 
-  // Do not attempt to compare generated LocalDate with java.time.LocalDate here.
-  // Use a servlet-provided boolean 'cerrada' if available; otherwise default to false.
+
   Boolean cerradaAttr = (Boolean) request.getAttribute("cerrada");
   boolean cerrada = (cerradaAttr != null) ? cerradaAttr.booleanValue() : false;
 %>
@@ -110,12 +109,15 @@
                 </span>
               </label>
             <% } %>
-            <div class="form-group-registroEdicionEvento" style="margin-top:1rem">
+            <div class="form-group-registroEdicionEvento" style="margin-top:1rem; display:flex; gap:1rem;">
               <label for="codigoPatrocinio">Código de patrocinio (opcional)</label>
               <input id="codigoPatrocinio" name="codigoPatrocinio" placeholder="Ej: CORREANTEL"/>
               <small>Si es válido, el costo será $0.</small>
             </div>
-            <button type="submit" class="btn-guardar-registroEdicionEvento" style="margin-top:1rem;">Confirmar inscripción</button>
+            <div style="margin-top:1rem; display:flex; gap:1rem;">
+              <button type="submit" class="btn-guardar-registroEdicionEvento">Confirmar inscripción</button>
+              <button type="button" class="btn ghost btn-cancelar-registroEdicionEvento" onclick="window.location='<%=ctx%>/inicio'">Cancelar</button>
+            </div>
           </form>
         <% } %>
       </section>

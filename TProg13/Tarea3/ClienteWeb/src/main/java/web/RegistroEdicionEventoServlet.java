@@ -76,7 +76,6 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             for (String nombreEdicion : claves) {
                 DtEdicion ed = null;
                 try {
-                    // Ya sabemos que listarEdicionesEvento devuelve NOMBRES, no siglas
                     ed = port.obtenerDtEdicion(nombreEv, nombreEdicion);
                 } catch (Exception ignore) { }
 
@@ -109,7 +108,6 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
                 try { if (edSel.getTiposRegistro() != null && edSel.getTiposRegistro().getTipoRegistro() != null) tipos.addAll(edSel.getTiposRegistro().getTipoRegistro()); } catch (Exception ignore) {}
                 req.setAttribute("tiposRegistro", tipos);
 
-                // Calcular cupos disponibles y si el usuario ya está registrado
                 Map<String, Integer> cuposDisponibles = new HashMap<>();
                 if (tipos != null) {
                     for (DtTipoRegistro tipo : tipos) {
@@ -161,7 +159,6 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             return;
         }
 
-        // 🔹 Obtener usuario via publicador
         PublicadorUsuario portU = obtenerPortUsuario();
         DtDatosUsuario dtUsuario = null;
         try {
@@ -176,7 +173,6 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             return;
         }
 
-        // 🔹 Resolver evento / edición
         PublicadorEvento port = obtenerPortEvento();
 
         List<DtEvento> eventos = new ArrayList<>();
@@ -194,7 +190,6 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             return;
         }
 
-        // 🔹 Tipo de registro seleccionado
         DtTipoRegistro tipoSel = null;
         try {
             if (edSel.getTiposRegistro() != null && edSel.getTiposRegistro().getTipoRegistro() != null) {
@@ -236,31 +231,42 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             }
         }
 
-        // 🔹 Registrar inscripción usando el nuevo método del web service
         try {
             String idRegistro = UUID.randomUUID().toString();
             LocalDate fechaRegistro = LocalDate.now();
 
-            // El método altaRegistroEdicionEventoDT espera fechas como String (yyyy-MM-dd)
             String fechaRegistroStr = fechaRegistro.toString();
-            String fechaInicioStr   = fechaRegistroStr; // Si querés usar otra fecha, ajustalo
+            String fechaInicioStr   = fechaRegistroStr;
 
-            // 🔸 Llamada directa al nuevo método sin reflexión
             port.altaRegistroEdicionEventoDT(
-                idRegistro,                         // idRegistro
-                nick,                               // nicknameUsuario
-                res != null ? res.nombreEvento : "",// nombreEvento
-                edicionParam,                       // nombreEdicion
-                tipoNom,                            // nombreTipoRegistro
-                fechaRegistroStr,                   // fechaRegistroStr
-                costo,                              // costo
-                fechaInicioStr                      // fechaInicioStr
+                idRegistro,                         
+                nick,                               
+                res != null ? res.nombreEvento : "",
+                edicionParam,                       
+                tipoNom,                            
+                fechaRegistroStr,                   
+                costo,                              
+                fechaInicioStr                      
             );
 
             resp.sendRedirect(req.getContextPath() + "/inicio");
 
         } catch (Exception e) {
-            req.setAttribute("error", e.getMessage());
+            String msg = e.getMessage();
+            if (msg != null && msg.contains("ya finalizó")) {
+                String nombre = edicionParam;
+                String fecha = "";
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("finalizó el (\\d{4}-\\d{2}-\\d{2})").matcher(msg);
+                if (m.find()) fecha = m.group(1);
+                String fechaFormateada = fecha;
+                try {
+                    java.time.LocalDate f = java.time.LocalDate.parse(fecha);
+                    fechaFormateada = String.format("%02d/%02d/%04d", f.getDayOfMonth(), f.getMonthValue(), f.getYear());
+                } catch (Exception ignore) {}
+                req.setAttribute("error", String.format("No puedes inscribirte porque la edición '%s' finalizó el %s.", nombre, fechaFormateada));
+            } else {
+                req.setAttribute("error", "No se pudo realizar la inscripción: " + (msg != null ? msg : "Error desconocido."));
+            }
             doGet(req, resp);
         }
     }
