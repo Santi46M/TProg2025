@@ -484,14 +484,15 @@ public class ControladorEvento implements IControladorEvento {
             if (!eventIter.getVigente()) {
 				continue;
 			}
-        	lista.add(new DTEvento(
-                eventIter.getNombre(),
-                eventIter.getSigla(),
-                eventIter.getDescripcion(),
-                eventIter.getFecha(),
-                new ArrayList<>(eventIter.getCategorias().keySet()),
-                new ArrayList<>(eventIter.getEdiciones().keySet())
-            ));
+            lista.add(new DTEvento(
+            	    eventIter.getNombre(),
+            	    eventIter.getSigla(),
+            	    eventIter.getDescripcion(),
+            	    eventIter.getFecha(),
+            	    new ArrayList<>(eventIter.getCategorias().keySet()),
+            	    new ArrayList<>(eventIter.getEdiciones().keySet()),
+            	    eventIter.getImagen() 
+            	));
         }
         return lista;
     }

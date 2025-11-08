@@ -36,7 +36,7 @@ public class EventoServlet extends HttpServlet {
     private static final String JSP_LISTAR = "/WEB-INF/evento/listado.jsp";
 
     // carpeta pública donde se guardan subidas
-    private static final String UPLOAD_PUBLIC_DIR = "/img/eventos";
+    private static final String UPLOAD_PUBLIC_DIR = "/images/eventos";
 
     // no usar la lógica local; se consumen los publicadores
     private String ctx(HttpServletRequest req) { return req.getContextPath(); }
@@ -243,33 +243,25 @@ public class EventoServlet extends HttpServlet {
                 Part imgPart = null;
                 try { imgPart = req.getPart("imagen"); } catch (IllegalStateException ise) { imgPart = null; }
                 if (imgPart != null && imgPart.getSize() > 0) {
+                    String safeName = nombre.replaceAll("[^a-zA-Z0-9_-]", "_");
                     String ctype = imgPart.getContentType();
-                    if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
-                        req.setAttribute("error", "El archivo subido no es una imagen válida.");
-                        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-                        return;
+                    String ext = getExtension(getSafeFilename(imgPart));
+                    if (isBlank(ext)) ext = guessExtensionFromContentType(ctype);
+                    if (isBlank(ext)) ext = ".jpg";
+                    String finalName = "IMG-" + safeName + ext;
+
+                    String baseImg = getServletContext().getRealPath("/images/eventos");
+                    if (baseImg == null) {
+                        baseImg = Path.of(getServletContext().getRealPath("/"), "images", "eventos").toString();
                     }
 
-                    String baseImg = getServletContext().getRealPath(UPLOAD_PUBLIC_DIR);
-                    if (baseImg == null) {
-                        String root = getServletContext().getRealPath("/");
-                        if (root != null) baseImg = Path.of(root, "img", "eventos").toString();
-                    }
-                    if (baseImg != null) {
-                        Files.createDirectories(Path.of(baseImg));
-                        String original = getSafeFilename(imgPart);
-                        String ext = getExtension(original);
-                        if (isBlank(ext)) ext = guessExtensionFromContentType(ctype);
-                        if (isBlank(ext)) ext = ".jpg";
-                        String finalName = (isBlank(sigla) ? "evento" : sigla) + ext;
-                        Path destino = Path.of(baseImg, finalName);
-                        imgPart.write(destino.toAbsolutePath().toString());
-                        imagenFileName = finalName;
-                        System.out.println("[IMG] Guardada en: " + destino + " | URL: " + ctx(req) + UPLOAD_PUBLIC_DIR + "/" + finalName);
-                    } else {
-                        System.err.println("WARN: No se pudo resolver ruta física para " + UPLOAD_PUBLIC_DIR);
-                    }
+                    Files.createDirectories(Path.of(baseImg));
+                    Path destino = Path.of(baseImg, finalName);
+                    imgPart.write(destino.toAbsolutePath().toString());
+                    imagenFileName = finalName;
+                    System.out.println("[IMG] Guardada en: " + destino);
                 }
+                
             } catch (Exception fileEx) {
                 req.setAttribute("error", "Error al procesar la imagen: " + fileEx.getMessage());
                 req.getRequestDispatcher(JSP_ALTA).forward(req, resp);

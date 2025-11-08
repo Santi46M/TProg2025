@@ -3,7 +3,6 @@
   String ctx  = request.getContextPath();
   String nick = (String) session.getAttribute("nick");
 
-  // Prefer request-provided event if servlet set it; otherwise fetch using webservice
   DtEvento ev = null;
   Object reqEv = request.getAttribute("evento");
   String paramNombre = request.getParameter("nombre");
@@ -22,32 +21,21 @@
   String evNombre = (ev != null ? ev.getNombre() : null);
   String evSigla  = (ev != null ? ev.getSigla() : null);
   String evDesc   = (ev != null ? ev.getDescripcion() : null);
-  // use the generated LocalDate type (publicadores.LocalDate) to avoid type mismatch
-	String evFecha = (ev != null ? ev.getFecha() : "");
-  List<String> evCategorias = (ev != null && ev.getCategorias() != null) ? ev.getCategorias().getCategoria() : Collections.emptyList();
+  String evFecha  = (ev != null ? String.valueOf(ev.getFecha()) : "");
+  List<String> evCategorias = (ev != null && ev.getCategorias() != null)
+      ? ev.getCategorias().getCategoria() : Collections.emptyList();
 
-  String raw = (String) request.getAttribute("evImagenUrl");
+  String baseUrl = "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/";
+  String img = (ev != null ? ev.getImagen() : null);
+  String evImagenUrl = (img != null && !img.isBlank())
+      ? (img.startsWith("IMG-EV") ? baseUrl + "eventos/" + img
+        : img.startsWith("IMG-ED") ? baseUrl + "ediciones/" + img
+        : img.startsWith("IMG-US") ? baseUrl + "usuarios/" + img
+        : baseUrl + "eventos/" + img)
+      : (baseUrl + "eventos/evento-default.png");
 
-  if ((raw == null || raw.isBlank()) && ev != null) {
-      raw = ev.getImagen();
-  }
+  boolean hasImgCandidate = (evImagenUrl != null && !evImagenUrl.isBlank());
 
-  String evImagenUrl = null;
-  boolean hasImgCandidate = false;
-  if (raw != null && !raw.isBlank()) {
-      if (raw.startsWith("http://") || raw.startsWith("https://")) {
-          evImagenUrl = raw;                       
-      } else if (raw.startsWith(ctx + "/")) {
-          evImagenUrl = raw;                      
-      } else if (raw.startsWith("/")) {
-          evImagenUrl = ctx + raw;                 
-      } else {
-          evImagenUrl = ctx + "/img/eventos/" + raw; 
-      }
-      hasImgCandidate = (evImagenUrl != null && !evImagenUrl.isBlank());
-  }
-
-  // ediciones: prefer request attribute, otherwise fetch via publicador
   List<DtEdicion> ediciones = (List<DtEdicion>) request.getAttribute("evEdiciones");
   try {
     if ((ediciones == null || ediciones.isEmpty()) && ev != null) {
@@ -79,30 +67,16 @@
   <link rel="stylesheet" href="<%=ctx%>/css/layoutMenu.css">
   <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
   <style>
-    /* ---- layout principal ---- */
     .event-hero { display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem; }
-    .event-hero.no-img { display:block; } /* cuando no hay imagen, el texto ocupa todo */
-
-    /* ---- bloque de imagen: oculto por defecto */
+    .event-hero.no-img { display:block; }
     .event-hero__img { display:none; width:360px; max-width:40vw; aspect-ratio:16/9; background:#f3f4f6; border-radius:12px; overflow:hidden; flex-shrink:0; }
     .event-hero.has-img .event-hero__img { display:block; }
-
     .event-hero__img img { width:100%; height:100%; object-fit:cover; display:block; }
-
     .chips { display:flex; flex-wrap:wrap; gap:.4rem; }
     .chip { background:#eef2ff; color:#3730a3; padding:.2rem .5rem; border-radius:999px; font-size:.9rem; }
     .ediciones-list { list-style:none; padding:0; margin:0; display:grid; gap:.6rem; }
-    .ediciones-list li {
-	  display:flex;
-	  align-items:center;
-	  gap:.5rem;
-	  justify-content:space-between;
-	  border:1px solid var(--line);
-	  border-radius:10px;
-	  padding:.5rem .75rem;
-	  background:#fff; /* ← esto es lo que causa el bloque blanco */
-	}
-	.btn { border:none; padding:.35rem .7rem; border-radius:8px; cursor:pointer; }
+    .ediciones-list li { display:flex; align-items:center; gap:.5rem; justify-content:space-between; border:1px solid var(--line); border-radius:10px; padding:.5rem .75rem; background:#fff; }
+    .btn { border:none; padding:.35rem .7rem; border-radius:8px; cursor:pointer; }
     .btn-ver-detalles { background:#111827; color:#fff; }
   </style>
   <link rel="stylesheet" href="<%=ctx%>/css/custom.css">
@@ -123,7 +97,7 @@
                 src="<%= evImagenUrl %>"
                 alt="Imagen de <%= (evNombre != null ? evNombre : "Evento") %>"
                 onload="this.closest('.event-hero')?.classList.add('has-img');"
-                onerror="const hero=this.closest('.event-hero'); if(hero){ hero.classList.add('no-img'); } this.parentElement.remove();"
+                onerror="this.onerror=null;this.src='<%=baseUrl%>eventos/evento-default.png';"
               >
             </div>
           <% } %>
@@ -149,16 +123,13 @@
               <div class="event-meta" style="margin-top:.5rem;">
                 <p><strong>Fecha:</strong> <%= evFecha %></p>
               </div>
-              
-              
-               <% if ("ORGANIZADOR".equalsIgnoreCase(rolUsuario)){ %> 
 
+              <% if ("ORGANIZADOR".equalsIgnoreCase(rolUsuario)) { %>
                 <form action="<%= ctx %>/evento/FinalizarEvento" method="post" style="margin-top:1rem;">
-  					<input type="hidden" name="nombreEvento" value="<%= evNombre %>" />
-  					<button type="submit" class="btn btn-finalizar-evento">Finalizar evento</button>
-				</form>
-				
-			<%} %> 
+                  <input type="hidden" name="nombreEvento" value="<%= evNombre %>" />
+                  <button type="submit" class="btn btn-finalizar-evento">Finalizar evento</button>
+                </form>
+              <% } %>
             </div>
           </div>
         </div>
@@ -167,13 +138,9 @@
 
     <aside class="card event-card" style="min-width:300px; flex:1; margin-left:2rem; align-self:flex-start;">
       <h3>Ediciones</h3>
-      <%
-        if (ediciones == null || ediciones.isEmpty()) {
-      %>
+      <% if (ediciones == null || ediciones.isEmpty()) { %>
         <p>No hay ediciones asociadas a este evento.</p>
-      <%
-        } else {
-      %>
+      <% } else { %>
         <ul class="ediciones-list li">
         <% for (DtEdicion ed : ediciones) { %>
           <li>

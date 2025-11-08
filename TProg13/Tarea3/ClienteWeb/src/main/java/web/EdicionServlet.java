@@ -27,7 +27,7 @@ public class EdicionServlet extends HttpServlet {
   private static final String JSP_ALTA     = "/WEB-INF/ediciones/AltaEdicion.jsp";
   private static final String JSP_CONSULTA = "/WEB-INF/ediciones/ConsultaEdicion.jsp";
   private static final String JSP_LISTADO  = "/WEB-INF/ediciones/ListarEdiciones.jsp";
-  private static final String UPLOAD_PUBLIC_DIR_ED = "/img/ediciones";
+  private static final String UPLOAD_PUBLIC_DIR_ED = "/images/ediciones";
 
   private String ctx(HttpServletRequest req) { return req.getContextPath(); }
 
@@ -252,29 +252,29 @@ public class EdicionServlet extends HttpServlet {
   }
 
   private String guardarImagen(HttpServletRequest req, Part imagen, String nombre) throws IOException {
-    if (imagen == null || imagen.getSize() == 0) return null;
+	    if (imagen == null || imagen.getSize() == 0) return null;
 
-    String ctype = imagen.getContentType();
-    if (ctype == null || !ctype.toLowerCase().startsWith("image/"))
-      throw new IOException("El archivo subido no es una imagen válida.");
+	    String ctype = imagen.getContentType();
+	    if (ctype == null || !ctype.toLowerCase().startsWith("image/"))
+	        throw new IOException("El archivo subido no es una imagen válida.");
 
-    String baseImg = getServletContext().getRealPath(UPLOAD_PUBLIC_DIR_ED);
-    if (baseImg == null) {
-      String root = getServletContext().getRealPath("/");
-      if (root != null) baseImg = Path.of(root, "img", "ediciones").toString();
-    }
+	    String safeName = nombre.replaceAll("[^a-zA-Z0-9_-]", "_");
+	    String ext = getExtension(getSafeFilename(imagen));
+	    if (isBlank(ext)) ext = guessExtensionFromContentType(ctype);
+	    if (isBlank(ext)) ext = ".jpg";
+	    String finalName = "IMG-" + safeName + ext;
 
-    Files.createDirectories(Path.of(baseImg));
-    String original = getSafeFilename(imagen);
-    String ext = getExtension(original);
-    if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
-    if (ext == null || ext.isBlank()) ext = ".jpg";
+	    String baseImg = getServletContext().getRealPath("/images/ediciones");
+	    if (baseImg == null) {
+	        baseImg = Path.of(getServletContext().getRealPath("/"), "images", "ediciones").toString();
+	    }
 
-    String finalName = (isBlank(nombre) ? "edicion" : nombre) + ext;
-    Path destino = Path.of(baseImg, finalName);
-    imagen.write(destino.toAbsolutePath().toString());
-    return finalName;
-  }
+	    Files.createDirectories(Path.of(baseImg));
+	    Path destino = Path.of(baseImg, finalName);
+	    imagen.write(destino.toAbsolutePath().toString());
+	    System.out.println("[IMG] Guardada en: " + destino);
+	    return finalName;
+	}
 
   private List<DtEdicion> listarEdicionesEventoCompleto(String nombreEvento, publicadores.PublicadorEvento port) {
     List<DtEdicion> lista = new ArrayList<>();
@@ -342,28 +342,15 @@ public class EdicionServlet extends HttpServlet {
   }
 
   private String resolveImagenUrlEdicion(HttpServletRequest req, String raw) {
-    if (raw == null || raw.isBlank()) return null;
-    String ctx = ctx(req);
-    String lower = raw.toLowerCase();
+	    if (raw == null || raw.isBlank()) return null;
+	    raw = raw.trim();
 
-    if (lower.startsWith("http://") || lower.startsWith("https://")) return raw;
-    if (raw.startsWith("/")) return raw.startsWith(ctx + "/") ? raw : (ctx + raw);
+	    // Si ya es una URL absoluta, se deja igual
+	    if (raw.startsWith("http://") || raw.startsWith("https://"))
+	        return raw;
 
-    String[] candidates = new String[] {
-      "/img/" + raw,
-      "/img/ediciones/" + raw,
-      "/ediciones/" + raw
-    };
-    for (String rel : candidates) {
-      String abs = getServletContext().getRealPath(rel);
-      boolean exists;
-      if (abs != null) {
-        exists = Files.exists(Path.of(abs));
-      } else {
-        exists = true;
-      }
-      if (exists) return ctx + rel;
-    }
-    return null;
-  }
+	    // URL base del ServidorCentral
+	    String baseUrl = "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/";
+	    return baseUrl + raw;
+	}
 }
