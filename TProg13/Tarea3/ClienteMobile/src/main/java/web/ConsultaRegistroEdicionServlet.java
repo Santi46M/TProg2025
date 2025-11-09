@@ -108,6 +108,55 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
             return;
         }
         try {
+            // Obtener el registro para extraer el evento
+            DtDatosUsuario dtoUsuario = (DtDatosUsuario) session.getAttribute("usuario_logueado");
+            DtRegistro dtRegistro = null;
+            if (dtoUsuario != null && dtoUsuario.getRegistros() != null) {
+                List<DtRegistro> registros = dtoUsuario.getRegistros().getRegistro();
+                for (DtRegistro r : registros) {
+                    if (r.getEdicion() != null && r.getEdicion().equals(edicion)) {
+                        dtRegistro = r;
+                        break;
+                    }
+                }
+            }
+            if (dtRegistro == null || dtRegistro.getEvento() == null) {
+                req.setAttribute("error", "No se pudo obtener el evento de la edición.");
+                doGet(req, resp);
+                return;
+            }
+            String siglaEvento = dtRegistro.getEvento();
+            // Obtener la edición y chequear la fecha de fin
+            PublicadorEventoService evSvc = new PublicadorEventoService();
+            PublicadorEvento evPort = evSvc.getPublicadorEventoPort();
+            publicadores.DtEdicion dtEdicion = null;
+            try {
+                dtEdicion = evPort.consultaEdicionEvento(siglaEvento, edicion);
+            } catch (Exception e) {
+                req.setAttribute("error", "No se pudo obtener la edición: " + e.getMessage());
+                doGet(req, resp);
+                return;
+            }
+            String fechaFinStr = dtEdicion.getFechaFin();
+            if (fechaFinStr == null || fechaFinStr.isEmpty()) {
+                req.setAttribute("error", "No se puede confirmar asistencia porque la edición no tiene fecha de finalización.");
+                doGet(req, resp);
+                return;
+            }
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date fechaFin = null;
+            try {
+                fechaFin = sdf.parse(fechaFinStr);
+            } catch (Exception e) {
+                req.setAttribute("error", "Formato de fecha de edición inválido.");
+                doGet(req, resp);
+                return;
+            }
+            if (fechaFin.after(new java.util.Date())) {
+                req.setAttribute("error", "No se puede confirmar asistencia porque la edición aún no se ha realizado.");
+                doGet(req, resp);
+                return;
+            }
             // Llamar al backend para marcar asistencia
             PublicadorUsuarioService service = new PublicadorUsuarioService();
             PublicadorUsuario port = service.getPublicadorUsuarioPort();

@@ -48,7 +48,7 @@
           edVideoEmbed = "https://player.vimeo.com/video/" + id;
         }
       } else if (lower.startsWith("http://") || lower.startsWith("https://")) {
-        edVideoEmbed = edVideoRaw; // fallback: try direct URL
+        edVideoEmbed = edVideoRaw;
       }
     } catch (Exception ignore) { edVideoEmbed = edVideoRaw; }
     hasVideo = (edVideoEmbed != null && !edVideoEmbed.isBlank());
