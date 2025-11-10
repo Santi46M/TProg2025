@@ -26,6 +26,7 @@ public interface IControladorUsuario {
     public Asistente ingresarAsistente(String nickname, String nombre, String email, String contrasena, String imagen, String apellido, LocalDate fechaDeNacimiento, Institucion institucion);
     
     // Crear institución
+    
     public void altaInstitucion(String nombre, String descripcion, String link)throws InstitucionYaExisteException;
     // Overload: allow optional imagen filename for institution logo
     public void altaInstitucion(String nombre, String descripcion, String link, String imagen) throws InstitucionYaExisteException;

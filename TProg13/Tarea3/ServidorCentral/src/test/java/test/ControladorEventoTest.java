@@ -69,11 +69,11 @@ class ControladorEventoTest {
 
         // Institución y organizador (firmas largas)
         TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"},
-                INST, "desc", "web");
+                INST, "desc", "web", null);
 
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario", "AltaUsuario"},
                 ORG, "Org Uno", MAIL, "desc", "link",
-                "Ap", LocalDate.of(1990, 1, 1), INST, true, null, null);
+                "Ap", LocalDate.of(1990, 1, 1), INST, true, "pASS", null);
 
         // Categorías base (idempotentes)
         altaCategoriaIdempotente(controladorEv, "Tecnologia");
@@ -162,9 +162,11 @@ class ControladorEventoTest {
             .collect(Collectors.toSet());
         assertTrue(nombres.contains(evName));
 
-        Object evento = TestUtils.tryInvoke(controladorEv, new String[]{"consultaEvento"}, evName);
+        Object evento = TestUtils.tryInvoke(controladorEv, new String[]{"consultaDTEvento"}, evName);
         assertNotNull(evento);
-        assertEquals("logica", evento.getClass().getPackageName());
+//        assertEquals("logica", evento.getClass().getPackageName());
+        assertTrue(evento.getClass().getPackageName().startsWith("logica"));
+
     }
 
     @Test
@@ -252,7 +254,7 @@ class ControladorEventoTest {
 
         Object instObj = DomainAccess.obtenerInstitucion(INST);
         Object usuario = TestUtils.tryInvoke(controladorUs, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
-                "ana", "Ana", "ana@x", "Ap", hoy.minusYears(20), instObj);
+                "ana", "Ana", "ana@x", "Ap", null, "Garcia", hoy.minusYears(20), instObj);
         assertNotNull(usuario);
 
         TestUtils.tryInvoke(controladorEv, new String[]{"altaTipoRegistro", "AltaTipoRegistro"},
@@ -270,11 +272,22 @@ class ControladorEventoTest {
         assertNotNull(dtr);
     }
 
-    private Object resolverTipoRegistro(Object edicion, String string) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+//    private Object resolverTipoRegistro(Object edicion, String string) {
+//		// TODO Auto-generated method stub
+//		return null;
+//	}
 
+    private Object resolverTipoRegistro(Object edicion, String nombreTR) {
+        if (edicion == null || nombreTR == null) return null;
+        try {
+            // llamar al método directamente por reflexión
+            return TestUtils.invokeUnwrapped(edicion, new String[]{"obtenerTipoRegistro"}, nombreTR);
+        } catch (Throwable e) {
+            return null;
+        }
+    }
+
+    
 	@Test
     @DisplayName("altaEdicionEvento inválida → debe lanzar IllegalArgumentException")
     void altaEdicionEventoFechasInvalidas() throws Throwable {
@@ -343,7 +356,7 @@ class ControladorEventoTest {
 
         Object instObj = DomainAccess.obtenerInstitucion(INST);
         Object usuarioAsis = TestUtils.tryInvoke(controladorUs, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
-                "luis", "Luis", "luis@x", "Pérez", hoy.minusYears(30), instObj);
+                "luis", "Luis", "luis@x", "p",null,"Pérez", hoy.minusYears(30), instObj);
         assertNotNull(usuarioAsis);
 
         // Tipo y registro
@@ -404,7 +417,7 @@ class ControladorEventoTest {
 
         Object instObj = DomainAccess.obtenerInstitucion(INST);
         Object usuarioAsis = TestUtils.tryInvoke(controladorUs, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
-                "val", "Valeria", "val@x", "L", hoy.minusYears(25), instObj);
+                "val", "Valeria", "val@x", "L", null, "Garia", hoy.minusYears(25), instObj);
         TestUtils.tryInvoke(controladorEv, new String[]{"altaTipoRegistro"}, edicion, "GEN", "x", 0, 10);
         Object tipo = resolverTipoRegistro(edicion, "GEN");
 
@@ -431,7 +444,7 @@ class ControladorEventoTest {
     void consultaRegistro_idInexistente() throws Exception {
         Object instObj = DomainAccess.obtenerInstitucion(INST);
         Object usuarioAsis = TestUtils.tryInvoke(controladorUs, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
-                "bea", "Bea", "bea@x", "Z", LocalDate.now().minusYears(22), instObj);
+                "bea", "Bea", "bea@x", "Z", null, "Garia",LocalDate.now().minusYears(22), instObj);
         assertNotNull(usuarioAsis);
 
         try {
@@ -519,7 +532,7 @@ class ControladorEventoTest {
         // 1 asistente + 1 registro
         Object instObj = DomainAccess.obtenerInstitucion(INST);
         Object usuarioAsis = TestUtils.tryInvoke(controladorUs, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
-                "ema", "Ema", "ema@x", "R", hoy.minusYears(19), instObj);
+                "ema", "Ema", "ema@x", "R", null, "Garcia", hoy.minusYears(19), instObj);
 
         Object evento  = TestUtils.tryInvoke(controladorEv, new String[]{"consultaEvento"}, evName);
         Object tipo    = resolverTipoRegistro(edicion, "GENERAL");
@@ -711,7 +724,7 @@ class ControladorEventoTest {
 
         Object inst = DomainAccess.obtenerInstitucion(INST);
         Object usuarioAsis = TestUtils.tryInvoke(controladorUs, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
-                "sol", "Sol", "sol@x", "P", hoy.minusYears(23), inst);
+                "sol", "Sol", "sol@x", "P", null, "Garcia", hoy.minusYears(23), inst);
 
         String rid = "R-" + System.nanoTime();
         assertDoesNotThrow(() ->
@@ -797,19 +810,28 @@ class ControladorEventoTest {
 
         Object edEntidad = TestUtils.tryInvoke(DomainAccess.obtenerEvento(ev), new String[]{"obtenerEdicion"}, ed);
 
-        // Tipo con cupo 0 → CupoTipoRegistroInvalidoException
-        TestUtils.tryInvoke(controladorEv, new String[]{"altaTipoRegistro"}, edEntidad, "SINCUPO", "x", 0, 0);
-        Object inst = DomainAccess.obtenerInstitucion(INST);
-        TestUtils.tryInvoke(controladorUs, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
-                "ari", "Ari", "ari@x", "P", hoy.minusYears(19), inst);
+//        // Tipo con cupo 0 → CupoTipoRegistroInvalidoException
+//        TestUtils.tryInvoke(controladorEv, new String[]{"altaTipoRegistro"}, edEntidad, "SINCUPO", "x", 0, 0);
+//        Object inst = DomainAccess.obtenerInstitucion(INST);
+//        TestUtils.tryInvoke(controladorUs, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
+//                "ari", "Ari", "ari@x", "P", null, "Garcia", hoy.minusYears(19), inst);
+//        try {
+//            TestUtils.invokeUnwrapped(controladorEv, new String[]{"altaRegistroEdicionEvento"},
+//                    "R0", "ari", ev, ed, "SINCUPO", hoy, 0f, hoy.plusDays(10));
+//            fail("Debe lanzar CupoTipoRegistroInvalidoException por cupo 0");
+//        } catch (Throwable e) {
+//            assertTrue(e.getClass().getSimpleName().contains("CupoTipoRegistroInvalido"), "Esperábamos CupoTipoRegistroInvalidoException");
+//        }
+     // Tipo con cupo 0 → CupoTipoRegistroInvalidoException
         try {
-            TestUtils.invokeUnwrapped(controladorEv, new String[]{"altaRegistroEdicionEvento"},
-                    "R0", "ari", ev, ed, "SINCUPO", hoy, 0f, hoy.plusDays(10));
-            fail("Debe lanzar CupoTipoRegistroInvalidoException por cupo 0");
+            TestUtils.tryInvoke(controladorEv, new String[]{"altaTipoRegistro"}, edEntidad, "SINCUPO", "x", 0, 0);
+            fail("Debe lanzar CupoTipoRegistroInvalidoException en altaTipoRegistro por cupo 0");
         } catch (Throwable e) {
-            assertTrue(e.getClass().getSimpleName().contains("CupoTipoRegistroInvalido"), "Esperábamos CupoTipoRegistroInvalidoException");
+            assertTrue(e.getClass().getSimpleName().contains("CupoTipoRegistroInvalido"),
+                    "Esperábamos CupoTipoRegistroInvalidoException");
         }
 
+        Object inst = DomainAccess.obtenerInstitucion(INST);
         // Tipo con cupo 1 → segundo registro debe fallar por cupo lleno
         TestUtils.tryInvoke(controladorEv, new String[]{"altaTipoRegistro"}, edEntidad, "UNO", "x", 0, 1);
         TestUtils.tryInvoke(controladorUs, new String[]{"ingresarAsistente", "IngresarDatosAsis"},
@@ -858,16 +880,35 @@ class ControladorEventoTest {
 
         Class<?> dtDatosUsrCls = Class.forName("logica.datatypes.DTDatosUsuario");
         // probamos constructores comunes: (nick, nombre, correo, ...). Si cambia, usá TestUtils.tolerantNew
+//        Object dtUsr = TestUtils.tolerantNew("logica.datatypes.DTDatosUsuario",
+//                ORG, "Org Uno", MAIL, "Ap", LocalDate.of(1990, 1, 1), INST, true, null, null);
         Object dtUsr = TestUtils.tolerantNew("logica.datatypes.DTDatosUsuario",
-                ORG, "Org Uno", MAIL, "Ap", LocalDate.of(1990, 1, 1), INST, true, null, null);
+        	    ORG, "Org Uno", MAIL
+        	);
 
+//     // *** asegurar organizador existente ***
+//        try {
+//            TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
+//                    ORG, "Org Uno", MAIL,
+//                    "desc", "link",
+//                    "Apellido",
+//                    LocalDate.of(1990, 1, 1),
+//                    INST,
+//                    true,   // esOrganizador
+//                    "pass",
+//                    null);
+//        } catch (Throwable ignored) {
+//            // si ya existía, ignorar
+//        }
+
+        
         LocalDate hoy = LocalDate.now();
         assertDoesNotThrow(() ->
             TestUtils.invokeUnwrapped(controladorEv, new String[]{"altaEdicionEventoDTO"},
                 dtEvento, dtUsr,
                 "DTOEd", "DTO1", "x",
                 hoy.plusDays(7), hoy.plusDays(8), hoy,
-                "MVD", "UY", "dto.png")
+                "MVD", "UY", "dto.png", null)
         );
 
         // Verificamos que ahora existe la edición
@@ -881,7 +922,7 @@ class ControladorEventoTest {
                 dtEventoNo, dtUsr,
                 "X", "X1", "x",
                 hoy.plusDays(1), hoy.plusDays(2), hoy,
-                "MVD", "UY", null);
+                "MVD", "UY", null, null);
             fail("Debe lanzar EventoYaExisteException cuando el evento no está en el manejador (según implementación pegada)");
         } catch (Throwable e) {
             assertTrue(e.getClass().getSimpleName().contains("EventoYaExiste"),

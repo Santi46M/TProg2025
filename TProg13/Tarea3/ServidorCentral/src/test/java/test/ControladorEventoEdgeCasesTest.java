@@ -88,7 +88,7 @@ class ControladorEventoEdgeCasesTest {
         CATEG    = "Tec_" + (nonce % 100000);
 
         // Alta institución y usuario organizador (acepta minúscula/mayúscula)
-        TestUtils.tryInvoke(this.controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(this.controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w", null);
         TestUtils.tryInvoke(this.controladorUs, new String[]{"altaUsuario", "AltaUsuario"},
                 ORG_NICK, "Org Uno", ORG_MAIL, "desc", "link",
                 "Ap", LocalDate.of(1990, 1, 1), INST, true, null, null);

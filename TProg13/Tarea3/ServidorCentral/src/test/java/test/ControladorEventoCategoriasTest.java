@@ -55,7 +55,7 @@ class ControladorEventoCategoriasTest {
         ORG  = "orgCat_" + nonce;
         MAIL = ORG + "@x";
 
-        TestUtils.tryInvoke(cu, new String[]{"altaInstitucion","AltaInstitucion"}, INST, "desc", "web");
+        TestUtils.tryInvoke(cu, new String[]{"altaInstitucion","AltaInstitucion"}, INST, "desc", "web", null);
         TestUtils.tryInvoke(cu, new String[]{"altaUsuario","AltaUsuario"},
                 ORG, "Org Cat", MAIL, "desc","link",
                 "Ap", LocalDate.of(1990,1,1), INST, true, null, null);

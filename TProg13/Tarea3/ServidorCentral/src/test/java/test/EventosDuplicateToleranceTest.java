@@ -47,7 +47,7 @@ class EventosDuplicateToleranceTest {
 
         // Institución
         try {
-            TestUtils.tryInvoke(controladorUs, new String[] { "altaInstitucion" }, INST, "d", "w");
+            TestUtils.tryInvoke(controladorUs, new String[] { "altaInstitucion" }, INST, "d", "w", null);
         } catch (RuntimeException e) {
             if (!esDup(e)) throw e;
         }

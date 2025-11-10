@@ -33,7 +33,7 @@ class ControladorUsuarioTest {
     @DisplayName("AltaInstitucion y getInstituciones incluyen la institución creada")
     void altaInstitucionYListado() {
         String INST = "Inst_A_" + System.nanoTime();
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "desc", "web");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "desc", "web", null);
         @SuppressWarnings("unchecked")
         Set<String> insts = (Set<String>) TestUtils.tryInvoke(controladorUs, new String[]{"getInstituciones"});
         assertTrue(insts.contains(INST));
@@ -43,7 +43,7 @@ class ControladorUsuarioTest {
     @DisplayName("ingresarOrganizador crea dominio; aparece en listarOrganizadores (por key o por valor)")
     void ingresarOrganizadorYListarOrganizadores() {
         String INST = "Inst_A_" + System.nanoTime();
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
 
         Object org = TestUtils.tryInvoke(controladorUs, new String[]{"ingresarOrganizador"},
                 "org1", "Org Uno", "org1@x",
@@ -81,7 +81,7 @@ class ControladorUsuarioTest {
     @DisplayName("ingresarAsistente o AltaUsuario → aparece en listarAsistentes")
     void ingresarAsistenteYListarAsistentes() {
         String INST = "Inst_A_" + System.nanoTime();
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
 
         Object inst = DomainAccess.obtenerInstitucion(INST);
         if (inst != null) {
@@ -145,7 +145,7 @@ class ControladorUsuarioTest {
     @DisplayName("AltaUsuario crea Asistente y Organizador según flag")
     void altaUsuarioAsistenteYOrganizador() {
         String INST = "Inst_A_" + System.nanoTime();   // institución única
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
 
         // Asistente
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
@@ -180,7 +180,7 @@ class ControladorUsuarioTest {
     @DisplayName("AltaUsuario duplicado → UsuarioYaExisteException")
     void altaUsuarioDuplicado() throws Exception {
         String INST = "Inst_B_" + System.nanoTime();
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
 
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "dup", "Dup", "dup@x", "d", "l",
@@ -199,7 +199,7 @@ class ControladorUsuarioTest {
     @DisplayName("actualizarAsistente modifica apellido y fecha (sin depender de DomainAccess)")
     void actualizarAsistenteModificaCampos() {
         String INST = "Inst_C_" + System.nanoTime();
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
 
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "beto", "Beto", "b@x", "desc", "link",
@@ -228,7 +228,7 @@ class ControladorUsuarioTest {
     @DisplayName("actualizarOrganizador modifica desc y link")
     void actualizarOrganizadorModificaCampos() {
         String INST = "Inst_D_" + System.nanoTime();
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
 
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "maria", "Maria", "m@x", "desc0", "link0",
@@ -256,7 +256,7 @@ class ControladorUsuarioTest {
     @DisplayName("obtenerDatosUsuario devuelve DTDatosUsuario para nick existente")
     void obtenerDatosUsuarioOk() {
         String INST = "Inst_E_" + System.nanoTime();
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "luz", "Luz", "l@x", "d", "l",
                 "Ap", LocalDate.of(2001, 7, 7), INST, false,
@@ -277,7 +277,7 @@ class ControladorUsuarioTest {
     @DisplayName("listarEdicionesAPartirDeOrganizador(org) no rompe (puede ser vacío)")
     void listarEdicionesAPartirDeOrganizadorOk() throws Exception {
         String INST = "Inst_F_" + System.nanoTime();
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
         Object org = TestUtils.tryInvoke(controladorUs, new String[]{"ingresarOrganizador"},
                 "orga", "Or Ga", "oga@x", null, null, "d", "l");
 
@@ -301,7 +301,7 @@ class ControladorUsuarioTest {
     @DisplayName("ConsultaUsuario(nick) no lanza excepción")
     void consultaUsuarioNoRompe() {
         String INST = "Inst_G_" + System.nanoTime();
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 "cata", "Cata", "c@x", "d", "l",
                 "Ap", LocalDate.of(2002, 2, 2), INST, false, null, null);

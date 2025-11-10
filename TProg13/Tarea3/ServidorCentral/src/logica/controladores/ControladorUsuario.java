@@ -89,13 +89,14 @@ nuevoUsuario.setImagen(img);
 manejador.addUsuario(nuevoUsuario);
 }
 
-
+    @Override
     public void altaInstitucion(String nombre, String descripcion, String link) throws InstitucionYaExisteException {
         // Delegate to new overload without image
         altaInstitucion(nombre, descripcion, link, null);
     }
     
     // New overload that accepts an optional imagen filename
+    @Override
     public void altaInstitucion(String nombre, String descripcion, String link, String imagen) throws InstitucionYaExisteException {
         if (manejador.findInstitucion(nombre) != null) {
             throw new InstitucionYaExisteException("La institución " + nombre + " ya existe");        

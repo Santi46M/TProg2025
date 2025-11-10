@@ -40,7 +40,7 @@ class ControladorUsuarioListingsPlusTest {
 
         // Institución única
         INST = "Inst_LPU_" + System.nanoTime();
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
     }
 
     @Test

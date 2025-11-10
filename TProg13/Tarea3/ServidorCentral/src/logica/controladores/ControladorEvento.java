@@ -728,26 +728,98 @@ public class ControladorEvento implements IControladorEvento {
         // Si tu Manejador requiere persistir/cerrar transacción, hacelo aquí (p.ej., me().guardar(ev);)
     }
     
+//    @Override
+//    public void altaRegistroEdicionEvento(
+//        String idRegistro,
+//        String nickUsuario,
+//        String nombreEvento,
+//        String nombreEdicion,
+//        String nombreTipoRegistro,
+//        LocalDate fechaRegistro,
+//        float costo,
+//        LocalDate fechaInicio
+//    ) throws RuntimeException {
+//        ManejadorUsuario manejU = ManejadorUsuario.getInstancia();
+//        ManejadorEvento manejE = ManejadorEvento.getInstancia();
+//
+//        Usuario usuario = manejU.findUsuario(nickUsuario);
+//        if (usuario == null || !(usuario instanceof Asistente asistente)) {
+//            throw new IllegalArgumentException("El usuario no es un asistente válido.");
+//        }
+//
+//        Eventos evento = manejE.obtenerEvento(nombreEvento);
+//        if (evento == null) {
+//            throw new IllegalArgumentException("Evento no encontrado: " + nombreEvento);
+//        }
+//
+//        Ediciones edicion = evento.getEdiciones().get(nombreEdicion);
+//        if (edicion == null) {
+//            throw new IllegalArgumentException("Edición no encontrada: " + nombreEdicion);
+//        }
+//
+//        TipoRegistro tipo = null;
+//        for (TipoRegistro t : edicion.getTiposRegistro()) {
+//            if (t.getNombre().equalsIgnoreCase(nombreTipoRegistro)) {
+//                tipo = t;
+//                break;
+//            }
+//        }
+//        if (tipo == null) {
+//            throw new IllegalArgumentException("Tipo de registro no encontrado: " + nombreTipoRegistro);
+//        }
+//
+//        if (tipo.getCupo() <= 0) {
+//            throw new excepciones.CupoTipoRegistroInvalidoException(tipo.getCupo());
+//        }
+//
+//        // Control de ya registrado
+//        for (Registro reg : manejE.obtenerRegistros().values()) {
+//            if (reg.getUsuario().equals(usuario) && reg.getEdicion().equals(edicion)) {
+//                throw new RuntimeException("El usuario ya está registrado a esta edición.");
+//            }
+//        }
+//
+//        // Control de cupo ocupado (comparar por nombre, no por instancia)
+//        int cantidadRegistrados = 0;
+//        for (Registro reg : manejE.obtenerRegistros().values()) {
+//            if (reg.getEdicion().equals(edicion)
+//                && reg.getTipoRegistro() != null
+//                && reg.getTipoRegistro().getNombre().equalsIgnoreCase(nombreTipoRegistro)) {
+//                cantidadRegistrados++;
+//            }
+//        }
+//        if (cantidadRegistrados >= tipo.getCupo()) {
+//            throw new excepciones.CupoTipoRegistroInvalidoException(tipo.getCupo());
+//        }
+//
+//        Registro nuevo = new Registro(idRegistro, usuario, edicion, tipo, fechaRegistro, costo, fechaInicio, edicion.getEvento());
+//        manejE.agregarRegistro(nuevo);
+//        edicion.agregarRegistro(idRegistro, nuevo);
+//        asistente.addRegistro(idRegistro, nuevo);
+//    }
+//    
+    
     @Override
     public void altaRegistroEdicionEvento(
-        String idRegistro,
-        String nickUsuario,
-        String nombreEvento,
-        String nombreEdicion,
-        String nombreTipoRegistro,
-        LocalDate fechaRegistro,
-        float costo,
-        LocalDate fechaInicio
-    ) throws RuntimeException {
-        ManejadorUsuario manejU = ManejadorUsuario.getInstancia();
-        ManejadorEvento manejE = ManejadorEvento.getInstancia();
+            String idRegistro,
+            String nickUsuario,
+            String nombreEvento,
+            String nombreEdicion,
+            String nombreTipoRegistro,
+            LocalDate fechaRegistro,
+            float costo,
+            LocalDate fechaInicio
+    ) {
 
-        Usuario usuario = manejU.findUsuario(nickUsuario);
-        if (usuario == null || !(usuario instanceof Asistente asistente)) {
-            throw new IllegalArgumentException("El usuario no es un asistente válido.");
+        ManejadorUsuario mu = ManejadorUsuario.getInstancia();
+        ManejadorEvento me = ManejadorEvento.getInstancia();
+
+        Usuario usuario = mu.findUsuario(nickUsuario);
+        if (usuario == null) {
+            throw new IllegalArgumentException("Usuario no encontrado: " + nickUsuario);
         }
 
-        Eventos evento = manejE.obtenerEvento(nombreEvento);
+        Eventos evento = me.obtenerEvento(nombreEvento);
         if (evento == null) {
             throw new IllegalArgumentException("Evento no encontrado: " + nombreEvento);
         }
@@ -768,36 +840,19 @@ public class ControladorEvento implements IControladorEvento {
             throw new IllegalArgumentException("Tipo de registro no encontrado: " + nombreTipoRegistro);
         }
 
-        if (tipo.getCupo() <= 0) {
-            throw new excepciones.CupoTipoRegistroInvalidoException(tipo.getCupo());
-        }
-
-        // Control de ya registrado
-        for (Registro reg : manejE.obtenerRegistros().values()) {
-            if (reg.getUsuario().equals(usuario) && reg.getEdicion().equals(edicion)) {
-                throw new RuntimeException("El usuario ya está registrado a esta edición.");
-            }
-        }
-
-        // Control de cupo ocupado (comparar por nombre, no por instancia)
-        int cantidadRegistrados = 0;
-        for (Registro reg : manejE.obtenerRegistros().values()) {
-            if (reg.getEdicion().equals(edicion)
-                && reg.getTipoRegistro() != null
-                && reg.getTipoRegistro().getNombre().equalsIgnoreCase(nombreTipoRegistro)) {
-                cantidadRegistrados++;
-            }
-        }
-        if (cantidadRegistrados >= tipo.getCupo()) {
-            throw new excepciones.CupoTipoRegistroInvalidoException(tipo.getCupo());
-        }
-
-        Registro nuevo = new Registro(idRegistro, usuario, edicion, tipo, fechaRegistro, costo, fechaInicio, edicion.getEvento());
-        manejE.agregarRegistro(nuevo);
-        edicion.agregarRegistro(idRegistro, nuevo);
-        asistente.addRegistro(idRegistro, nuevo);
+        // **DELEGAMOS AL MÉTODO CORE**
+        altaRegistroEdicionEvento(
+                idRegistro,
+                usuario,
+                evento,
+                edicion,
+                tipo,
+                fechaRegistro,
+                costo,
+                fechaInicio
+        );
     }
-    
+
     @Override
     public void altaEdicionEventoDTO(
             logica.datatypes.DTEvento eventoDTO,
@@ -820,7 +875,10 @@ public class ControladorEvento implements IControladorEvento {
         if (usuarioDTO == null) throw new IllegalArgumentException("usuarioDTO no puede ser null");
 
         // Resolver entidades desde los DTOs
-        logica.manejadores.ManejadorEvento manejador = logica.manejadores.ManejadorEvento.getInstancia();
+//        logica.manejadores.ManejadorEvento manejador = logica.manejadores.ManejadorEvento.getInstancia();
+        ManejadorEvento manejador = ManejadorEvento.getInstancia();
+        ManejadorUsuario mUsuario = ManejadorUsuario.getInstancia();
+        
         logica.clases.Eventos evento = manejador.obtenerEvento(eventoDTO.getNombre());
         if (evento == null) {
             // Mantengo tu misma excepción usada en el else original

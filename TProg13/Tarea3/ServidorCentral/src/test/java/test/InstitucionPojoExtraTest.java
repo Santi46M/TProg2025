@@ -36,7 +36,7 @@ class InstitucionPojoExtraTest {
         Object controladorUs = TestUtils.tryInvoke(fabrica, new String[]{"getIUsuario", "getIControladorUsuario"});
 
         // Alta por CU (lado “oficial”)
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_X", "Desc X", "webX");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, "Inst_X", "Desc X", "webX", null);
 
         // Verificación de que fue registrada
         Object setObj = TestUtils.tryInvoke(controladorUs, new String[]{"getInstituciones"});

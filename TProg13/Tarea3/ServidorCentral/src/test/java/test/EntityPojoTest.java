@@ -30,7 +30,7 @@ class EntityPojoTest {
         String MAIL = "u1_" + System.nanoTime() + "@x";
 
         // Institución + AltaUsuario (asistente, con 11 params)
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w", null);
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario", "AltaUsuario"},
                 NICK, "U Uno", MAIL, "desc", "link",
                 "Ap", LocalDate.of(1999, 1, 1), INST, false, null, null);
@@ -58,7 +58,7 @@ class EntityPojoTest {
         String NICK = "a1";
         String MAIL = "a1_" + System.nanoTime() + "@x";
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w", null);
         Object inst = DomainAccess.obtenerInstitucion(INST);
 
         Object asis = null;
@@ -98,7 +98,7 @@ class EntityPojoTest {
         String NICK = "o1";
         String MAIL = "o1_" + System.nanoTime() + "@x";
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w", null);
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario", "AltaUsuario"},
                 NICK, "O Uno", MAIL, "desc", "link",
                 "Ap", LocalDate.of(1990, 1, 1), INST, true, null, null);

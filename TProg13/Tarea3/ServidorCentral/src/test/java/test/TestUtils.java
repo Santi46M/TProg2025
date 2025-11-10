@@ -21,7 +21,14 @@ final class TestUtils {
      *  - findMethod(target, "methodName", Class<?>... paramTypes) or
      *    findMethod(target, "methodName", new Class<?>[0])
      */
+    
+ // *** overload 1 (compatibilidad con tests que no pasan args) ***
     static Method findMethod(Object target, Object... namesOrTypes) {
+        return findMethod(target, namesOrTypes, new Object[0]);
+    }
+    
+    static Method findMethod(Object target, Object[] namesOrTypes, Object[] args) {
+
         if (target == null || namesOrTypes == null || namesOrTypes.length == 0) return null;
 
         // Case A: (target, methodName, Class<?>... paramTypes) OR (target, methodName, Class<?>[])
@@ -58,9 +65,29 @@ final class TestUtils {
             }
         }
 
-        // Case B: treat all arguments as alternative method NAMES (strings)
+//        // Case B: treat all arguments as alternative method NAMES (strings)
+//        for (Object o : namesOrTypes) {
+//            String name = String.valueOf(o);
+//            for (Method method : target.getClass().getMethods()) {
+//                if (method.getName().equals(name)) {
+//                    method.setAccessible(true);
+//                    return method;
+//                }
+//            }
+//        }
+     // Case B: treat all arguments as alternative method NAMES (strings)
         for (Object o : namesOrTypes) {
             String name = String.valueOf(o);
+
+            // *** NUEVO: intentá matchear con cantidad de params ***
+            for (Method method : target.getClass().getMethods()) {
+                if (method.getName().equals(name) && method.getParameterCount() == args.length) {
+                    method.setAccessible(true);
+                    return method;
+                }
+            }
+
+            // fallback original (si no matchea cantidad)
             for (Method method : target.getClass().getMethods()) {
                 if (method.getName().equals(name)) {
                     method.setAccessible(true);
@@ -68,11 +95,13 @@ final class TestUtils {
                 }
             }
         }
+
         return null;
     }
 
     static Object tryInvoke(Object target, String[] names, Object... args) {
-        Method method = findMethod(target, names);
+    	Method method = findMethod(target, names, args);
+
         if (method == null) {
             String all = Arrays.stream(target.getClass().getMethods()).map(Method::getName).toList().toString();
             fail("No se encontró ninguno de: " + String.join(", ", names) +
@@ -177,7 +206,7 @@ final class TestUtils {
 
     // Lanza la excepción original (sin envolver) para poder usar assertThrows con su tipo real.
     static Object invokeUnwrapped(Object target, String[] names, Object... args) throws Exception {
-        Method method = findMethod(target, names);
+        Method method = findMethod(target, names, args);
         if (method == null) {
             String all = Arrays.stream(target.getClass().getMethods()).map(Method::getName).toList().toString();
             throw new AssertionError("No se encontró ninguno de: " + String.join(", ", names) +

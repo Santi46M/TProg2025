@@ -45,7 +45,7 @@ class ManejadorEventoDeepScanTest {
         final String EVENTO = "DS-Event";
 
         // Institución + Organizador
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 ORG, "Org DS", "o@x", "d", "l", " Ap",
                 LocalDate.of(1990, 1, 1), INST, true, null, null);

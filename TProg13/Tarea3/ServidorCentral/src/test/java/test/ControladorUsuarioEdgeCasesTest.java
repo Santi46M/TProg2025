@@ -71,12 +71,12 @@ class ControladorUsuarioEdgeCasesTest {
         String nombre = "Inst_X_" + System.nanoTime();
 
         // 1) primera alta: debe pasar
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, nombre, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, nombre, "d", "w", null);
 
         // 2) segunda alta con el mismo nombre: aceptamos que lance o que sea idempotente
         try {
             assertThrows(Exception.class, () ->
-                TestUtils.invokeUnwrapped(controladorUs, new String[]{"altaInstitucion"}, nombre, "d2", "w2")
+                TestUtils.invokeUnwrapped(controladorUs, new String[]{"altaInstitucion"}, nombre, "d2", "w2", null)
             );
             // si llegamos acá, lanzó y está bien
         } catch (AssertionError ignored) {
@@ -91,7 +91,7 @@ class ControladorUsuarioEdgeCasesTest {
         try {
             assertThrows(Exception.class, () ->
                 TestUtils.invokeUnwrapped(controladorUs, new String[]{"ingresarAsistente"},
-                    "a1", "A", "a@x", "Ap", LocalDate.of(2000, 1, 1), null)
+                    "a1", "A", "a@x", "Ap", null, "Garcia", LocalDate.of(2000, 1, 1), null)
             );
             lanzo = true;
         } catch (AssertionError ae) {

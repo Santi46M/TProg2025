@@ -34,7 +34,7 @@ class ManejadorUsuarioIntrospectTest {
 
         // Institución única y llamada tolerante (minúscula y fallback mayúscula)
         INST = "Inst_MU_" + System.nanoTime();
-        TestUtils.tryInvoke(controladorUs, new String[] { "altaInstitucion", "AltaInstitucion" }, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[] { "altaInstitucion", "AltaInstitucion" }, INST, "d", "w", null);
 
         // 1 asistente + 1 organizador (altaUsuario con 11 parámetros)
         TestUtils.tryInvoke(controladorUs, new String[] { "altaUsuario", "AltaUsuario" },

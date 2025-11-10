@@ -49,7 +49,7 @@ class ManejadorEventoStateMoreTest {
         ORG_NICK = "orgME2_" + nonce;
         ORG_MAIL = ORG_NICK + "@x";
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, INST, "d", "w", null);
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario"},
                 ORG_NICK, "Org ME2", ORG_MAIL, "d", "l", "Ap",
                 LocalDate.of(1990, 1, 1), INST, true, null, null);

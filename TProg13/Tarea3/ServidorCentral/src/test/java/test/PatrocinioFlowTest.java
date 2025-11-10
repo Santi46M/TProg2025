@@ -50,7 +50,7 @@ class PatrocinioFlowTest {
         ORG_MAIL = ORG_NICK + "@x";
 
         // base: org persistido + categoría (métodos en minúscula, con fallback a variantes)
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w", null);
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario", "AltaUsuario"},
                 ORG_NICK, "Org P", ORG_MAIL, "d", "l", "Ap",
                 LocalDate.of(1990, 1, 1), INST, true, null, null);

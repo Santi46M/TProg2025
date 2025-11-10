@@ -44,7 +44,7 @@ class ControladorEventoListarVacioTest {
         ORG  = "orgLE_" + nonce;
         ORG_MAIL = ORG + "@x";
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion", "AltaInstitucion"}, INST, "d", "w", null);
 
         // altaUsuario con 11 parámetros (flag true = organizador)
         TestUtils.tryInvoke(controladorUs, new String[]{"altaUsuario", "AltaUsuario"},

@@ -33,7 +33,7 @@ class ControladorUsuarioConsultaPlusTest {
         // nombre único por corrida (evita InstitucionYaExisteException)
         instNombre = "Inst_CUP_" + System.nanoTime();
 
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, instNombre, "d", "w");
+        TestUtils.tryInvoke(controladorUs, new String[]{"altaInstitucion"}, instNombre, "d", "w", null);
     }
 
     @Test
