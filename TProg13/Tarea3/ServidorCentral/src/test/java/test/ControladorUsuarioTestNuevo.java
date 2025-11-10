@@ -16,6 +16,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ControladorUsuarioTestNuevo {
 
     private ControladorUsuario ctrl;
+    
+    @BeforeEach
+    void limpiarEstado() {
+        ManejadorUsuario.getInstancia().reset();
+        ManejadorAuxiliar.getInstancia().reset();
+        ManejadorEvento.getInstancia().reset();
+    }
 
     @BeforeEach
     void setUp() {
