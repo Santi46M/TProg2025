@@ -10,7 +10,10 @@ public class ConfigLoader {
 
     public static void load() {
         if (loaded) return;
-        String configPath = System.getProperty("user.home") + "\\.eventosUy\\config.properties";
+
+        // Usar la ruta para Linux explícitamente
+        String configPath = System.getProperty("user.home") + "/.eventosUy/config.properties";
+
         try (FileInputStream fis = new FileInputStream(configPath)) {
             props.load(fis);
             loaded = true;
