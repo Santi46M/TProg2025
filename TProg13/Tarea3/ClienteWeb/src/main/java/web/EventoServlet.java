@@ -35,13 +35,10 @@ public class EventoServlet extends HttpServlet {
     private static final String JSP_REGISTRO = "/WEB-INF/evento/RegistrarseEvento.jsp";
     private static final String JSP_LISTAR = "/WEB-INF/evento/listado.jsp";
 
-    // carpeta pública donde se guardan subidas
     private static final String UPLOAD_PUBLIC_DIR = "/images/eventos";
 
-    // no usar la lógica local; se consumen los publicadores
     private String ctx(HttpServletRequest req) { return req.getContextPath(); }
     
-    // Helper para obtener el port de publicador
     private PublicadorEvento obtenerPort() {
         PublicadorEventoService service = new PublicadorEventoService();
         return service.getPublicadorEventoPort();
@@ -89,7 +86,6 @@ public class EventoServlet extends HttpServlet {
             for (String clave : claves) {
                 DtEdicion dtEd = null;
 
-                // Intento por SIGLA usando el método disponible en el stub
                 try {
                     if (clave != null) dtEd = port.obtenerEdicionPorSiglaDT(clave);
                 } catch (Exception ignore) {}
@@ -147,18 +143,12 @@ public class EventoServlet extends HttpServlet {
                 }
 
                 req.setAttribute("lista", lista);
-
-                // Build a map of resolved image URLs for each event to ensure the JSP
-                // receives a correct, absolute URL (or default) regardless of how
-                // the DtEvento.imagen field is represented.
                 java.util.Map<String,String> fotos = new java.util.HashMap<>();
                 String ctx = ctx(req);
                 for (DtEvento e : lista) {
                     if (e == null) continue;
                     try {
                         DtEvento source = e;
-                        // if the summarized DtEvento from listarEventos doesn't include imagen,
-                        // fetch the full DtEvento as ConsultaEvento does
                         boolean hasImg = false;
                         try {
                             String imgCandidate = (e.getImagen() == null) ? null : e.getImagen().trim();
@@ -167,13 +157,13 @@ public class EventoServlet extends HttpServlet {
 
                         if (!hasImg) {
                             try {
-                                // use the same publicador port to fetch full DTO
+                              
                                 DtEvento full = portList.consultaDTEvento(e.getNombre());
                                 if (full != null) source = full;
                             } catch (Exception ignore) { /* ignore and keep original */ }
                         }
 
-                        String url = resolveImagenUrl(req, source); // Ensure default image logic is applied
+                        String url = resolveImagenUrl(req, source); 
                         fotos.put(e.getNombre(), url);
                         System.out.println("[FOTOS MAP] Evento: " + e.getNombre() + " -> " + url);
                     } catch (Exception ignore) { /* ignore and continue */ }
@@ -273,8 +263,6 @@ public class EventoServlet extends HttpServlet {
             inner.getCategoria().addAll(categoriasList);
             dtCategorias.setCategorias(inner);
             try {
-                // Note: generated stub expects publicadores.LocalDate, use its empty instance
-//                publicadores.LocalDate fechaAlta = new publicadores.LocalDate();
             	String fechaAlta = LocalDate.now().toString(); // o cualquier fecha válida
 
                 
@@ -326,7 +314,6 @@ public class EventoServlet extends HttpServlet {
         		m.invoke(portFin, nombreEvento);
         		
         	} catch (NoSuchMethodException nsme) {
-        		// no expuesto en el stub: ignorar
         		
         	} catch (Exception ex) {
         		ex.printStackTrace();
@@ -341,7 +328,6 @@ public class EventoServlet extends HttpServlet {
         resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 
-    // Helpers 
 
     private boolean requiereOrganizador(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         HttpSession sAux = req.getSession(false);
@@ -383,29 +369,23 @@ public class EventoServlet extends HttpServlet {
         if (raw == null) raw = "";
         raw = raw.replace('\\', '/').trim();
 
-        // normalize common prefixes that might already include 'img/' or 'eventos/'
         String lowRaw = raw.toLowerCase();
         if (lowRaw.startsWith("img/")) {
-            raw = raw.substring(4); // remove leading 'img/'
+            raw = raw.substring(4); 
             lowRaw = raw.toLowerCase();
         } else if (lowRaw.startsWith("eventos/")) {
             raw = raw.substring("eventos/".length());
             lowRaw = raw.toLowerCase();
         }
 
-        // nothing -> default
         if (raw.isEmpty()) return ctx + "/img/eventos/evento-default.svg";
 
-        // absolute URL
         if (lowRaw.startsWith("http://") || lowRaw.startsWith("https://")) return raw;
 
-        // already contains context path (absolute within app)
         if (raw.startsWith(ctx + "/")) return raw;
 
-        // leading slash -> treat as app-relative
         if (raw.startsWith("/")) return ctx + raw;
 
-        // build candidate locations (in order of preference)
         String[] candidates = new String[] {
             "/img/eventos/" + raw,
             "/img/" + raw,
@@ -429,13 +409,10 @@ public class EventoServlet extends HttpServlet {
             } catch (Exception ignore) { }
         }
 
-        // If we couldn't check the filesystem at all (abs == null for candidates),
-        // return the first constructed URL so resources served from the WAR can be used.
         if (!anyReal && !unknown.isEmpty()) {
             return ctx + unknown.get(0);
         }
 
-        // fallback to the simplest assumption (default image)
         return ctx + "/img/eventos/evento-default.svg";
      }
 

@@ -185,7 +185,6 @@ public class AltaRegistroServlet extends HttpServlet {
 
     // ===================== Helpers =====================
 
-    /** Carga las ediciones del organizador logueado usando el servicio remoto. */
     private void recargarDatosDT(HttpServletRequest req, publicadores.PublicadorEvento port) {
         HttpSession sAux = req.getSession(false);
         String nick = sAux == null ? null : (String) sAux.getAttribute("nick");
@@ -193,35 +192,30 @@ public class AltaRegistroServlet extends HttpServlet {
         List<DtEdicion> ediciones = new ArrayList<>();
 
         if (nick != null) {
-            // 1) Listar eventos (usar el publicador generado: listarEventos() -> DtEventoArray)
             List<DtEvento> eventos = new ArrayList<>();
             try {
                 try {
-                    // Prefer direct typed wrapper
                     DtEventoArray arr = port.listarEventos();
                     if (arr != null && arr.getItem() != null) {
                         eventos.addAll(arr.getItem());
                     }
                 } catch (NoSuchMethodError | NoClassDefFoundError nsmd) {
-                    // Fallback: some stubs might expose a raw array; try reflectively
+                    
                     try {
                         Object raw = port.getClass().getMethod("listarEventos").invoke(port);
                         if (raw instanceof DtEvento[]) {
                             DtEvento[] darr = (DtEvento[]) raw;
                             eventos.addAll(Arrays.asList(darr));
                         } else {
-                            // If wrapper object has getItem(), call it reflectively
                             try {
                                 var items = (List<DtEvento>) raw.getClass().getMethod("getItem").invoke(raw);
                                 if (items != null) eventos.addAll(items);
                             } catch (Exception ignore) {}
                         }
                     } catch (Exception ignore) {
-                        // leave eventos empty
                     }
                 }
             } catch (Throwable t) {
-                // final safety: try a reflective call named listarEventos (different signatures)
                 try {
                     Object wrapper = port.getClass().getMethod("listarEventos").invoke(port);
                     if (wrapper instanceof DtEventoArray) {
@@ -238,7 +232,6 @@ public class AltaRegistroServlet extends HttpServlet {
                 } catch (Exception ignore) {}
             }
 
-             // 2) Por cada evento, listar nombres de ediciones y traer cada DtEdicion
              for (DtEvento ev : eventos) {
                  if (ev == null) continue;
                  String nombreEvento = ev.getNombre();
@@ -260,7 +253,6 @@ public class AltaRegistroServlet extends HttpServlet {
                 for (String nomEd : nombresEd) {
                     DtEdicion dt = port.obtenerDtEdicion(nombreEvento, nomEd);
                     if (dt != null) {
-                        // Filtrar por organizador (si coincide o si no viene)
                         String org = null;
                         try { org = dt.getOrganizador(); } catch (Exception ignore) {}
                         if (org == null || org.equals(nick)) {

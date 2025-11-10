@@ -113,12 +113,10 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
 
                 List<DtEvento> todos = new ArrayList<>();
                 try {
-                    // Prefer typed wrapper listarEventos() -> DtEventoArray
                     try {
                         publicadores.DtEventoArray arr = portEv.listarEventos();
                         if (arr != null && arr.getItem() != null) todos.addAll(arr.getItem());
                     } catch (Throwable t) {
-                        // Fallback: reflective handling of different stubs
                         Object evRes = portEv.getClass().getMethod("listarEventos").invoke(portEv);
                         if (evRes instanceof DtEvento[]) {
                             DtEvento[] darr = (DtEvento[]) evRes;
@@ -267,9 +265,6 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
             // Fecha como java.util.Date (00:00 en zona local)
             LocalDate fecha = LocalDate.parse(fechaStr); // yyyy-MM-dd
             Date fechaDate = Date.from(fecha.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-            // altaPatrocinioDT may expect different date types depending on the generated stub.
-            // Invoke reflectively and adapt the date argument.
             try {
                 java.lang.reflect.Method meth = null;
                 for (java.lang.reflect.Method m : portEv.getClass().getMethods()) {
@@ -301,10 +296,8 @@ public class ConsultaPatrocinioServlet extends HttpServlet {
                 Object[] args = new Object[] { siglaEd, instit, nivel, tipo, aporte, fechaArg, cantidad, codigo };
                 meth.invoke(portEv, args);
             } catch (java.lang.reflect.InvocationTargetException ite) {
-                // unwrap target exception and rethrow known publicador exceptions
                 Throwable t = ite.getTargetException();
                 if (t instanceof ValorPatrocinioExcedidoException_Exception) throw (ValorPatrocinioExcedidoException_Exception) t;
-                // Unknown target exception: wrap and rethrow for outer handler
                 throw new RuntimeException(t);
             }
             

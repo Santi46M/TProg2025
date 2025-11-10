@@ -118,33 +118,7 @@ public class ConsultaRegistroEdicionServlet extends HttpServlet {
         }
     }
 
-    /* @Override
-     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
 
-        String accion = req.getParameter("accion");
-        String idRegistro = req.getParameter("idRegistro");
-        HttpSession session = req.getSession(false);
-        String nick = (session != null) ? (String) session.getAttribute("nick") : null;
-
-        if ("marcarAsistencia".equalsIgnoreCase(accion)) {
-            try {
-                PublicadorEventoService evSvc = new PublicadorEventoService();
-                PublicadorEvento evPort = evSvc.getPublicadorEventoPort();
-                evPort.marcarAsistenciaRegistro(nick, idRegistro);
-                resp.sendRedirect(req.getContextPath()
-                        + "/registro/ConsultaRegistroEdicion?idRegistro=" + idRegistro + "&marcoAsistencia=true");
-                return;
-            } catch (Exception e) {
-                req.setAttribute("error", "No se pudo registrar la asistencia: " + e.getMessage());
-                doGet(req, resp);
-                return;
-            }
-        }
-
-        doGet(req, resp);
-    }
-*/
     private void generarCertificadoPDF(HttpServletResponse resp, DtDatosUsuario usr,
                                        DtRegistro reg, DtEvento ev, DtEdicion ed)
             throws IOException, DocumentException {

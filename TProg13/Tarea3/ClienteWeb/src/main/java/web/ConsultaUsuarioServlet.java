@@ -215,7 +215,10 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                     publicadores.PublicadorEventoService evSrv = new publicadores.PublicadorEventoService();
                     publicadores.PublicadorEvento evPort = evSrv.getPublicadorEventoPort();
                     publicadores.DTArchEdicionArray archOrgWrap = null;
-                    if (esPerfilOrganizador) {
+                    // Only fetch archived editions from the DB when the profile belongs to the organizer
+                    // and the viewer is the organizer themselves. The requirement is that the DB is used
+                    // exclusively to show archived editions when an organizer views their own profile.
+                    if (esPerfilOrganizador && esSuPropioPerfil) {
                         archOrgWrap = evPort.edicionesArchivadasOrganizadas(usuario.getNickname());
                     }
                     java.util.List<publicadores.DTArchEdicion> archOrgList =

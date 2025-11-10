@@ -21,6 +21,7 @@ public class EdicionOO implements Serializable {
     private String nombre;
 
     @Column(name = "evento", length = 200)
+    @NotBlank
     private String evento;
 
     @Column(name = "sigla", length = 50)

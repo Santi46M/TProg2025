@@ -46,12 +46,10 @@ public class ContadorVisitasFilter implements Filter {
             ("/evento".equals(servletPath) && "/listado".equals(pathInfo));
 
         if (esListado) {
-            // No registrar visitas para listados (p.ej. /evento/listado?categoria=Entretenimiento)
             chain.doFilter(request, response);
             return;
         }
 
-        // 1) /evento/ConsultaEvento (o /evento + /ConsultaEvento): priorizar ?evento=
         boolean esConsultaEvento =
             "/evento/ConsultaEvento".equals(servletPath) ||
             ("/evento".equals(servletPath) && "/ConsultaEvento".equals(pathInfo));
@@ -59,7 +57,6 @@ public class ContadorVisitasFilter implements Filter {
             evento = queryEvento;
         }
 
-        // 2) /edicion/ConsultaEdicion: también usa ?evento=
         boolean esConsultaEdicion =
             "/edicion/ConsultaEdicion".equals(servletPath) ||
             ("/edicion".equals(servletPath) && "/ConsultaEdicion".equals(pathInfo));
@@ -67,10 +64,8 @@ public class ContadorVisitasFilter implements Filter {
             evento = queryEvento;
         }
 
-        // 3) Forma REST: /evento/<nombre>  (pero NO para /evento/listado)
         if (isBlank(evento) && "/evento".equals(servletPath) && pathInfo != null && pathInfo.length() > 1) {
             String candidato = URLDecoder.decode(pathInfo.substring(1), StandardCharsets.UTF_8);
-            // Defensa extra: si el candidato es "listado", ignorarlo
             if (!"listado".equalsIgnoreCase(candidato)) {
                 evento = candidato;
             }
@@ -87,10 +82,8 @@ public class ContadorVisitasFilter implements Filter {
                 ? String.valueOf(req.getSession(false).getAttribute("nick"))
                 : "<anon>";
 
-        // Dejar continuar primero (para que el servlet ponga atributos antes del forward)
         chain.doFilter(request, response);
 
-        // 4) Post-chain: si aún no lo tenemos, intentar por ATRIBUTOS del request
         if (isBlank(evento)) {
             Object v;
 
@@ -113,7 +106,6 @@ public class ContadorVisitasFilter implements Filter {
                 }
             }
 
-            // Si el servlet puso un DTO (por ejemplo DtEvento) en algún atributo común
             if (isBlank(evento)) {
                 String[] posiblesDTO = { "dtEvento", "eventoDTO", "eventoObj" };
                 for (String key : posiblesDTO) {
