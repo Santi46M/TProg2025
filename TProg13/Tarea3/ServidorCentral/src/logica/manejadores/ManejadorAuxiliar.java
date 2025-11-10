@@ -58,4 +58,15 @@ public class ManejadorAuxiliar {
 	public Set<Patrocinio> listarPatrocinios() {
 	    return patrocinios;
 	}
+	
+	private static synchronized void doReset() {
+	    if (instancia != null) {
+	        instancia.categorias.clear();
+	        instancia.patrocinios.clear();
+	    }
+	}
+	
+	public static void testReset() { doReset(); }
+    public static void reset()       { doReset(); }
+    public static void clear()       { doReset(); }
 }
