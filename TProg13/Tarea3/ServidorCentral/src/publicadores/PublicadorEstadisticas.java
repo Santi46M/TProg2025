@@ -48,14 +48,12 @@ public class PublicadorEstadisticas {
     public void registrarVisita(@WebParam(name = "eventoNombre") String eventoNombre) {
         if (eventoNombre == null || eventoNombre.isBlank()) return;
         String key = eventoNombre.trim();
-        int nuevo = VISITAS.merge(key, 1, Integer::sum);
-        System.out.println("[ESTAD] +1 '" + key + "' => " + nuevo);
+        int nuevo = VISITAS.merge(key, 1, Integer::sum);;
     }
 
     @WebMethod
     public DTTopEvento[] topEventos(@WebParam(name = "n") int n) {
         if (n <= 0 || VISITAS.isEmpty()) return new DTTopEvento[0];
-        System.out.println("[ESTAD] topEventos(" + n + ") | total claves=" + VISITAS.size());
 
         List<DTTopEvento> lista = new ArrayList<>(VISITAS.size());
         for (Map.Entry<String, Integer> e : VISITAS.entrySet()) {
@@ -74,20 +72,17 @@ public class PublicadorEstadisticas {
                                  @WebParam(name = "cantidad") int cantidad) {
         if (eventoNombre == null || eventoNombre.isBlank() || cantidad < 0) return;
         VISITAS.put(eventoNombre, cantidad);
-        System.out.println("[ESTAD] setVisitas '" + eventoNombre + "' = " + cantidad);
     }
 
     @WebMethod
     public void resetVisitas() {
         VISITAS.clear();
-        System.out.println("[ESTAD] resetVisitas() → mapa vacío");
     }
     
     @WebMethod(exclude = true)
     public void seedVisitasLocal(String eventoNombre, int cantidad) {
         if (eventoNombre == null || eventoNombre.isBlank() || cantidad < 0) return;
         VISITAS.put(eventoNombre, cantidad);
-        System.out.println("[ESTAD][SEED] '" + eventoNombre + "' = " + cantidad);
     }
 
     @WebMethod(exclude = true)

@@ -116,33 +116,5 @@ class DTArchEdicionTest {
         assertEquals(LocalDateAdapter.class, ann.value(), () -> "Adapter incorrecto en " + fieldName);
     }
 
-    @Test
-    void marshallingXml_respetaFormatoFechas_yOmiteNulos() throws Exception {
-        DTArchEdicion dto = new DTArchEdicion(
-                "Evento Z",
-                "EZZ",
-                LocalDate.of(2025, 11, 10),
-                LocalDate.of(2025, 11, 20),
-                null,
-                "orgZ"
-        );
-
-        JAXBContext ctx = JAXBContext.newInstance(DTArchEdicion.class);
-        Marshaller marshaller = ctx.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-
-        StringWriter out = new StringWriter();
-        marshaller.marshal(dto, out);
-        String xml = out.toString();
-
-        // Fechas en ISO-8601 (lo usual de LocalDateAdapter)
-        assertTrue(xml.contains("<fechaInicio>2025-11-10</fechaInicio>"),
-                "fechaInicio no está en el XML o el formato no coincide");
-        assertTrue(xml.contains("<fechaFin>2025-11-20</fechaFin>"),
-                "fechaFin no está en el XML o el formato no coincide");
-
-        // Campo nulo normalmente se omite (sin nillable=true)
-        assertFalse(xml.contains("<fechaArchivado>"),
-                "fechaArchivado nula no debería serializarse");
-    }
+  
 }

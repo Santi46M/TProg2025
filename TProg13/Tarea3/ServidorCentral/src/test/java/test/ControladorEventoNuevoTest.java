@@ -33,6 +33,9 @@ public class ControladorEventoNuevoTest {
     @BeforeEach
     void setUp() {
         ctrl = new ControladorEvento();
+        ManejadorUsuario.reset();
+        ManejadorEvento.reset();
+        ManejadorAuxiliar.reset();
         mEvento = ManejadorEvento.getInstancia();
         mUsuario = ManejadorUsuario.getInstancia();
         mAux = ManejadorAuxiliar.getInstancia();

@@ -15,6 +15,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import logica.clases.TipoRegistro;
+import logica.manejadores.ManejadorAuxiliar;
+import logica.manejadores.ManejadorEvento;
+import logica.manejadores.ManejadorUsuario;
 
 @DisplayName("ControladorEvento – Altas/Listados/Consultas (sin catch genéricos)")
 class ControladorEventoTest {
@@ -31,6 +34,10 @@ class ControladorEventoTest {
     @BeforeEach
     void setUp() throws Exception {
         TestUtils.resetAll();
+        ManejadorUsuario.reset();
+        ManejadorEvento.reset();
+        ManejadorAuxiliar.reset();
+        
 
         // Fábrica (minúscula o mayúscula)
         Class<?> fab = TestUtils.loadAny("logica.Fabrica", "logica.fabrica");
@@ -102,12 +109,7 @@ class ControladorEventoTest {
         catch (ReflectiveOperationException | IllegalArgumentException e) { return String.valueOf(dtevento); }
     }
 
-    private String getDTEdicionNombre(Object dted) {
-        Method metodo = TestUtils.findMethod(dted, "getNombre", "nombre");
-        if (metodo == null) return String.valueOf(dted);
-        try { return String.valueOf(metodo.invoke(dted)); }
-        catch (ReflectiveOperationException | IllegalArgumentException e) { return String.valueOf(dted); }
-    }
+
 
     private void altaCategoriaIdempotente(Object ceRef, String nombre) {
         try {
