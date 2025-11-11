@@ -200,4 +200,35 @@ class EdicionesTest {
         e.setEstado(DTEstado.Aceptada);
         assertFalse(e.estaIngresada());
     }
+    
+    // ===== Organizador =====
+    @Test
+    void setOrganizador_aceptaNull_yQuedaNull() {
+        Ediciones e = new Ediciones(
+                crearEvento(), "OrgEd", "ORG",
+                LocalDate.now(), LocalDate.now(), LocalDate.now(),
+                null, "Montevideo", "Uruguay"
+        );
+
+        // pre: null
+        assertNull(e.getOrganizador());
+
+        // act: asigno null
+        e.setOrganizador(null);
+
+        // post: sigue null y la llamada cubre la línea del setter
+        assertNull(e.getOrganizador());
+    }
+
+    @Test
+    void setOrganizador_noLanza_explictamente() {
+        Ediciones e = new Ediciones(
+                crearEvento(), "OrgEd2", "ORG2",
+                LocalDate.now(), LocalDate.now(), LocalDate.now(),
+                null, "C", "P"
+        );
+
+        // simplemente verificamos que la invocación no explote (sin crear Usuario concreto)
+        assertDoesNotThrow(() -> e.setOrganizador(null));
+    }
 }

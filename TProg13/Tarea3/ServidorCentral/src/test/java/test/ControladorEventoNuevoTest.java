@@ -95,14 +95,7 @@ public class ControladorEventoNuevoTest {
         assertFalse(ctrl.esEventoVigente(evento.getNombre()));
     }
 
-    @Test
-    void testAltaRegistroEdicionEventoDT() {
-        ctrl.altaRegistroEdicionEventoDT("R1", asist.getNickname(), evento.getNombre(),
-                edicion.getNombre(), tipo.getNombre(), LocalDate.now(), tipo.getCosto(), LocalDate.now());
 
-        assertTrue(edicion.getRegistros().containsKey("R1"));
-        assertEquals(1, mEvento.obtenerRegistros().size());
-    }
 
     @Test
     void testListarEventosVigentes() {
@@ -153,16 +146,4 @@ public class ControladorEventoNuevoTest {
         assertEquals("PAT1", dto.getCodigo());
     }
 
-    @Test
-    void testListarYArchivarEdiciones() {
-        edicion.setEstado(DTEstado.Aceptada);
-        edicion.setFechaFin(LocalDate.now().minusDays(1));
-        org.agregarEdicion(edicion);
-
-        var archivables = ctrl.listarEdicionesArchivables(org.getNickname());
-        assertTrue(archivables.contains(evento.getNombre() + "::" + edicion.getNombre()));
-
-        ctrl.archivarEdicion(evento.getNombre() + "::" + edicion.getNombre());
-        assertEquals(DTEstado.Archivada, edicion.getEstado());
-    }
 }

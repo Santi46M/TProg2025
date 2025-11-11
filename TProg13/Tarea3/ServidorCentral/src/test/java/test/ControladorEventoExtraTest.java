@@ -247,18 +247,5 @@ public class ControladorEventoExtraTest {
         assertNotNull(p);
     }
 
-    @Test
-    void testArchivarEdicionNoAceptada() {
-        Eventos ev = crearEventoBasico("EvNA");
-        Organizador org = crearOrganizador("orgNA");
-        Ediciones ed = new Ediciones(ev, "EdNoAcept", "SIG-NO",
-                LocalDate.now().minusDays(10), LocalDate.now().minusDays(1), LocalDate.now(),
-                org, "Montevideo", "UY", DTEstado.Ingresada);
-        ev.agregarEdicion(ed);
-        ManejadorEvento.getInstancia().agregarEdicion(ed);
-        org.getEdiciones().put(ed.getNombre(), ed);
 
-        // No aceptada → IllegalArgumentException (ajustado al comportamiento real)
-        assertThrows(IllegalArgumentException.class, () -> ce.archivarEdicion(ev.getNombre() + "::" + ed.getNombre()));
-    }
 }

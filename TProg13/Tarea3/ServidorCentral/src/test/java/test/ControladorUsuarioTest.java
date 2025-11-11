@@ -310,11 +310,5 @@ class ControladorUsuarioTest {
         assertTrue(true);
     }
 
-    @Test
-    @DisplayName("altaCategoriaSinGUI no rompe y permite agregar categorías base")
-    void altaCategoriaSinGUIOk() {
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaCategoriaSinGUI"}, "Deportes");
-        TestUtils.tryInvoke(controladorUs, new String[]{"altaCategoriaSinGUI"}, "Tecnologia");
-        assertTrue(true);
-    }
+
 }

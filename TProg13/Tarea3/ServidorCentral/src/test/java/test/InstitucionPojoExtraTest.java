@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Institucion – creación por CU y getters básicos")
-class InstitucionPojoExtraTest {
+public class InstitucionPojoExtraTest {
 
     @Test
     @DisplayName("Institucion – creación por CU y getters básicos")

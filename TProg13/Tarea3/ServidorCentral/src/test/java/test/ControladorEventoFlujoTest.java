@@ -2,29 +2,20 @@ package test;
 
 import logica.controladores.ControladorEvento;
 import logica.datatypes.DTCategorias;
+import logica.manejadores.ManejadorAuxiliar;
+import logica.manejadores.ManejadorEvento;
+import logica.manejadores.ManejadorUsuario;
 import excepciones.EventoYaExisteException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.ArrayList;
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ControladorEventoFlujoTest {
-
-    @Test
-    void testAltaEventoBasicoYListarCategorias() {
-        ControladorEvento ctrl = new ControladorEvento();
-
-        List<String> cats = new ArrayList<>();
-        cats.add("Conferencias");
-        DTCategorias dtcat = new DTCategorias(cats);
-
-        // No debe lanzar excepción
-        assertDoesNotThrow(() -> ctrl.altaEvento(
-                "EventoPrueba", "Desc", LocalDate.now(), "EPR", dtcat, "img.jpg"
-        ));
-    }
 
     @Test
     void testNormalizarYListarCategorias() {

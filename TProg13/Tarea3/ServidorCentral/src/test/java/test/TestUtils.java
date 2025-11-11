@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-final class TestUtils {
+public final class TestUtils {
     private TestUtils() {}
 
     /* ---------- Invocación flexible ---------- */

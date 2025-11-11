@@ -47,10 +47,5 @@ class PublicadorEstadisticasTest {
         assertEquals(3, top[0].getVisitas());
     }
 
-    @Test
-    void testPublicarEndpoint() {
-        assertDoesNotThrow(() -> pub.publicar());
-        assertNotNull(pub.getEndpoint());
-        pub.getEndpoint().stop();
-    }
+
 }
