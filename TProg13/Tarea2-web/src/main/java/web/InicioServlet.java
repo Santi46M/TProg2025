@@ -4,6 +4,7 @@ import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -32,7 +33,29 @@ public class InicioServlet extends HttpServlet {
 
     // nombreEvento -> urlImagen
     Map<String, String> imgUrls = new HashMap<>();
-    String ctx = req.getContextPath();
+
+    // build absolute base URL so clients on other machines can reach resources
+    String scheme = req.getScheme(); // http / https
+
+    // Prefer Host header (includes host:port) because req.getServerName()/getServerPort()
+    // may return localhost when server was started locally. Host header reflects what
+    // clients used in the request (IP or hostname).
+    String hostHeader = req.getHeader("Host");
+    String hostPart;
+    if (hostHeader != null && !hostHeader.isBlank()) {
+      hostPart = hostHeader; // already contains port if present
+    } else {
+      String serverName = req.getServerName(); // hostname or IP
+      int serverPort = req.getServerPort();
+      String portPart = "";
+      if (!(("http".equalsIgnoreCase(scheme) && serverPort == 80) || ("https".equalsIgnoreCase(scheme) && serverPort == 443))) {
+        portPart = ":" + serverPort;
+      }
+      hostPart = serverName + portPart;
+    }
+
+    String contextPath = req.getContextPath();
+    String baseUrl = scheme + "://" + hostPart + contextPath;
 
     if (eventos != null) {
       for (DTEvento e : eventos) {
@@ -54,32 +77,44 @@ public class InicioServlet extends HttpServlet {
         String url = null;
         if (raw != null && !raw.isBlank()) {
           if (raw.startsWith("http://") || raw.startsWith("https://")) {
-            url = raw; 
+            // external URL: keep as-is
+            url = raw;
           } else if (raw.startsWith("/")) {
-            url = ctx + raw; // ya viene con ruta (/img/ o otra)
+            // app-relative path in the WAR: build absolute URL
+            url = baseUrl + raw;
           } else {
-            // Solo nombre de archivo:
+            // Solo nombre de archivo: try common locations inside the webapp
             String[] candidates = new String[] {
               "/img/" + raw,
-              "/img/eventos/" + raw,  
+              "/img/eventos/" + raw,
               "/eventos/" + raw        // subidos por la app
             };
 
             for (String rel : candidates) {
+              boolean exists = false;
+
+              // Try to resolve as a real file on disk (exploded WAR)
               String abs = getServletContext().getRealPath(rel);
-              boolean exists;
               if (abs != null) {
                 exists = Files.exists(Path.of(abs));
               } else {
-                exists = true; // asumimos true para no bloquear
+                // If not exploded, try to find the resource inside the WAR
+                URL resource = getServletContext().getResource(rel);
+                if (resource != null) {
+                  exists = true;
+                }
               }
+
               if (exists) {
-                url = ctx + rel;
+                url = baseUrl + rel;
                 break;
               }
             }
           }
         }
+
+        // debug output to help troubleshooting from server logs
+        System.out.println("Resolved image URL for '" + nombre + "' => " + url);
 
         imgUrls.put(nombre, url); // puede ser null si realmente no hay imagen
       }

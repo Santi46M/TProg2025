@@ -341,15 +341,42 @@ public class EdicionServlet extends HttpServlet {
   }
 
   private String resolveImagenUrlEdicion(HttpServletRequest req, String raw) {
-	    if (raw == null || raw.isBlank()) return null;
-	    raw = raw.trim();
+    // Replace previous hardcoded-localhost behavior with request-based absolute URL building
+    if (raw == null || raw.isBlank()) return null;
+    raw = raw.replace('\\', '/').trim();
 
-	    // Si ya es una URL absoluta, se deja igual
-	    if (raw.startsWith("http://") || raw.startsWith("https://"))
-	        return raw;
+    // If already absolute URL, keep it
+    if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
 
-	    // URL base del ServidorCentral
-	    String baseUrl = "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/";
-	    return baseUrl + raw;
-	}
+    String scheme = req.getScheme(); // http or https
+    String hostHeader = req.getHeader("Host");
+    String hostPart;
+    if (hostHeader != null && !hostHeader.isBlank()) {
+      hostPart = hostHeader; // may include port
+    } else {
+      int port = req.getServerPort();
+      String portPart = "";
+      if (!(("http".equalsIgnoreCase(scheme) && port == 80) || ("https".equalsIgnoreCase(scheme) && port == 443))) {
+        portPart = ":" + port;
+      }
+      hostPart = req.getServerName() + portPart;
+    }
+
+    String servidorCtx = "/ServidorCentral-0.0.1-SNAPSHOT";
+
+    // If raw already contains a leading slash, treat as absolute path on the host
+    if (raw.startsWith("/")) {
+      return scheme + "://" + hostPart + raw;
+    }
+
+    // Accept common raw forms (eventual prefixes) and normalize
+    String low = raw.toLowerCase();
+    if (low.startsWith("images/") || low.startsWith("img/") || low.startsWith("ediciones/")) {
+      // ensure we produce: http(s)://host/ServidorCentral-.../<raw>
+      return scheme + "://" + hostPart + servidorCtx + "/" + raw;
+    }
+
+    // default: filename only -> place under images/ediciones/
+    return scheme + "://" + hostPart + servidorCtx + "/images/ediciones/" + raw;
+  }
 }

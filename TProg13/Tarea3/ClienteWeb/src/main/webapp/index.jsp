@@ -3,6 +3,8 @@
   String ctx = request.getContextPath();
   List<DtEvento> eventos = (List<DtEvento>) request.getAttribute("eventos");
   String baseUrl = (String) request.getAttribute("baseUrl");
+  Map<String,String> imgUrls = (Map<String,String>) request.getAttribute("imgUrls");
+  Map<String,String> imgChecks = (Map<String,String>) request.getAttribute("imgChecks");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -19,6 +21,7 @@
     .card__media img{width:100%;height:100%;object-fit:cover;display:block}
     .btn{background:#f9fafb;border:1px solid #d1d5db;padding:.45rem .75rem;border-radius:8px;cursor:pointer}
     .btn:hover{background:#f3f4f6}
+    .debug { font-size: 0.8rem; color: #666; margin-top:4px }
   </style>
 </head>
 <body>
@@ -32,9 +35,12 @@
           if (eventos != null && !eventos.isEmpty()) {
             for (DtEvento e : eventos) {
               String img = e.getImagen();
-              String imgUrl = (img != null && !img.isBlank())
-                              ? (baseUrl + "eventos/" + img)
-                              : (baseUrl + "eventos/evento-default.svg");
+              String imgUrl = null;
+              if (imgUrls != null) imgUrl = imgUrls.get(e.getNombre());
+              if (imgUrl == null || imgUrl.isBlank()) {
+                imgUrl = (img != null && !img.isBlank()) ? (baseUrl + "eventos/" + img) : (baseUrl + "eventos/evento-default.svg");
+              }
+              String check = (imgChecks != null) ? imgChecks.get(e.getNombre()) : null;
         %>
           <article class="card">
             <div class="card__media">
@@ -47,6 +53,9 @@
               <input type="hidden" name="nombre" value="<%= e.getNombre() %>">
               <button type="submit" class="btn">Ver más</button>
             </form>
+            <% if (check != null) { %>
+              <div class="debug">Image check: <%= check %></div>
+            <% } %>
           </article>
         <%
             }
