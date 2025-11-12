@@ -45,7 +45,6 @@ String ctx = request.getContextPath();
              String img = ev.getImagen();
              String imgUrl = null;
 
-             // Prefer pre-resolved map (set by EventoServlet) when available
              java.util.Map<String,String> fotos = (java.util.Map<String,String>) request.getAttribute("fotos");
              if (fotos != null && fotos.get(nombre) != null) {
                  imgUrl = fotos.get(nombre);
@@ -57,7 +56,6 @@ String ctx = request.getContextPath();
                      } else if (img.startsWith("/")) {
                        imgUrl = ctx + img;
                      } else {
-                       // ✅ imágenes nuevas van dentro de /img/eventos/
                        imgUrl = ctx + "/img/eventos/" + img;
                      }
                  }
@@ -70,7 +68,6 @@ String ctx = request.getContextPath();
          src="<%= imgUrl %>" 
          alt="Imagen de <%= nombre %>"
          onerror="this.style.display='none';">
-    
   <% } %>
 
             <h3 class="event-title"><%= nombre %></h3>

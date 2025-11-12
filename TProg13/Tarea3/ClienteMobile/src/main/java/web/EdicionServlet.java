@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Properties;
 
 import publicadores.DtEdicion;
 import publicadores.DtEvento;
@@ -68,6 +69,16 @@ public class EdicionServlet extends HttpServlet {
         return;
       }
 
+      
+      Path propsPath = Path.of(System.getProperty("user.home"), ".eventosUy", ".properties");
+      Properties props = new Properties();
+      props.load(Files.newInputStream(propsPath));
+      String ip = props.getProperty("servidor.ip", "localhost");
+      String puerto = props.getProperty("servidor.puerto", "8080");
+
+      req.setAttribute("edicionesIp", ip);
+      req.setAttribute("edicionesPuerto", puerto);
+      
       req.setAttribute("edicion", edicionObj);
       req.setAttribute("organizador", edicionObj.getOrganizador());
       // extract tiposRegistro list
@@ -170,7 +181,11 @@ public class EdicionServlet extends HttpServlet {
           resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Falta parámetro 'evento'");
           return;
         }
-        req.setAttribute("listaEdiciones", listarEdicionesEventoCompleto(evento, port));
+        List<DtEdicion> listaEdiciones = listarEdicionesEventoCompleto(evento, port);
+        String baseImgUrl = buildBaseImageUrl(req);
+        req.setAttribute("listaEdiciones", listaEdiciones);
+        req.setAttribute("evento", evento);
+        req.setAttribute("edicionesBaseImgUrl", baseImgUrl);
         req.getRequestDispatcher(JSP_LISTADO).forward(req, resp);
         return;
       }
@@ -401,4 +416,51 @@ public class EdicionServlet extends HttpServlet {
 	    if (raw == null || raw.isBlank()) return null;
 	    return "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/" + raw;
 	}
+
+  // Construye la base URL dinámica para imágenes de ediciones
+  private String buildBaseImageUrl(HttpServletRequest req) {
+    String context = "/ServidorCentral-0.0.1-SNAPSHOT";
+    String scheme = req.getScheme();
+    String hostHeader = req.getHeader("Host");
+    String baseUrl;
+    try {
+      Path propsPath = Path.of(System.getProperty("user.home"), ".eventosUy", ".properties");
+      java.util.Properties props = new java.util.Properties();
+      props.load(Files.newInputStream(propsPath));
+      String ip = props.getProperty("servidor.ip", "localhost");
+      String puerto = props.getProperty("servidor.puerto", "8080");
+      String hostPart;
+      if ("localhost".equals(ip) || "127.0.0.1".equals(ip)) {
+        if (hostHeader != null && !hostHeader.isBlank()) {
+          hostPart = hostHeader;
+        } else {
+          int reqPort = req.getServerPort();
+          String portPart = "";
+          if (!(scheme.equalsIgnoreCase("http") && reqPort == 80) && !(scheme.equalsIgnoreCase("https") && reqPort == 443)) {
+            portPart = ":" + reqPort;
+          }
+          hostPart = req.getServerName() + portPart;
+        }
+      } else {
+        hostPart = ip;
+        if (puerto != null && !puerto.isBlank()) hostPart += ":" + puerto;
+      }
+      baseUrl = scheme + "://" + hostPart + context + "/images/ediciones/";
+    } catch (IOException e) {
+      String effectiveHost;
+      String hostHeaderFallback = req.getHeader("Host");
+      if (hostHeaderFallback != null && !hostHeaderFallback.isBlank()) {
+        effectiveHost = hostHeaderFallback;
+      } else {
+        int reqPort = req.getServerPort();
+        String portPart = "";
+        if (!(scheme.equalsIgnoreCase("http") && reqPort == 80) && !(scheme.equalsIgnoreCase("https") && reqPort == 443)) {
+          portPart = ":" + reqPort;
+        }
+        effectiveHost = req.getServerName() + portPart;
+      }
+      baseUrl = scheme + "://" + effectiveHost + context + "/images/ediciones/";
+    }
+    return baseUrl;
+  }
 }

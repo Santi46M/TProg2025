@@ -24,6 +24,7 @@ import publicadores.DtEdicion;
 import publicadores.DtEvento;
 import publicadores.DtEventoArray;
 import publicadores.StringArray;
+import util.ConfigLoader;
 import publicadores.EventoYaExisteException_Exception;
 
 @WebServlet("/evento/*")
@@ -194,6 +195,13 @@ public class EventoServlet extends HttpServlet {
                         ediciones.add(dtEd);
                     }
                 }
+                
+        	    String ip = ConfigLoader.get("ipServidor");
+           	    String puerto = ConfigLoader.get("puerto");
+                
+           	    
+           	    req.setAttribute("ipServidor", ip);
+           	    req.setAttribute("puertoServidor", puerto);
                 req.setAttribute("evento", nombreEvento);
                 req.setAttribute("listaEdiciones", ediciones);
                 req.getRequestDispatcher("/WEB-INF/ediciones/ListadoEdiciones.jsp").forward(req, resp);

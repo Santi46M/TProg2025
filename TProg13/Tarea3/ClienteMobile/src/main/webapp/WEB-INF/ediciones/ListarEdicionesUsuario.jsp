@@ -3,6 +3,7 @@
 String ctx = request.getContextPath();
 String nick = (String) session.getAttribute("nick");
 List<DtEdicion> edicionesRegistradas = (List<DtEdicion>) request.getAttribute("edicionesRegistradas");
+String baseImgUrl = (String) request.getAttribute("edicionesBaseImgUrl");
 %>
 <link rel="stylesheet" href="<%=ctx%>/css/style.css">
 <link rel="stylesheet" href="<%=ctx%>/css/listado.css">
@@ -25,19 +26,15 @@ List<DtEdicion> edicionesRegistradas = (List<DtEdicion>) request.getAttribute("e
              String ciudad = ed.getCiudad();
              String pais   = ed.getPais();
              String img = ed.getImagen();
-             boolean hasImg = (img != null && !img.isBlank());
+             String ip = (String) request.getAttribute("ipServidor");
+             String puerto = (String) request.getAttribute("puertoServidor");
+             String imgUrl = ("http://" + ip + ":8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/" + img);
         %>
-          <article class="card event-card list <%= hasImg ? "" : "no-cover" %>">
-            <% if (hasImg) { %>
-  <img class="event-cover"
-       src="http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/<%= img %>"
-       alt="Imagen de <%= nombre %>"
-       onerror="this.onerror=null;this.src='<%=ctx%>/img/evento-default.jpg';">
-<% } else { %>
-  <img class="event-cover"
-       src="<%=ctx%>/img/evento-default.jpg"
-       alt="Sin imagen disponible">
-<% } %>
+          <article class="card event-card list">
+            <img class="event-cover"
+                 src="<%= imgUrl %>"
+                 alt="Imagen de <%=nombre%>"
+                 onerror="this.onerror=null;this.src='<%=ctx%>/img/ediciones/edicion-default.svg';">
             <h3 class="event-title"><%= nombre %></h3>
             <p class="event-sub"><%= (sigla==null||sigla.isBlank()) ? "—" : sigla %></p>
             <p class="event-desc">
@@ -47,7 +44,7 @@ List<DtEdicion> edicionesRegistradas = (List<DtEdicion>) request.getAttribute("e
               <form action="<%= ctx %>/registro/ConsultaRegistroEdicion" method="get" style="display:inline;">
                 <input type="hidden" name="usuario" value="<%= nick %>" />
                 <input type="hidden" name="edicion" value="<%= nombre %>" />
-				<button type="submit" class="btn btn-primary">Ver detalles de mi registro</button>
+                <button type="submit" class="btn btn-primary">Ver detalles de mi registro</button>
               </form>
             </div>
           </article>

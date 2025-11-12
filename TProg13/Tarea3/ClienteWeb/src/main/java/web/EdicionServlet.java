@@ -41,6 +41,62 @@ public class EdicionServlet extends HttpServlet {
     return sAux == null ? null : (String) sAux.getAttribute("rol");
   }
 
+  private String buildBaseImageUrl(HttpServletRequest req) {
+    String context = "/ServidorCentral-0.0.1-SNAPSHOT";
+    String scheme = req.getScheme();
+    String hostHeader = req.getHeader("Host");
+    String baseUrl = null;
+    try {
+      Path propsPath = Path.of(System.getProperty("user.home"), ".eventosUy", ".properties");
+      java.util.Properties props = new java.util.Properties();
+      props.load(Files.newInputStream(propsPath));
+      String ip = props.getProperty("servidor.ip", "localhost");
+      String puerto = props.getProperty("servidor.puerto", "8080");
+      String hostPart;
+      if ("localhost".equals(ip) || "127.0.0.1".equals(ip)) {
+        if (hostHeader != null && !hostHeader.isBlank()) {
+          hostPart = hostHeader;
+        } else {
+          int reqPort = req.getServerPort();
+          String portPart = "";
+          if (!(("http".equalsIgnoreCase(scheme) && reqPort == 80) || ("https".equalsIgnoreCase(scheme) && reqPort == 443))) {
+            portPart = ":" + reqPort;
+          }
+          hostPart = req.getServerName() + portPart;
+        }
+      } else {
+        hostPart = ip;
+        if (puerto != null && !puerto.isBlank()) hostPart += ":" + puerto;
+      }
+      baseUrl = scheme + "://" + hostPart + context + "/images/";
+    } catch (IOException e) {
+      String effectiveHost;
+      String hostHeaderFallback = req.getHeader("Host");
+      if (hostHeaderFallback != null && !hostHeaderFallback.isBlank()) {
+        effectiveHost = hostHeaderFallback;
+      } else {
+        int reqPort = req.getServerPort();
+        String portPart = "";
+        if (!(("http".equalsIgnoreCase(scheme) && reqPort == 80) || ("https".equalsIgnoreCase(scheme) && reqPort == 443))) {
+          portPart = ":" + reqPort;
+        }
+        effectiveHost = req.getServerName() + portPart;
+      }
+      baseUrl = scheme + "://" + effectiveHost + context + "/images/";
+    }
+    return baseUrl;
+  }
+
+  private String buildEdicionImageUrl(HttpServletRequest req, String img) {
+    String baseUrl = buildBaseImageUrl(req);
+    String imgName = (img == null || img.isBlank()) ? null : img.trim();
+    if (imgName == null || imgName.isEmpty()) {
+      return baseUrl + "ediciones/edicion-default.svg";
+    }
+    return baseUrl + "ediciones/" + imgName;
+  }
+  // --- FIN: Métodos para construir URLs de imágenes igual que InicioServlet ---
+
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
@@ -86,9 +142,9 @@ public class EdicionServlet extends HttpServlet {
       req.setAttribute("evNombre", evento);
       req.setAttribute("rol", getRol(req));
 
-      String edImagenUrl = resolveImagenUrlEdicion(req, edicionObj.getImagen());
-      if (edImagenUrl != null)
-        req.setAttribute("edImagenUrl", edImagenUrl);
+      // URL de imagen de edición
+      String edImagenUrl = buildEdicionImageUrl(req, edicionObj.getImagen());
+      req.setAttribute("edImagenUrl", edImagenUrl);
 
       HttpSession session = req.getSession(false);
       String nickSesion = session != null ? (String) session.getAttribute("nick") : null;
@@ -238,7 +294,6 @@ public class EdicionServlet extends HttpServlet {
         return;
     }
 
-
     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
   }
 
@@ -338,45 +393,5 @@ public class EdicionServlet extends HttpServlet {
     if (ctype.contains("gif"))  return ".gif";
     if (ctype.contains("webp")) return ".webp";
     return null;
-  }
-
-  private String resolveImagenUrlEdicion(HttpServletRequest req, String raw) {
-    // Replace previous hardcoded-localhost behavior with request-based absolute URL building
-    if (raw == null || raw.isBlank()) return null;
-    raw = raw.replace('\\', '/').trim();
-
-    // If already absolute URL, keep it
-    if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
-
-    String scheme = req.getScheme(); // http or https
-    String hostHeader = req.getHeader("Host");
-    String hostPart;
-    if (hostHeader != null && !hostHeader.isBlank()) {
-      hostPart = hostHeader; // may include port
-    } else {
-      int port = req.getServerPort();
-      String portPart = "";
-      if (!(("http".equalsIgnoreCase(scheme) && port == 80) || ("https".equalsIgnoreCase(scheme) && port == 443))) {
-        portPart = ":" + port;
-      }
-      hostPart = req.getServerName() + portPart;
-    }
-
-    String servidorCtx = "/ServidorCentral-0.0.1-SNAPSHOT";
-
-    // If raw already contains a leading slash, treat as absolute path on the host
-    if (raw.startsWith("/")) {
-      return scheme + "://" + hostPart + raw;
-    }
-
-    // Accept common raw forms (eventual prefixes) and normalize
-    String low = raw.toLowerCase();
-    if (low.startsWith("images/") || low.startsWith("img/") || low.startsWith("ediciones/")) {
-      // ensure we produce: http(s)://host/ServidorCentral-.../<raw>
-      return scheme + "://" + hostPart + servidorCtx + "/" + raw;
-    }
-
-    // default: filename only -> place under images/ediciones/
-    return scheme + "://" + hostPart + servidorCtx + "/images/ediciones/" + raw;
   }
 }

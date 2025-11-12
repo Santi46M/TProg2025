@@ -77,10 +77,10 @@ public class ConsultaUsuarioServlet extends HttpServlet {
 
         if (forzarListado || isBlank(nick)) {
             List<DtDatosUsuario> usuarios = new ArrayList<>();
+            Map<String, String> usuariosImagenUrlMap = new HashMap<>();
             try {
                 DtDatosUsuarioArray arr = port.obtenerUsuariosDT();
                 usuarios = asList(arr);
-
                 String nickSesion = nickEnSesion(request);
                 Map<String, Boolean> yaLoSigoMap = new HashMap<>();
                 if (nickSesion != null && !nickSesion.isBlank()) {
@@ -89,14 +89,24 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                         String objetivo = u.getNickname();
                         if (nickSesion.equalsIgnoreCase(objetivo)) {
                             yaLoSigoMap.put(objetivo, false);
-                            continue;
+                        } else {
+                            try {
+                                boolean sigue = port.sigueA(nickSesion, objetivo);
+                                yaLoSigoMap.put(objetivo, sigue);
+                            } catch (Exception ignore) {
+                                yaLoSigoMap.put(objetivo, false);
+                            }
                         }
-                        try {
-                            boolean sigue = port.sigueA(nickSesion, objetivo);
-                            yaLoSigoMap.put(objetivo, sigue);
-                        } catch (Exception ignore) {
-                            yaLoSigoMap.put(objetivo, false);
-                        }
+                        // Construir la URL de imagen para cada usuario
+                        String imgUrl = buildUsuarioImageUrl(request, u.getImagen());
+                        usuariosImagenUrlMap.put(objetivo, imgUrl);
+                    }
+                } else {
+                    for (DtDatosUsuario u : usuarios) {
+                        if (u == null || u.getNickname() == null) continue;
+                        String objetivo = u.getNickname();
+                        String imgUrl = buildUsuarioImageUrl(request, u.getImagen());
+                        usuariosImagenUrlMap.put(objetivo, imgUrl);
                     }
                 }
                 request.setAttribute("yaLoSigoMap", yaLoSigoMap);
@@ -104,12 +114,13 @@ public class ConsultaUsuarioServlet extends HttpServlet {
                 request.setAttribute("error", "No se pudo obtener la lista de usuarios.");
             }
             request.setAttribute("usuarios", usuarios);
+            request.setAttribute("usuariosImagenUrlMap", usuariosImagenUrlMap);
 
         } else {
             try {
                 DtDatosUsuario usuario = port.obtenerDatosUsuario(nick);
                 String ctx = request.getContextPath();
-                String imagenUrl = "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/usuarios/" + usuario.getImagen();
+                String imagenUrl = buildUsuarioImageUrl(request, usuario.getImagen());
                 request.setAttribute("usrImagenUrl", imagenUrl);
                 request.setAttribute("usuario", usuario);
 
@@ -354,5 +365,60 @@ public class ConsultaUsuarioServlet extends HttpServlet {
     private static String escapeJson(String s) {
         if (s == null) return "";
         return s.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
+    private String buildBaseImageUrl(HttpServletRequest req) {
+        String context = "/ServidorCentral-0.0.1-SNAPSHOT";
+        String scheme = req.getScheme();
+        String hostHeader = req.getHeader("Host");
+        String baseUrl = null;
+        try {
+            Path propsPath = Path.of(System.getProperty("user.home"), ".eventosUy", ".properties");
+            java.util.Properties props = new java.util.Properties();
+            props.load(Files.newInputStream(propsPath));
+            String ip = props.getProperty("servidor.ip", "localhost");
+            String puerto = props.getProperty("servidor.puerto", "8080");
+            String hostPart;
+            if ("localhost".equals(ip) || "127.0.0.1".equals(ip)) {
+                if (hostHeader != null && !hostHeader.isBlank()) {
+                    hostPart = hostHeader;
+                } else {
+                    int reqPort = req.getServerPort();
+                    String portPart = "";
+                    if (!("http".equalsIgnoreCase(scheme) && reqPort == 80) || ("https".equalsIgnoreCase(scheme) && reqPort == 443)) {
+                        portPart = ":" + reqPort;
+                    }
+                    hostPart = req.getServerName() + portPart;
+                }
+            } else {
+                hostPart = ip;
+                if (puerto != null && !puerto.isBlank()) hostPart += ":" + puerto;
+            }
+            baseUrl = scheme + "://" + hostPart + context + "/images/";
+        } catch (IOException e) {
+            String effectiveHost;
+            String hostHeaderFallback = req.getHeader("Host");
+            if (hostHeaderFallback != null && !hostHeaderFallback.isBlank()) {
+                effectiveHost = hostHeaderFallback;
+            } else {
+                int reqPort = req.getServerPort();
+                String portPart = "";
+                if (!("http".equalsIgnoreCase(scheme) && reqPort == 80) || ("https".equalsIgnoreCase(scheme) && reqPort == 443)) {
+                    portPart = ":" + reqPort;
+                }
+                effectiveHost = req.getServerName() + portPart;
+            }
+            baseUrl = scheme + "://" + effectiveHost + context + "/images/";
+        }
+        return baseUrl;
+    }
+
+    private String buildUsuarioImageUrl(HttpServletRequest req, String img) {
+        String baseUrl = buildBaseImageUrl(req);
+        String imgName = (img == null || img.isBlank()) ? null : img.trim();
+        if (imgName == null || imgName.isEmpty()) {
+            return baseUrl + "usuarios/usuario-default.svg";
+        }
+        return baseUrl + "usuarios/" + imgName;
     }
 }

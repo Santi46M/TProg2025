@@ -53,9 +53,6 @@
               <input type="hidden" name="nombre" value="<%= e.getNombre() %>">
               <button type="submit" class="btn">Ver más</button>
             </form>
-            <% if (check != null) { %>
-              <div class="debug">Image check: <%= check %></div>
-            <% } %>
           </article>
         <%
             }

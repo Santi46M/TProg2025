@@ -10,12 +10,14 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Properties;
 
 import publicadores.DtDatosUsuario;
 import publicadores.DtDatosUsuarioArray;
 import publicadores.StringArray;
 import publicadores.UsuarioNoExisteException_Exception;
 import publicadores.UsuarioYaExisteException_Exception;
+import util.ConfigLoader;
 
 
 
@@ -122,6 +124,13 @@ public class UsuarioServlet extends HttpServlet {
           edicionesRegistradas.add(ed);
         }
       }
+      
+      String ip = ConfigLoader.get("ipServidor");
+      String puerto = ConfigLoader.get("puerto");
+    
+    
+      req.setAttribute("ipServidor", ip);
+      req.setAttribute("puertoServidor", puerto);
       req.setAttribute("edicionesRegistradas", edicionesRegistradas);
       req.getRequestDispatcher("/WEB-INF/ediciones/ListarEdicionesUsuario.jsp").forward(req, resp);
       return;

@@ -9,6 +9,7 @@ import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
 import publicadores.*;
+import util.ConfigLoader;
 
 @WebServlet({"/inicio"})
 public class InicioServlet extends HttpServlet {
@@ -33,7 +34,7 @@ public class InicioServlet extends HttpServlet {
         String baseUrl = null;
 
         try {
-            Path propsPath = Path.of(System.getProperty("user.home"), ".trabajoUy", ".properties");
+            Path propsPath = Path.of(System.getProperty("user.home"), ".eventosUy", ".properties");
             Properties props = new Properties();
             props.load(Files.newInputStream(propsPath));
             String ip = props.getProperty("servidor.ip", "localhost");

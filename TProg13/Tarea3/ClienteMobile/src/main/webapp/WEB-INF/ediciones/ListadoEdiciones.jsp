@@ -3,6 +3,7 @@
 String ctx = request.getContextPath();
 String evento = (String) request.getAttribute("evento");
 List<DtEdicion> listaEdiciones = (List<DtEdicion>) request.getAttribute("listaEdiciones");
+String baseImgUrl = (String) request.getAttribute("edicionesBaseImgUrl");
 %>
 <link rel="stylesheet" href="<%=ctx%>/css/style.css">
 <link rel="stylesheet" href="<%=ctx%>/css/listado.css">
@@ -24,18 +25,16 @@ List<DtEdicion> listaEdiciones = (List<DtEdicion>) request.getAttribute("listaEd
              String sigla  = ed.getSigla();
              String ciudad = ed.getCiudad();
              String pais   = ed.getPais();
-             String img = ed.getImagen();
-             boolean hasImg = (img != null && !img.isBlank());
+             String img    = ed.getImagen();
+             String ip = (String) request.getAttribute("ipServidor");
+             String puerto = (String) request.getAttribute("puertoServidor");
+             String imgUrl = ("http://" + ip + ":8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/" + img);
         %>
-          <article class="card event-card list <%= hasImg ? "" : "no-cover" %>">
-            <% if (hasImg) { %>
-              <img class="event-cover"
-     				src="<%= (img != null && !img.isBlank()
-                		? "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/" + img
-                		: (ctx + "/img/evento-default.jpg")) %>"
-    					 alt="Imagen de <%=nombre%>"
-     			onerror="this.onerror=null;this.src='<%=ctx%>/img/evento-default.jpg';">
-            <% } %>
+          <article class="card event-card list">
+            <img class="event-cover"
+                 src="<%= imgUrl %>"
+                 alt="Imagen de <%=nombre%>"
+                 onerror="this.onerror=null;this.src='<%=ctx%>/img/ediciones/edicion-default.svg';">
             <h3 class="event-title"><%= nombre %></h3>
             <p class="event-sub"><%= (sigla==null||sigla.isBlank()) ? "—" : sigla %></p>
             <p class="event-desc">

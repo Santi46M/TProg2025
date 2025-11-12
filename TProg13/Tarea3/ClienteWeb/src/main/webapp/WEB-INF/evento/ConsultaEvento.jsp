@@ -25,15 +25,7 @@
   List<String> evCategorias = (ev != null && ev.getCategorias() != null)
       ? ev.getCategorias().getCategoria() : Collections.emptyList();
 
-  String baseUrl = "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/";
-  String img = (ev != null ? ev.getImagen() : null);
-  String evImagenUrl = (img != null && !img.isBlank())
-      ? (img.startsWith("IMG-EV") ? baseUrl + "eventos/" + img
-        : img.startsWith("IMG-ED") ? baseUrl + "ediciones/" + img
-        : img.startsWith("IMG-US") ? baseUrl + "usuarios/" + img
-        : baseUrl + "eventos/" + img)
-      : (baseUrl + "eventos/evento-default.svg");
-
+  String evImagenUrl = (String) request.getAttribute("evImagenUrl");
   boolean hasImgCandidate = (evImagenUrl != null && !evImagenUrl.isBlank());
 
   List<DtEdicion> ediciones = (List<DtEdicion>) request.getAttribute("evEdiciones");
@@ -97,7 +89,7 @@
                 src="<%= evImagenUrl %>"
                 alt="Imagen de <%= (evNombre != null ? evNombre : "Evento") %>"
                 onload="this.closest('.event-hero')?.classList.add('has-img');"
-                onerror="this.onerror=null;this.src='<%=baseUrl%>eventos/evento-default.svg';"
+                onerror="this.onerror=null;this.src='<%=ctx%>/img/eventos/evento-default.svg';"
               >
             </div>
           <% } %>

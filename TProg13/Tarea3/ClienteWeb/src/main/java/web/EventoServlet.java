@@ -44,6 +44,62 @@ public class EventoServlet extends HttpServlet {
         return service.getPublicadorEventoPort();
     }
 
+    
+    private String buildBaseImageUrl(HttpServletRequest req) {
+        String context = "/ServidorCentral-0.0.1-SNAPSHOT";
+        String scheme = req.getScheme();
+        String hostHeader = req.getHeader("Host");
+        String baseUrl = null;
+        try {
+            Path propsPath = Path.of(System.getProperty("user.home"), ".eventosUy", ".properties");
+            java.util.Properties props = new java.util.Properties();
+            props.load(Files.newInputStream(propsPath));
+            String ip = props.getProperty("servidor.ip", "localhost");
+            String puerto = props.getProperty("servidor.puerto", "8080");
+            String hostPart;
+            if ("localhost".equals(ip) || "127.0.0.1".equals(ip)) {
+                if (hostHeader != null && !hostHeader.isBlank()) {
+                    hostPart = hostHeader;
+                } else {
+                    int reqPort = req.getServerPort();
+                    String portPart = "";
+                    if (!(scheme.equalsIgnoreCase("http") && reqPort == 80) || (scheme.equalsIgnoreCase("https") && reqPort == 443)) {
+                        portPart = ":" + reqPort;
+                    }
+                    hostPart = req.getServerName() + portPart;
+                }
+            } else {
+                hostPart = ip;
+                if (puerto != null && !puerto.isBlank()) hostPart += ":" + puerto;
+            }
+            baseUrl = scheme + "://" + hostPart + context + "/images/";
+        } catch (IOException e) {
+            String effectiveHost;
+            String hostHeaderFallback = req.getHeader("Host");
+            if (hostHeaderFallback != null && !hostHeaderFallback.isBlank()) {
+                effectiveHost = hostHeaderFallback;
+            } else {
+                int reqPort = req.getServerPort();
+                String portPart = "";
+                if (!(scheme.equalsIgnoreCase("http") && reqPort == 80) || (scheme.equalsIgnoreCase("https") && reqPort == 443)) {
+                    portPart = ":" + reqPort;
+                }
+                effectiveHost = req.getServerName() + portPart;
+            }
+            baseUrl = scheme + "://" + effectiveHost + context + "/images/";
+        }
+        return baseUrl;
+    }
+
+    private String buildEventoImageUrl(HttpServletRequest req, DtEvento ev) {
+        String img = (ev == null || ev.getImagen() == null) ? null : ev.getImagen().trim();
+        String baseUrl = buildBaseImageUrl(req);
+        if (img == null || img.isEmpty()) {
+            return baseUrl + "eventos/evento-default.svg";
+        }
+        return baseUrl + "eventos/" + img;
+    }
+    
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
@@ -74,7 +130,7 @@ public class EventoServlet extends HttpServlet {
    
 
             // URL de imagen 
-            String evImagenUrl = resolveImagenUrl(req, ev);
+            String evImagenUrl = buildEventoImageUrl(req, ev);
             req.setAttribute("evImagenUrl", evImagenUrl);
 
             // EDICIONES 
