@@ -56,20 +56,20 @@ public class PublicadorUsuario {
         @WebParam(name = "descripcion") String descripcion,
         @WebParam(name = "link") String link,
         @WebParam(name = "apellido") String apellido,
-        @WebParam(name = "fechaNacimiento") XMLGregorianCalendar fechaNacimiento,
+        @WebParam(name = "fechaNacimientoISO") String fechaNacimientoISO, 
         @WebParam(name = "institucion") String institucion,
         @WebParam(name = "esOrganizador") boolean esOrganizador,
         @WebParam(name = "contrasena") String contrasena,
         @WebParam(name = "imagen") String imagen
     ) throws UsuarioYaExisteException {
-        LocalDate ld = null;
-        if (fechaNacimiento != null) {
-            int y = fechaNacimiento.getYear();
-            int m = fechaNacimiento.getMonth();
-            int d = fechaNacimiento.getDay();
-            ld = LocalDate.of(y, m, d);
+
+        java.time.LocalDate ld = null;
+        if (fechaNacimientoISO != null && !fechaNacimientoISO.isBlank()) {
+            ld = java.time.LocalDate.parse(fechaNacimientoISO); // "yyyy-MM-dd"
         }
-        icu.altaUsuario(nickname, nombre, correo, descripcion, link, apellido, ld, institucion, esOrganizador, contrasena, imagen);
+
+        icu.altaUsuario(nickname, nombre, correo, descripcion, link,
+                apellido, ld, institucion, esOrganizador, contrasena, imagen);
     }
 
     @WebMethod
@@ -110,16 +110,13 @@ public class PublicadorUsuario {
         @WebParam(name = "descripcion") String descripcion,
         @WebParam(name = "link") String link,
         @WebParam(name = "apellido") String apellido,
-        @WebParam(name = "fechaNacimiento") XMLGregorianCalendar fechaNacimiento,
+        @WebParam(name = "fechaNacimiento") String fechaNacimiento,
         @WebParam(name = "institucion") String institucion,
         @WebParam(name = "imagen") String imagen
     ) throws UsuarioNoExisteException, UsuarioTipoIncorrectoException {
         LocalDate ld = null;
-        if (fechaNacimiento != null) {
-            int y = fechaNacimiento.getYear();
-            int m = fechaNacimiento.getMonth();
-            int d = fechaNacimiento.getDay();
-            ld = LocalDate.of(y, m, d);
+        if (fechaNacimiento != null && !fechaNacimiento.isBlank()) {
+            ld = LocalDate.parse(fechaNacimiento);
         }
         icu.modificarDatosUsuario(nickname, nombre, descripcion, link, apellido, ld, institucion, imagen);
     }

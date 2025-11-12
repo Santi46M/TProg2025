@@ -143,18 +143,36 @@ public class PublicadorUsuarioFullTest {
 
     @Test
     void altaUsuario_convierteFechaNullYNoNull() {
-        IcuHandler h = new IcuHandler();
+    	IcuHandler h = new IcuHandler();
         PublicadorUsuario svc = newSvc(h);
 
+        // Organizador: fechaNacimiento = null  -> debe llegar null al handler
         assertDoesNotThrow(() ->
-                svc.altaUsuario("nick","Nom","mail@x","desc","link","ape", null,"Inst", true,"123","img.png")
+                svc.altaUsuario(
+                        "nick", "Nom", "mail@x",
+                        "desc", "link",
+                        "ape",
+                        /* fechaNacimiento */ null,   // <--- ahora String
+                        "Inst",
+                        true,                         // esOrganizador
+                        "123",
+                        "img.png")
         );
         assertNull(h.altaUsuarioFecha);
 
+        // Asistente: fechaNacimiento = "2004-09-11" -> debe parsearse a LocalDate(2004,9,11)
         assertDoesNotThrow(() ->
-                svc.altaUsuario("nick","Nom","mail@x","desc","link","ape", xgc(2004,9,11),"Inst", false,"123","img.png")
+                svc.altaUsuario(
+                        "nick", "Nom", "mail@x",
+                        "desc", "link",
+                        "ape",
+                        /* fechaNacimiento */ "2004-09-11", // <--- ahora String
+                        "Inst",
+                        false,                        // asistente
+                        "123",
+                        "img.png")
         );
-        assertEquals(LocalDate.of(2004,9,11), h.altaUsuarioFecha);
+        assertEquals(LocalDate.of(2004, 9, 11), h.altaUsuarioFecha);
     }
 
     @Test
@@ -162,15 +180,33 @@ public class PublicadorUsuarioFullTest {
         IcuHandler h = new IcuHandler();
         PublicadorUsuario svc = newSvc(h);
 
+        // fechaNacimiento = null -> handler recibe null
         assertDoesNotThrow(() ->
-                svc.modificarDatosUsuario("nick","Nom","desc","link","ape", null,"Inst","img")
+                svc.modificarDatosUsuario(
+                        "nick",
+                        "Nom",
+                        "desc",
+                        "link",
+                        "ape",
+                        /* fechaNacimiento */ null,   // <--- ahora String
+                        "Inst",
+                        "img")
         );
         assertNull(h.modificarFecha);
 
+        // fechaNacimiento = "1999-01-02" -> handler recibe LocalDate(1999,1,2)
         assertDoesNotThrow(() ->
-                svc.modificarDatosUsuario("nick","Nom","desc","link","ape", xgc(1999,1,2),"Inst","img")
+                svc.modificarDatosUsuario(
+                        "nick",
+                        "Nom",
+                        "desc",
+                        "link",
+                        "ape",
+                        /* fechaNacimiento */ "1999-01-02", // <--- ahora String
+                        "Inst",
+                        "img")
         );
-        assertEquals(LocalDate.of(1999,1,2), h.modificarFecha);
+        assertEquals(LocalDate.of(1999, 1, 2), h.modificarFecha);
     }
 
     @Test

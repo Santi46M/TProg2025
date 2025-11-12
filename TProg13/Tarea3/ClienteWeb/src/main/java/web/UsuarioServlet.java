@@ -75,202 +75,182 @@ public class UsuarioServlet extends HttpServlet {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp)
       throws ServletException, IOException {
 
-    if (!"/usuario/AltaUsuario".equals(req.getServletPath())) {
-      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
-      return;
-    }
+	  if (!"/usuario/AltaUsuario".equals(req.getServletPath())) {
+		  resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+		  return;
+		}
 
-    // *** Mantenemos EXACTAMENTE estas dos líneas también acá ***
-    publicadores.PublicadorUsuarioService service = new publicadores.PublicadorUsuarioService();
-    publicadores.PublicadorUsuario port = service.getPublicadorUsuarioPort();
+		publicadores.PublicadorUsuarioService service = new publicadores.PublicadorUsuarioService();
+		publicadores.PublicadorUsuario port = service.getPublicadorUsuarioPort();
 
-    // === manejo de imagen (opcional) ===
-    Part imagenPart = null;
-    try { imagenPart = req.getPart("imagen"); } catch (Exception ignore) {}
-    String nombreArchivo = null;
+		Part imagenPart = null;
+		try { imagenPart = req.getPart("imagen"); } catch (Exception ignore) {}
+		String nombreArchivo = null;
 
-    if (imagenPart != null && imagenPart.getSize() > 0) {
-        String ctype = imagenPart.getContentType();
-        if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
-            req.setAttribute("error", "El archivo subido no es una imagen válida.");
-            cargarInstituciones(req, port);
-            req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
-            return;
-        }
+		if (imagenPart != null && imagenPart.getSize() > 0) {
+		    String ctype = imagenPart.getContentType();
+		    if (ctype == null || !ctype.toLowerCase().startsWith("image/")) {
+		        req.setAttribute("error", "El archivo subido no es una imagen válida.");
+		        cargarInstituciones(req, port);
+		        req.getRequestDispatcher(JSP_ALTA).forward(req, resp);
+		        return;
+		    }
 
-        String tomcatBase = System.getProperty("catalina.base");
-        Path basePath = Path.of(tomcatBase, "webapps", "ServidorCentral-0.0.1-SNAPSHOT", "images", "usuarios");
-        Files.createDirectories(basePath);
+		    String tomcatBase = System.getProperty("catalina.base");
+		    Path basePath = Path.of(tomcatBase, "webapps", "ServidorCentral-0.0.1-SNAPSHOT", "images", "usuarios");
+		    Files.createDirectories(basePath);
 
-        String original = getSafeFilename(imagenPart);
-        String ext = getExtension(original);
-        if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
-        if (ext == null || ext.isBlank()) ext = ".jpg";
+		    String original = getSafeFilename(imagenPart);
+		    String ext = getExtension(original);
+		    if (ext == null || ext.isBlank()) ext = guessExtensionFromContentType(ctype);
+		    if (ext == null || ext.isBlank()) ext = ".jpg";
 
+		    String safeNick = req.getParameter("nick").replaceAll("[^a-zA-Z0-9_-]", "_");
+		    String finalName = safeNick + ext;
 
-        String safeNick = req.getParameter("nick").replaceAll("[^a-zA-Z0-9_-]", "_");
-        String finalName = safeNick + ext;
+		    Path destino = basePath.resolve(finalName);
+		    try (var in = imagenPart.getInputStream()) {
+		        Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+		    }
 
-        Path destino = basePath.resolve(finalName);
-        try (var in = imagenPart.getInputStream()) {
-            Files.copy(in, destino, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-        }
+		    nombreArchivo = finalName;
+		    System.out.println("✅ Imagen guardada en: " + destino.toAbsolutePath());
+		}
 
-        nombreArchivo = finalName;
-        System.out.println("✅ Imagen guardada en: " + destino.toAbsolutePath());
-    }
+		String rol          = req.getParameter("rol");
+		String nick         = req.getParameter("nick");
+		String nombre       = req.getParameter("nombreA");
+		String pass1        = req.getParameter("pass");
+		String pass2        = req.getParameter("pass2");
+		String organizacion = req.getParameter("nombreO");
+		String apellido     = req.getParameter("apellidoA");
+		String correo       = req.getParameter("email");
+		String descripcion  = req.getParameter("descO");
+		String link         = req.getParameter("webO");
+		String institucion  = req.getParameter("instIdA");
+		String nacStr       = req.getParameter("nacA");
 
-    // === leer params ===
-    String rol          = req.getParameter("rol");
-    String nick         = req.getParameter("nick");
-    String nombre       = req.getParameter("nombreA");
-    String pass1        = req.getParameter("pass");
-    String pass2        = req.getParameter("pass2");
-    String organizacion = req.getParameter("nombreO");
-    String apellido     = req.getParameter("apellidoA");
-    String correo       = req.getParameter("email");
-    String descripcion  = req.getParameter("descO");
-    String link         = req.getParameter("webO");
-    String institucion  = req.getParameter("instIdA");
-    String nacStr       = req.getParameter("nacA");
+		if (pass1 == null || pass2 == null || pass1.isBlank() || pass2.isBlank() || !pass1.equals(pass2)) {
+		  req.setAttribute("error", "Las contraseñas no coinciden o están vacías.");
+		  cargarInstituciones(req, port);
+		  forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+		  return;
+		}
+		if (nick == null || correo == null || rol == null || nick.isBlank() || correo.isBlank()) {
+		  req.setAttribute("error", "Faltan datos obligatorios.");
+		  cargarInstituciones(req, port);
+		  forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+		  return;
+		}
 
-    // validaciones básicas
-    if (pass1 == null || pass2 == null || pass1.isBlank() || pass2.isBlank() || !pass1.equals(pass2)) {
-      req.setAttribute("error", "Las contraseñas no coinciden o están vacías.");
-      cargarInstituciones(req, port);
-      forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-      return;
-    }
-    if (nick == null || correo == null || rol == null || nick.isBlank() || correo.isBlank()) {
-      req.setAttribute("error", "Faltan datos obligatorios.");
-      cargarInstituciones(req, port);
-      forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-      return;
-    }
+		LocalDate fechaNac = null;
+		boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rol);
 
-    // validación específica por rol
-    LocalDate fechaNac = null;
-    boolean esOrganizador = "ORGANIZADOR".equalsIgnoreCase(rol);
+		if (!esOrganizador) {
+		  if (nacStr == null || nacStr.isBlank()) {
+		    req.setAttribute("error", "Debe ingresar una fecha de nacimiento.");
+		    cargarInstituciones(req, port);
+		    forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+		    return;
+		  }
+		  try {
+		    fechaNac = LocalDate.parse(nacStr);
+		    if (fechaNac.isAfter(LocalDate.now())) throw new IllegalArgumentException();
+		  } catch (Exception e) {
+		    req.setAttribute("error", "Formato de fecha inválido o futura.");
+		    cargarInstituciones(req, port);
+		    forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+		    return;
+		  }
+		} else {
+		  if (organizacion == null || organizacion.isBlank() || descripcion == null || descripcion.isBlank()) {
+		    req.setAttribute("error", "Debe completar los campos obligatorios del organizador.");
+		    cargarInstituciones(req, port);
+		    forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+		    return;
+		  }
+		}
 
-    if (!esOrganizador) {
-      if (nacStr == null || nacStr.isBlank()) {
-        req.setAttribute("error", "Debe ingresar una fecha de nacimiento.");
-        cargarInstituciones(req, port);
-        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-        return;
-      }
-      try {
-        fechaNac = LocalDate.parse(nacStr);
-        if (fechaNac.isAfter(LocalDate.now())) throw new IllegalArgumentException();
-      } catch (Exception e) {
-        req.setAttribute("error", "Formato de fecha inválido o futura.");
-        cargarInstituciones(req, port);
-        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-        return;
-      }
-    } else {
-      if (organizacion == null || organizacion.isBlank() || descripcion == null || descripcion.isBlank()) {
-        req.setAttribute("error", "Debe completar los campos obligatorios del organizador.");
-        cargarInstituciones(req, port);
-        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-        return;
-      }
-    }
+		String nombreFinal = esOrganizador ? organizacion : nombre;
 
-    String nombreFinal = esOrganizador ? organizacion : nombre;
+		try {
+		  if (existeNickDT(nick, port)) {
+		    req.setAttribute("error","El nick ya existe.");
+		    cargarInstituciones(req, port);
+		    forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+		    return;
+		  }
+		  if (existeEmailDT(correo, port)) {
+		    req.setAttribute("error","El email ya existe.");
+		    cargarInstituciones(req, port);
+		    forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+		    return;
+		  }
 
-    try {
-      // Chequeos de unicidad vía servicio
-      if (existeNickDT(nick, port)) {
-        req.setAttribute("error","El nick ya existe.");
-        cargarInstituciones(req, port);
-        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-        return;
-      }
-      if (existeEmailDT(correo, port)) {
-        req.setAttribute("error","El email ya existe.");
-        cargarInstituciones(req, port);
-        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-        return;
-      }
+		  java.util.function.Function<String,String> sendNonNull = s -> (s == null) ? "" : s.trim();
 
-      // Alta por publicador
-      // Ensure we never pass nulls to the SOAP client: use empty strings and a LocalDate instance.
-      // Use the generated publicadores.LocalDate wrapper (we patched it to carry an ISO date string).
-      // Send null when there's no date (organizer case) and send an ISO string when fechaNac is present.
+		  String svcNombre = sendNonNull.apply(nombreFinal);
+		  String svcCorreo = sendNonNull.apply(correo);
+		  String svcDescripcion = sendNonNull.apply(descripcion);
+		  String svcLink = sendNonNull.apply(link);
+		  String svcApellido = sendNonNull.apply(apellido);
+		  String svcInstitucion = sendNonNull.apply(institucion);
+		  String svcImagen = (nombreArchivo == null) ? "" : nombreArchivo;
 
-      
+		  if (esOrganizador) {
+		    svcApellido = "";
+		  } else {
+		    svcDescripcion = "";
+		    svcLink = "";
+		  }
 
-      // helper to send non-null trimmed strings
-      java.util.function.Function<String,String> sendNonNull = s -> (s == null) ? "" : s.trim();
+		  String fechaStr = esOrganizador ? "" : (fechaNac != null ? fechaNac.toString() : "");
 
-      String svcNombre = sendNonNull.apply(nombreFinal);
-      String svcCorreo = sendNonNull.apply(correo);
-      String svcDescripcion = sendNonNull.apply(descripcion);
-      String svcLink = sendNonNull.apply(link);
-      String svcApellido = sendNonNull.apply(apellido);
-      String svcInstitucion = sendNonNull.apply(institucion);
-      String svcImagen = (nombreArchivo == null) ? "" : nombreArchivo;
+		  System.out.println("DEBUG altaUsuario params: nickname='" + nick + "', nombre='" + svcNombre + "', correo='" + svcCorreo + "', descripcion='" + svcDescripcion + "', link='" + svcLink + "', apellido='" + svcApellido + "', fechaNacimiento='" + fechaStr + "', institucion='" + svcInstitucion + "', esOrganizador='" + esOrganizador + "', imagen='" + svcImagen + "'");
 
-      // For role-specific unused fields, send empty string (do NOT send null)
-      if (esOrganizador) {
-        // organizador: assistant-specific fields should be empty
-        svcApellido = "";
-        // fecha not used by organizer but keep a non-null object
-      } else {
-        // asistente: organizer-specific fields should be empty
-        svcDescripcion = "";
-        svcLink = "";
-      }
-      String fechaStr = (fechaNac != null) ? fechaNac.toString() : null;
-      // Debug: print sanitized parameters to confirm none are null
-      System.out.println("DEBUG altaUsuario params: nickname='" + nick + "', nombre='" + svcNombre + "', correo='" + svcCorreo + "', descripcion='" + svcDescripcion + "', link='" + svcLink + "', apellido='" + svcApellido + "', fechaNacimiento='" + fechaStr + "', institucion='" + svcInstitucion + "', esOrganizador='" + esOrganizador + "', imagen='" + svcImagen + "'");
+		  port.altaUsuario(
+		      nick,
+		      svcNombre,
+		      svcCorreo,
+		      svcDescripcion,
+		      svcLink,
+		      svcApellido,
+		      fechaStr,
+		      svcInstitucion,
+		      esOrganizador,
+		      pass1,
+		      svcImagen
+		  );
 
-      port.altaUsuario(
-          nick,
-          svcNombre,
-          svcCorreo,
-          svcDescripcion,
-          svcLink,
-          svcApellido,
-          fechaStr,
-          svcInstitucion,
-          esOrganizador,
-          pass1,
-          svcImagen
-      );
+		  HttpSession sAux = req.getSession(true);
+		  DtDatosUsuario usuarioLogueado;
+		  try {
+		    usuarioLogueado = port.obtenerDatosUsuario(nick);
+		  } catch (UsuarioNoExisteException_Exception e) {
+		    req.setAttribute("error", "No se pudo encontrar el usuario recién creado.");
+		    cargarInstituciones(req, port);
+		    forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+		    return;
+		  }
+		  sAux.setAttribute("usuario_logueado", usuarioLogueado);
+		  sAux.setAttribute("nick", nick);
+		  sAux.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
+		  sAux.setAttribute("estado_sesion", "LOGIN_CORRECTO");
 
-      // login directo post-alta
-      HttpSession sAux = req.getSession(true);
-      DtDatosUsuario usuarioLogueado;
-      try {
-        usuarioLogueado = port.obtenerDatosUsuario(nick);
-      } catch (UsuarioNoExisteException_Exception e) {
-    	    req.setAttribute("error", "No se pudo encontrar el usuario recién creado.");
-    	    cargarInstituciones(req, port);
-    	    forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-    	    return;
-    	}
-      sAux.setAttribute("usuario_logueado", usuarioLogueado);
-      sAux.setAttribute("nick", nick);
-      sAux.setAttribute("rol", esOrganizador ? "ORGANIZADOR" : "ASISTENTE");
-      sAux.setAttribute("estado_sesion", "LOGIN_CORRECTO");
+		  Enumeration<String> names = sAux.getAttributeNames();
+		  while (names.hasMoreElements()) {
+		    String nAux = names.nextElement();
+		    Object vAux = sAux.getAttribute(nAux);
+		    System.out.println("   * " + nAux + " = " + vAux);
+		  }
 
-      // debug (opcional)
-      Enumeration<String> names = sAux.getAttributeNames();
-      while (names.hasMoreElements()) {
-        String nAux = names.nextElement();
-        Object vAux = sAux.getAttribute(nAux);
-        System.out.println("   * " + nAux + " = " + vAux);
-      }
+		  resp.sendRedirect(ctx(req) + "/inicio");
 
-      resp.sendRedirect(ctx(req) + "/inicio");
-
-    } catch (UsuarioYaExisteException_Exception e) {
-        req.setAttribute("error", e.getMessage());
-        cargarInstituciones(req, port);
-        forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
-    }
+		} catch (UsuarioYaExisteException_Exception e) {
+		    req.setAttribute("error", e.getMessage());
+		    cargarInstituciones(req, port);
+		    forwardConDatos(req, resp, rol, nick, nombre, apellido, correo, descripcion, link, institucion, nacStr);
+		}
   }
 
   private void forwardConDatos(HttpServletRequest req, HttpServletResponse resp,
