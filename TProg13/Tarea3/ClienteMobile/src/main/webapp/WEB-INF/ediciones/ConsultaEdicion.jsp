@@ -104,13 +104,20 @@
           <h1 class="event-title"><%= (edicion != null ? edicion.getNombre() : "Edición") %></h1>
         </div>
 
-<% if (hasAnyImg) { %>
-  <div class="img-frame">
-    <img src="<%= "http://localhost:8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/" + edicion.getImagen() %>"
-         alt="Imagen de la edición <%= (edicion != null ? edicion.getNombre() : "") %>"
-         onerror="this.onerror=null;this.src='<%=ctx%>/img/evento-default.jpg';">
-  </div>
-<% } %>
+	<% String imagen = (edicion != null && edicion.getImagen() != null) ? edicion.getImagen() : ""; %>
+	<% String ip = (String) request.getAttribute("ipServidor"); %>
+	<% String puerto = (String) request.getAttribute("puertoServidor"); %>
+	<% String urlCompleta = "http://" + ip + ":8080/ServidorCentral-0.0.1-SNAPSHOT/images/ediciones/" + imagen; %>
+	<% if (hasAnyImg && imagen != null && !imagen.isBlank()) { %>
+	  <div class="img-frame">
+	    <img src="<%= urlCompleta %>"
+	         alt="Imagen de la edición <%= (edicion != null ? edicion.getNombre() : "") %>"
+	         onerror="this.onerror=null;this.src='<%=ctx%>/img/evento-default.jpg';">
+	    <div style="margin-top:8px;font-size:0.95em;color:#555;text-align:center;">
+	      URL: <span style="word-break:break-all;"><%= urlCompleta %></span>
+	    </div>
+	  </div>
+	<% } %>
 
         <% if (hasVideo) { %>
           <div class="img-frame video-frame" style="margin: 0.5rem auto 1rem;">
@@ -132,6 +139,7 @@
             <div class="event-meta"><strong>Estado:</strong> <%= (edicion.getEstado() != null ? edicion.getEstado() : "—") %></div>
             <div class="event-meta"><strong>Organizador:</strong> <%= (organizador != null && !organizador.isBlank()) ? organizador : "No disponible" %></div>
             <div class="event-meta"><strong>Tipos de Registro:</strong>
+            
               <% if (tiposRegistro != null && !tiposRegistro.isEmpty()) { %>
                 <ul>
                   <% for (DtTipoRegistro tr : tiposRegistro) { %>

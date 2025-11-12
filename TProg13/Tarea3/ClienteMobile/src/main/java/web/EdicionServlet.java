@@ -14,12 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Properties;
+import util.ConfigLoader;
 
 import publicadores.DtEdicion;
 import publicadores.DtEvento;
 import publicadores.DtRegistro;
 import publicadores.DtDatosUsuario;
 import publicadores.StringArray;
+
 
 @WebServlet("/edicion/*")
 @MultipartConfig
@@ -70,14 +72,12 @@ public class EdicionServlet extends HttpServlet {
       }
 
       
-      Path propsPath = Path.of(System.getProperty("user.home"), ".eventosUy", ".properties");
-      Properties props = new Properties();
-      props.load(Files.newInputStream(propsPath));
-      String ip = props.getProperty("servidor.ip", "localhost");
-      String puerto = props.getProperty("servidor.puerto", "8080");
-
-      req.setAttribute("edicionesIp", ip);
-      req.setAttribute("edicionesPuerto", puerto);
+	    String ip = ConfigLoader.get("ipServidor");
+   	    String puerto = ConfigLoader.get("puerto");
+        
+   	    
+   	    req.setAttribute("ipServidor", ip);
+   	    req.setAttribute("puertoServidor", puerto);
       
       req.setAttribute("edicion", edicionObj);
       req.setAttribute("organizador", edicionObj.getOrganizador());
