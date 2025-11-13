@@ -236,7 +236,7 @@ public class RegistroEdicionEventoServlet extends HttpServlet {
             LocalDate fechaRegistro = LocalDate.now();
 
             String fechaRegistroStr = fechaRegistro.toString();
-            String fechaInicioStr   = fechaRegistroStr;
+            String fechaInicioStr = edSel.getFechaInicio();
 
             port.altaRegistroEdicionEventoDT(
                 idRegistro,                         
