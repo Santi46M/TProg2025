@@ -1308,18 +1308,17 @@ public class ControladorEvento implements IControladorEvento {
 
 	            // merge por si edOO era existente
 	            em.merge(edOO);
+	            
+	            manejador.eliminarEdicionDeMemoria(ed);
 	            System.out.println("[ARCHIV][TX] OK edOO " + (createdEd ? "creada" : "actualizada")
 	                    + " | registros nuevos=" + creadosReg + " | ya existentes=" + yaExistReg);
 	            System.out.println("[ARCHIV][TX] COMMIT");
 	            return null;
 	        });
-	        
-	        
 
 	        System.out.println("[ARCHIV][OUT] DONE ed='" + edNombreLog + "'");
-	        ManejadorEvento me = ManejadorEvento.getInstancia();
-	        me.eliminarEdicionDeMemoria(ed);
-	        System.out.println("[ARCHIV][MEM] edición removida de la lógica");
+	        
+	        
 	        
 	    } catch (RuntimeException ex) {
 	        System.out.println("[ARCHIV][ERR] " + ex.getClass().getName() + " | " + String.valueOf(ex.getMessage()));
@@ -1332,8 +1331,6 @@ public class ControladorEvento implements IControladorEvento {
 	        throw ex; // re-lanzo para que el WS devuelva 500 y podamos ver el stack
 	    }
 	}
-	
-	
 	public List<DTArchEdicion> edicionesArchivadasOrganizadas(String nickOrg) {
 		  EntityManager em = EntityManagerUtil.em();
 		  try {
