@@ -134,7 +134,8 @@
         <p>No hay ediciones asociadas a este evento.</p>
       <% } else { %>
         <ul class="ediciones-list li">
-        <% for (DtEdicion ed : ediciones) { %>
+        <% for (DtEdicion ed : ediciones) { 
+        	if (ed.getEstado().toString() == "ACEPTADA"){%>
           <li>
             <div>
               <strong><%= ed.getNombre() %></strong>
@@ -146,7 +147,7 @@
               <button type="submit" class="btn btn-ver-detalles">Ver detalles</button>
             </form>
           </li>
-        <% } %>
+        <% }} %>
         </ul>
       <% } %>
     </aside>

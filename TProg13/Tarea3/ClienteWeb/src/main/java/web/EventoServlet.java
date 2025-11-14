@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.lang.reflect.Method;
+import publicadores.DTEstado;
 
 import publicadores.PublicadorEventoService;
 import publicadores.PublicadorEvento;
@@ -155,7 +156,10 @@ public class EventoServlet extends HttpServlet {
 
                 // filtrado por estado aceptado 
                 if (dtEd != null && esAceptada(dtEd.getEstado())) {
-                    ediciones.add(dtEd);
+                	
+                	System.out.println("edicion agregada  "+ dtEd.getNombre() + "y su estado es " + dtEd.getEstado().toString());
+                	if (dtEd.getEstado().toString() != "ACEPTADA" || dtEd.getEstado() == DTEstado.ACEPTADA )  {
+                    ediciones.add(dtEd);}
                 }
             }
             req.setAttribute("evEdiciones", ediciones);
