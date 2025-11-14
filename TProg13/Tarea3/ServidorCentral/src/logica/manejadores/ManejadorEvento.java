@@ -120,6 +120,24 @@ public class ManejadorEvento {
         return registros;
     }
     
+    
+    public void eliminarEdicionDeMemoria(Ediciones ed) {
+        if (ed == null) return;
+
+        // 1) Quitar del mapa global de ediciones (sigla -> Ediciones)
+        if (ed.getSigla() != null) {
+            ediciones.remove(ed.getSigla());
+        }
+
+        // 2) Quitar del evento dueño (mapa nombreEdicion -> Ediciones)
+        Eventos ev = ed.getEvento();
+        if (ev != null && ev.getEdiciones() != null) {
+            ev.getEdiciones().remove(ed.getNombre());
+        }
+
+        
+    }
+    
     private static void doReset() {
         if (instancia != null) {
             // Limpia TODAS tus colecciones internas
